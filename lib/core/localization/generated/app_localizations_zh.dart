@@ -391,21 +391,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get panelSettings_feishu => '飞书';
 
   @override
-  String get panelSettings_emailTodo => '邮件配置功能即将上线';
-
-  @override
-  String get panelSettings_weComTodo => '企业微信配置功能即将上线';
-
-  @override
-  String get panelSettings_dingTalkTodo => '钉钉配置功能即将上线';
-
-  @override
-  String get panelSettings_feishuTodo => '飞书配置功能即将上线';
-
-  @override
-  String get panelSettings_barkTodo => 'Bark 配置功能即将上线';
-
-  @override
   String get panelSettings_type => '类型';
 
   @override
@@ -1657,9 +1642,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get toolbox_title => '工具箱';
 
   @override
-  String get toolbox_quickSettings => '快速设置';
-
-  @override
   String get toolbox_hostname => '主机名';
 
   @override
@@ -1673,18 +1655,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get toolbox_cacheClean => '缓存清理';
-
-  @override
-  String get toolbox_cleanSource => '来源';
-
-  @override
-  String get toolbox_cleanSourceValue => '1Panel 工具箱扫描接口';
-
-  @override
-  String get toolbox_cleanAction => '执行';
-
-  @override
-  String get toolbox_cleanActionValue => '扫描可清理项目，不直接删除';
 
   @override
   String get toolbox_scan => '扫描';
@@ -1760,9 +1730,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_groupName => '分组名称';
-
-  @override
-  String get websites_groupDefault => '默认分组';
 
   @override
   String get websites_groupSetDefault => '设为默认';
@@ -1848,4 +1815,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dashboard_collecting => '正在采集…';
+
+  @override
+  String get toolbox_device_info => '设备信息';
+
+  @override
+  String get toolbox_actions => '可执行操作';
+
+  @override
+  String get toolbox_readOnlyHint => '以下信息来自面板，修改请到 1Panel 网页';
 }

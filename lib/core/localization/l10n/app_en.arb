@@ -546,26 +546,6 @@
   "@panelSettings_feishu": {
     "description": "Feishu notification setting title."
   },
-  "panelSettings_emailTodo": "Email configuration is coming soon",
-  "@panelSettings_emailTodo": {
-    "description": "Todo toast for email notification configuration."
-  },
-  "panelSettings_weComTodo": "WeCom configuration is coming soon",
-  "@panelSettings_weComTodo": {
-    "description": "Todo toast for WeCom notification configuration."
-  },
-  "panelSettings_dingTalkTodo": "DingTalk configuration is coming soon",
-  "@panelSettings_dingTalkTodo": {
-    "description": "Todo toast for DingTalk notification configuration."
-  },
-  "panelSettings_feishuTodo": "Feishu configuration is coming soon",
-  "@panelSettings_feishuTodo": {
-    "description": "Todo toast for Feishu notification configuration."
-  },
-  "panelSettings_barkTodo": "Bark configuration is coming soon",
-  "@panelSettings_barkTodo": {
-    "description": "Todo toast for Bark notification configuration."
-  },
   "panelSettings_type": "Type",
   "@panelSettings_type": {
     "description": "Backup account type field label."
@@ -2159,16 +2139,11 @@
   "supervisor_deleteSubtitle": "Delete this process config and update Supervisor",
   "supervisor_workDir": "Working Directory",
   "toolbox_title": "Toolbox",
-  "toolbox_quickSettings": "Quick Settings",
   "toolbox_hostname": "Hostname",
   "toolbox_systemUser": "System User",
   "toolbox_timeZone": "Time Zone",
   "toolbox_localTime": "Local Time",
   "toolbox_cacheClean": "Cache Cleanup",
-  "toolbox_cleanSource": "Source",
-  "toolbox_cleanSourceValue": "1Panel toolbox scan API",
-  "toolbox_cleanAction": "Action",
-  "toolbox_cleanActionValue": "Scan cleanable items without deleting them",
   "toolbox_scan": "Scan",
   "toolbox_scanFailed": "Scan failed",
   "toolbox_installed": "Installed",
@@ -2194,7 +2169,6 @@
   "common_edit": "Edit",
   "websites_groupManagement": "Group Management",
   "websites_groupName": "Group Name",
-  "websites_groupDefault": "Default Group",
   "websites_groupSetDefault": "Set as Default",
   "websites_groupDeleteConfirm": "Delete group \"{name}\"? Sites in it will fall back to the default group.",
   "websites_groupEmpty": "No groups",
@@ -2353,9 +2327,6 @@
   "@toolbox_title": {
     "description": "Text for toolbox_title."
   },
-  "@toolbox_quickSettings": {
-    "description": "Text for toolbox_quickSettings."
-  },
   "@toolbox_hostname": {
     "description": "Text for toolbox_hostname."
   },
@@ -2370,18 +2341,6 @@
   },
   "@toolbox_cacheClean": {
     "description": "Text for toolbox_cacheClean."
-  },
-  "@toolbox_cleanSource": {
-    "description": "Text for toolbox_cleanSource."
-  },
-  "@toolbox_cleanSourceValue": {
-    "description": "Text for toolbox_cleanSourceValue."
-  },
-  "@toolbox_cleanAction": {
-    "description": "Text for toolbox_cleanAction."
-  },
-  "@toolbox_cleanActionValue": {
-    "description": "Text for toolbox_cleanActionValue."
   },
   "@toolbox_scan": {
     "description": "Text for toolbox_scan."
@@ -2457,9 +2416,6 @@
   },
   "@websites_groupName": {
     "description": "Text for websites_groupName."
-  },
-  "@websites_groupDefault": {
-    "description": "Text for websites_groupDefault."
   },
   "@websites_groupSetDefault": {
     "description": "Text for websites_groupSetDefault."
@@ -2574,5 +2530,17 @@
   "dashboard_collecting": "Collecting…",
   "@dashboard_collecting": {
     "description": "Placeholder shown while the network chart has fewer than three samples."
+  },
+  "toolbox_device_info": "Device information",
+  "@toolbox_device_info": {
+    "description": "Toolbox section containing read-only host details."
+  },
+  "toolbox_actions": "Actions",
+  "@toolbox_actions": {
+    "description": "Toolbox section containing operations the app can trigger."
+  },
+  "toolbox_readOnlyHint": "Read-only data from the panel. Edit it in the 1Panel web UI.",
+  "@toolbox_readOnlyHint": {
+    "description": "Footer explaining that toolbox information is read-only."
   }
 }

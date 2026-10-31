@@ -812,36 +812,6 @@ abstract class AppLocalizations {
   /// **'Feishu'**
   String get panelSettings_feishu;
 
-  /// Todo toast for email notification configuration.
-  ///
-  /// In en, this message translates to:
-  /// **'Email configuration is coming soon'**
-  String get panelSettings_emailTodo;
-
-  /// Todo toast for WeCom notification configuration.
-  ///
-  /// In en, this message translates to:
-  /// **'WeCom configuration is coming soon'**
-  String get panelSettings_weComTodo;
-
-  /// Todo toast for DingTalk notification configuration.
-  ///
-  /// In en, this message translates to:
-  /// **'DingTalk configuration is coming soon'**
-  String get panelSettings_dingTalkTodo;
-
-  /// Todo toast for Feishu notification configuration.
-  ///
-  /// In en, this message translates to:
-  /// **'Feishu configuration is coming soon'**
-  String get panelSettings_feishuTodo;
-
-  /// Todo toast for Bark notification configuration.
-  ///
-  /// In en, this message translates to:
-  /// **'Bark configuration is coming soon'**
-  String get panelSettings_barkTodo;
-
   /// Backup account type field label.
   ///
   /// In en, this message translates to:
@@ -3218,12 +3188,6 @@ abstract class AppLocalizations {
   /// **'Toolbox'**
   String get toolbox_title;
 
-  /// Text for toolbox_quickSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick Settings'**
-  String get toolbox_quickSettings;
-
   /// Text for toolbox_hostname.
   ///
   /// In en, this message translates to:
@@ -3253,30 +3217,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cache Cleanup'**
   String get toolbox_cacheClean;
-
-  /// Text for toolbox_cleanSource.
-  ///
-  /// In en, this message translates to:
-  /// **'Source'**
-  String get toolbox_cleanSource;
-
-  /// Text for toolbox_cleanSourceValue.
-  ///
-  /// In en, this message translates to:
-  /// **'1Panel toolbox scan API'**
-  String get toolbox_cleanSourceValue;
-
-  /// Text for toolbox_cleanAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Action'**
-  String get toolbox_cleanAction;
-
-  /// Text for toolbox_cleanActionValue.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan cleanable items without deleting them'**
-  String get toolbox_cleanActionValue;
 
   /// Text for toolbox_scan.
   ///
@@ -3427,12 +3367,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Group Name'**
   String get websites_groupName;
-
-  /// Text for websites_groupDefault.
-  ///
-  /// In en, this message translates to:
-  /// **'Default Group'**
-  String get websites_groupDefault;
 
   /// Text for websites_groupSetDefault.
   ///
@@ -3595,6 +3529,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Collecting…'**
   String get dashboard_collecting;
+
+  /// Toolbox section containing read-only host details.
+  ///
+  /// In en, this message translates to:
+  /// **'Device information'**
+  String get toolbox_device_info;
+
+  /// Toolbox section containing operations the app can trigger.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get toolbox_actions;
+
+  /// Footer explaining that toolbox information is read-only.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only data from the panel. Edit it in the 1Panel web UI.'**
+  String get toolbox_readOnlyHint;
 }
 
 class _AppLocalizationsDelegate

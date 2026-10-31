@@ -397,22 +397,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get panelSettings_feishu => 'Feishu';
 
   @override
-  String get panelSettings_emailTodo => 'Email configuration is coming soon';
-
-  @override
-  String get panelSettings_weComTodo => 'WeCom configuration is coming soon';
-
-  @override
-  String get panelSettings_dingTalkTodo =>
-      'DingTalk configuration is coming soon';
-
-  @override
-  String get panelSettings_feishuTodo => 'Feishu configuration is coming soon';
-
-  @override
-  String get panelSettings_barkTodo => 'Bark configuration is coming soon';
-
-  @override
   String get panelSettings_type => 'Type';
 
   @override
@@ -1704,9 +1688,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toolbox_title => 'Toolbox';
 
   @override
-  String get toolbox_quickSettings => 'Quick Settings';
-
-  @override
   String get toolbox_hostname => 'Hostname';
 
   @override
@@ -1720,19 +1701,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get toolbox_cacheClean => 'Cache Cleanup';
-
-  @override
-  String get toolbox_cleanSource => 'Source';
-
-  @override
-  String get toolbox_cleanSourceValue => '1Panel toolbox scan API';
-
-  @override
-  String get toolbox_cleanAction => 'Action';
-
-  @override
-  String get toolbox_cleanActionValue =>
-      'Scan cleanable items without deleting them';
 
   @override
   String get toolbox_scan => 'Scan';
@@ -1808,9 +1776,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_groupName => 'Group Name';
-
-  @override
-  String get websites_groupDefault => 'Default Group';
 
   @override
   String get websites_groupSetDefault => 'Set as Default';
@@ -1897,4 +1862,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboard_collecting => 'Collecting…';
+
+  @override
+  String get toolbox_device_info => 'Device information';
+
+  @override
+  String get toolbox_actions => 'Actions';
+
+  @override
+  String get toolbox_readOnlyHint =>
+      'Read-only data from the panel. Edit it in the 1Panel web UI.';
 }

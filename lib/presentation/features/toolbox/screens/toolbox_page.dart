@@ -82,7 +82,7 @@ class ToolboxPage extends ConsumerWidget {
         builder: (value) => ListView(
           padding: const EdgeInsets.all(AppTokens.s16),
           children: [
-            SectionHeader(title: l10n.toolbox_quickSettings),
+            SectionHeader(title: l10n.toolbox_device_info),
             SplitListGroup(
               children: [
                 _info(l10n.toolbox_hostname, value.device['hostname']),
@@ -97,12 +97,22 @@ class ToolboxPage extends ConsumerWidget {
                 ),
               ],
             ),
+            Padding(
+              padding: const EdgeInsets.only(
+                top: AppTokens.s8,
+                left: AppTokens.s4,
+              ),
+              child: Text(
+                l10n.toolbox_readOnlyHint,
+                style: AppTextStyles.caption.copyWith(
+                  color: context.scheme.onSurfaceVariant,
+                ),
+              ),
+            ),
             const SizedBox(height: AppTokens.s24),
-            SectionHeader(title: l10n.toolbox_cacheClean),
+            SectionHeader(title: l10n.toolbox_actions),
             SplitListGroup(
               children: [
-                _info(l10n.toolbox_cleanSource, l10n.toolbox_cleanSourceValue),
-                _info(l10n.toolbox_cleanAction, l10n.toolbox_cleanActionValue),
                 SplitListTile(
                   leading: const Icon(TablerIcons.scan),
                   title: l10n.toolbox_scan,
