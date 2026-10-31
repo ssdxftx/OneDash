@@ -98,6 +98,12 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                   onPressed: () =>
                       ref.read(containersProvider.notifier).refresh(),
                 ),
+                AppIconButton(
+                  icon: TablerIcons.plus,
+                  tooltip: l10n.containers_create,
+                  onPressed: () =>
+                      context.push('/s/${widget.serverId}/containers/create'),
+                ),
               ],
             ),
             if (_searching)

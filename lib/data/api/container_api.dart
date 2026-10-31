@@ -346,6 +346,16 @@ class ContainerApi {
     return ApiResponseParser.list(resp, ContainerOptionDto.fromJson);
   }
 
+  /// 创建容器。
+  /// POST /api/v2/containers
+  Future<void> createContainer(Map<String, dynamic> data) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers',
+      data: data,
+    );
+    ApiResponseParser.ok(resp);
+  }
+
   /// 更新容器。
   /// POST /api/v2/containers/update
   Future<void> updateContainer(Map<String, dynamic> data) async {

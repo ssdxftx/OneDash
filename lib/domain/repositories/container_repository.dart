@@ -128,6 +128,9 @@ abstract interface class ContainerRepository {
   /// 获取全部镜像信息。
   Future<List<ContainerOptionDto>> getImages();
 
+  /// 创建容器。
+  Future<void> createContainer(Map<String, dynamic> data);
+
   /// 更新容器。
   Future<void> updateContainer(Map<String, dynamic> data);
 

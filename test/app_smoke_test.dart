@@ -75,6 +75,17 @@ void main() {
         );
       }
     }
+    appRouter.go('/s/1/containers/create');
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    expect(
+      appRouter.routerDelegate.currentConfiguration.uri.path,
+      '/s/1/containers/create',
+    );
+    expect(tester.takeException(), isNull);
+
+    appRouter.go('/s/1/more');
+    await tester.pump();
     expect(appContainer.read(activeServerIdProvider), 1);
   });
 }

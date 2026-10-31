@@ -9,6 +9,7 @@ import '../../presentation/features/app_store/screens/app_store_page.dart';
 import '../../presentation/features/app_store/screens/installed_app_page.dart';
 import '../../presentation/features/backups/screens/backups_page.dart';
 import '../../presentation/features/containers/screens/compose_page.dart';
+import '../../presentation/features/containers/screens/container_create_page.dart';
 import '../../presentation/features/containers/screens/container_detail_page.dart';
 import '../../presentation/features/containers/screens/containers_page.dart';
 import '../../presentation/features/cronjobs/screens/cronjobs_page.dart';
@@ -126,6 +127,12 @@ final appRouter = GoRouter(
           parentNavigatorKey: _rootNavigatorKey,
           pageBuilder: (context, state) =>
               slidePage(state, WebsiteCreateWizard(serverId: _serverId(state))),
+        ),
+        GoRoute(
+          path: 'containers/create',
+          parentNavigatorKey: _rootNavigatorKey,
+          pageBuilder: (context, state) =>
+              slidePage(state, ContainerCreatePage(serverId: _serverId(state))),
         ),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {

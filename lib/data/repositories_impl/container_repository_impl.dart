@@ -196,6 +196,10 @@ class ContainerRepositoryImpl implements ContainerRepository {
   Future<List<ContainerOptionDto>> getImages() => _containerApi.getImages();
 
   @override
+  Future<void> createContainer(Map<String, dynamic> data) =>
+      _containerApi.createContainer(data);
+
+  @override
   Future<void> updateContainer(Map<String, dynamic> data) =>
       _containerApi.updateContainer(data);
 
