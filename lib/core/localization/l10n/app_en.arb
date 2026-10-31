@@ -2490,5 +2490,9 @@
   "supervisor_stateStarting": "Starting",
   "@supervisor_stateStarting": {
     "description": "Text for supervisor_stateStarting."
+  },
+  "websites_groupSystemReserved": "Reserved by 1Panel, cannot be deleted",
+  "@websites_groupSystemReserved": {
+    "description": "Subtitle of the built-in default website group."
   }
 }

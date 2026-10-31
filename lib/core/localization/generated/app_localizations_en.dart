@@ -1833,4 +1833,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get supervisor_stateStarting => 'Starting';
+
+  @override
+  String get websites_groupSystemReserved =>
+      'Reserved by 1Panel, cannot be deleted';
 }

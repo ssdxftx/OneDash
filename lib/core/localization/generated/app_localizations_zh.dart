@@ -1785,4 +1785,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get supervisor_stateStarting => '启动中';
+
+  @override
+  String get websites_groupSystemReserved => '系统保留，不可删除';
 }

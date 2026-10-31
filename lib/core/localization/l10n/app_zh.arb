@@ -561,5 +561,6 @@
   "websites_groupEmpty": "暂无分组",
   "supervisor_deleteConfirm": "确定要删除守护进程「{name}」？",
   "supervisor_editProcess": "编辑守护进程",
-  "supervisor_stateStarting": "启动中"
+  "supervisor_stateStarting": "启动中",
+  "websites_groupSystemReserved": "系统保留，不可删除"
 }

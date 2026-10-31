@@ -3469,6 +3469,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Starting'**
   String get supervisor_stateStarting;
+
+  /// Subtitle of the built-in default website group.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserved by 1Panel, cannot be deleted'**
+  String get websites_groupSystemReserved;
 }
 
 class _AppLocalizationsDelegate

@@ -63,35 +63,10 @@ class WebsiteGroupsPage extends ConsumerWidget {
               SplitListGroup(
                 children: [
                   for (final group in items)
-                    SplitListTile(
-                      leading: Icon(
-                        group.isDefault
-                            ? TablerIcons.folder_star
-                            : TablerIcons.folder,
-                      ),
-                      title: group.name,
-                      subtitle: group.isDefault
-                          ? l10n.websites_groupDefault
-                          : null,
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            tooltip: l10n.common_edit,
-                            onPressed: () =>
-                                _openEditor(context, ref, group: group),
-                            icon: const Icon(TablerIcons.pencil),
-                          ),
-                          IconButton(
-                            tooltip: l10n.common_delete,
-                            onPressed: () => _delete(context, ref, group),
-                            icon: Icon(
-                              TablerIcons.trash,
-                              color: context.scheme.error,
-                            ),
-                          ),
-                        ],
-                      ),
+                    WebsiteGroupTile(
+                      group: group,
+                      onEdit: () => _openEditor(context, ref, group: group),
+                      onDelete: () => _delete(context, ref, group),
                     ),
                 ],
               ),
@@ -136,6 +111,7 @@ class WebsiteGroupsPage extends ConsumerWidget {
     WidgetRef ref,
     WebsiteGroupDto group,
   ) async {
+    if (group.isDefault) return;
     final l10n = AppLocalizations.of(context);
     final confirmed = await showConfirmSheet(
       context,
@@ -242,6 +218,59 @@ class _GroupEditorSheetState extends State<_GroupEditorSheet> {
           ],
         ),
       ],
+    );
+  }
+}
+
+class WebsiteGroupTile extends StatelessWidget {
+  const WebsiteGroupTile({
+    super.key,
+    required this.group,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final WebsiteGroupDto group;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return SplitListTile(
+      leading: Icon(
+        group.isDefault ? TablerIcons.folder_star : TablerIcons.folder,
+      ),
+      title: group.name,
+      subtitle: group.isDefault ? l10n.websites_groupSystemReserved : null,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            tooltip: l10n.common_edit,
+            onPressed: onEdit,
+            icon: const Icon(TablerIcons.pencil),
+          ),
+          if (!group.isDefault)
+            IconButton(
+              tooltip: l10n.common_delete,
+              onPressed: onDelete,
+              icon: Icon(TablerIcons.trash, color: context.scheme.error),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.only(
+                right: AppTokens.s16,
+                left: AppTokens.s8,
+              ),
+              child: Icon(
+                TablerIcons.lock,
+                size: AppTokens.iconList,
+                color: context.scheme.onSurfaceVariant,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
