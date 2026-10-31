@@ -308,7 +308,9 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
               unit: '%',
               caption: l10n.dashboard_cores(cores),
               status: current.cpuUsedPercent > 90 ? 'error' : 'running',
-              sparkline: Sparkline(values: state.cpuHistory, maxValue: 100),
+              sparkline: state.cpuHistory.length < 3
+                  ? null
+                  : Sparkline(values: state.cpuHistory, maxValue: 100),
               onTap: () => _showCoreUsage(context, current.cpuDetailedPercent),
               onLongPress: () => _copy(context, current.cpuUsedPercent),
             ),
@@ -321,7 +323,9 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                 formatBytes(current.memoryTotal),
               ),
               status: current.memoryUsedPercent > 90 ? 'error' : 'running',
-              sparkline: Sparkline(values: state.memoryHistory, maxValue: 100),
+              sparkline: state.memoryHistory.length < 3
+                  ? null
+                  : Sparkline(values: state.memoryHistory, maxValue: 100),
               onLongPress: () => _copy(context, current.memoryUsedPercent),
             ),
             MetricCard(
@@ -345,10 +349,6 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                   '${l10n.dashboard_trafficTotal(formatBytes(current.netBytesRecv + current.netBytesSent))}',
               captionMaxLines: 2,
               status: 'running',
-              sparkline: Sparkline(
-                values: state.netDownHistory,
-                placeholder: l10n.dashboard_collecting,
-              ),
               onLongPress: () => _copy(context, formatByteRate(netDown)),
             ),
           ]),

@@ -96,4 +96,44 @@ void main() {
       });
     }
   }
+
+  for (final width in [240.0, 390.0]) {
+    for (final scale in [1.0, 1.5]) {
+      testWidgets('network card fits a 136dp cell at ${width}dp ${scale}x', (
+        tester,
+      ) async {
+        tester.view.physicalSize = Size(width, 800);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _wrap(
+            GridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              mainAxisExtent: 136 + (scale - 1) * 80,
+              children: const [
+                MetricCard(
+                  title: '网络',
+                  value: '0 B/s',
+                  caption: '↑ 0 B/s\n累计 3.0 KB',
+                  captionMaxLines: 2,
+                  status: 'running',
+                ),
+              ],
+            ),
+            scale: scale,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+        expect(
+          find.textContaining('累计 3.0 KB', findRichText: true),
+          findsOneWidget,
+        );
+      });
+    }
+  }
 }
