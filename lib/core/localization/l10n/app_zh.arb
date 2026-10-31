@@ -574,5 +574,9 @@
   "dashboard_collecting": "正在采集…",
   "toolbox_device_info": "设备信息",
   "toolbox_actions": "可执行操作",
-  "toolbox_readOnlyHint": "以下信息来自面板，修改请到 1Panel 网页"
+  "toolbox_readOnlyHint": "以下信息来自面板，修改请到 1Panel 网页",
+  "app_detail_key": "应用标识",
+  "app_detail_container": "容器",
+  "app_detail_compose": "Compose 文件",
+  "app_detail_message": "说明"
 }

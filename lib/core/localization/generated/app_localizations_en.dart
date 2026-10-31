@@ -1872,4 +1872,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get toolbox_readOnlyHint =>
       'Read-only data from the panel. Edit it in the 1Panel web UI.';
+
+  @override
+  String get app_detail_key => 'App key';
+
+  @override
+  String get app_detail_container => 'Container';
+
+  @override
+  String get app_detail_compose => 'Compose';
+
+  @override
+  String get app_detail_message => 'Message';
 }

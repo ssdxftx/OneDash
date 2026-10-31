@@ -3547,6 +3547,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Read-only data from the panel. Edit it in the 1Panel web UI.'**
   String get toolbox_readOnlyHint;
+
+  /// Label for the installed application key.
+  ///
+  /// In en, this message translates to:
+  /// **'App key'**
+  String get app_detail_key;
+
+  /// Label for the installed application container name.
+  ///
+  /// In en, this message translates to:
+  /// **'Container'**
+  String get app_detail_container;
+
+  /// Label for the Compose file path.
+  ///
+  /// In en, this message translates to:
+  /// **'Compose'**
+  String get app_detail_compose;
+
+  /// Label for the installed application message.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get app_detail_message;
 }
 
 class _AppLocalizationsDelegate

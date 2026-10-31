@@ -2542,5 +2542,21 @@
   "toolbox_readOnlyHint": "Read-only data from the panel. Edit it in the 1Panel web UI.",
   "@toolbox_readOnlyHint": {
     "description": "Footer explaining that toolbox information is read-only."
+  },
+  "app_detail_key": "App key",
+  "@app_detail_key": {
+    "description": "Label for the installed application key."
+  },
+  "app_detail_container": "Container",
+  "@app_detail_container": {
+    "description": "Label for the installed application container name."
+  },
+  "app_detail_compose": "Compose",
+  "@app_detail_compose": {
+    "description": "Label for the Compose file path."
+  },
+  "app_detail_message": "Message",
+  "@app_detail_message": {
+    "description": "Label for the installed application message."
   }
 }

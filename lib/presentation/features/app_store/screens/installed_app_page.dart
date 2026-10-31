@@ -108,11 +108,20 @@ class InstalledAppPage extends ConsumerWidget {
             const SizedBox(height: AppTokens.s24),
             SplitListGroup(
               children: [
-                SplitListTile(title: 'App key', subtitle: app.appKey),
-                SplitListTile(title: 'Container', subtitle: app.container),
-                SplitListTile(title: 'Compose', subtitle: app.composePath),
+                SplitListTile(title: l10n.app_detail_key, subtitle: app.appKey),
+                SplitListTile(
+                  title: l10n.app_detail_container,
+                  subtitle: app.container,
+                ),
+                SplitListTile(
+                  title: l10n.app_detail_compose,
+                  subtitle: app.composePath,
+                ),
                 if (app.message.isNotEmpty)
-                  SplitListTile(title: 'Message', subtitle: app.message),
+                  SplitListTile(
+                    title: l10n.app_detail_message,
+                    subtitle: app.message,
+                  ),
               ],
             ),
           ],

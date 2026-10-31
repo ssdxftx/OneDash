@@ -1824,4 +1824,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get toolbox_readOnlyHint => '以下信息来自面板，修改请到 1Panel 网页';
+
+  @override
+  String get app_detail_key => '应用标识';
+
+  @override
+  String get app_detail_container => '容器';
+
+  @override
+  String get app_detail_compose => 'Compose 文件';
+
+  @override
+  String get app_detail_message => '说明';
 }
