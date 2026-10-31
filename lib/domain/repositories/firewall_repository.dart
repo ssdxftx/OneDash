@@ -1,36 +1,82 @@
-import '../../data/dto/common/page_result.dart';
 import '../../data/dto/firewall/firewall_base_info_dto.dart';
-import '../../data/dto/firewall/rule_info_dto.dart';
+import '../../data/dto/firewall/firewall_v2_dto.dart';
 
 abstract interface class FirewallRepository {
   Future<FirewallBaseInfoDto> getBaseInfo();
 
-  Future<PageResult<RuleInfoDto>> searchRules({
-    required String type,
+  Future<FirewallSettingsInfo> getSettings();
+
+  Future<FirewallInventory> searchRules({
+    required String provider,
     int page,
     int pageSize,
     String info,
-    String strategy,
+    List<String> families,
+    List<String> actions,
+    bool refresh,
+  });
+
+  Future<void> createRule(Map<String, dynamic> rule);
+
+  Future<void> deleteRule(FirewallRuleItem item);
+
+  Future<void> updateRule(
+    FirewallRuleItem item, {
+    Map<String, dynamic>? rule,
+    String? description,
+    int? orderIndex,
+    int? priority,
+  });
+
+  Future<void> reorderRule(
+    FirewallRuleItem item, {
+    int? targetPosition,
+    int? priority,
   });
 
   Future<void> operate(String operation, {bool withDockerRestart});
 
-  Future<void> operatePortRule(Map<String, dynamic> body);
+  Future<void> updateIPv6(bool enabled);
 
-  Future<void> operateIpRule(Map<String, dynamic> body);
-
-  Future<void> updatePortRule(Map<String, dynamic> body);
-
-  Future<void> updateAddrRule(Map<String, dynamic> body);
-
-  Future<void> batchOperate(Map<String, dynamic> body);
-
-  Future<void> updateDescription(Map<String, dynamic> body);
-
-  Future<void> operateFilterChain({
-    required String name,
-    required String operate,
+  Future<void> operateBackend({
+    required String subsystem,
+    required String backend,
+    required String operation,
   });
+
+  Future<void> createWhitelist(FirewallWhitelistRule rule);
+
+  Future<void> updateWhitelist({
+    required FirewallWhitelistRule oldRule,
+    required FirewallWhitelistRule rule,
+  });
+
+  Future<void> deleteWhitelist(FirewallWhitelistRule rule);
+
+  Future<FirewallBaseInfoDto> getForwardBase();
+
+  Future<FirewallForwardPage> searchForwardRules({
+    int page,
+    int pageSize,
+    String info,
+  });
+
+  Future<void> operateForwardRule(
+    List<Map<String, dynamic>> rules, {
+    bool import,
+  });
+
+  Future<void> enableForwarding();
+
+  Future<DockerGuardInfo> getDockerGuard();
+
+  Future<List<DockerGuardEndpoint>> getDockerEndpoints();
+
+  Future<void> operateDockerGuard(String operation);
+
+  Future<List<Map<String, dynamic>>> listRuleBackups();
+
+  Future<void> resetRules({String? backupFile});
 
   Future<List<Map<String, dynamic>>> getListeningProcesses();
 }
