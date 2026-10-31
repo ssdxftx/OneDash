@@ -15,7 +15,7 @@ abstract final class AppTheme {
         ColorScheme.fromSeed(
           seedColor: seedColor,
           brightness: brightness,
-          dynamicSchemeVariant: DynamicSchemeVariant.neutral,
+          dynamicSchemeVariant: DynamicSchemeVariant.tonalSpot,
         );
 
     if (brightness == Brightness.light) {
