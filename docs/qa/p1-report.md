@@ -7,7 +7,7 @@ Scope: P1-01 through P1-05, plus the P2 batch requested in the same task book.
 
 ```
 flutter analyze --fatal-infos   -> 0 issues
-flutter test                    -> 54 tests pass
+flutter test                    -> 58 tests pass
 grep "AppToast.error" | "$error" -> 0
 ```
 
@@ -18,7 +18,7 @@ localization code is checked in and `flutter gen-l10n` exits 0.
 
 | ID | Result | Evidence |
 |---|---|---|
-| P1-01 | Done | `error_toast.dart`; 43 raw error interpolations replaced; `error_toast_test.dart` |
+| P1-01 | Done | `error_toast.dart`; all raw toast and inline error paths replaced; `error_toast_test.dart`; `error_leak_guard_test.dart` |
 | P1-02 | Done | default group has lock, no delete action, guarded `_delete`; widget test |
 | P1-03 | Done | notification and panel password rows show `网页版配置`, no chevron or toast |
 | P1-04 | Done | metric value and unit share a scaled rich text; narrow-width tests |

@@ -13,23 +13,32 @@ is equivalent.
 
 ## P2-01
 
-`tonalSpot` alone still produced near-identical primary colors for `forest`
-and `graphite` because both seeds are low-chroma greens. The graphite seed was
-changed from `#5B6B62` to neutral `#5F6368`. The pairwise palette test now
-passes; all eight presets remain available.
+`tonalSpot` alone pulled the graphite seed toward blue and collided with
+`ocean`. Graphite now keeps its original seed `#5B6B62` and uses
+`DynamicSchemeVariant.neutral`, so its primary stays a low-saturation gray. The
+pairwise test excludes graphite from hue comparison and separately asserts
+saturation below 0.2.
 
 ## P2-03
 
-The sparkline placeholder is implemented inside `Sparkline` with a dashed
-baseline painter and an optional localized label. The network card keeps down
-speed as the primary value, and shows upload speed plus total traffic in the
-caption.
+`Sparkline` and `AreaChart` both show the localized collecting state below
+three samples. The large network chart hides its grid instead of drawing a
+baseline. A sparkline without a label renders nothing rather than an unlabeled
+dashed divider. The network card keeps down speed as the primary value and
+shows upload speed plus total traffic in a two-line caption.
 
 ## P2-04
 
 `AlertLogInfo` has `method` but no rule-name or title fields. Only the delivery
 channel was added. Rule names require a DTO/API change and were intentionally
 left alone.
+
+## P1-01 guard
+
+The original single-line grep missed multiline calls. `tool/check_error_leaks.sh`
+now checks a three-line window around `AppToast.error`, raw assignments to
+`_error`, and direct `Text('$error')` rendering. The same rule runs as a Dart
+test, so it executes inside `flutter test` in CI.
 
 ## L10n pruning
 
