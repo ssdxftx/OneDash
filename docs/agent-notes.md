@@ -40,6 +40,12 @@ now checks a three-line window around `AppToast.error`, raw assignments to
 `_error`, and direct `Text('$error')` rendering. The same rule runs as a Dart
 test, so it executes inside `flutter test` in CI.
 
+## R1 network card
+
+The network card no longer carries a sparkline because the 160dp chart directly
+below it shows the same data. The caption keeps upload speed and total traffic
+in two lines. CPU and memory only render sparklines once three samples exist.
+
 ## L10n pruning
 
 The toolbox rewrite made the old clean-source and clean-action keys unused.

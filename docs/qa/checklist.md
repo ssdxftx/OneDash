@@ -29,5 +29,5 @@ Automated checks already passing:
 
 ```bash
 flutter analyze   # no issues
-flutter test      # 58 tests pass
+flutter test      # 62 tests pass
 ```
