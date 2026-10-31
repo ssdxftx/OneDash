@@ -12,6 +12,7 @@ class MetricCard extends StatelessWidget {
     required this.value,
     this.unit,
     this.caption,
+    this.captionMaxLines = 1,
     this.status,
     this.trailing,
     this.sparkline,
@@ -24,6 +25,7 @@ class MetricCard extends StatelessWidget {
   final String value;
   final String? unit;
   final String? caption;
+  final int captionMaxLines;
   final String? status;
   final Widget? trailing;
   final Widget? sparkline;
@@ -108,7 +110,7 @@ class MetricCard extends StatelessWidget {
                   style: AppTextStyles.caption.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
-                  maxLines: 1,
+                  maxLines: captionMaxLines,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],

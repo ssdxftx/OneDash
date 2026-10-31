@@ -17,6 +17,7 @@ class AreaChart extends StatelessWidget {
     this.showGrid = true,
     this.strokeWidth = 2,
     this.fill = true,
+    this.placeholder,
   });
 
   final List<double> seriesA;
@@ -28,11 +29,25 @@ class AreaChart extends StatelessWidget {
   final bool showGrid;
   final double strokeWidth;
   final bool fill;
+  final String? placeholder;
 
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final colors = context.appColors;
+    final sampleCount = math.max(seriesA.length, seriesB?.length ?? 0);
+    if (sampleCount < 3 && placeholder != null) {
+      return RepaintBoundary(
+        child: Center(
+          child: Text(
+            placeholder!,
+            style: AppTextStyles.caption.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      );
+    }
     return RepaintBoundary(
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -212,6 +227,7 @@ class Sparkline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (values.length < 3) {
+      if (placeholder == null) return const SizedBox.shrink();
       return RepaintBoundary(
         child: Stack(
           fit: StackFit.expand,

@@ -341,8 +341,9 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
               title: l10n.dashboard_network,
               value: formatByteRate(netDown),
               caption:
-                  '↑ ${formatByteRate(netUp)} · '
+                  '↑ ${formatByteRate(netUp)}\n'
                   '${l10n.dashboard_trafficTotal(formatBytes(current.netBytesRecv + current.netBytesSent))}',
+              captionMaxLines: 2,
               status: 'running',
               sparkline: Sparkline(
                 values: state.netDownHistory,
@@ -387,6 +388,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                     seriesB: state.netUpHistory,
                     colorA: context.appColors.chart1,
                     colorB: context.appColors.chart2,
+                    placeholder: l10n.dashboard_collecting,
                   ),
                 ),
               ],

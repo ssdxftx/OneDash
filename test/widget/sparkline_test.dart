@@ -41,4 +41,67 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Collecting…'), findsNothing);
   });
+
+  testWidgets('unlabeled sparkline draws no dashed divider', (tester) async {
+    await tester.pumpWidget(wrap(const Sparkline(values: [])));
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.descendant(
+        of: find.byType(Sparkline),
+        matching: find.byType(CustomPaint),
+      ),
+      findsNothing,
+    );
+  });
+
+  testWidgets('area chart shows the collecting placeholder below 3 samples', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: const Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 300,
+              height: 160,
+              child: AreaChart(
+                seriesA: [0],
+                seriesB: [0],
+                placeholder: 'Collecting…',
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Collecting…'), findsOneWidget);
+  });
+
+  testWidgets('area chart draws normally with 3 samples', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: const Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 300,
+              height: 160,
+              child: AreaChart(
+                seriesA: [1, 2, 3],
+                seriesB: [1, 2, 3],
+                placeholder: 'Collecting…',
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Collecting…'), findsNothing);
+  });
 }
