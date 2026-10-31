@@ -57,3 +57,20 @@ removed. Key count is 575 after this batch.
 
 No dependency, endpoint signature, or envelope changes were made. `test/visual`
 is absent from the working tree.
+
+## 1Panel v2.4.2 P0
+
+- `hosts/firewall/rules/search` rejects `all=true` with empty `scopes`
+  (`FW_SCOPE_UNSUPPORTED`). The client now always sends the full managed scope
+  list for the active backend.
+- `POST /containers` rejects `networks: []` with `please set up the network`.
+  The task book sample omitted this field; the create form now defaults to
+  `1panel-network` and loads the panel network list.
+- Forward rule editing is implemented as `remove` of the old rule followed by
+  `add` of the new rule, matching the panel frontend.
+- The hosted lab does not expose test container port 18080 externally. Container
+  creation was verified through the panel API (running state and published
+  ports), not through a browser request.
+- No Android device or emulator is available in this workspace, so the new
+  full-screen forms were validated by analyzer, tests, route smoke coverage and
+  real API calls rather than device screenshots.
