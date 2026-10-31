@@ -18,6 +18,7 @@ import '../../../common/components/tonal_card.dart';
 import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/error_toast.dart';
 
 final _alertsProvider = FutureProvider.autoDispose<List<AlertInfo>>((
   ref,
@@ -112,9 +113,10 @@ class _AlertListTab extends ConsumerWidget {
                   ref.invalidate(_alertsProvider);
                 } catch (error) {
                   if (!context.mounted) return;
-                  AppToast.error(
+                  showErrorToast(
                     context,
-                    '${l10n.panelSettings_operationFailed}: $error',
+                    error,
+                    prefix: l10n.panelSettings_operationFailed,
                   );
                 }
               },
@@ -138,9 +140,10 @@ class _AlertListTab extends ConsumerWidget {
                   ref.invalidate(_alertsProvider);
                 } catch (error) {
                   if (!context.mounted) return;
-                  AppToast.error(
+                  showErrorToast(
                     context,
-                    '${l10n.panelSettings_deleteFailed}: $error',
+                    error,
+                    prefix: l10n.panelSettings_deleteFailed,
                   );
                 }
               },
@@ -275,9 +278,10 @@ class _AlertLogTab extends ConsumerWidget {
                       ref.invalidate(_alertLogsProvider);
                     } catch (error) {
                       if (!context.mounted) return;
-                      AppToast.error(
+                      showErrorToast(
                         context,
-                        '${l10n.panelSettings_clearFailed}: $error',
+                        error,
+                        prefix: l10n.panelSettings_clearFailed,
                       );
                     }
                   },
@@ -407,12 +411,6 @@ class _AlertSettingsTab extends ConsumerWidget {
                 leading: Icon(method.icon),
                 title: method.title,
                 subtitle: method.subtitle,
-                trailing: Text(
-                  l10n.panelSettings_webOnlyTag,
-                  style: AppTextStyles.caption.copyWith(
-                    color: context.scheme.onSurfaceVariant,
-                  ),
-                ),
               ),
           ],
         ),

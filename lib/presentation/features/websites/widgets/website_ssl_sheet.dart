@@ -82,7 +82,7 @@ class _WebsiteSslSheetState extends ConsumerState<WebsiteSslSheet> {
     } catch (error) {
       if (!mounted) return;
       setState(() {
-        _error = '$error';
+        _error = describeError(error, AppLocalizations.of(context));
         _loading = false;
       });
     }
@@ -107,7 +107,7 @@ class _WebsiteSslSheetState extends ConsumerState<WebsiteSslSheet> {
     } catch (error) {
       if (!mounted) return;
       setState(() {
-        _error = '$error';
+        _error = describeError(error, AppLocalizations.of(context));
         _loading = false;
       });
     }

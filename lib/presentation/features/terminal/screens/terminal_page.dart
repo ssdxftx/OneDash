@@ -9,6 +9,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:xterm/xterm.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
+import '../../../common/states/error_toast.dart';
 import '../../../../core/network/api_compatibility.dart';
 import '../../../../core/network/one_panel_auth.dart';
 import '../../../../core/network/web_socket_connector.dart';
@@ -135,7 +136,7 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
           if (!mounted) return;
           setState(() {
             _status = _TerminalStatus.error;
-            _error = '$error';
+            _error = describeError(error, AppLocalizations.of(context));
           });
         },
         onDone: () {
@@ -166,7 +167,7 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
       if (!mounted) return;
       setState(() {
         _status = _TerminalStatus.error;
-        _error = '$error';
+        _error = describeError(error, AppLocalizations.of(context));
       });
     }
   }
@@ -317,12 +318,12 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
             if (_error != null)
               Container(
                 width: double.infinity,
-                color: const Color(0xFF3A1A1A),
+                color: context.appColors.danger.withValues(alpha: 0.15),
                 padding: const EdgeInsets.all(AppTokens.s8),
                 child: Text(
                   _error!,
                   style: AppTextStyles.caption.copyWith(
-                    color: const Color(0xFFFFB4AB),
+                    color: context.appColors.danger,
                   ),
                 ),
               ),

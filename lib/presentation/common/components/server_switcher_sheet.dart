@@ -4,6 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/localization/generated/app_localizations.dart';
+import '../states/error_toast.dart';
 import '../../../core/theme/tokens.dart';
 import '../../features/servers/providers/servers_provider.dart';
 import 'bottom_sheet_surface.dart';
@@ -41,7 +42,7 @@ class _ServerSwitcherBody extends ConsumerWidget {
             padding: EdgeInsets.symmetric(vertical: AppTokens.s24),
             child: Center(child: CircularProgressIndicator()),
           ),
-          error: (error, stack) => Text('$error'),
+          error: (error, _) => Text(describeError(error, l10n)),
           data: (items) => Column(
             children: [
               SplitListGroup(

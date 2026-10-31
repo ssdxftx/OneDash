@@ -81,7 +81,7 @@ class _AppInstallSheetState extends ConsumerState<AppInstallSheet> {
     } catch (error) {
       if (!mounted) return;
       setState(() {
-        _error = '$error';
+        _error = describeError(error, AppLocalizations.of(context));
         _loading = false;
       });
     }
