@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import '../../core/localization/generated/app_localizations.dart';
 import '../../core/theme/tokens.dart';
 import '../common/components/server_switcher_sheet.dart';
-import '../features/server_detail/providers/active_server_provider.dart';
 import '../features/servers/providers/servers_provider.dart';
 
 class ServerShell extends ConsumerWidget {
@@ -22,12 +21,9 @@ class ServerShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ProviderScope(
-      overrides: [activeServerIdProvider.overrideWithValue(serverId)],
-      child: _ServerShellScaffold(
-        serverId: serverId,
-        navigationShell: navigationShell,
-      ),
+    return _ServerShellScaffold(
+      serverId: serverId,
+      navigationShell: navigationShell,
     );
   }
 }

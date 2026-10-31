@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'core/router/app_router.dart';
 import 'core/storage/storage_service.dart';
 
 Future<void> main() async {
@@ -14,9 +15,13 @@ Future<void> main() async {
   final storageService = StorageService();
   await storageService.init();
 
+  appContainer = ProviderContainer(
+    overrides: [storageServiceProvider.overrideWithValue(storageService)],
+  );
+
   runApp(
-    ProviderScope(
-      overrides: [storageServiceProvider.overrideWithValue(storageService)],
+    UncontrolledProviderScope(
+      container: appContainer,
       child: const OneDashApp(),
     ),
   );
