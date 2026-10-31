@@ -1509,7 +1509,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Clear all alert logs? This cannot be undone.';
 
   @override
-  String get server_edit_port_default => 'Default 9999';
+  String get server_edit_port_default => '9999';
 
   @override
   String websites_count(int count) {

@@ -1471,7 +1471,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get panelSettings_clearLogsConfirm => '确定要清空全部告警日志吗？该操作无法撤销。';
 
   @override
-  String get server_edit_port_default => '默认 9999';
+  String get server_edit_port_default => '9999';
 
   @override
   String websites_count(int count) {

@@ -2879,7 +2879,7 @@ abstract class AppLocalizations {
   /// Helper text showing the default panel port.
   ///
   /// In en, this message translates to:
-  /// **'Default 9999'**
+  /// **'9999'**
   String get server_edit_port_default;
 
   /// Count shown in list header.

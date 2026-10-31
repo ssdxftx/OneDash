@@ -2057,7 +2057,7 @@
   "@panelSettings_clearLogsConfirm": {
     "description": "Confirmation for clearing alert logs."
   },
-  "server_edit_port_default": "Default 9999",
+  "server_edit_port_default": "9999",
   "@server_edit_port_default": {
     "description": "Helper text showing the default panel port."
   },

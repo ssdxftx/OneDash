@@ -463,7 +463,7 @@
   "websites_sslExpire": "到期时间",
   "panelSettings_deleteAlertConfirm": "确定要删除告警「{title}」吗？",
   "panelSettings_clearLogsConfirm": "确定要清空全部告警日志吗？该操作无法撤销。",
-  "server_edit_port_default": "默认 9999",
+  "server_edit_port_default": "9999",
   "websites_count": "{count} 个网站",
   "containers_count": "{count} 个容器",
   "dashboard_trafficTotal": "累计 {value}",
