@@ -1,0 +1,27 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - '**/*.g.dart'
+    - '**/*.freezed.dart'
+    - build/**
+    - android/**
+  language:
+    strict-casts: false
+    strict-raw-types: false
+
+linter:
+  rules:
+    avoid_print: true
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_final_fields: true
+    unnecessary_lambdas: true
+    use_null_aware_elements: false
+    use_super_parameters: true
+    always_declare_return_types: true
+    unawaited_futures: true
+    cancel_subscriptions: true
+    close_sinks: true
+    avoid_single_cascade_in_expression_statements: true
+    directives_ordering: false
