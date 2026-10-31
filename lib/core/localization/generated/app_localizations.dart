@@ -1784,10 +1784,10 @@ abstract class AppLocalizations {
   /// **'Running'**
   String get websites_running;
 
-  /// OneDash UI string
+  /// Toast shown after a website stops.
   ///
   /// In en, this message translates to:
-  /// **'Stopped'**
+  /// **'Site stopped'**
   String get websites_stopped;
 
   /// OneDash UI string
@@ -3577,6 +3577,636 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved, connecting…'**
   String get server_edit_savedConnecting;
+
+  /// Generic action to add an item.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get action_add;
+
+  /// Firewall rules tab label.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules'**
+  String get firewall_tabRules;
+
+  /// Firewall port forwarding tab label.
+  ///
+  /// In en, this message translates to:
+  /// **'Forwarding'**
+  String get firewall_tabForward;
+
+  /// Firewall Docker port guard tab label.
+  ///
+  /// In en, this message translates to:
+  /// **'Docker'**
+  String get firewall_tabDocker;
+
+  /// Firewall settings tab label.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get firewall_tabSettings;
+
+  /// Number of firewall rules.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules: {count}'**
+  String firewall_rulesCount(int count);
+
+  /// Firewall rule search field hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search address, port or note'**
+  String get firewall_searchHint;
+
+  /// Firewall filter for all rules.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get firewall_filterAll;
+
+  /// Firewall filter for IPv4 rules.
+  ///
+  /// In en, this message translates to:
+  /// **'IPv4'**
+  String get firewall_filterIpv4;
+
+  /// Firewall filter for IPv6 rules.
+  ///
+  /// In en, this message translates to:
+  /// **'IPv6'**
+  String get firewall_filterIpv6;
+
+  /// Firewall filter for allow rules.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get firewall_filterAllow;
+
+  /// Firewall filter for deny rules.
+  ///
+  /// In en, this message translates to:
+  /// **'Deny'**
+  String get firewall_filterDeny;
+
+  /// Placeholder when a firewall rule has no source address.
+  ///
+  /// In en, this message translates to:
+  /// **'Any address'**
+  String get firewall_anyAddress;
+
+  /// Placeholder when a firewall rule has no port.
+  ///
+  /// In en, this message translates to:
+  /// **'Any port'**
+  String get firewall_anyPort;
+
+  /// Confirmation title for deleting a firewall rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete rule {name}?'**
+  String firewall_ruleDeleteTitle(String name);
+
+  /// Confirmation message for deleting a firewall rule.
+  ///
+  /// In en, this message translates to:
+  /// **'This rule will be removed from the panel firewall.'**
+  String get firewall_ruleDeleteMessage;
+
+  /// Action to add a port forwarding rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Add forwarding rule'**
+  String get firewall_addForward;
+
+  /// Title for editing a port forwarding rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit forwarding rule'**
+  String get firewall_editForward;
+
+  /// Empty state title for port forwarding.
+  ///
+  /// In en, this message translates to:
+  /// **'No forwarding rules'**
+  String get firewall_forwardEmptyTitle;
+
+  /// Empty state message for port forwarding.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a rule to forward a host port to an internal service.'**
+  String get firewall_forwardEmptyMessage;
+
+  /// Port forwarding listen port label.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen port'**
+  String get firewall_forwardPort;
+
+  /// Port forwarding target IP label.
+  ///
+  /// In en, this message translates to:
+  /// **'Target IP'**
+  String get firewall_forwardTargetIp;
+
+  /// Port forwarding target port label.
+  ///
+  /// In en, this message translates to:
+  /// **'Target port'**
+  String get firewall_forwardTargetPort;
+
+  /// Port forwarding interface label.
+  ///
+  /// In en, this message translates to:
+  /// **'Interface (optional)'**
+  String get firewall_forwardInterface;
+
+  /// Status label when port forwarding is enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Forwarding enabled'**
+  String get firewall_forwardEnabled;
+
+  /// Action to enable port forwarding.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable forwarding'**
+  String get firewall_enableForward;
+
+  /// Docker port guard section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Docker port guard'**
+  String get firewall_dockerGuard;
+
+  /// Status label when the Docker port guard is active.
+  ///
+  /// In en, this message translates to:
+  /// **'Guard active'**
+  String get firewall_dockerGuardEnabled;
+
+  /// Status label when the Docker port guard is inactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Guard inactive'**
+  String get firewall_dockerGuardDisabled;
+
+  /// Empty state for Docker published ports.
+  ///
+  /// In en, this message translates to:
+  /// **'No published container ports'**
+  String get firewall_dockerGuardEmpty;
+
+  /// Docker container endpoint label.
+  ///
+  /// In en, this message translates to:
+  /// **'Container endpoint'**
+  String get firewall_dockerEndpoint;
+
+  /// Firewall backend label.
+  ///
+  /// In en, this message translates to:
+  /// **'Firewall backend'**
+  String get firewall_settingsBackend;
+
+  /// Firewall backend version label.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get firewall_settingsVersion;
+
+  /// IPv6 firewall setting label.
+  ///
+  /// In en, this message translates to:
+  /// **'IPv6'**
+  String get firewall_settingsIpv6;
+
+  /// IPv6 firewall setting description.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow the panel to manage IPv6 rules'**
+  String get firewall_settingsIpv6Hint;
+
+  /// Firewall port whitelist section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Port whitelist'**
+  String get firewall_settingsWhitelist;
+
+  /// Panel port label.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel port'**
+  String get firewall_settingsPanelPort;
+
+  /// SSH port label.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH port'**
+  String get firewall_settingsSshPort;
+
+  /// Action to add a firewall whitelist port.
+  ///
+  /// In en, this message translates to:
+  /// **'Add whitelist port'**
+  String get firewall_whitelistAdd;
+
+  /// Whitelist port label.
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get firewall_whitelistPort;
+
+  /// Whitelist protocol label.
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol'**
+  String get firewall_whitelistProtocol;
+
+  /// Whitelist allowed sources label.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed sources'**
+  String get firewall_whitelistSources;
+
+  /// Whitelist allowed sources hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Comma separated, e.g. 0.0.0.0/0'**
+  String get firewall_whitelistSourcesHint;
+
+  /// Firewall rule source address label.
+  ///
+  /// In en, this message translates to:
+  /// **'Source address'**
+  String get firewall_ruleAddress;
+
+  /// Firewall rule destination port label.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination port'**
+  String get firewall_rulePort;
+
+  /// Firewall rule protocol label.
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol'**
+  String get firewall_ruleProtocol;
+
+  /// Firewall rule IP family label.
+  ///
+  /// In en, this message translates to:
+  /// **'IP family'**
+  String get firewall_ruleFamily;
+
+  /// Firewall rule action label.
+  ///
+  /// In en, this message translates to:
+  /// **'Action'**
+  String get firewall_ruleStrategy;
+
+  /// Firewall rule note label.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get firewall_ruleRemark;
+
+  /// Firewall rule interface label.
+  ///
+  /// In en, this message translates to:
+  /// **'Interface'**
+  String get firewall_ruleInterface;
+
+  /// Firewall rule port input hint.
+  ///
+  /// In en, this message translates to:
+  /// **'80, 8000-8100, or 80,443'**
+  String get firewall_rulePortHint;
+
+  /// Firewall rule source address input hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty for any address'**
+  String get firewall_ruleAddressHint;
+
+  /// Validation message for an invalid firewall port.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid port or port range'**
+  String get firewall_ruleInvalidPort;
+
+  /// Action to edit a firewall rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit rule'**
+  String get firewall_editRule;
+
+  /// Action to delete a firewall rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete rule'**
+  String get firewall_deleteRule;
+
+  /// Action to move a firewall rule up.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get firewall_moveUp;
+
+  /// Action to move a firewall rule down.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get firewall_moveDown;
+
+  /// Validation message for a port forwarding rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in listen port, target IP and target port'**
+  String get firewall_forwardRequired;
+
+  /// Validation message for a firewall whitelist rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in port and at least one source'**
+  String get firewall_whitelistRequired;
+
+  /// Action to start a website.
+  ///
+  /// In en, this message translates to:
+  /// **'Start site'**
+  String get websites_start;
+
+  /// Action to stop a website.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop site'**
+  String get websites_stop;
+
+  /// Action to delete a website.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete site'**
+  String get websites_delete;
+
+  /// Action to copy a website domain.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy domain'**
+  String get websites_copyDomain;
+
+  /// Action to open a website in a browser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open website'**
+  String get websites_open;
+
+  /// Website deletion confirmation title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}?'**
+  String websites_deleteTitle(String name);
+
+  /// Website deletion warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Site files, Nginx configuration and SSL certificates will be deleted. This cannot be undone.'**
+  String get websites_deleteMessage;
+
+  /// Checkbox label to delete linked databases.
+  ///
+  /// In en, this message translates to:
+  /// **'Also delete {count} linked database(s)'**
+  String websites_deleteDatabaseCount(int count);
+
+  /// Checkbox label to delete website backups.
+  ///
+  /// In en, this message translates to:
+  /// **'Also delete site backups'**
+  String get websites_deleteBackup;
+
+  /// Checkbox label for forced website deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Force delete and ignore errors'**
+  String get websites_forceDelete;
+
+  /// Toast shown after a website is deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Site deleted'**
+  String get websites_deleted;
+
+  /// Toast shown after a website starts.
+  ///
+  /// In en, this message translates to:
+  /// **'Site started'**
+  String get websites_started;
+
+  /// Title for the website actions sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Site actions'**
+  String get websites_actions;
+
+  /// Title and action for creating a container.
+  ///
+  /// In en, this message translates to:
+  /// **'Create container'**
+  String get containers_create;
+
+  /// Container image label.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get containers_image;
+
+  /// Container name label.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get containers_name;
+
+  /// Container port mappings section.
+  ///
+  /// In en, this message translates to:
+  /// **'Port mappings'**
+  String get containers_ports;
+
+  /// Container volume mappings section.
+  ///
+  /// In en, this message translates to:
+  /// **'Volumes'**
+  String get containers_volumes;
+
+  /// Container environment variables section.
+  ///
+  /// In en, this message translates to:
+  /// **'Environment'**
+  String get containers_env;
+
+  /// Container advanced settings section.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get containers_advanced;
+
+  /// Action to add a form row.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get containers_add;
+
+  /// Container host port label.
+  ///
+  /// In en, this message translates to:
+  /// **'Host port'**
+  String get containers_hostPort;
+
+  /// Container port label.
+  ///
+  /// In en, this message translates to:
+  /// **'Container port'**
+  String get containers_containerPort;
+
+  /// Container volume host path label.
+  ///
+  /// In en, this message translates to:
+  /// **'Host path'**
+  String get containers_sourceDir;
+
+  /// Container volume container path label.
+  ///
+  /// In en, this message translates to:
+  /// **'Container path'**
+  String get containers_containerDir;
+
+  /// Container environment variable hint.
+  ///
+  /// In en, this message translates to:
+  /// **'KEY=VALUE'**
+  String get containers_envHint;
+
+  /// Submit button label for creating a container.
+  ///
+  /// In en, this message translates to:
+  /// **'Create container'**
+  String get containers_createSubmit;
+
+  /// Validation message for an invalid container name.
+  ///
+  /// In en, this message translates to:
+  /// **'Use letters, numbers, dots, dashes or underscores'**
+  String get containers_nameInvalid;
+
+  /// Validation message for a missing container image.
+  ///
+  /// In en, this message translates to:
+  /// **'Select or enter an image'**
+  String get containers_imageRequired;
+
+  /// Validation message for a missing container name.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a container name'**
+  String get containers_nameRequired;
+
+  /// Title for the local image picker sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Select image'**
+  String get containers_selectImage;
+
+  /// Option to enter a container image manually.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter manually'**
+  String get containers_manualInput;
+
+  /// Empty state for local Docker images.
+  ///
+  /// In en, this message translates to:
+  /// **'No local images'**
+  String get containers_noImages;
+
+  /// Toast shown after a container is created.
+  ///
+  /// In en, this message translates to:
+  /// **'Container created'**
+  String get containers_created;
+
+  /// Action to remove a form row.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get containers_removeRow;
+
+  /// Container CPU limit label.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU limit'**
+  String get containers_cpuLimit;
+
+  /// Container memory limit label.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory limit (MB)'**
+  String get containers_memoryLimit;
+
+  /// Container auto remove label.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto remove'**
+  String get containers_autoRemove;
+
+  /// Container privileged mode label.
+  ///
+  /// In en, this message translates to:
+  /// **'Privileged'**
+  String get containers_privileged;
+
+  /// Container restart policy hint.
+  ///
+  /// In en, this message translates to:
+  /// **'unless-stopped'**
+  String get containers_restartPolicyHint;
+
+  /// Container command hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Command, space separated'**
+  String get containers_cmdHint;
+
+  /// Container entrypoint hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Entrypoint, space separated'**
+  String get containers_entrypointHint;
+
+  /// Container working directory hint.
+  ///
+  /// In en, this message translates to:
+  /// **'/usr/share/nginx/html'**
+  String get containers_workingDirHint;
+
+  /// Container network label.
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get containers_network;
+
+  /// Default Docker network used by the create form.
+  ///
+  /// In en, this message translates to:
+  /// **'1panel-network'**
+  String get containers_defaultNetwork;
+
+  /// Container advanced settings summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Command, entrypoint, working directory, network and limits'**
+  String get containers_advancedHint;
 }
 
 class _AppLocalizationsDelegate

@@ -903,7 +903,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_running => '运行中';
 
   @override
-  String get websites_stopped => '已停止';
+  String get websites_stopped => '站点已停止';
 
   @override
   String get websites_static => '静态';
@@ -1839,4 +1839,327 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get server_edit_savedConnecting => '已保存，正在连接…';
+
+  @override
+  String get action_add => '添加';
+
+  @override
+  String get firewall_tabRules => '规则';
+
+  @override
+  String get firewall_tabForward => '转发';
+
+  @override
+  String get firewall_tabDocker => 'Docker';
+
+  @override
+  String get firewall_tabSettings => '设置';
+
+  @override
+  String firewall_rulesCount(int count) {
+    return '规则 $count 条';
+  }
+
+  @override
+  String get firewall_searchHint => '搜索地址、端口或备注';
+
+  @override
+  String get firewall_filterAll => '全部';
+
+  @override
+  String get firewall_filterIpv4 => 'IPv4';
+
+  @override
+  String get firewall_filterIpv6 => 'IPv6';
+
+  @override
+  String get firewall_filterAllow => '允许';
+
+  @override
+  String get firewall_filterDeny => '拒绝';
+
+  @override
+  String get firewall_anyAddress => '所有地址';
+
+  @override
+  String get firewall_anyPort => '所有端口';
+
+  @override
+  String firewall_ruleDeleteTitle(String name) {
+    return '删除规则 $name？';
+  }
+
+  @override
+  String get firewall_ruleDeleteMessage => '该规则将从面板防火墙中移除。';
+
+  @override
+  String get firewall_addForward => '添加转发规则';
+
+  @override
+  String get firewall_editForward => '编辑转发规则';
+
+  @override
+  String get firewall_forwardEmptyTitle => '暂无转发规则';
+
+  @override
+  String get firewall_forwardEmptyMessage => '创建规则把主机端口转发到内部服务。';
+
+  @override
+  String get firewall_forwardPort => '监听端口';
+
+  @override
+  String get firewall_forwardTargetIp => '目标 IP';
+
+  @override
+  String get firewall_forwardTargetPort => '目标端口';
+
+  @override
+  String get firewall_forwardInterface => '网卡（可选）';
+
+  @override
+  String get firewall_forwardEnabled => '转发已启用';
+
+  @override
+  String get firewall_enableForward => '启用转发';
+
+  @override
+  String get firewall_dockerGuard => 'Docker 端口守卫';
+
+  @override
+  String get firewall_dockerGuardEnabled => '守卫已生效';
+
+  @override
+  String get firewall_dockerGuardDisabled => '守卫未生效';
+
+  @override
+  String get firewall_dockerGuardEmpty => '暂无已发布的容器端口';
+
+  @override
+  String get firewall_dockerEndpoint => '容器端口';
+
+  @override
+  String get firewall_settingsBackend => '防火墙后端';
+
+  @override
+  String get firewall_settingsVersion => '版本';
+
+  @override
+  String get firewall_settingsIpv6 => 'IPv6';
+
+  @override
+  String get firewall_settingsIpv6Hint => '允许面板管理 IPv6 规则';
+
+  @override
+  String get firewall_settingsWhitelist => '端口白名单';
+
+  @override
+  String get firewall_settingsPanelPort => '面板端口';
+
+  @override
+  String get firewall_settingsSshPort => 'SSH 端口';
+
+  @override
+  String get firewall_whitelistAdd => '添加白名单端口';
+
+  @override
+  String get firewall_whitelistPort => '端口';
+
+  @override
+  String get firewall_whitelistProtocol => '协议';
+
+  @override
+  String get firewall_whitelistSources => '允许来源';
+
+  @override
+  String get firewall_whitelistSourcesHint => '逗号分隔，例如 0.0.0.0/0';
+
+  @override
+  String get firewall_ruleAddress => '来源地址';
+
+  @override
+  String get firewall_rulePort => '目标端口';
+
+  @override
+  String get firewall_ruleProtocol => '协议';
+
+  @override
+  String get firewall_ruleFamily => 'IP 协议族';
+
+  @override
+  String get firewall_ruleStrategy => '动作';
+
+  @override
+  String get firewall_ruleRemark => '备注';
+
+  @override
+  String get firewall_ruleInterface => '网卡';
+
+  @override
+  String get firewall_rulePortHint => '80、8000-8100 或 80,443';
+
+  @override
+  String get firewall_ruleAddressHint => '留空表示所有地址';
+
+  @override
+  String get firewall_ruleInvalidPort => '请输入有效端口或端口范围';
+
+  @override
+  String get firewall_editRule => '编辑规则';
+
+  @override
+  String get firewall_deleteRule => '删除规则';
+
+  @override
+  String get firewall_moveUp => '上移';
+
+  @override
+  String get firewall_moveDown => '下移';
+
+  @override
+  String get firewall_forwardRequired => '请填写监听端口、目标 IP 和目标端口';
+
+  @override
+  String get firewall_whitelistRequired => '请填写端口和至少一个来源';
+
+  @override
+  String get websites_start => '启动站点';
+
+  @override
+  String get websites_stop => '停止站点';
+
+  @override
+  String get websites_delete => '删除站点';
+
+  @override
+  String get websites_copyDomain => '复制域名';
+
+  @override
+  String get websites_open => '打开网页';
+
+  @override
+  String websites_deleteTitle(String name) {
+    return '删除 $name？';
+  }
+
+  @override
+  String get websites_deleteMessage => '站点文件、Nginx 配置和 SSL 证书将一并删除，且不可恢复。';
+
+  @override
+  String websites_deleteDatabaseCount(int count) {
+    return '同时删除关联数据库（$count 个）';
+  }
+
+  @override
+  String get websites_deleteBackup => '同时删除站点备份';
+
+  @override
+  String get websites_forceDelete => '强制删除（忽略错误）';
+
+  @override
+  String get websites_deleted => '站点已删除';
+
+  @override
+  String get websites_started => '站点已启动';
+
+  @override
+  String get websites_actions => '站点操作';
+
+  @override
+  String get containers_create => '新建容器';
+
+  @override
+  String get containers_image => '镜像';
+
+  @override
+  String get containers_name => '名称';
+
+  @override
+  String get containers_ports => '端口映射';
+
+  @override
+  String get containers_volumes => '目录挂载';
+
+  @override
+  String get containers_env => '环境变量';
+
+  @override
+  String get containers_advanced => '高级';
+
+  @override
+  String get containers_add => '添加';
+
+  @override
+  String get containers_hostPort => '主机端口';
+
+  @override
+  String get containers_containerPort => '容器端口';
+
+  @override
+  String get containers_sourceDir => '主机路径';
+
+  @override
+  String get containers_containerDir => '容器路径';
+
+  @override
+  String get containers_envHint => 'KEY=VALUE';
+
+  @override
+  String get containers_createSubmit => '创建容器';
+
+  @override
+  String get containers_nameInvalid => '仅支持字母、数字、点、横线和下划线';
+
+  @override
+  String get containers_imageRequired => '请选择或输入镜像';
+
+  @override
+  String get containers_nameRequired => '请输入容器名称';
+
+  @override
+  String get containers_selectImage => '选择镜像';
+
+  @override
+  String get containers_manualInput => '手动输入';
+
+  @override
+  String get containers_noImages => '暂无本地镜像';
+
+  @override
+  String get containers_created => '容器已创建';
+
+  @override
+  String get containers_removeRow => '移除';
+
+  @override
+  String get containers_cpuLimit => 'CPU 限制';
+
+  @override
+  String get containers_memoryLimit => '内存限制（MB）';
+
+  @override
+  String get containers_autoRemove => '自动删除';
+
+  @override
+  String get containers_privileged => '特权模式';
+
+  @override
+  String get containers_restartPolicyHint => 'unless-stopped';
+
+  @override
+  String get containers_cmdHint => '启动命令，空格分隔';
+
+  @override
+  String get containers_entrypointHint => '入口，空格分隔';
+
+  @override
+  String get containers_workingDirHint => '/usr/share/nginx/html';
+
+  @override
+  String get containers_network => '网络';
+
+  @override
+  String get containers_defaultNetwork => '1panel-network';
+
+  @override
+  String get containers_advancedHint => '命令、入口、工作目录、网络与资源限制';
 }

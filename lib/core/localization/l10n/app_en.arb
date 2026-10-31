@@ -2562,5 +2562,449 @@
   "server_edit_savedConnecting": "Saved, connecting…",
   "@server_edit_savedConnecting": {
     "description": "Toast shown after a panel is saved locally and the app opens its overview."
+  },
+  "action_add": "Add",
+  "@action_add": {
+    "description": "Generic action to add an item."
+  },
+  "firewall_tabRules": "Rules",
+  "@firewall_tabRules": {
+    "description": "Firewall rules tab label."
+  },
+  "firewall_tabForward": "Forwarding",
+  "@firewall_tabForward": {
+    "description": "Firewall port forwarding tab label."
+  },
+  "firewall_tabDocker": "Docker",
+  "@firewall_tabDocker": {
+    "description": "Firewall Docker port guard tab label."
+  },
+  "firewall_tabSettings": "Settings",
+  "@firewall_tabSettings": {
+    "description": "Firewall settings tab label."
+  },
+  "firewall_rulesCount": "Rules: {count}",
+  "@firewall_rulesCount": {
+    "description": "Number of firewall rules.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "firewall_searchHint": "Search address, port or note",
+  "@firewall_searchHint": {
+    "description": "Firewall rule search field hint."
+  },
+  "firewall_filterAll": "All",
+  "@firewall_filterAll": {
+    "description": "Firewall filter for all rules."
+  },
+  "firewall_filterIpv4": "IPv4",
+  "@firewall_filterIpv4": {
+    "description": "Firewall filter for IPv4 rules."
+  },
+  "firewall_filterIpv6": "IPv6",
+  "@firewall_filterIpv6": {
+    "description": "Firewall filter for IPv6 rules."
+  },
+  "firewall_filterAllow": "Allow",
+  "@firewall_filterAllow": {
+    "description": "Firewall filter for allow rules."
+  },
+  "firewall_filterDeny": "Deny",
+  "@firewall_filterDeny": {
+    "description": "Firewall filter for deny rules."
+  },
+  "firewall_anyAddress": "Any address",
+  "@firewall_anyAddress": {
+    "description": "Placeholder when a firewall rule has no source address."
+  },
+  "firewall_anyPort": "Any port",
+  "@firewall_anyPort": {
+    "description": "Placeholder when a firewall rule has no port."
+  },
+  "firewall_ruleDeleteTitle": "Delete rule {name}?",
+  "@firewall_ruleDeleteTitle": {
+    "description": "Confirmation title for deleting a firewall rule.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "firewall_ruleDeleteMessage": "This rule will be removed from the panel firewall.",
+  "@firewall_ruleDeleteMessage": {
+    "description": "Confirmation message for deleting a firewall rule."
+  },
+  "firewall_addForward": "Add forwarding rule",
+  "@firewall_addForward": {
+    "description": "Action to add a port forwarding rule."
+  },
+  "firewall_editForward": "Edit forwarding rule",
+  "@firewall_editForward": {
+    "description": "Title for editing a port forwarding rule."
+  },
+  "firewall_forwardEmptyTitle": "No forwarding rules",
+  "@firewall_forwardEmptyTitle": {
+    "description": "Empty state title for port forwarding."
+  },
+  "firewall_forwardEmptyMessage": "Create a rule to forward a host port to an internal service.",
+  "@firewall_forwardEmptyMessage": {
+    "description": "Empty state message for port forwarding."
+  },
+  "firewall_forwardPort": "Listen port",
+  "@firewall_forwardPort": {
+    "description": "Port forwarding listen port label."
+  },
+  "firewall_forwardTargetIp": "Target IP",
+  "@firewall_forwardTargetIp": {
+    "description": "Port forwarding target IP label."
+  },
+  "firewall_forwardTargetPort": "Target port",
+  "@firewall_forwardTargetPort": {
+    "description": "Port forwarding target port label."
+  },
+  "firewall_forwardInterface": "Interface (optional)",
+  "@firewall_forwardInterface": {
+    "description": "Port forwarding interface label."
+  },
+  "firewall_forwardEnabled": "Forwarding enabled",
+  "@firewall_forwardEnabled": {
+    "description": "Status label when port forwarding is enabled."
+  },
+  "firewall_enableForward": "Enable forwarding",
+  "@firewall_enableForward": {
+    "description": "Action to enable port forwarding."
+  },
+  "firewall_dockerGuard": "Docker port guard",
+  "@firewall_dockerGuard": {
+    "description": "Docker port guard section title."
+  },
+  "firewall_dockerGuardEnabled": "Guard active",
+  "@firewall_dockerGuardEnabled": {
+    "description": "Status label when the Docker port guard is active."
+  },
+  "firewall_dockerGuardDisabled": "Guard inactive",
+  "@firewall_dockerGuardDisabled": {
+    "description": "Status label when the Docker port guard is inactive."
+  },
+  "firewall_dockerGuardEmpty": "No published container ports",
+  "@firewall_dockerGuardEmpty": {
+    "description": "Empty state for Docker published ports."
+  },
+  "firewall_dockerEndpoint": "Container endpoint",
+  "@firewall_dockerEndpoint": {
+    "description": "Docker container endpoint label."
+  },
+  "firewall_settingsBackend": "Firewall backend",
+  "@firewall_settingsBackend": {
+    "description": "Firewall backend label."
+  },
+  "firewall_settingsVersion": "Version",
+  "@firewall_settingsVersion": {
+    "description": "Firewall backend version label."
+  },
+  "firewall_settingsIpv6": "IPv6",
+  "@firewall_settingsIpv6": {
+    "description": "IPv6 firewall setting label."
+  },
+  "firewall_settingsIpv6Hint": "Allow the panel to manage IPv6 rules",
+  "@firewall_settingsIpv6Hint": {
+    "description": "IPv6 firewall setting description."
+  },
+  "firewall_settingsWhitelist": "Port whitelist",
+  "@firewall_settingsWhitelist": {
+    "description": "Firewall port whitelist section title."
+  },
+  "firewall_settingsPanelPort": "Panel port",
+  "@firewall_settingsPanelPort": {
+    "description": "Panel port label."
+  },
+  "firewall_settingsSshPort": "SSH port",
+  "@firewall_settingsSshPort": {
+    "description": "SSH port label."
+  },
+  "firewall_whitelistAdd": "Add whitelist port",
+  "@firewall_whitelistAdd": {
+    "description": "Action to add a firewall whitelist port."
+  },
+  "firewall_whitelistPort": "Port",
+  "@firewall_whitelistPort": {
+    "description": "Whitelist port label."
+  },
+  "firewall_whitelistProtocol": "Protocol",
+  "@firewall_whitelistProtocol": {
+    "description": "Whitelist protocol label."
+  },
+  "firewall_whitelistSources": "Allowed sources",
+  "@firewall_whitelistSources": {
+    "description": "Whitelist allowed sources label."
+  },
+  "firewall_whitelistSourcesHint": "Comma separated, e.g. 0.0.0.0/0",
+  "@firewall_whitelistSourcesHint": {
+    "description": "Whitelist allowed sources hint."
+  },
+  "firewall_ruleAddress": "Source address",
+  "@firewall_ruleAddress": {
+    "description": "Firewall rule source address label."
+  },
+  "firewall_rulePort": "Destination port",
+  "@firewall_rulePort": {
+    "description": "Firewall rule destination port label."
+  },
+  "firewall_ruleProtocol": "Protocol",
+  "@firewall_ruleProtocol": {
+    "description": "Firewall rule protocol label."
+  },
+  "firewall_ruleFamily": "IP family",
+  "@firewall_ruleFamily": {
+    "description": "Firewall rule IP family label."
+  },
+  "firewall_ruleStrategy": "Action",
+  "@firewall_ruleStrategy": {
+    "description": "Firewall rule action label."
+  },
+  "firewall_ruleRemark": "Note",
+  "@firewall_ruleRemark": {
+    "description": "Firewall rule note label."
+  },
+  "firewall_ruleInterface": "Interface",
+  "@firewall_ruleInterface": {
+    "description": "Firewall rule interface label."
+  },
+  "firewall_rulePortHint": "80, 8000-8100, or 80,443",
+  "@firewall_rulePortHint": {
+    "description": "Firewall rule port input hint."
+  },
+  "firewall_ruleAddressHint": "Leave empty for any address",
+  "@firewall_ruleAddressHint": {
+    "description": "Firewall rule source address input hint."
+  },
+  "firewall_ruleInvalidPort": "Enter a valid port or port range",
+  "@firewall_ruleInvalidPort": {
+    "description": "Validation message for an invalid firewall port."
+  },
+  "firewall_editRule": "Edit rule",
+  "@firewall_editRule": {
+    "description": "Action to edit a firewall rule."
+  },
+  "firewall_deleteRule": "Delete rule",
+  "@firewall_deleteRule": {
+    "description": "Action to delete a firewall rule."
+  },
+  "firewall_moveUp": "Move up",
+  "@firewall_moveUp": {
+    "description": "Action to move a firewall rule up."
+  },
+  "firewall_moveDown": "Move down",
+  "@firewall_moveDown": {
+    "description": "Action to move a firewall rule down."
+  },
+  "firewall_forwardRequired": "Fill in listen port, target IP and target port",
+  "@firewall_forwardRequired": {
+    "description": "Validation message for a port forwarding rule."
+  },
+  "firewall_whitelistRequired": "Fill in port and at least one source",
+  "@firewall_whitelistRequired": {
+    "description": "Validation message for a firewall whitelist rule."
+  },
+  "websites_start": "Start site",
+  "@websites_start": {
+    "description": "Action to start a website."
+  },
+  "websites_stop": "Stop site",
+  "@websites_stop": {
+    "description": "Action to stop a website."
+  },
+  "websites_delete": "Delete site",
+  "@websites_delete": {
+    "description": "Action to delete a website."
+  },
+  "websites_copyDomain": "Copy domain",
+  "@websites_copyDomain": {
+    "description": "Action to copy a website domain."
+  },
+  "websites_open": "Open website",
+  "@websites_open": {
+    "description": "Action to open a website in a browser."
+  },
+  "websites_deleteTitle": "Delete {name}?",
+  "@websites_deleteTitle": {
+    "description": "Website deletion confirmation title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "websites_deleteMessage": "Site files, Nginx configuration and SSL certificates will be deleted. This cannot be undone.",
+  "@websites_deleteMessage": {
+    "description": "Website deletion warning."
+  },
+  "websites_deleteDatabaseCount": "Also delete {count} linked database(s)",
+  "@websites_deleteDatabaseCount": {
+    "description": "Checkbox label to delete linked databases.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "websites_deleteBackup": "Also delete site backups",
+  "@websites_deleteBackup": {
+    "description": "Checkbox label to delete website backups."
+  },
+  "websites_forceDelete": "Force delete and ignore errors",
+  "@websites_forceDelete": {
+    "description": "Checkbox label for forced website deletion."
+  },
+  "websites_deleted": "Site deleted",
+  "@websites_deleted": {
+    "description": "Toast shown after a website is deleted."
+  },
+  "websites_started": "Site started",
+  "@websites_started": {
+    "description": "Toast shown after a website starts."
+  },
+  "websites_stopped": "Site stopped",
+  "@websites_stopped": {
+    "description": "Toast shown after a website stops."
+  },
+  "websites_actions": "Site actions",
+  "@websites_actions": {
+    "description": "Title for the website actions sheet."
+  },
+  "containers_create": "Create container",
+  "@containers_create": {
+    "description": "Title and action for creating a container."
+  },
+  "containers_image": "Image",
+  "@containers_image": {
+    "description": "Container image label."
+  },
+  "containers_name": "Name",
+  "@containers_name": {
+    "description": "Container name label."
+  },
+  "containers_ports": "Port mappings",
+  "@containers_ports": {
+    "description": "Container port mappings section."
+  },
+  "containers_volumes": "Volumes",
+  "@containers_volumes": {
+    "description": "Container volume mappings section."
+  },
+  "containers_env": "Environment",
+  "@containers_env": {
+    "description": "Container environment variables section."
+  },
+  "containers_advanced": "Advanced",
+  "@containers_advanced": {
+    "description": "Container advanced settings section."
+  },
+  "containers_add": "Add",
+  "@containers_add": {
+    "description": "Action to add a form row."
+  },
+  "containers_hostPort": "Host port",
+  "@containers_hostPort": {
+    "description": "Container host port label."
+  },
+  "containers_containerPort": "Container port",
+  "@containers_containerPort": {
+    "description": "Container port label."
+  },
+  "containers_sourceDir": "Host path",
+  "@containers_sourceDir": {
+    "description": "Container volume host path label."
+  },
+  "containers_containerDir": "Container path",
+  "@containers_containerDir": {
+    "description": "Container volume container path label."
+  },
+  "containers_envHint": "KEY=VALUE",
+  "@containers_envHint": {
+    "description": "Container environment variable hint."
+  },
+  "containers_createSubmit": "Create container",
+  "@containers_createSubmit": {
+    "description": "Submit button label for creating a container."
+  },
+  "containers_nameInvalid": "Use letters, numbers, dots, dashes or underscores",
+  "@containers_nameInvalid": {
+    "description": "Validation message for an invalid container name."
+  },
+  "containers_imageRequired": "Select or enter an image",
+  "@containers_imageRequired": {
+    "description": "Validation message for a missing container image."
+  },
+  "containers_nameRequired": "Enter a container name",
+  "@containers_nameRequired": {
+    "description": "Validation message for a missing container name."
+  },
+  "containers_selectImage": "Select image",
+  "@containers_selectImage": {
+    "description": "Title for the local image picker sheet."
+  },
+  "containers_manualInput": "Enter manually",
+  "@containers_manualInput": {
+    "description": "Option to enter a container image manually."
+  },
+  "containers_noImages": "No local images",
+  "@containers_noImages": {
+    "description": "Empty state for local Docker images."
+  },
+  "containers_created": "Container created",
+  "@containers_created": {
+    "description": "Toast shown after a container is created."
+  },
+  "containers_removeRow": "Remove",
+  "@containers_removeRow": {
+    "description": "Action to remove a form row."
+  },
+  "containers_cpuLimit": "CPU limit",
+  "@containers_cpuLimit": {
+    "description": "Container CPU limit label."
+  },
+  "containers_memoryLimit": "Memory limit (MB)",
+  "@containers_memoryLimit": {
+    "description": "Container memory limit label."
+  },
+  "containers_autoRemove": "Auto remove",
+  "@containers_autoRemove": {
+    "description": "Container auto remove label."
+  },
+  "containers_privileged": "Privileged",
+  "@containers_privileged": {
+    "description": "Container privileged mode label."
+  },
+  "containers_restartPolicyHint": "unless-stopped",
+  "@containers_restartPolicyHint": {
+    "description": "Container restart policy hint."
+  },
+  "containers_cmdHint": "Command, space separated",
+  "@containers_cmdHint": {
+    "description": "Container command hint."
+  },
+  "containers_entrypointHint": "Entrypoint, space separated",
+  "@containers_entrypointHint": {
+    "description": "Container entrypoint hint."
+  },
+  "containers_workingDirHint": "/usr/share/nginx/html",
+  "@containers_workingDirHint": {
+    "description": "Container working directory hint."
+  },
+  "containers_network": "Network",
+  "@containers_network": {
+    "description": "Container network label."
+  },
+  "containers_defaultNetwork": "1panel-network",
+  "@containers_defaultNetwork": {
+    "description": "Default Docker network used by the create form."
+  },
+  "containers_advancedHint": "Command, entrypoint, working directory, network and limits",
+  "@containers_advancedHint": {
+    "description": "Container advanced settings summary."
   }
 }

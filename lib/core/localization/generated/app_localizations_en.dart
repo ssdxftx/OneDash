@@ -921,7 +921,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_running => 'Running';
 
   @override
-  String get websites_stopped => 'Stopped';
+  String get websites_stopped => 'Site stopped';
 
   @override
   String get websites_static => 'Static';
@@ -1887,4 +1887,335 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get server_edit_savedConnecting => 'Saved, connecting…';
+
+  @override
+  String get action_add => 'Add';
+
+  @override
+  String get firewall_tabRules => 'Rules';
+
+  @override
+  String get firewall_tabForward => 'Forwarding';
+
+  @override
+  String get firewall_tabDocker => 'Docker';
+
+  @override
+  String get firewall_tabSettings => 'Settings';
+
+  @override
+  String firewall_rulesCount(int count) {
+    return 'Rules: $count';
+  }
+
+  @override
+  String get firewall_searchHint => 'Search address, port or note';
+
+  @override
+  String get firewall_filterAll => 'All';
+
+  @override
+  String get firewall_filterIpv4 => 'IPv4';
+
+  @override
+  String get firewall_filterIpv6 => 'IPv6';
+
+  @override
+  String get firewall_filterAllow => 'Allow';
+
+  @override
+  String get firewall_filterDeny => 'Deny';
+
+  @override
+  String get firewall_anyAddress => 'Any address';
+
+  @override
+  String get firewall_anyPort => 'Any port';
+
+  @override
+  String firewall_ruleDeleteTitle(String name) {
+    return 'Delete rule $name?';
+  }
+
+  @override
+  String get firewall_ruleDeleteMessage =>
+      'This rule will be removed from the panel firewall.';
+
+  @override
+  String get firewall_addForward => 'Add forwarding rule';
+
+  @override
+  String get firewall_editForward => 'Edit forwarding rule';
+
+  @override
+  String get firewall_forwardEmptyTitle => 'No forwarding rules';
+
+  @override
+  String get firewall_forwardEmptyMessage =>
+      'Create a rule to forward a host port to an internal service.';
+
+  @override
+  String get firewall_forwardPort => 'Listen port';
+
+  @override
+  String get firewall_forwardTargetIp => 'Target IP';
+
+  @override
+  String get firewall_forwardTargetPort => 'Target port';
+
+  @override
+  String get firewall_forwardInterface => 'Interface (optional)';
+
+  @override
+  String get firewall_forwardEnabled => 'Forwarding enabled';
+
+  @override
+  String get firewall_enableForward => 'Enable forwarding';
+
+  @override
+  String get firewall_dockerGuard => 'Docker port guard';
+
+  @override
+  String get firewall_dockerGuardEnabled => 'Guard active';
+
+  @override
+  String get firewall_dockerGuardDisabled => 'Guard inactive';
+
+  @override
+  String get firewall_dockerGuardEmpty => 'No published container ports';
+
+  @override
+  String get firewall_dockerEndpoint => 'Container endpoint';
+
+  @override
+  String get firewall_settingsBackend => 'Firewall backend';
+
+  @override
+  String get firewall_settingsVersion => 'Version';
+
+  @override
+  String get firewall_settingsIpv6 => 'IPv6';
+
+  @override
+  String get firewall_settingsIpv6Hint =>
+      'Allow the panel to manage IPv6 rules';
+
+  @override
+  String get firewall_settingsWhitelist => 'Port whitelist';
+
+  @override
+  String get firewall_settingsPanelPort => 'Panel port';
+
+  @override
+  String get firewall_settingsSshPort => 'SSH port';
+
+  @override
+  String get firewall_whitelistAdd => 'Add whitelist port';
+
+  @override
+  String get firewall_whitelistPort => 'Port';
+
+  @override
+  String get firewall_whitelistProtocol => 'Protocol';
+
+  @override
+  String get firewall_whitelistSources => 'Allowed sources';
+
+  @override
+  String get firewall_whitelistSourcesHint => 'Comma separated, e.g. 0.0.0.0/0';
+
+  @override
+  String get firewall_ruleAddress => 'Source address';
+
+  @override
+  String get firewall_rulePort => 'Destination port';
+
+  @override
+  String get firewall_ruleProtocol => 'Protocol';
+
+  @override
+  String get firewall_ruleFamily => 'IP family';
+
+  @override
+  String get firewall_ruleStrategy => 'Action';
+
+  @override
+  String get firewall_ruleRemark => 'Note';
+
+  @override
+  String get firewall_ruleInterface => 'Interface';
+
+  @override
+  String get firewall_rulePortHint => '80, 8000-8100, or 80,443';
+
+  @override
+  String get firewall_ruleAddressHint => 'Leave empty for any address';
+
+  @override
+  String get firewall_ruleInvalidPort => 'Enter a valid port or port range';
+
+  @override
+  String get firewall_editRule => 'Edit rule';
+
+  @override
+  String get firewall_deleteRule => 'Delete rule';
+
+  @override
+  String get firewall_moveUp => 'Move up';
+
+  @override
+  String get firewall_moveDown => 'Move down';
+
+  @override
+  String get firewall_forwardRequired =>
+      'Fill in listen port, target IP and target port';
+
+  @override
+  String get firewall_whitelistRequired =>
+      'Fill in port and at least one source';
+
+  @override
+  String get websites_start => 'Start site';
+
+  @override
+  String get websites_stop => 'Stop site';
+
+  @override
+  String get websites_delete => 'Delete site';
+
+  @override
+  String get websites_copyDomain => 'Copy domain';
+
+  @override
+  String get websites_open => 'Open website';
+
+  @override
+  String websites_deleteTitle(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String get websites_deleteMessage =>
+      'Site files, Nginx configuration and SSL certificates will be deleted. This cannot be undone.';
+
+  @override
+  String websites_deleteDatabaseCount(int count) {
+    return 'Also delete $count linked database(s)';
+  }
+
+  @override
+  String get websites_deleteBackup => 'Also delete site backups';
+
+  @override
+  String get websites_forceDelete => 'Force delete and ignore errors';
+
+  @override
+  String get websites_deleted => 'Site deleted';
+
+  @override
+  String get websites_started => 'Site started';
+
+  @override
+  String get websites_actions => 'Site actions';
+
+  @override
+  String get containers_create => 'Create container';
+
+  @override
+  String get containers_image => 'Image';
+
+  @override
+  String get containers_name => 'Name';
+
+  @override
+  String get containers_ports => 'Port mappings';
+
+  @override
+  String get containers_volumes => 'Volumes';
+
+  @override
+  String get containers_env => 'Environment';
+
+  @override
+  String get containers_advanced => 'Advanced';
+
+  @override
+  String get containers_add => 'Add';
+
+  @override
+  String get containers_hostPort => 'Host port';
+
+  @override
+  String get containers_containerPort => 'Container port';
+
+  @override
+  String get containers_sourceDir => 'Host path';
+
+  @override
+  String get containers_containerDir => 'Container path';
+
+  @override
+  String get containers_envHint => 'KEY=VALUE';
+
+  @override
+  String get containers_createSubmit => 'Create container';
+
+  @override
+  String get containers_nameInvalid =>
+      'Use letters, numbers, dots, dashes or underscores';
+
+  @override
+  String get containers_imageRequired => 'Select or enter an image';
+
+  @override
+  String get containers_nameRequired => 'Enter a container name';
+
+  @override
+  String get containers_selectImage => 'Select image';
+
+  @override
+  String get containers_manualInput => 'Enter manually';
+
+  @override
+  String get containers_noImages => 'No local images';
+
+  @override
+  String get containers_created => 'Container created';
+
+  @override
+  String get containers_removeRow => 'Remove';
+
+  @override
+  String get containers_cpuLimit => 'CPU limit';
+
+  @override
+  String get containers_memoryLimit => 'Memory limit (MB)';
+
+  @override
+  String get containers_autoRemove => 'Auto remove';
+
+  @override
+  String get containers_privileged => 'Privileged';
+
+  @override
+  String get containers_restartPolicyHint => 'unless-stopped';
+
+  @override
+  String get containers_cmdHint => 'Command, space separated';
+
+  @override
+  String get containers_entrypointHint => 'Entrypoint, space separated';
+
+  @override
+  String get containers_workingDirHint => '/usr/share/nginx/html';
+
+  @override
+  String get containers_network => 'Network';
+
+  @override
+  String get containers_defaultNetwork => '1panel-network';
+
+  @override
+  String get containers_advancedHint =>
+      'Command, entrypoint, working directory, network and limits';
 }
