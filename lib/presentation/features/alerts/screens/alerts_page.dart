@@ -306,7 +306,21 @@ class _AlertLogTab extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(log.message, style: AppTextStyles.bodyM),
+                            Text(
+                              log.message,
+                              style: AppTextStyles.bodyM,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (log.method.isNotEmpty) ...[
+                              const SizedBox(height: AppTokens.s4),
+                              Text(
+                                alertMethodLabel(log.method, l10n),
+                                style: AppTextStyles.caption.copyWith(
+                                  color: context.scheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: AppTokens.s8),
                             Row(
                               children: [
