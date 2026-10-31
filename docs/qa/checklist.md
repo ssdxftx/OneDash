@@ -16,10 +16,18 @@ Run after installing the release APK on a real device (spec 13.4).
 | 10 | TalkBack: add server -> overview is understandable | pending |
 | 11 | OLED black theme: cards, sheets, skeleton and terminal remain distinguishable | pending |
 | 12 | English locale: website detail, backups, server edit, files and terminal show no Chinese fallback | pending |
+| 13 | Offline or bad API key: every page shows the error state with a working retry button, never a blank screen | pending |
+| 14 | Settings: switch all 8 accents and confirm primary buttons, selected tabs and rings change | pending |
+| 15 | Panel settings: grouped labels, edit default address/theme/language/session timeout, no raw JSON keys | pending |
+| 16 | Alerts: list rules, toggle status, delete with confirmation, load logs and clear them | pending |
+| 17 | Websites and containers: status text, chevron and item count visible in both locales | pending |
+| 18 | Host tools: detect Supervisor, initialize it, start/stop/restart service, create/edit/start/stop/delete a guarded process | pending |
+| 19 | Toolbox: device info, Fail2ban/FTP/ClamAV status, cache scan opens grouped result sheet | pending |
+| 20 | Website groups: create, rename, set default, delete with confirmation | pending |
 
 Automated checks already passing:
 
 ```bash
 flutter analyze   # no issues
-flutter test      # all tests pass
+flutter test      # 37 tests pass
 ```

@@ -161,7 +161,7 @@ class OverviewController
           lastError: null,
         ),
       );
-      _schedule(const Duration(seconds: 1));
+      _schedule(const Duration(seconds: 2));
     } catch (error) {
       if (_disposed) return;
       _failureCount++;

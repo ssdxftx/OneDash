@@ -103,7 +103,19 @@ class _AreaChartPainter extends CustomPainter {
 
     void drawSeries(List<double> data, Color color, bool withFill) {
       final points = _downsample(data, size.width.round());
-      if (points.length < 2) return;
+      if (points.isEmpty) return;
+      if (points.length == 1) {
+        final normalized = ((points.first - lower) / range).clamp(0.0, 1.0);
+        final y = size.height - normalized * size.height;
+        canvas.drawLine(
+          Offset(0, y),
+          Offset(size.width, y),
+          Paint()
+            ..color = color.withValues(alpha: 0.45)
+            ..strokeWidth = strokeWidth,
+        );
+        return;
+      }
       final path = Path();
       final fillPath = Path();
       for (var i = 0; i < points.length; i++) {

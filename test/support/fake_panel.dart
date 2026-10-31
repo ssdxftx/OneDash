@@ -152,7 +152,7 @@ class FakePanel {
     'ioReadTime': 1,
     'ioWriteBytes': 1024,
     'ioWriteTime': 1,
-    'disks': [
+    'diskData': [
       {
         'path': '/',
         'device': '/dev/sda1',

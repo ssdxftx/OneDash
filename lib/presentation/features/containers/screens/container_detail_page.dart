@@ -207,16 +207,25 @@ class _OverviewTab extends ConsumerWidget {
           const SizedBox(height: AppTokens.s24),
           SplitListGroup(
             children: [
-              SplitListTile(title: 'Image', subtitle: data.image),
-              SplitListTile(title: 'Hostname', subtitle: data.hostname),
               SplitListTile(
-                title: 'Restart policy',
+                title: l10n.containers_images,
+                subtitle: data.image,
+              ),
+              SplitListTile(
+                title: l10n.containers_hostname,
+                subtitle: data.hostname,
+              ),
+              SplitListTile(
+                title: l10n.containers_restartPolicy,
                 subtitle: data.restartPolicy,
               ),
-              SplitListTile(title: 'Working dir', subtitle: data.workingDir),
+              SplitListTile(
+                title: l10n.containers_workingDir,
+                subtitle: data.workingDir,
+              ),
               if (data.volumes.isNotEmpty)
                 SplitListTile(
-                  title: 'Volumes',
+                  title: l10n.containers_mountedVolumes,
                   subtitle: data.volumes.map((v) => v.sourceDir).join('\n'),
                 ),
             ],
@@ -234,6 +243,7 @@ class _ConfigTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final info = ref.watch(_containerInfoProvider(containerName));
     return AsyncStateView(
       value: info,
@@ -244,30 +254,30 @@ class _ConfigTab extends ConsumerWidget {
           SplitListGroup(
             children: [
               SplitListTile(
-                title: 'Environment',
+                title: l10n.containers_envVars,
                 subtitle: data.env.isEmpty ? '-' : data.env.join('\n'),
               ),
               SplitListTile(
-                title: 'Command',
+                title: l10n.containers_command,
                 subtitle: data.cmd?.join(' ') ?? '-',
               ),
               SplitListTile(
-                title: 'Entrypoint',
+                title: l10n.containers_entrypoint,
                 subtitle: data.entrypoint?.join(' ') ?? '-',
               ),
               SplitListTile(
-                title: 'Network',
+                title: l10n.nav_network,
                 subtitle: data.networks.map((n) => n.network).join(', '),
               ),
               SplitListTile(
-                title: 'Memory',
+                title: l10n.containers_memory,
                 subtitle: data.memory == 0
-                    ? 'unlimited'
+                    ? l10n.containers_unlimited
                     : formatBytes(data.memory),
               ),
               SplitListTile(
-                title: 'Privileged',
-                subtitle: data.privileged ? 'yes' : 'no',
+                title: l10n.containers_privilegedMode,
+                subtitle: data.privileged ? l10n.common_yes : l10n.common_no,
               ),
             ],
           ),

@@ -65,8 +65,10 @@ class _ErrorStateState extends State<ErrorState> {
             ),
             if (widget.onRetry != null || widget.onSecondaryAction != null) ...[
               const SizedBox(height: AppTokens.s24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: AppTokens.s12,
+                runSpacing: AppTokens.s8,
                 children: [
                   if (widget.onSecondaryAction != null &&
                       widget.data.secondaryActionLabel != null)
@@ -74,9 +76,6 @@ class _ErrorStateState extends State<ErrorState> {
                       onPressed: widget.onSecondaryAction,
                       child: Text(widget.data.secondaryActionLabel!),
                     ),
-                  if (widget.onSecondaryAction != null &&
-                      widget.onRetry != null)
-                    const SizedBox(width: AppTokens.s12),
                   if (widget.onRetry != null)
                     FilledButton(
                       onPressed: widget.onRetry,

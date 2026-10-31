@@ -114,12 +114,12 @@ class _ConfigTab extends ConsumerWidget {
         const SizedBox(height: AppTokens.s24),
         SplitListGroup(
           children: [
-            _Row(label: 'Alias', value: detail.alias),
-            _Row(label: 'Root', value: site.siteDir),
-            _Row(label: 'Path', value: site.sitePath),
-            _Row(label: 'Runtime', value: site.runtimeName),
-            _Row(label: 'Remark', value: site.remark),
-            _Row(label: 'Created', value: site.createdAt),
+            _Row(label: l10n.websites_websiteAlias, value: detail.alias),
+            _Row(label: l10n.websites_rootDirectory, value: site.siteDir),
+            _Row(label: l10n.websites_path, value: site.sitePath),
+            _Row(label: l10n.websites_runtime, value: site.runtimeName),
+            _Row(label: l10n.websites_remark, value: site.remark),
+            _Row(label: l10n.websites_createdAt, value: site.createdAt),
           ],
         ),
       ],
@@ -420,10 +420,10 @@ class _SslTab extends StatelessWidget {
         const SizedBox(height: AppTokens.s24),
         SplitListGroup(
           children: [
-            _Row(label: 'Provider', value: ssl.provider),
-            _Row(label: 'Type', value: ssl.type),
-            _Row(label: 'Expire', value: ssl.expireDate),
-            _Row(label: 'Domain', value: ssl.primaryDomain),
+            _Row(label: l10n.websites_sslProvider, value: ssl.provider),
+            _Row(label: l10n.websites_type, value: ssl.type),
+            _Row(label: l10n.websites_sslExpire, value: ssl.expireDate),
+            _Row(label: l10n.websites_domain, value: ssl.primaryDomain),
           ],
         ),
         const SizedBox(height: AppTokens.s24),

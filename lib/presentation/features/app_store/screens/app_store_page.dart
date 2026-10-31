@@ -17,9 +17,10 @@ import '../../../common/states/empty_state.dart';
 import '../providers/app_store_provider.dart';
 
 class AppStorePage extends ConsumerStatefulWidget {
-  const AppStorePage({super.key, required this.serverId});
+  const AppStorePage({super.key, required this.serverId, this.initialTab = 0});
 
   final int serverId;
+  final int initialTab;
 
   @override
   ConsumerState<AppStorePage> createState() => _AppStorePageState();
@@ -67,6 +68,7 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
           ),
           Expanded(
             child: SegmentedTabsView(
+              initialIndex: widget.initialTab,
               labels: [l10n.apps_title, l10n.apps_installed],
               children: [
                 _CatalogTab(serverId: widget.serverId, query: _query),

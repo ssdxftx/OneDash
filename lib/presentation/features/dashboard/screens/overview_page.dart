@@ -179,7 +179,6 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
       load1: current.load1,
       cores: cores,
     );
-    final netUp = state.netUpHistory.isEmpty ? 0.0 : state.netUpHistory.last;
     final netDown = state.netDownHistory.isEmpty
         ? 0.0
         : state.netDownHistory.last;
@@ -340,8 +339,9 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
             MetricCard(
               title: l10n.dashboard_network,
               value: formatByteRate(netDown),
-              caption:
-                  '↑ ${formatByteRate(netUp)} · ↓ ${formatByteRate(netDown)}',
+              caption: l10n.dashboard_trafficTotal(
+                formatBytes(current.netBytesRecv + current.netBytesSent),
+              ),
               status: 'running',
               sparkline: Sparkline(values: state.netDownHistory),
               onLongPress: () => _copy(context, formatByteRate(netDown)),
@@ -404,19 +404,25 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
               SectionHeader(title: l10n.dashboard_system_info),
               SplitListGroup(
                 children: [
-                  _InfoRow(label: 'Host', value: base.hostname),
-                  _InfoRow(label: 'OS', value: base.prettyDistro),
-                  _InfoRow(label: 'Kernel', value: base.kernelVersion),
-                  _InfoRow(label: 'Arch', value: base.kernelArch),
-                  _InfoRow(label: 'CPU', value: base.cpuModelName),
-                  _InfoRow(label: 'Cores', value: '$cores'),
+                  _InfoRow(label: l10n.servers_host, value: base.hostname),
                   _InfoRow(
-                    label: 'Load',
+                    label: l10n.dashboard_system,
+                    value: base.prettyDistro,
+                  ),
+                  _InfoRow(
+                    label: l10n.dashboard_kernel,
+                    value: base.kernelVersion,
+                  ),
+                  _InfoRow(label: l10n.dashboard_arch, value: base.kernelArch),
+                  _InfoRow(label: l10n.dashboard_cpu, value: base.cpuModelName),
+                  _InfoRow(label: l10n.dashboard_cpuCores, value: '$cores'),
+                  _InfoRow(
+                    label: l10n.dashboard_load,
                     value:
                         '${current.load1.toStringAsFixed(2)} / ${current.load5.toStringAsFixed(2)} / ${current.load15.toStringAsFixed(2)}',
                   ),
                   _InfoRow(
-                    label: 'Uptime',
+                    label: l10n.dashboard_uptime,
                     value: formatUptime(current.uptimeSeconds, l10n),
                   ),
                 ],

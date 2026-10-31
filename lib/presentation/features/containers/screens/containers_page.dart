@@ -60,6 +60,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
     final l10n = AppLocalizations.of(context);
     final server = ref.watch(serverByIdProvider(widget.serverId)).valueOrNull;
     final containers = ref.watch(containersProvider);
+    final total = containers.valueOrNull?.items.length;
     final docker = ref.watch(dockerStatusProvider);
 
     return Scaffold(
@@ -69,7 +70,10 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
           children: [
             AppBarLarge(
               title: l10n.containers_title,
-              subtitle: server?.displayName,
+              subtitle: [
+                if (server != null) server.displayName,
+                if (total != null) l10n.containers_count(total),
+              ].join(' · '),
               onTitleLongPress: () => showServerSwitcher(
                 context,
                 ref,
@@ -279,6 +283,15 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
   }
 }
 
+String _stateLabel(String state, AppLocalizations l10n) {
+  return switch (state.toLowerCase()) {
+    'running' => l10n.containers_running,
+    'stopped' || 'exited' => l10n.containers_stopped,
+    'paused' => l10n.containers_pause,
+    _ => l10n.containers_abnormal,
+  };
+}
+
 class _ContainerCard extends StatelessWidget {
   const _ContainerCard({
     required this.item,
@@ -316,6 +329,18 @@ class _ContainerCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              Text(
+                _stateLabel(item.state, l10n),
+                style: AppTextStyles.caption.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: AppTokens.s4),
+              Icon(
+                TablerIcons.chevron_right,
+                size: AppTokens.iconList,
+                color: scheme.onSurfaceVariant,
+              ),
               if (item.isFromCompose)
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -340,7 +365,7 @@ class _ContainerCard extends StatelessWidget {
             item.imageName,
             style: AppTextStyles.bodyS.copyWith(
               color: scheme.onSurfaceVariant,
-              fontFamily: 'monospace',
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

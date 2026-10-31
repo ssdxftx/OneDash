@@ -97,7 +97,7 @@ ErrorViewData mapError(Object error, AppLocalizations l10n) {
     return ErrorViewData(
       icon: TablerIcons.alert_triangle,
       title: l10n.error_request_title,
-      message: error.message,
+      message: l10n.error_request_message,
       detail: raw,
       actionLabel: l10n.common_retry,
       kind: ErrorKind.business,

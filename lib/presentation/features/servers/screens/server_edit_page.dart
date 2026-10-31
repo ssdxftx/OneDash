@@ -12,6 +12,7 @@ import '../../../../core/network/dio_client_provider.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/server_repository_impl.dart';
 import '../../../../domain/entities/server.dart';
+import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
@@ -347,24 +348,11 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.isEditing
-              ? l10n.server_edit_edit_title
-              : l10n.server_edit_add_title,
-        ),
-        actions: [
-          TextButton(
-            onPressed: _saving ? null : _save,
-            child: _saving
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(l10n.action_save),
-          ),
-        ],
+      appBar: AppBarLarge(
+        title: widget.isEditing
+            ? l10n.server_edit_edit_title
+            : l10n.server_edit_add_title,
+        subtitle: l10n.server_edit_address,
       ),
       body: Form(
         key: _formKey,
@@ -423,6 +411,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
                         child: AppTextField(
                           controller: _portController,
                           label: l10n.server_edit_port,
+                          helper: l10n.server_edit_port_default,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,

@@ -81,7 +81,7 @@ class DashboardDto {
       ioReadTime: _int(json['ioReadTime']),
       ioWriteBytes: _int(json['ioWriteBytes']),
       ioWriteTime: _int(json['ioWriteTime']),
-      disks: _mapList(json['diskData'], _parseDisk),
+      disks: _mapList(json['diskData'] ?? json['disks'], _parseDisk),
       topCpuItems: _mapList(json['topCPUItems'], _parseProcess),
       topMemItems: _mapList(json['topMemItems'], _parseProcess),
       gpus: _mapList(json['gpuData'], _parseGpu),

@@ -7,12 +7,13 @@ abstract final class AppTheme {
   static ColorScheme schemeFor(
     Brightness brightness, {
     ColorScheme? dynamicScheme,
+    Color seedColor = AppTokens.seed,
     bool oled = false,
   }) {
     final base =
         dynamicScheme ??
         ColorScheme.fromSeed(
-          seedColor: AppTokens.seed,
+          seedColor: seedColor,
           brightness: brightness,
           dynamicSchemeVariant: DynamicSchemeVariant.neutral,
         );
@@ -45,11 +46,13 @@ abstract final class AppTheme {
   static ThemeData build(
     Brightness brightness, {
     ColorScheme? dynamicScheme,
+    Color seedColor = AppTokens.seed,
     bool oled = false,
   }) {
     final scheme = schemeFor(
       brightness,
       dynamicScheme: dynamicScheme,
+      seedColor: seedColor,
       oled: oled,
     );
     final semantic = brightness == Brightness.dark
@@ -161,14 +164,14 @@ abstract final class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppTokens.buttonHeight),
+          minimumSize: const Size(0, AppTokens.buttonHeight),
           shape: const StadiumBorder(),
           textStyle: AppTextStyles.label,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppTokens.buttonHeight),
+          minimumSize: const Size(0, AppTokens.buttonHeight),
           shape: const StadiumBorder(),
           side: BorderSide(color: scheme.outlineVariant),
           textStyle: AppTextStyles.label,

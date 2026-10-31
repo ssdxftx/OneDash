@@ -58,13 +58,19 @@ class AppDetailPage extends ConsumerWidget {
             const SizedBox(height: AppTokens.s24),
             SplitListGroup(
               children: [
-                SplitListTile(title: 'Key', subtitle: app.key),
-                SplitListTile(title: 'Type', subtitle: app.type),
-                SplitListTile(title: 'Website', subtitle: app.website),
+                SplitListTile(title: l10n.appStore_appKey, subtitle: app.key),
+                SplitListTile(
+                  title: l10n.panelSettings_type,
+                  subtitle: app.type,
+                ),
+                SplitListTile(
+                  title: l10n.websites_website,
+                  subtitle: app.website,
+                ),
                 SplitListTile(title: 'GitHub', subtitle: app.github),
                 SplitListTile(
-                  title: 'Installed',
-                  subtitle: app.installed ? 'yes' : 'no',
+                  title: l10n.appStore_installed,
+                  subtitle: app.installed ? l10n.common_yes : l10n.common_no,
                 ),
               ],
             ),

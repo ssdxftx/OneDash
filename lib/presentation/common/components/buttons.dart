@@ -79,14 +79,14 @@ class DangerButton extends StatelessWidget {
         ? FilledButton.styleFrom(
             backgroundColor: scheme.error,
             foregroundColor: scheme.onError,
-            minimumSize: const Size.fromHeight(AppTokens.buttonHeight),
+            minimumSize: const Size(0, AppTokens.buttonHeight),
             shape: const StadiumBorder(),
             textStyle: AppTextStyles.label,
           )
         : OutlinedButton.styleFrom(
             foregroundColor: scheme.error,
             side: BorderSide(color: scheme.error.withValues(alpha: 0.6)),
-            minimumSize: const Size.fromHeight(AppTokens.buttonHeight),
+            minimumSize: const Size(0, AppTokens.buttonHeight),
             shape: const StadiumBorder(),
             textStyle: AppTextStyles.label,
           );

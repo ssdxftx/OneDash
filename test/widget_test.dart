@@ -14,4 +14,17 @@ void main() {
       expect(find.text('OneDash'), findsOneWidget);
     }
   });
+
+  test('accent seed changes the generated primary color', () {
+    final forest = AppTheme.build(
+      Brightness.light,
+      seedColor: const Color(0xFF3F7F5F),
+    );
+    final ocean = AppTheme.build(
+      Brightness.light,
+      seedColor: const Color(0xFF2F6F8F),
+    );
+
+    expect(forest.colorScheme.primary, isNot(ocean.colorScheme.primary));
+  });
 }

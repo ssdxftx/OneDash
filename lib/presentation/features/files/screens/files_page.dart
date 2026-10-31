@@ -488,7 +488,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     final scheme = context.scheme;
     final files = ref.watch(filesProvider(_path));
     final folderName = _path == '/'
-        ? '/'
+        ? l10n.files_rootDirectory
         : _path.split('/').where((e) => e.isNotEmpty).last;
 
     return Scaffold(
@@ -648,6 +648,7 @@ class _Breadcrumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final segments = path.split('/').where((e) => e.isNotEmpty).toList();
     final scheme = context.scheme;
     return SizedBox(
@@ -662,7 +663,7 @@ class _Breadcrumb extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: AppTokens.s4),
               child: Center(
                 child: Text(
-                  '/',
+                  l10n.files_rootDirectory,
                   style: AppTextStyles.bodyS.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),

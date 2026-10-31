@@ -57,7 +57,7 @@ class MorePage extends ConsumerWidget {
                         context,
                         icon: TablerIcons.apps,
                         title: l10n.more_app_store,
-                        subtitle: l10n.apps_search_hint,
+                        subtitle: l10n.more_appStoreSubtitle,
                         onTap: () => context.push('/s/$serverId/more/apps'),
                       ),
                       _tile(
@@ -65,7 +65,9 @@ class MorePage extends ConsumerWidget {
                         icon: TablerIcons.package,
                         title: l10n.more_installed_apps,
                         subtitle: '${counts?.appInstalledNumber ?? '-'}',
-                        onTap: () => context.push('/s/$serverId/more/apps'),
+                        onTap: () => context.push(
+                          '/s/$serverId/more/apps?tab=installed',
+                        ),
                       ),
                       _tile(
                         context,
@@ -115,6 +117,12 @@ class MorePage extends ConsumerWidget {
                         title: l10n.more_firewall,
                         onTap: () => context.push('/s/$serverId/more/firewall'),
                       ),
+                      _tile(
+                        context,
+                        icon: TablerIcons.folder,
+                        title: l10n.websites_groupManagement,
+                        onTap: () => context.push('/s/$serverId/more/groups'),
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppTokens.s24),
@@ -145,6 +153,26 @@ class MorePage extends ConsumerWidget {
                         icon: TablerIcons.cloud_upload,
                         title: l10n.more_backups,
                         onTap: () => context.push('/s/$serverId/more/backups'),
+                      ),
+                      _tile(
+                        context,
+                        icon: TablerIcons.bell,
+                        title: l10n.panelSettings_alerts,
+                        subtitle: l10n.panelSettings_alertList,
+                        onTap: () => context.push('/s/$serverId/more/alerts'),
+                      ),
+                      _tile(
+                        context,
+                        icon: TablerIcons.cpu,
+                        title: l10n.supervisor_title,
+                        onTap: () =>
+                            context.push('/s/$serverId/more/host-tools'),
+                      ),
+                      _tile(
+                        context,
+                        icon: TablerIcons.tool,
+                        title: l10n.toolbox_title,
+                        onTap: () => context.push('/s/$serverId/more/toolbox'),
                       ),
                     ],
                   ),

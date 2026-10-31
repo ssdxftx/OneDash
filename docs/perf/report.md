@@ -18,12 +18,13 @@ Baseline target device: Pixel 6 / Snapdragon 778G, 120 Hz (per spec 9.1).
 
 ## Static guarantees implemented
 
-- Dashboard polling is visibility- and lifecycle-gated (`VisibilityDetector` + `AppLifecycleState`).
+- Dashboard polling runs every 2 s only while visible and the app is resumed, with 3/5/10 s backoff after failures (`VisibilityDetector` + `AppLifecycleState`).
 - Metric history uses a fixed 120-point ring buffer.
 - Charts are isolated with `RepaintBoundary` and custom painters with `shouldRepaint`.
 - File and container lists use fixed `itemExtent` / lazy builders.
 - `ListView(shrinkWrap: true)` is not used for data lists.
 - Image cache is capped at 120 entries / 80 MB in `main.dart`.
+- Localization keeps 562 referenced keys; generated localization code is about 3,500 lines instead of 49,773.
 
 ## How to measure
 

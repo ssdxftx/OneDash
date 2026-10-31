@@ -59,6 +59,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
     final l10n = AppLocalizations.of(context);
     final server = ref.watch(serverByIdProvider(widget.serverId)).valueOrNull;
     final websites = ref.watch(websitesProvider);
+    final total = websites.valueOrNull?.total;
 
     return Scaffold(
       body: SafeArea(
@@ -67,7 +68,10 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
           children: [
             AppBarLarge(
               title: l10n.websites_title,
-              subtitle: server?.displayName,
+              subtitle: [
+                if (server != null) server.displayName,
+                if (total != null) l10n.websites_count(total),
+              ].join(' · '),
               onTitleLongPress: () => showServerSwitcher(
                 context,
                 ref,
@@ -222,6 +226,13 @@ class _WebsiteCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: AppTokens.s8),
+              Text(
+                _statusLabel(site.status, l10n),
+                style: AppTextStyles.caption.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
               if (site.sslExpireDate.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -240,6 +251,12 @@ class _WebsiteCard extends StatelessWidget {
                     ),
                   ),
                 ),
+              const SizedBox(width: AppTokens.s4),
+              Icon(
+                TablerIcons.chevron_right,
+                size: AppTokens.iconList,
+                color: scheme.onSurfaceVariant,
+              ),
             ],
           ),
           const SizedBox(height: AppTokens.s8),
@@ -293,6 +310,14 @@ class _WebsiteCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _statusLabel(String status, AppLocalizations l10n) {
+    return switch (status.toLowerCase()) {
+      'running' => l10n.websites_running,
+      'stopped' => l10n.websites_stopped,
+      _ => status,
+    };
   }
 
   DateTime _parseDate(String raw) {

@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../presentation/features/alerts/screens/alerts_page.dart';
 import '../../presentation/features/app_store/screens/app_detail_page.dart';
 import '../../presentation/features/app_store/screens/app_store_page.dart';
 import '../../presentation/features/app_store/screens/installed_app_page.dart';
@@ -24,8 +26,11 @@ import '../../presentation/features/runtimes/screens/runtimes_page.dart';
 import '../../presentation/features/servers/screens/server_edit_page.dart';
 import '../../presentation/features/servers/screens/servers_page.dart';
 import '../../presentation/features/settings/screens/app_settings_page.dart';
+import '../../presentation/features/supervisor/screens/supervisor_page.dart';
+import '../../presentation/features/toolbox/screens/toolbox_page.dart';
 import '../../presentation/features/terminal/screens/terminal_page.dart';
 import '../../presentation/features/websites/screens/website_create_wizard.dart';
+import '../../presentation/features/websites/screens/website_groups_page.dart';
 import '../../presentation/features/websites/screens/website_detail_page.dart';
 import '../../presentation/features/websites/screens/websites_page.dart';
 import '../../presentation/shell/server_shell.dart';
@@ -69,6 +74,7 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/dev/gallery',
       parentNavigatorKey: _rootNavigatorKey,
+      redirect: (context, state) => kDebugMode ? null : '/',
       pageBuilder: (context, state) => fadePage(state, const GalleryPage()),
     ),
     GoRoute(
@@ -189,7 +195,13 @@ final appRouter = GoRouter(
                   path: 'apps',
                   pageBuilder: (context, state) => slidePage(
                     state,
-                    AppStorePage(serverId: _serverId(state)),
+                    AppStorePage(
+                      serverId: _serverId(state),
+                      initialTab:
+                          state.uri.queryParameters['tab'] == 'installed'
+                          ? 1
+                          : 0,
+                    ),
                   ),
                   routes: [
                     GoRoute(
@@ -269,6 +281,11 @@ final appRouter = GoRouter(
                   ),
                 ),
                 GoRoute(
+                  path: 'alerts',
+                  pageBuilder: (context, state) =>
+                      slidePage(state, AlertsPage(serverId: _serverId(state))),
+                ),
+                GoRoute(
                   path: 'process',
                   pageBuilder: (context, state) =>
                       slidePage(state, ProcessPage(serverId: _serverId(state))),
@@ -283,6 +300,25 @@ final appRouter = GoRouter(
                   pageBuilder: (context, state) => slidePage(
                     state,
                     RuntimesPage(serverId: _serverId(state)),
+                  ),
+                ),
+                GoRoute(
+                  path: 'host-tools',
+                  pageBuilder: (context, state) => slidePage(
+                    state,
+                    SupervisorPage(serverId: _serverId(state)),
+                  ),
+                ),
+                GoRoute(
+                  path: 'toolbox',
+                  pageBuilder: (context, state) =>
+                      slidePage(state, ToolboxPage(serverId: _serverId(state))),
+                ),
+                GoRoute(
+                  path: 'groups',
+                  pageBuilder: (context, state) => slidePage(
+                    state,
+                    WebsiteGroupsPage(serverId: _serverId(state)),
                   ),
                 ),
               ],

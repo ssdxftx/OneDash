@@ -107,22 +107,22 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
             SplitListGroup(
               children: [
                 _CopyRow(
-                  label: 'Host',
+                  label: l10n.databases_address,
                   value: _conn('host', state),
                   onCopy: _copy,
                 ),
                 _CopyRow(
-                  label: 'Port',
+                  label: l10n.databases_port,
                   value: _conn('port', state),
                   onCopy: _copy,
                 ),
                 _CopyRow(
-                  label: 'User',
+                  label: l10n.databases_username,
                   value: state.item.username,
                   onCopy: _copy,
                 ),
                 _PasswordRow(
-                  label: 'Password',
+                  label: l10n.databases_password,
                   value: state.item.password,
                   visible: _showPassword,
                   onToggle: _togglePassword,

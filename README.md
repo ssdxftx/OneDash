@@ -15,7 +15,7 @@ OneDash is a single-panel, zero-backend Android client for [1Panel](https://gith
 | M4 | Files: browse, breadcrumb, upload, download, image preview, compress/extract, rename, delete, editor | done |
 | M5 | Containers, logs, terminal, compose, per-container terminal | done |
 | M6 | Websites: list, detail, domain add/delete, site dir edit, Nginx config edit, SSL binding, reverse proxy list/toggle/delete, create wizard | done |
-| M7 | App store (dynamic install + installed lifecycle), databases, cronjobs, firewall (port + IP), logs, process, backups (download/delete/restore), runtimes, panel/app settings | done (read + core actions) |
+| M7 | App store (dynamic install + installed lifecycle), databases, cronjobs, firewall (port + IP), logs, process, backups (download/delete/restore), runtimes, alerts (list/logs/toggle/delete), Supervisor host tools, toolbox status/scan, website groups, grouped panel settings, app settings | done (read + core actions) |
 | M8 | Performance profiling on real device | pending (needs hardware) |
 
 ## Requirements
