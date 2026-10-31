@@ -48,7 +48,7 @@ class AppFilterChips<T> extends StatelessWidget {
             scheme.surface,
             scheme.surface.withValues(alpha: 0),
           ],
-          stops: const [0, 0.04, 0.96, 1],
+          stops: const [0, 0.08, 0.92, 1],
         ).createShader(bounds),
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
