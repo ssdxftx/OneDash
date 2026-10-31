@@ -67,31 +67,39 @@ class MetricCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Flexible(
-                    child: Text(
-                      value,
-                      style: AppTextStyles.numericLarge.copyWith(
-                        color: valueColor,
-                        fontSize: 28,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: value,
+                          style: AppTextStyles.numericLarge.copyWith(
+                            color: valueColor,
+                            fontSize: switch (value.length) {
+                              <= 4 => 28,
+                              <= 6 => 26,
+                              _ => 23,
+                            },
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                        if (unit != null)
+                          TextSpan(
+                            text: ' $unit',
+                            style: AppTextStyles.bodyS.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
                     ),
+                    maxLines: 1,
+                    softWrap: false,
                   ),
-                  if (unit != null) ...[
-                    const SizedBox(width: 2),
-                    Text(
-                      unit!,
-                      style: AppTextStyles.bodyS.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ],
+                ),
               ),
               if (caption != null) ...[
                 const SizedBox(height: 2),
@@ -153,16 +161,26 @@ class MetricRing extends StatelessWidget {
               strokeWidth: strokeWidth,
             ),
             child: Center(
-              child:
-                  center ??
-                  Text(
-                    '${value.toStringAsFixed(0)}%',
-                    style: AppTextStyles.bodyS.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: scheme.onSurface,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
+              child: SizedBox(
+                width: math.max(0, size - strokeWidth * 2 - 6),
+                height: math.max(0, size - strokeWidth * 2 - 6),
+                child: MediaQuery.withClampedTextScaling(
+                  maxScaleFactor: 1.2,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child:
+                        center ??
+                        Text(
+                          '${value.toStringAsFixed(0)}%',
+                          style: AppTextStyles.bodyS.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: scheme.onSurface,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
                   ),
+                ),
+              ),
             ),
           ),
         ),

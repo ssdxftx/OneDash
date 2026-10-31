@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onedash/core/theme/app_theme.dart';
 import 'package:onedash/presentation/common/components/metric_card.dart';
@@ -56,4 +57,43 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  for (final width in [240.0, 320.0]) {
+    for (final scale in [1.0, 1.5]) {
+      testWidgets('value is not ellipsized at ${width}dp ${scale}x', (
+        tester,
+      ) async {
+        tester.view.physicalSize = Size(width, 400);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _wrap(
+            const Center(
+              child: SizedBox(
+                width: 200,
+                child: MetricCard(
+                  title: 'Network',
+                  value: '123.4',
+                  unit: 'MB/s',
+                  caption: 'down',
+                ),
+              ),
+            ),
+            scale: scale,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+        final paragraph = tester.renderObject<RenderParagraph>(
+          find.descendant(
+            of: find.byType(MetricCard),
+            matching: find.textContaining('123.4', findRichText: true),
+          ),
+        );
+        expect(paragraph.didExceedMaxLines, isFalse);
+      });
+    }
+  }
 }
