@@ -2494,5 +2494,9 @@
   "websites_groupSystemReserved": "Reserved by 1Panel, cannot be deleted",
   "@websites_groupSystemReserved": {
     "description": "Subtitle of the built-in default website group."
+  },
+  "panelSettings_webOnlyTag": "Web panel only",
+  "@panelSettings_webOnlyTag": {
+    "description": "Tag shown on rows that can only be configured in the 1Panel web UI."
   }
 }

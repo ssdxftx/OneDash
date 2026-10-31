@@ -1837,4 +1837,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get websites_groupSystemReserved =>
       'Reserved by 1Panel, cannot be deleted';
+
+  @override
+  String get panelSettings_webOnlyTag => 'Web panel only';
 }

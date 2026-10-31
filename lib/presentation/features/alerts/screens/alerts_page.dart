@@ -350,31 +350,26 @@ class _AlertSettingsTab extends ConsumerWidget {
         icon: TablerIcons.mail,
         title: l10n.panelSettings_emailNotification,
         subtitle: l10n.panelSettings_smtpSubtitle,
-        todo: l10n.panelSettings_emailTodo,
       ),
       (
         icon: TablerIcons.brand_wechat,
         title: l10n.panelSettings_weCom,
         subtitle: l10n.panelSettings_webhookSubtitle,
-        todo: l10n.panelSettings_weComTodo,
       ),
       (
         icon: TablerIcons.brand_dingtalk,
         title: l10n.panelSettings_dingTalk,
         subtitle: l10n.panelSettings_webhookSubtitle,
-        todo: l10n.panelSettings_dingTalkTodo,
       ),
       (
         icon: TablerIcons.brand_telegram,
         title: l10n.panelSettings_feishu,
         subtitle: l10n.panelSettings_webhookSubtitle,
-        todo: l10n.panelSettings_feishuTodo,
       ),
       (
         icon: TablerIcons.bell_ringing,
         title: 'Bark',
         subtitle: l10n.panelSettings_webhookSubtitle,
-        todo: l10n.panelSettings_barkTodo,
       ),
     ];
     return ListView(
@@ -394,8 +389,12 @@ class _AlertSettingsTab extends ConsumerWidget {
                 leading: Icon(method.icon),
                 title: method.title,
                 subtitle: method.subtitle,
-                trailing: const Icon(TablerIcons.chevron_right),
-                onTap: () => AppToast.warning(context, method.todo),
+                trailing: Text(
+                  l10n.panelSettings_webOnlyTag,
+                  style: AppTextStyles.caption.copyWith(
+                    color: context.scheme.onSurfaceVariant,
+                  ),
+                ),
               ),
           ],
         ),

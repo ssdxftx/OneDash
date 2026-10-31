@@ -202,10 +202,11 @@ class _PanelSettingsBody extends ConsumerWidget {
                     leading: const Icon(TablerIcons.lock),
                     title: l10n.panelSettings_panelLoginPassword,
                     subtitle: l10n.panelSettings_changePanelLoginPassword,
-                    trailing: const Icon(TablerIcons.chevron_right),
-                    onTap: () => AppToast.warning(
-                      context,
-                      l10n.panelSettings_webPanelRequired,
+                    trailing: Text(
+                      l10n.panelSettings_webOnlyTag,
+                      style: AppTextStyles.caption.copyWith(
+                        color: context.scheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ],

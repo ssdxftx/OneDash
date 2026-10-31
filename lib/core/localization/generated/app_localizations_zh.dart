@@ -1788,4 +1788,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_groupSystemReserved => '系统保留，不可删除';
+
+  @override
+  String get panelSettings_webOnlyTag => '网页版配置';
 }

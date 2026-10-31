@@ -3475,6 +3475,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reserved by 1Panel, cannot be deleted'**
   String get websites_groupSystemReserved;
+
+  /// Tag shown on rows that can only be configured in the 1Panel web UI.
+  ///
+  /// In en, this message translates to:
+  /// **'Web panel only'**
+  String get panelSettings_webOnlyTag;
 }
 
 class _AppLocalizationsDelegate
