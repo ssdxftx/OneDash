@@ -2498,5 +2498,77 @@
   "panelSettings_webOnlyTag": "Web panel only",
   "@panelSettings_webOnlyTag": {
     "description": "Tag shown on rows that can only be configured in the 1Panel web UI."
+  },
+  "alert_type_cpu": "CPU",
+  "@alert_type_cpu": {
+    "description": "Alert rule category: processor usage."
+  },
+  "alert_type_memory": "Memory",
+  "@alert_type_memory": {
+    "description": "Alert rule category: memory usage."
+  },
+  "alert_type_disk": "Disk",
+  "@alert_type_disk": {
+    "description": "Alert rule category: disk usage."
+  },
+  "alert_type_load": "Load",
+  "@alert_type_load": {
+    "description": "Alert rule category: system load."
+  },
+  "alert_type_network": "Network",
+  "@alert_type_network": {
+    "description": "Alert rule category: network traffic."
+  },
+  "alert_type_smart": "SMART",
+  "@alert_type_smart": {
+    "description": "Alert rule category: disk SMART health."
+  },
+  "alert_type_log": "Logs",
+  "@alert_type_log": {
+    "description": "Alert rule category: system logs."
+  },
+  "alert_method_email": "Email",
+  "@alert_method_email": {
+    "description": "Alert delivery channel: email or SMTP."
+  },
+  "alert_method_telegram": "Telegram",
+  "@alert_method_telegram": {
+    "description": "Alert delivery channel: Telegram."
+  },
+  "alert_method_wecom": "WeCom",
+  "@alert_method_wecom": {
+    "description": "Alert delivery channel: WeCom."
+  },
+  "alert_method_dingtalk": "DingTalk",
+  "@alert_method_dingtalk": {
+    "description": "Alert delivery channel: DingTalk."
+  },
+  "alert_method_feishu": "Feishu",
+  "@alert_method_feishu": {
+    "description": "Alert delivery channel: Feishu or Lark."
+  },
+  "alert_method_bark": "Bark",
+  "@alert_method_bark": {
+    "description": "Alert delivery channel: Bark."
+  },
+  "alert_method_webhook": "Webhook",
+  "@alert_method_webhook": {
+    "description": "Alert delivery channel: webhook."
+  },
+  "alert_method_sms": "SMS",
+  "@alert_method_sms": {
+    "description": "Alert delivery channel: SMS."
+  },
+  "alert_status_success": "Success",
+  "@alert_status_success": {
+    "description": "Alert delivery log status: success."
+  },
+  "alert_status_failed": "Failed",
+  "@alert_status_failed": {
+    "description": "Alert delivery log status: failed."
+  },
+  "alert_status_pending": "Pending",
+  "@alert_status_pending": {
+    "description": "Alert delivery log status: pending."
   }
 }

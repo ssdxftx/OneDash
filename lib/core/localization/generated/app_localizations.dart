@@ -3481,6 +3481,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Web panel only'**
   String get panelSettings_webOnlyTag;
+
+  /// Alert rule category: processor usage.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU'**
+  String get alert_type_cpu;
+
+  /// Alert rule category: memory usage.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get alert_type_memory;
+
+  /// Alert rule category: disk usage.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk'**
+  String get alert_type_disk;
+
+  /// Alert rule category: system load.
+  ///
+  /// In en, this message translates to:
+  /// **'Load'**
+  String get alert_type_load;
+
+  /// Alert rule category: network traffic.
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get alert_type_network;
+
+  /// Alert rule category: disk SMART health.
+  ///
+  /// In en, this message translates to:
+  /// **'SMART'**
+  String get alert_type_smart;
+
+  /// Alert rule category: system logs.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs'**
+  String get alert_type_log;
+
+  /// Alert delivery channel: email or SMTP.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get alert_method_email;
+
+  /// Alert delivery channel: Telegram.
+  ///
+  /// In en, this message translates to:
+  /// **'Telegram'**
+  String get alert_method_telegram;
+
+  /// Alert delivery channel: WeCom.
+  ///
+  /// In en, this message translates to:
+  /// **'WeCom'**
+  String get alert_method_wecom;
+
+  /// Alert delivery channel: DingTalk.
+  ///
+  /// In en, this message translates to:
+  /// **'DingTalk'**
+  String get alert_method_dingtalk;
+
+  /// Alert delivery channel: Feishu or Lark.
+  ///
+  /// In en, this message translates to:
+  /// **'Feishu'**
+  String get alert_method_feishu;
+
+  /// Alert delivery channel: Bark.
+  ///
+  /// In en, this message translates to:
+  /// **'Bark'**
+  String get alert_method_bark;
+
+  /// Alert delivery channel: webhook.
+  ///
+  /// In en, this message translates to:
+  /// **'Webhook'**
+  String get alert_method_webhook;
+
+  /// Alert delivery channel: SMS.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS'**
+  String get alert_method_sms;
+
+  /// Alert delivery log status: success.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get alert_status_success;
+
+  /// Alert delivery log status: failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get alert_status_failed;
+
+  /// Alert delivery log status: pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get alert_status_pending;
 }
 
 class _AppLocalizationsDelegate

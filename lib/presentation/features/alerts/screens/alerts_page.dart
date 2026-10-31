@@ -15,6 +15,7 @@ import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 
@@ -197,7 +198,10 @@ class _AlertCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  l10n.panelSettings_alertCardMeta(alert.type, alert.method),
+                  l10n.panelSettings_alertCardMeta(
+                    alertTypeLabel(alert.type, l10n),
+                    alertMethodLabel(alert.method, l10n),
+                  ),
                   style: AppTextStyles.bodyS.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
@@ -311,7 +315,7 @@ class _AlertLogTab extends ConsumerWidget {
                                 ),
                                 const SizedBox(width: AppTokens.s8),
                                 Text(
-                                  log.status,
+                                  alertLogStatusLabel(log.status, l10n),
                                   style: AppTextStyles.caption.copyWith(
                                     color: success
                                         ? context.appColors.success

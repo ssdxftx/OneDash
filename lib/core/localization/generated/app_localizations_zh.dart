@@ -1791,4 +1791,58 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get panelSettings_webOnlyTag => '网页版配置';
+
+  @override
+  String get alert_type_cpu => 'CPU';
+
+  @override
+  String get alert_type_memory => '内存';
+
+  @override
+  String get alert_type_disk => '磁盘';
+
+  @override
+  String get alert_type_load => '负载';
+
+  @override
+  String get alert_type_network => '网络';
+
+  @override
+  String get alert_type_smart => 'SMART';
+
+  @override
+  String get alert_type_log => '日志';
+
+  @override
+  String get alert_method_email => '邮件';
+
+  @override
+  String get alert_method_telegram => 'Telegram';
+
+  @override
+  String get alert_method_wecom => '企业微信';
+
+  @override
+  String get alert_method_dingtalk => '钉钉';
+
+  @override
+  String get alert_method_feishu => '飞书';
+
+  @override
+  String get alert_method_bark => 'Bark';
+
+  @override
+  String get alert_method_webhook => 'Webhook';
+
+  @override
+  String get alert_method_sms => '短信';
+
+  @override
+  String get alert_status_success => '成功';
+
+  @override
+  String get alert_status_failed => '失败';
+
+  @override
+  String get alert_status_pending => '待发送';
 }

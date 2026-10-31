@@ -1840,4 +1840,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get panelSettings_webOnlyTag => 'Web panel only';
+
+  @override
+  String get alert_type_cpu => 'CPU';
+
+  @override
+  String get alert_type_memory => 'Memory';
+
+  @override
+  String get alert_type_disk => 'Disk';
+
+  @override
+  String get alert_type_load => 'Load';
+
+  @override
+  String get alert_type_network => 'Network';
+
+  @override
+  String get alert_type_smart => 'SMART';
+
+  @override
+  String get alert_type_log => 'Logs';
+
+  @override
+  String get alert_method_email => 'Email';
+
+  @override
+  String get alert_method_telegram => 'Telegram';
+
+  @override
+  String get alert_method_wecom => 'WeCom';
+
+  @override
+  String get alert_method_dingtalk => 'DingTalk';
+
+  @override
+  String get alert_method_feishu => 'Feishu';
+
+  @override
+  String get alert_method_bark => 'Bark';
+
+  @override
+  String get alert_method_webhook => 'Webhook';
+
+  @override
+  String get alert_method_sms => 'SMS';
+
+  @override
+  String get alert_status_success => 'Success';
+
+  @override
+  String get alert_status_failed => 'Failed';
+
+  @override
+  String get alert_status_pending => 'Pending';
 }
