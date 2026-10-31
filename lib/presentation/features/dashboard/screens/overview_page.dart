@@ -182,6 +182,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
     final netDown = state.netDownHistory.isEmpty
         ? 0.0
         : state.netDownHistory.last;
+    final netUp = state.netUpHistory.isEmpty ? 0.0 : state.netUpHistory.last;
     final busiestDisk = current.disks.isEmpty
         ? null
         : current.disks.reduce(
@@ -339,11 +340,14 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
             MetricCard(
               title: l10n.dashboard_network,
               value: formatByteRate(netDown),
-              caption: l10n.dashboard_trafficTotal(
-                formatBytes(current.netBytesRecv + current.netBytesSent),
-              ),
+              caption:
+                  '↑ ${formatByteRate(netUp)} · '
+                  '${l10n.dashboard_trafficTotal(formatBytes(current.netBytesRecv + current.netBytesSent))}',
               status: 'running',
-              sparkline: Sparkline(values: state.netDownHistory),
+              sparkline: Sparkline(
+                values: state.netDownHistory,
+                placeholder: l10n.dashboard_collecting,
+              ),
               onLongPress: () => _copy(context, formatByteRate(netDown)),
             ),
           ]),

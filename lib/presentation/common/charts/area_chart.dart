@@ -199,6 +199,7 @@ class Sparkline extends StatelessWidget {
     this.strokeWidth = 1.5,
     this.minValue,
     this.maxValue,
+    this.placeholder,
   });
 
   final List<double> values;
@@ -206,9 +207,33 @@ class Sparkline extends StatelessWidget {
   final double strokeWidth;
   final double? minValue;
   final double? maxValue;
+  final String? placeholder;
 
   @override
   Widget build(BuildContext context) {
+    if (values.length < 3) {
+      return RepaintBoundary(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            CustomPaint(
+              painter: _DashedBaselinePainter(
+                color: context.scheme.outlineVariant,
+              ),
+            ),
+            if (placeholder != null)
+              Center(
+                child: Text(
+                  placeholder!,
+                  style: AppTextStyles.caption.copyWith(
+                    color: context.scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
     return RepaintBoundary(
       child: CustomPaint(
         painter: _SparklinePainter(
@@ -221,6 +246,37 @@ class Sparkline extends StatelessWidget {
         size: Size.infinite,
       ),
     );
+  }
+}
+
+class _DashedBaselinePainter extends CustomPainter {
+  _DashedBaselinePainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+    final y = size.height / 2;
+    const dash = 4.0;
+    const gap = 4.0;
+    var x = 0.0;
+    while (x < size.width) {
+      canvas.drawLine(
+        Offset(x, y),
+        Offset(math.min(x + dash, size.width), y),
+        paint,
+      );
+      x += dash + gap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedBaselinePainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }
 

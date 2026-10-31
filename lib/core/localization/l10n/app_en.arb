@@ -2570,5 +2570,9 @@
   "alert_status_pending": "Pending",
   "@alert_status_pending": {
     "description": "Alert delivery log status: pending."
+  },
+  "dashboard_collecting": "Collecting…",
+  "@dashboard_collecting": {
+    "description": "Placeholder shown while the network chart has fewer than three samples."
   }
 }

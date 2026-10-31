@@ -581,5 +581,6 @@
   "alert_method_sms": "短信",
   "alert_status_success": "成功",
   "alert_status_failed": "失败",
-  "alert_status_pending": "待发送"
+  "alert_status_pending": "待发送",
+  "dashboard_collecting": "正在采集…"
 }

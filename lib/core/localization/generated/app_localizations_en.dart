@@ -1894,4 +1894,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alert_status_pending => 'Pending';
+
+  @override
+  String get dashboard_collecting => 'Collecting…';
 }

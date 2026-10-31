@@ -3589,6 +3589,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pending'**
   String get alert_status_pending;
+
+  /// Placeholder shown while the network chart has fewer than three samples.
+  ///
+  /// In en, this message translates to:
+  /// **'Collecting…'**
+  String get dashboard_collecting;
 }
 
 class _AppLocalizationsDelegate

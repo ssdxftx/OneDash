@@ -1845,4 +1845,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get alert_status_pending => '待发送';
+
+  @override
+  String get dashboard_collecting => '正在采集…';
 }
