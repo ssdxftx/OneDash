@@ -69,6 +69,34 @@ class WebsiteApi {
     );
   }
 
+  /// 启动或停止网站。
+  Future<void> operateWebsite(int id, String operate) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/operate',
+      data: {'id': id, 'operate': operate},
+    );
+  }
+
+  /// 删除网站。
+  Future<void> deleteWebsite(
+    int id, {
+    bool deleteApp = false,
+    bool deleteBackup = false,
+    bool forceDelete = false,
+    bool deleteDB = false,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/del',
+      data: {
+        'id': id,
+        'deleteApp': deleteApp,
+        'deleteBackup': deleteBackup,
+        'forceDelete': forceDelete,
+        'deleteDB': deleteDB,
+      },
+    );
+  }
+
   /// 查询网站详情。
   Future<WebsiteDetailDto> getWebsite(int id) async {
     final resp = await _client.get<Map<String, dynamic>>(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
@@ -27,6 +28,7 @@ import '../../../common/states/error_mapper.dart';
 import '../../../common/states/error_state.dart';
 import '../providers/websites_provider.dart';
 import '../../../common/states/error_toast.dart';
+import 'websites_page.dart';
 
 class WebsiteDetailPage extends ConsumerWidget {
   const WebsiteDetailPage({
@@ -43,11 +45,45 @@ class WebsiteDetailPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final id = int.tryParse(siteId) ?? 0;
     final detail = ref.watch(websiteDetailProvider(id));
+    final site = detail.valueOrNull?.website;
 
     return Scaffold(
       appBar: AppBarLarge(
-        title: detail.valueOrNull?.website.primaryDomain ?? l10n.websites_title,
-        subtitle: detail.valueOrNull?.website.type,
+        title: site?.primaryDomain ?? l10n.websites_title,
+        subtitle: site?.type,
+        actions: [
+          if (site != null)
+            PopupMenuButton<String>(
+              tooltip: l10n.action_more,
+              onSelected: (value) {
+                if (value == 'toggle') {
+                  _operate(
+                    context,
+                    ref,
+                    site,
+                    site.status.toLowerCase() == 'running' ? 'stop' : 'start',
+                  );
+                }
+                if (value == 'open') _open(context, site);
+                if (value == 'delete') _delete(context, ref, site);
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'toggle',
+                  child: Text(
+                    site.status.toLowerCase() == 'running'
+                        ? l10n.websites_stop
+                        : l10n.websites_start,
+                  ),
+                ),
+                PopupMenuItem(value: 'open', child: Text(l10n.websites_open)),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Text(l10n.websites_delete),
+                ),
+              ],
+            ),
+        ],
       ),
       body: detail.when(
         loading: () => const SkeletonList(itemCount: 6),
@@ -73,6 +109,68 @@ class WebsiteDetailPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _operate(
+    BuildContext context,
+    WidgetRef ref,
+    WebsiteDto site,
+    String operate,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.operateWebsite(site.id, operate);
+      if (!context.mounted) return;
+      AppToast.success(
+        context,
+        operate == 'start' ? l10n.websites_started : l10n.websites_stopped,
+      );
+      ref.invalidate(websiteDetailProvider(site.id));
+      ref.invalidate(websitesProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _delete(
+    BuildContext context,
+    WidgetRef ref,
+    WebsiteDto site,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final options = await showAppSheet<WebsiteDeleteOptions>(
+      context: context,
+      builder: (sheetContext) => WebsiteDeleteSheet(site: site),
+    );
+    if (options == null || !context.mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.deleteWebsite(
+        site.id,
+        deleteBackup: options.deleteBackup,
+        forceDelete: options.forceDelete,
+        deleteDB: options.deleteDB,
+      );
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.websites_deleted);
+      ref.invalidate(websitesProvider);
+      context.pop();
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _open(BuildContext context, WebsiteDto site) async {
+    final protocol = site.protocol.toLowerCase() == 'https' ? 'https' : 'http';
+    final uri = Uri.tryParse('$protocol://${site.primaryDomain}');
+    if (uri == null) return;
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (!context.mounted) return;
+      showErrorToast(context, StateError('open website failed'));
+    }
   }
 }
 

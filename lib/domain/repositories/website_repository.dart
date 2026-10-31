@@ -76,6 +76,18 @@ abstract interface class WebsiteRepository {
   /// 创建网站
   Future<void> createWebsite(WebsiteCreateReq req);
 
+  /// 启动或停止网站
+  Future<void> operateWebsite(int id, String operate);
+
+  /// 删除网站
+  Future<void> deleteWebsite(
+    int id, {
+    bool deleteApp,
+    bool deleteBackup,
+    bool forceDelete,
+    bool deleteDB,
+  });
+
   /// 查询网站域名列表
   Future<List<WebsiteDomainDto>> listDomains(int websiteId);
 

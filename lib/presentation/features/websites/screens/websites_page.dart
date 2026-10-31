@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../data/dto/website/website_dto.dart';
+import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_toast.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/buttons.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/search_field.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/skeleton.dart';
+import '../../../common/components/split_list_group.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/error_toast.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../providers/websites_provider.dart';
 
@@ -166,6 +174,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                             onTap: () => context.push(
                               '/s/${widget.serverId}/websites/${site.id}',
                             ),
+                            onLongPress: () => _showSiteActions(site),
                           ),
                         );
                       },
@@ -179,13 +188,249 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
       ),
     );
   }
+
+  Future<void> _showSiteActions(WebsiteDto site) async {
+    final l10n = AppLocalizations.of(context);
+    final running = site.status.toLowerCase() == 'running';
+    await showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(site.primaryDomain, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s4),
+          Text(
+            site.type,
+            style: AppTextStyles.bodyS.copyWith(
+              color: context.scheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AppTokens.s16),
+          SplitListGroup(
+            children: [
+              SplitListTile(
+                leading: Icon(
+                  running ? TablerIcons.player_pause : TablerIcons.player_play,
+                ),
+                title: running ? l10n.websites_stop : l10n.websites_start,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _operateSite(site, running ? 'stop' : 'start');
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.copy),
+                title: l10n.websites_copyDomain,
+                onTap: () async {
+                  await Clipboard.setData(
+                    ClipboardData(text: site.primaryDomain),
+                  );
+                  if (!sheetContext.mounted) return;
+                  Navigator.of(sheetContext).pop();
+                  if (!mounted) return;
+                  AppToast.success(
+                    context,
+                    l10n.common_copiedLabel(site.primaryDomain),
+                  );
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.world),
+                title: l10n.websites_open,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _openSite(site);
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.trash),
+                title: l10n.websites_delete,
+                danger: true,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _deleteSite(site);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _operateSite(WebsiteDto site, String operate) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.operateWebsite(site.id, operate);
+      if (!mounted) return;
+      AppToast.success(
+        context,
+        operate == 'start' ? l10n.websites_started : l10n.websites_stopped,
+      );
+      await ref.read(websitesProvider.notifier).refresh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _openSite(WebsiteDto site) async {
+    final protocol = site.protocol.toLowerCase() == 'https' ? 'https' : 'http';
+    final uri = Uri.tryParse('$protocol://${site.primaryDomain}');
+    if (uri == null) return;
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (!mounted) return;
+      showErrorToast(context, StateError('open website failed'));
+    }
+  }
+
+  Future<void> _deleteSite(WebsiteDto site) async {
+    final l10n = AppLocalizations.of(context);
+    final options = await showAppSheet<WebsiteDeleteOptions>(
+      context: context,
+      builder: (sheetContext) => WebsiteDeleteSheet(site: site),
+    );
+    if (options == null || !mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.deleteWebsite(
+        site.id,
+        deleteBackup: options.deleteBackup,
+        forceDelete: options.forceDelete,
+        deleteDB: options.deleteDB,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.websites_deleted);
+      await ref.read(websitesProvider.notifier).refresh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+}
+
+class WebsiteDeleteOptions {
+  const WebsiteDeleteOptions({
+    required this.deleteDB,
+    required this.deleteBackup,
+    required this.forceDelete,
+  });
+
+  final bool deleteDB;
+  final bool deleteBackup;
+  final bool forceDelete;
+}
+
+class WebsiteDeleteSheet extends StatefulWidget {
+  const WebsiteDeleteSheet({super.key, required this.site});
+
+  final WebsiteDto site;
+
+  @override
+  State<WebsiteDeleteSheet> createState() => WebsiteDeleteSheetState();
+}
+
+class WebsiteDeleteSheetState extends State<WebsiteDeleteSheet> {
+  bool _deleteDB = false;
+  bool _deleteBackup = false;
+  bool _forceDelete = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final hasDatabase = widget.site.dbID > 0;
+    final scheme = context.scheme;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.websites_deleteTitle(widget.site.primaryDomain),
+          style: AppTextStyles.titleL,
+        ),
+        const SizedBox(height: AppTokens.s8),
+        Text(
+          l10n.websites_deleteMessage,
+          style: AppTextStyles.bodyM.copyWith(color: scheme.onSurfaceVariant),
+        ),
+        const SizedBox(height: AppTokens.s16),
+        TonalCard(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              CheckboxListTile(
+                value: _deleteDB,
+                onChanged: hasDatabase
+                    ? (value) => setState(() => _deleteDB = value ?? false)
+                    : null,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(
+                  hasDatabase
+                      ? l10n.websites_deleteDatabaseCount(1)
+                      : l10n.websites_deleteDatabaseCount(0),
+                ),
+                subtitle: hasDatabase
+                    ? Text('${widget.site.dbType} · ${widget.site.dbID}')
+                    : null,
+              ),
+              CheckboxListTile(
+                value: _deleteBackup,
+                onChanged: (value) =>
+                    setState(() => _deleteBackup = value ?? false),
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(l10n.websites_deleteBackup),
+              ),
+              CheckboxListTile(
+                value: _forceDelete,
+                onChanged: (value) =>
+                    setState(() => _forceDelete = value ?? false),
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(l10n.websites_forceDelete),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppTokens.s24),
+        Row(
+          children: [
+            Expanded(
+              child: SecondaryButton(
+                label: l10n.action_cancel,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+            const SizedBox(width: AppTokens.s12),
+            Expanded(
+              child: DangerButton(
+                label: l10n.action_delete,
+                onPressed: () => Navigator.of(context).pop(
+                  WebsiteDeleteOptions(
+                    deleteDB: _deleteDB,
+                    deleteBackup: _deleteBackup,
+                    forceDelete: _forceDelete,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }
 
 class _WebsiteCard extends StatelessWidget {
-  const _WebsiteCard({required this.site, required this.onTap});
+  const _WebsiteCard({
+    required this.site,
+    required this.onTap,
+    required this.onLongPress,
+  });
 
   final WebsiteDto site;
   final VoidCallback onTap;
+  final VoidCallback onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -211,6 +456,7 @@ class _WebsiteCard extends StatelessWidget {
 
     return TonalCard(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

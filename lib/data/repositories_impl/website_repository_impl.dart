@@ -111,6 +111,25 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
       _websiteApi.createWebsite(req);
 
   @override
+  Future<void> operateWebsite(int id, String operate) =>
+      _websiteApi.operateWebsite(id, operate);
+
+  @override
+  Future<void> deleteWebsite(
+    int id, {
+    bool deleteApp = false,
+    bool deleteBackup = false,
+    bool forceDelete = false,
+    bool deleteDB = false,
+  }) => _websiteApi.deleteWebsite(
+    id,
+    deleteApp: deleteApp,
+    deleteBackup: deleteBackup,
+    forceDelete: forceDelete,
+    deleteDB: deleteDB,
+  );
+
+  @override
   Future<List<WebsiteDomainDto>> listDomains(int websiteId) =>
       _websiteApi.listDomains(websiteId);
 
