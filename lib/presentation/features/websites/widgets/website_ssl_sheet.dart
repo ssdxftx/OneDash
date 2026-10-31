@@ -11,6 +11,7 @@ import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
 import '../providers/websites_provider.dart';
+import '../../../common/states/error_toast.dart';
 
 class WebsiteSslSheet extends ConsumerStatefulWidget {
   const WebsiteSslSheet({
@@ -150,7 +151,7 @@ class _WebsiteSslSheetState extends ConsumerState<WebsiteSslSheet> {
     } catch (error) {
       if (!mounted) return;
       setState(() => _saving = false);
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 

@@ -15,6 +15,7 @@ import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../providers/websites_provider.dart';
+import '../../../common/states/error_toast.dart';
 
 class WebsiteCreateWizard extends ConsumerStatefulWidget {
   const WebsiteCreateWizard({super.key, required this.serverId});
@@ -90,7 +91,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
     } catch (error) {
       if (!mounted) return;
       setState(() => _creating = false);
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 

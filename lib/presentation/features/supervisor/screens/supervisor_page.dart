@@ -18,6 +18,7 @@ import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/error_toast.dart';
 
 class SupervisorViewData {
   const SupervisorViewData({required this.status, required this.processes});
@@ -234,7 +235,7 @@ class SupervisorPage extends ConsumerWidget {
       ref.invalidate(_supervisorProvider);
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '${l10n.supervisor_operationFailed}: $error');
+      showErrorToast(context, error, prefix: l10n.supervisor_operationFailed);
     }
   }
 
@@ -272,7 +273,7 @@ class SupervisorPage extends ConsumerWidget {
       ref.invalidate(_supervisorProvider);
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '${l10n.supervisor_operationFailed}: $error');
+      showErrorToast(context, error, prefix: l10n.supervisor_operationFailed);
     }
   }
 
@@ -299,7 +300,7 @@ class SupervisorPage extends ConsumerWidget {
       ref.invalidate(_supervisorProvider);
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '${l10n.supervisor_initFailed}: $error');
+      showErrorToast(context, error, prefix: l10n.supervisor_initFailed);
     }
   }
 
@@ -330,7 +331,7 @@ class SupervisorPage extends ConsumerWidget {
       ref.invalidate(_supervisorProvider);
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '${l10n.supervisor_saveFailed}: $error');
+      showErrorToast(context, error, prefix: l10n.supervisor_saveFailed);
     }
   }
 

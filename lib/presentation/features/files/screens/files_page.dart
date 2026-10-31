@@ -24,6 +24,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../providers/files_provider.dart';
+import '../../../common/states/error_toast.dart';
 
 class FilesPage extends ConsumerStatefulWidget {
   const FilesPage({
@@ -121,7 +122,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     } catch (error) {
       if (!mounted) return;
       Navigator.of(context).pop();
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
@@ -164,7 +165,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       ref.invalidate(filesProvider(_path));
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -204,7 +205,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       ref.invalidate(filesProvider(_path));
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -231,7 +232,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       ref.invalidate(filesProvider(_path));
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -268,7 +269,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       ref.invalidate(filesProvider(_path));
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -289,7 +290,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       ref.invalidate(filesProvider(_path));
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -334,7 +335,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       );
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -362,7 +363,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       );
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -379,7 +380,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       AppToast.success(context, share.code);
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 

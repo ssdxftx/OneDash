@@ -17,6 +17,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/error_toast.dart';
 
 class _DatabasesState {
   const _DatabasesState({required this.items, required this.types});
@@ -206,7 +207,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                   } catch (error) {
                     if (!context.mounted) return;
                     // ignore: use_build_context_synchronously
-                    AppToast.error(context, '$error');
+                    showErrorToast(context, error);
                   }
                 },
               ),

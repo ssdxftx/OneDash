@@ -23,6 +23,7 @@ import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../providers/containers_provider.dart';
+import '../../../common/states/error_toast.dart';
 
 class ContainersPage extends ConsumerStatefulWidget {
   const ContainersPage({super.key, required this.serverId});
@@ -278,7 +279,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
       await ref.read(containersProvider.notifier).refresh();
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 }

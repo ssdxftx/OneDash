@@ -19,6 +19,7 @@ import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/tonal_card.dart';
 import '../providers/servers_provider.dart';
+import '../../../common/states/error_toast.dart';
 
 enum _StepState { idle, running, ok, failed, skipped }
 
@@ -165,7 +166,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
     } catch (error) {
       if (!mounted) return;
       setState(() => _saving = false);
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 

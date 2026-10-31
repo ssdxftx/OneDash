@@ -6,6 +6,7 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../common/components/app_toast.dart';
+import '../../../common/states/error_toast.dart';
 
 class FileEditorPage extends ConsumerStatefulWidget {
   const FileEditorPage({super.key, required this.serverId, required this.path});
@@ -82,7 +83,7 @@ class _FileEditorPageState extends ConsumerState<FileEditorPage> {
     } catch (error) {
       if (!mounted) return;
       setState(() => _saving = false);
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 

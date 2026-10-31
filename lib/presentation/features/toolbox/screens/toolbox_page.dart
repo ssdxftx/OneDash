@@ -7,13 +7,13 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/toolbox_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
-import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/error_toast.dart';
 
 class ToolboxData {
   const ToolboxData({
@@ -190,7 +190,7 @@ class ToolboxPage extends ConsumerWidget {
       );
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '${l10n.toolbox_scanFailed}: $error');
+      showErrorToast(context, error, prefix: l10n.toolbox_scanFailed);
     }
   }
 }

@@ -26,6 +26,7 @@ import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_mapper.dart';
 import '../../../common/states/error_state.dart';
 import '../providers/websites_provider.dart';
+import '../../../common/states/error_toast.dart';
 
 class WebsiteDetailPage extends ConsumerWidget {
   const WebsiteDetailPage({
@@ -190,7 +191,7 @@ class _ConfigTab extends ConsumerWidget {
       controller.dispose();
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -229,7 +230,7 @@ class _ConfigTab extends ConsumerWidget {
       ref.invalidate(websiteDetailProvider(site.id));
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 }
@@ -331,7 +332,7 @@ class _DomainsTab extends ConsumerWidget {
       ref.invalidate(websiteDetailProvider(detail.website.id));
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -356,7 +357,7 @@ class _DomainsTab extends ConsumerWidget {
       ref.invalidate(websiteDetailProvider(detail.website.id));
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 }
@@ -538,7 +539,7 @@ class _ProxyTab extends ConsumerWidget {
     } catch (error) {
       ref.invalidate(websiteProxiesProvider(detail.website.id));
       if (!context.mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -563,7 +564,7 @@ class _ProxyTab extends ConsumerWidget {
       AppToast.success(context, l10n.websites_domainDeleted);
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 }

@@ -13,6 +13,7 @@ import '../../../common/components/app_toast.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../../common/states/async_state_view.dart';
 import '../providers/app_store_provider.dart';
+import '../../../common/states/error_toast.dart';
 
 class InstalledAppPage extends ConsumerWidget {
   const InstalledAppPage({
@@ -163,7 +164,7 @@ class InstalledAppPage extends ConsumerWidget {
       ref.invalidate(installedAppsProvider);
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 }

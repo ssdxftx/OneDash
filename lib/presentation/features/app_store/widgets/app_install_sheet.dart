@@ -13,6 +13,7 @@ import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
+import '../../../common/states/error_toast.dart';
 
 class AppInstallSheet extends ConsumerStatefulWidget {
   const AppInstallSheet({super.key, required this.app});
@@ -163,7 +164,7 @@ class _AppInstallSheetState extends ConsumerState<AppInstallSheet> {
     } catch (error) {
       if (!mounted) return;
       setState(() => _installing = false);
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 

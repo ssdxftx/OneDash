@@ -16,6 +16,7 @@ import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/error_toast.dart';
 
 final _runtimesProvider = FutureProvider.autoDispose<PageResult<RuntimeDto>>((
   ref,
@@ -191,7 +192,7 @@ class RuntimesPage extends ConsumerWidget {
       ref.invalidate(_runtimesProvider);
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 }

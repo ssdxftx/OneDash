@@ -16,6 +16,7 @@ import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../servers/providers/servers_provider.dart';
+import '../../../common/states/error_toast.dart';
 
 class _PanelSettingsData {
   const _PanelSettingsData(this.settings, this.core);
@@ -437,7 +438,7 @@ class _PanelSettingsBody extends ConsumerWidget {
       ref.invalidate(_panelSettingsProvider);
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '${l10n.panelSettings_updateFailed}: $error');
+      showErrorToast(context, error, prefix: l10n.panelSettings_updateFailed);
     }
   }
 }

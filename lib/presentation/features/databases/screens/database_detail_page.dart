@@ -18,6 +18,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../providers/database_detail_provider.dart';
+import '../../../common/states/error_toast.dart';
 
 class DatabaseDetailPage extends ConsumerStatefulWidget {
   const DatabaseDetailPage({
@@ -198,7 +199,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
       ref.invalidate(databaseDetailProvider(_key));
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -246,7 +247,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
       ref.invalidate(databaseDetailProvider(_key));
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -290,7 +291,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
       Navigator.of(context).pop();
     } catch (error) {
       if (!mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 }

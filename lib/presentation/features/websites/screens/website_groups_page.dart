@@ -15,6 +15,7 @@ import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/error_toast.dart';
 
 final _groupsProvider = FutureProvider.autoDispose<List<WebsiteGroupDto>>((
   ref,
@@ -126,7 +127,7 @@ class WebsiteGroupsPage extends ConsumerWidget {
       ref.invalidate(_groupsProvider);
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 
@@ -151,7 +152,7 @@ class WebsiteGroupsPage extends ConsumerWidget {
       ref.invalidate(_groupsProvider);
     } catch (error) {
       if (!context.mounted) return;
-      AppToast.error(context, '$error');
+      showErrorToast(context, error);
     }
   }
 }
