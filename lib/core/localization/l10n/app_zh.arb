@@ -239,7 +239,7 @@
   "server_edit_allow_insecure": "允许自签名证书",
   "server_edit_allow_insecure_hint": "仅对该主机生效，将跳过证书校验。",
   "server_edit_test": "测试连接",
-  "server_edit_save": "保存并连接",
+  "server_edit_save": "保存并进入",
   "server_edit_diag_network": "网络可达",
   "server_edit_diag_tls": "证书信任",
   "server_edit_diag_auth": "鉴权通过",
@@ -578,5 +578,6 @@
   "app_detail_key": "应用标识",
   "app_detail_container": "容器",
   "app_detail_compose": "Compose 文件",
-  "app_detail_message": "说明"
+  "app_detail_message": "说明",
+  "server_edit_savedConnecting": "已保存，正在连接…"
 }

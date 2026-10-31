@@ -1090,7 +1090,7 @@
   "@server_edit_test": {
     "description": "OneDash UI string"
   },
-  "server_edit_save": "Save and connect",
+  "server_edit_save": "Save and open",
   "@server_edit_save": {
     "description": "OneDash UI string"
   },
@@ -2558,5 +2558,9 @@
   "app_detail_message": "Message",
   "@app_detail_message": {
     "description": "Label for the installed application message."
+  },
+  "server_edit_savedConnecting": "Saved, connecting…",
+  "@server_edit_savedConnecting": {
+    "description": "Toast shown after a panel is saved locally and the app opens its overview."
   }
 }

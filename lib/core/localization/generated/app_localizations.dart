@@ -1535,7 +1535,7 @@ abstract class AppLocalizations {
   /// OneDash UI string
   ///
   /// In en, this message translates to:
-  /// **'Save and connect'**
+  /// **'Save and open'**
   String get server_edit_save;
 
   /// OneDash UI string
@@ -3571,6 +3571,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Message'**
   String get app_detail_message;
+
+  /// Toast shown after a panel is saved locally and the app opens its overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved, connecting…'**
+  String get server_edit_savedConnecting;
 }
 
 class _AppLocalizationsDelegate

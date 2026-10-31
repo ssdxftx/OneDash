@@ -788,7 +788,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get server_edit_test => 'Test connection';
 
   @override
-  String get server_edit_save => 'Save and connect';
+  String get server_edit_save => 'Save and open';
 
   @override
   String get server_edit_diag_network => 'Network reachable';
@@ -1884,4 +1884,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get app_detail_message => 'Message';
+
+  @override
+  String get server_edit_savedConnecting => 'Saved, connecting…';
 }

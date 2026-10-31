@@ -773,7 +773,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get server_edit_test => '测试连接';
 
   @override
-  String get server_edit_save => '保存并连接';
+  String get server_edit_save => '保存并进入';
 
   @override
   String get server_edit_diag_network => '网络可达';
@@ -1836,4 +1836,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get app_detail_message => '说明';
+
+  @override
+  String get server_edit_savedConnecting => '已保存，正在连接…';
 }

@@ -161,7 +161,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
       }
       await ref.read(serversProvider.notifier).touch(server.id);
       if (!mounted) return;
-      AppToast.success(context, l10n.action_save);
+      AppToast.success(context, l10n.server_edit_savedConnecting);
       context.go('/s/${server.id}/overview');
     } catch (error) {
       if (!mounted) return;
