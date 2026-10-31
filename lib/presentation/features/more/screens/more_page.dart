@@ -144,7 +144,7 @@ class MorePage extends ConsumerWidget {
                       ),
                       _tile(
                         context,
-                        icon: TablerIcons.cpu,
+                        icon: TablerIcons.list_details,
                         title: l10n.more_process,
                         onTap: () => context.push('/s/$serverId/more/process'),
                       ),
@@ -163,7 +163,7 @@ class MorePage extends ConsumerWidget {
                       ),
                       _tile(
                         context,
-                        icon: TablerIcons.cpu,
+                        icon: TablerIcons.settings_cog,
                         title: l10n.supervisor_title,
                         onTap: () =>
                             context.push('/s/$serverId/more/host-tools'),
