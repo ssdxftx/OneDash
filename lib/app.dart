@@ -30,11 +30,13 @@ class OneDashApp extends ConsumerWidget {
               Brightness.light,
               dynamicScheme: theme.dynamicColor ? lightDynamic : null,
               seedColor: seedOf(theme),
+              schemeVariant: theme.accent.schemeVariant,
             ),
             darkTheme: AppTheme.build(
               Brightness.dark,
               dynamicScheme: theme.dynamicColor ? darkDynamic : null,
               seedColor: seedOf(theme),
+              schemeVariant: theme.accent.schemeVariant,
               oled: theme.oled,
             ),
             themeMode: theme.mode.themeMode,

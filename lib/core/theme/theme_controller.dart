@@ -32,12 +32,17 @@ enum AccentPreset {
   rose('rose', Color(0xFFA8586F)),
   amber('amber', Color(0xFFB07A3C)),
   teal('teal', Color(0xFF3F8F86)),
-  graphite('graphite', Color(0xFF5F6368));
+  graphite('graphite', Color(0xFF5B6B62));
 
   const AccentPreset(this.storageName, this.color);
 
   final String storageName;
   final Color color;
+
+  /// Graphite keeps the neutral gray family instead of a saturated hue.
+  DynamicSchemeVariant get schemeVariant => this == AccentPreset.graphite
+      ? DynamicSchemeVariant.neutral
+      : DynamicSchemeVariant.tonalSpot;
 
   static AccentPreset fromName(String? name) => values.firstWhere(
     (preset) => preset.storageName == name,

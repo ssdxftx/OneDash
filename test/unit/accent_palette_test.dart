@@ -26,12 +26,18 @@ void main() {
         preset: AppTheme.schemeFor(
           Brightness.light,
           seedColor: preset.color,
+          schemeVariant: preset.schemeVariant,
         ).primary,
     };
 
     expect(primaries.values.toSet().length, AccentPreset.values.length);
 
-    final presets = primaries.keys.toList();
+    final graphite = HSLColor.fromColor(primaries[AccentPreset.graphite]!);
+    expect(graphite.saturation, lessThan(0.2));
+
+    final presets = primaries.keys
+        .where((preset) => preset != AccentPreset.graphite)
+        .toList();
     for (var i = 0; i < presets.length; i++) {
       for (var j = i + 1; j < presets.length; j++) {
         final a = primaries[presets[i]]!;

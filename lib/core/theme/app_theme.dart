@@ -8,6 +8,7 @@ abstract final class AppTheme {
     Brightness brightness, {
     ColorScheme? dynamicScheme,
     Color seedColor = AppTokens.seed,
+    DynamicSchemeVariant schemeVariant = DynamicSchemeVariant.tonalSpot,
     bool oled = false,
   }) {
     final base =
@@ -15,7 +16,7 @@ abstract final class AppTheme {
         ColorScheme.fromSeed(
           seedColor: seedColor,
           brightness: brightness,
-          dynamicSchemeVariant: DynamicSchemeVariant.tonalSpot,
+          dynamicSchemeVariant: schemeVariant,
         );
 
     if (brightness == Brightness.light) {
@@ -47,6 +48,7 @@ abstract final class AppTheme {
     Brightness brightness, {
     ColorScheme? dynamicScheme,
     Color seedColor = AppTokens.seed,
+    DynamicSchemeVariant schemeVariant = DynamicSchemeVariant.tonalSpot,
     bool oled = false,
   }) {
     final scheme = schemeFor(
