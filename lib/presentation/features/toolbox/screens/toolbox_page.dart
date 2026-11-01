@@ -120,8 +120,10 @@ class ToolboxPage extends ConsumerWidget {
                 SplitListTile(
                   leading: const Icon(TablerIcons.ban),
                   title: l10n.toolbox_fail2ban,
-                  subtitle: value.fail2ban['isActive'] == true
-                      ? l10n.toolbox_running
+                  subtitle: value.fail2ban['isExist'] == true
+                      ? (value.fail2ban['isActive'] == true
+                            ? l10n.toolbox_running
+                            : l10n.toolbox_stopped)
                       : l10n.runtime_notInstalled,
                   trailing: const Icon(TablerIcons.chevron_right),
                   onTap: () =>
@@ -136,8 +138,10 @@ class ToolboxPage extends ConsumerWidget {
                 SplitListTile(
                   leading: const Icon(TablerIcons.folder),
                   title: l10n.toolbox_ftp,
-                  subtitle: value.ftp['isActive'] == true
-                      ? l10n.toolbox_running
+                  subtitle: value.ftp['isExist'] == true
+                      ? (value.ftp['isActive'] == true
+                            ? l10n.toolbox_running
+                            : l10n.toolbox_stopped)
                       : l10n.runtime_notInstalled,
                   trailing: const Icon(TablerIcons.chevron_right),
                   onTap: () => context.push('/s/$serverId/more/toolbox/ftp'),

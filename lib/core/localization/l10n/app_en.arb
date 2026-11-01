@@ -4311,4 +4311,44 @@
   "@host_sshCheckAfterSave": {
     "description": "Shown when post-save SSH connectivity check fails."
   }
+  ,"containers_creating": "Creating container…",
+  "@containers_creating": {
+    "description": "Container creation progress label."
+  },
+  "host_sshValueOn": "On",
+  "@host_sshValueOn": {
+    "description": "SSH boolean option enabled."
+  },
+  "host_sshValueOff": "Off",
+  "@host_sshValueOff": {
+    "description": "SSH boolean option disabled."
+  },
+  "host_sshValueKeyOnly": "Key only",
+  "@host_sshValueKeyOnly": {
+    "description": "SSH root login restricted to keys."
+  },
+  "host_sshValuePasswordForbidden": "Password disabled",
+  "@host_sshValuePasswordForbidden": {
+    "description": "SSH password login forbidden."
+  },
+  "toolbox_stopped": "Stopped",
+  "@toolbox_stopped": {
+    "description": "Toolbox service installed but stopped."
+  },
+  "toolbox_notInstalledHint": "Fail2ban is not installed. Install it from the panel app store first.",
+  "@toolbox_notInstalledHint": {
+    "description": "Fail2ban not installed guidance."
+  },
+  "dashboard_networkTrend": "Network trend (last 5 minutes)",
+  "@dashboard_networkTrend": {
+    "description": "Network trend chart title."
+  },
+  "dashboard_networkCollectHint": "The curve appears after 3 samples are collected.",
+  "@dashboard_networkCollectHint": {
+    "description": "Network chart sampling hint."
+  },
+  "websites_openFailed": "Failed to open the website",
+  "@websites_openFailed": {
+    "description": "Shown when launching a website in the browser fails."
+  }
 }

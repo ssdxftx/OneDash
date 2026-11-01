@@ -125,7 +125,8 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
     setState(() => _submitting = true);
     try {
       final repository = await ref.read(containerRepositoryProvider.future);
-      await repository.createContainer(_payload(name, image));
+      final taskID = await repository.createContainer(_payload(name, image));
+      await repository.waitForTask(taskID);
       if (!mounted) return;
       AppToast.success(context, l10n.containers_created);
       ref.invalidate(containersProvider);
@@ -466,7 +467,9 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.all(AppTokens.s16),
         child: PrimaryButton(
-          label: l10n.containers_createSubmit,
+          label: _submitting
+              ? l10n.containers_creating
+              : l10n.containers_createSubmit,
           loading: _submitting,
           onPressed: _canSubmit && !_submitting ? _submit : null,
         ),

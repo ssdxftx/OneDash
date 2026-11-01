@@ -6133,6 +6133,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'SSH port saved, but the local connection check still fails. Verify the new port.'**
   String get host_sshCheckAfterSave;
+
+  /// Container creation progress label.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating container…'**
+  String get containers_creating;
+
+  /// SSH boolean option enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get host_sshValueOn;
+
+  /// SSH boolean option disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get host_sshValueOff;
+
+  /// SSH root login restricted to keys.
+  ///
+  /// In en, this message translates to:
+  /// **'Key only'**
+  String get host_sshValueKeyOnly;
+
+  /// SSH password login forbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Password disabled'**
+  String get host_sshValuePasswordForbidden;
+
+  /// Toolbox service installed but stopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get toolbox_stopped;
+
+  /// Fail2ban not installed guidance.
+  ///
+  /// In en, this message translates to:
+  /// **'Fail2ban is not installed. Install it from the panel app store first.'**
+  String get toolbox_notInstalledHint;
+
+  /// Network trend chart title.
+  ///
+  /// In en, this message translates to:
+  /// **'Network trend (last 5 minutes)'**
+  String get dashboard_networkTrend;
+
+  /// Network chart sampling hint.
+  ///
+  /// In en, this message translates to:
+  /// **'The curve appears after 3 samples are collected.'**
+  String get dashboard_networkCollectHint;
+
+  /// Shown when launching a website in the browser fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to open the website'**
+  String get websites_openFailed;
 }
 
 class _AppLocalizationsDelegate

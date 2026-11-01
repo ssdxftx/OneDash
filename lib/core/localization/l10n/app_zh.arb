@@ -522,9 +522,9 @@
   "toolbox_cacheClean": "缓存清理",
   "toolbox_scan": "扫描",
   "toolbox_scanFailed": "扫描失败",
-  "toolbox_installed": "安装",
-  "toolbox_running": "运行",
-  "toolbox_enabled": "启用",
+  "toolbox_installed": "已安装",
+  "toolbox_running": "运行中",
+  "toolbox_enabled": "已启用",
   "toolbox_version": "版本",
   "toolbox_port": "端口",
   "toolbox_virusScan": "病毒扫描",
@@ -1007,4 +1007,14 @@
   "firewall_settingsBackendHint": "点击切换面板管理的防火墙后端",
   "host_sshCheckFailed": "本地 SSH 连通性检查失败，已取消保存。",
   "host_sshCheckAfterSave": "SSH 端口已保存，但本地连通性检查仍未通过，请确认新端口。"
+  ,"containers_creating": "正在创建容器…"
+  ,"host_sshValueOn": "开启"
+  ,"host_sshValueOff": "关闭"
+  ,"host_sshValueKeyOnly": "仅密钥"
+  ,"host_sshValuePasswordForbidden": "禁止密码"
+  ,"toolbox_stopped": "已停止"
+  ,"toolbox_notInstalledHint": "尚未安装 Fail2ban，请先在面板应用商店完成安装。"
+  ,"dashboard_networkTrend": "网络趋势（近 5 分钟）"
+  ,"dashboard_networkCollectHint": "采集 3 个采样点后显示曲线"
+  ,"websites_openFailed": "打开网站失败"
 }

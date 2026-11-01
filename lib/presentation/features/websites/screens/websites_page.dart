@@ -283,12 +283,13 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
   }
 
   Future<void> _openSite(WebsiteDto site) async {
+    final l10n = AppLocalizations.of(context);
     final protocol = site.protocol.toLowerCase() == 'https' ? 'https' : 'http';
     final uri = Uri.tryParse('$protocol://${site.primaryDomain}');
     if (uri == null) return;
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (!mounted) return;
-      showErrorToast(context, StateError('open website failed'));
+      showErrorToast(context, StateError(l10n.websites_openFailed));
     }
   }
 
@@ -299,6 +300,15 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
       builder: (sheetContext) => WebsiteDeleteSheet(site: site),
     );
     if (options == null || !mounted) return;
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.websites_deleteTitle(site.primaryDomain),
+      message: l10n.websites_deleteMessage,
+      confirmLabel: l10n.action_delete,
+      requireText: site.primaryDomain,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
       await repository.deleteWebsite(

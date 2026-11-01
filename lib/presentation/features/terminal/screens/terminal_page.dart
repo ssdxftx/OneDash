@@ -337,13 +337,37 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
             if (_error != null)
               Container(
                 width: double.infinity,
-                color: context.appColors.danger.withValues(alpha: 0.15),
-                padding: const EdgeInsets.all(AppTokens.s8),
-                child: Text(
-                  _error!,
-                  style: AppTextStyles.caption.copyWith(
-                    color: context.appColors.danger,
+                margin: const EdgeInsets.fromLTRB(
+                  AppTokens.s16,
+                  AppTokens.s8,
+                  AppTokens.s16,
+                  0,
+                ),
+                padding: const EdgeInsets.all(AppTokens.s12),
+                decoration: BoxDecoration(
+                  color: context.appColors.danger.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppTokens.rSm),
+                  border: Border.all(
+                    color: context.appColors.danger.withValues(alpha: 0.35),
                   ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      TablerIcons.alert_triangle,
+                      size: AppTokens.iconList,
+                      color: context.appColors.danger,
+                    ),
+                    const SizedBox(width: AppTokens.s8),
+                    Expanded(
+                      child: Text(
+                        _error!,
+                        style: AppTextStyles.caption.copyWith(
+                          color: context.appColors.danger,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             Expanded(

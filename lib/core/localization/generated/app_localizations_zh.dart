@@ -1663,13 +1663,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get toolbox_scanFailed => '扫描失败';
 
   @override
-  String get toolbox_installed => '安装';
+  String get toolbox_installed => '已安装';
 
   @override
-  String get toolbox_running => '运行';
+  String get toolbox_running => '运行中';
 
   @override
-  String get toolbox_enabled => '启用';
+  String get toolbox_enabled => '已启用';
 
   @override
   String get toolbox_version => '版本';
@@ -3134,4 +3134,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get host_sshCheckAfterSave => 'SSH 端口已保存，但本地连通性检查仍未通过，请确认新端口。';
+
+  @override
+  String get containers_creating => '正在创建容器…';
+
+  @override
+  String get host_sshValueOn => '开启';
+
+  @override
+  String get host_sshValueOff => '关闭';
+
+  @override
+  String get host_sshValueKeyOnly => '仅密钥';
+
+  @override
+  String get host_sshValuePasswordForbidden => '禁止密码';
+
+  @override
+  String get toolbox_stopped => '已停止';
+
+  @override
+  String get toolbox_notInstalledHint => '尚未安装 Fail2ban，请先在面板应用商店完成安装。';
+
+  @override
+  String get dashboard_networkTrend => '网络趋势（近 5 分钟）';
+
+  @override
+  String get dashboard_networkCollectHint => '采集 3 个采样点后显示曲线';
+
+  @override
+  String get websites_openFailed => '打开网站失败';
 }

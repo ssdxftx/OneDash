@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens.dart';
 
-class SegmentedTabs extends StatelessWidget {
+class SegmentedTabs extends StatefulWidget {
   const SegmentedTabs({
     super.key,
     required this.labels,
@@ -19,14 +19,89 @@ class SegmentedTabs extends StatelessWidget {
   final bool scrollable;
 
   @override
+  State<SegmentedTabs> createState() => _SegmentedTabsState();
+}
+
+class _SegmentedTabsState extends State<SegmentedTabs> {
+  final ScrollController _controller = ScrollController();
+  late List<GlobalKey> _keys = _buildKeys();
+  bool _canScrollLeft = false;
+  bool _canScrollRight = false;
+
+  List<GlobalKey> _buildKeys() =>
+      List.generate(widget.labels.length, (_) => GlobalKey());
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_updateEdges);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateEdges();
+      _ensureSelectedVisible();
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant SegmentedTabs oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.labels.length != widget.labels.length) {
+      _keys = _buildKeys();
+    }
+    if (oldWidget.selectedIndex != widget.selectedIndex) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _ensureSelectedVisible(),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller
+      ..removeListener(_updateEdges)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _updateEdges() {
+    if (!mounted || !_controller.hasClients) return;
+    final position = _controller.position;
+    final canLeft = position.pixels > 0.5;
+    final canRight = position.pixels < position.maxScrollExtent - 0.5;
+    if (canLeft == _canScrollLeft && canRight == _canScrollRight) return;
+    setState(() {
+      _canScrollLeft = canLeft;
+      _canScrollRight = canRight;
+    });
+  }
+
+  void _ensureSelectedVisible() {
+    if (!mounted || !widget.scrollable) return;
+    final key = _keys[widget.selectedIndex];
+    final target = key.currentContext;
+    if (target == null) return;
+    Scrollable.ensureVisible(
+      target,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final tabs = <Widget>[];
-    for (var i = 0; i < labels.length; i++) {
-      final selected = i == selectedIndex;
+    for (var i = 0; i < widget.labels.length; i++) {
+      final selected = i == widget.selectedIndex;
       tabs.add(
         InkWell(
-          onTap: () => onChanged(i),
+          key: _keys[i],
+          onTap: () {
+            widget.onChanged(i);
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => _ensureSelectedVisible(),
+            );
+          },
           borderRadius: BorderRadius.circular(AppTokens.rSm),
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -37,7 +112,7 @@ class SegmentedTabs extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  labels[i],
+                  widget.labels[i],
                   style: AppTextStyles.label.copyWith(
                     color: selected ? scheme.primary : scheme.onSurfaceVariant,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
@@ -68,14 +143,33 @@ class SegmentedTabs extends StatelessWidget {
           bottom: BorderSide(color: scheme.outlineVariant, width: 1),
         ),
       ),
-      child: scrollable
-          ? SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: padding,
-              child: row,
+      child: widget.scrollable
+          ? ShaderMask(
+              blendMode: BlendMode.dstIn,
+              shaderCallback: (bounds) => LinearGradient(
+                colors: [
+                  if (_canScrollLeft)
+                    scheme.surface.withValues(alpha: 0)
+                  else
+                    scheme.surface,
+                  scheme.surface,
+                  scheme.surface,
+                  if (_canScrollRight)
+                    scheme.surface.withValues(alpha: 0)
+                  else
+                    scheme.surface,
+                ],
+                stops: const [0, 0.08, 0.92, 1],
+              ).createShader(bounds),
+              child: SingleChildScrollView(
+                controller: _controller,
+                scrollDirection: Axis.horizontal,
+                padding: widget.padding,
+                child: row,
+              ),
             )
           : Padding(
-              padding: padding,
+              padding: widget.padding,
               child: Row(
                 children: [
                   for (final tab in tabs) Expanded(child: Center(child: tab)),

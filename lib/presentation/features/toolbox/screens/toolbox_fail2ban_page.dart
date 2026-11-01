@@ -41,15 +41,19 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
     try {
       final repository = await ref.read(toolboxRepositoryProvider.future);
       final base = await repository.getFail2banBase();
+      if (!mounted) return;
+      setState(() => _base = base);
       var banned = const <String>[];
-      if (base['isActive'] == true) {
-        banned = await repository.searchFail2ban('banned');
+      if (base['isExist'] == true && base['isActive'] == true) {
+        try {
+          banned = await repository.searchFail2ban('banned');
+        } catch (error) {
+          if (!mounted) return;
+          showErrorToast(context, error);
+        }
       }
       if (!mounted) return;
-      setState(() {
-        _base = base;
-        _banned = banned;
-      });
+      setState(() => _banned = banned);
     } catch (error) {
       if (!mounted) return;
       showErrorToast(context, error);
@@ -236,7 +240,8 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    final active = _base['isActive'] == true;
+    final installed = _base['isExist'] == true;
+    final active = installed && _base['isActive'] == true;
     return Scaffold(
       appBar: AppBarLarge(
         title: l10n.toolbox_fail2ban,
@@ -248,78 +253,88 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
-        children: [
-          SplitListGroup(
-            children: [
-              SwitchListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppTokens.s16,
-                ),
-                title: Text(l10n.toolbox_sshProtection),
-                subtitle: Text(
-                  active ? l10n.toolbox_running : l10n.toolbox_enabled,
-                ),
-                value: active,
-                onChanged: _toggleService,
-              ),
-              SplitListTile(
-                title: l10n.toolbox_installed,
-                subtitle: _base['isExist'] == true
-                    ? l10n.common_yes
-                    : l10n.common_no,
-              ),
-              SplitListTile(
-                title: l10n.toolbox_version,
-                subtitle: '${_base['version'] ?? '-'}',
-              ),
-            ],
-          ),
-          if (_base['isExist'] == true) ...[
-            const SizedBox(height: AppTokens.s24),
-            SectionHeader(title: l10n.toolbox_fail2banBase),
-            SplitListGroup(
-              children: [
-                _confTile('port', l10n.toolbox_port, numeric: true),
-                _confTile('maxRetry', l10n.toolbox_maxRetry, numeric: true),
-                _confTile('banTime', l10n.toolbox_banTime),
-                _confTile('findTime', l10n.toolbox_findTime),
-                SplitListTile(
-                  title: l10n.toolbox_banAction,
-                  subtitle: '${_base['banAction'] ?? '-'}',
-                  trailing: const Icon(TablerIcons.edit),
-                  onTap: _editBanAction,
-                ),
-                _confTile('logPath', l10n.toolbox_logPath),
-              ],
-            ),
-          ],
-          const SizedBox(height: AppTokens.s24),
-          SectionHeader(title: l10n.toolbox_sshBan),
-          if (_banned.isEmpty)
-            EmptyState(
-              icon: TablerIcons.shield_check,
-              title: l10n.toolbox_sshBan,
-              message: l10n.state_empty,
-              compact: true,
+      body: !installed
+          ? EmptyState(
+              icon: TablerIcons.ban,
+              title: l10n.toolbox_fail2ban,
+              message: l10n.toolbox_notInstalledHint,
             )
-          else
-            SplitListGroup(
+          : ListView(
+              padding: const EdgeInsets.all(AppTokens.s16),
               children: [
-                for (final ip in _banned)
-                  SplitListTile(
-                    leading: const Icon(TablerIcons.ban),
-                    title: ip,
-                    trailing: TextButton(
-                      onPressed: () => _unban(ip),
-                      child: Text(l10n.toolbox_unban),
+                SplitListGroup(
+                  children: [
+                    SwitchListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppTokens.s16,
+                      ),
+                      title: Text(l10n.toolbox_sshProtection),
+                      subtitle: Text(
+                        active ? l10n.toolbox_running : l10n.toolbox_stopped,
+                      ),
+                      value: active,
+                      onChanged: _toggleService,
                     ),
+                    SplitListTile(
+                      title: l10n.toolbox_installed,
+                      subtitle: _base['isExist'] == true
+                          ? l10n.common_yes
+                          : l10n.common_no,
+                    ),
+                    SplitListTile(
+                      title: l10n.toolbox_version,
+                      subtitle: '${_base['version'] ?? '-'}',
+                    ),
+                  ],
+                ),
+                if (_base['isExist'] == true) ...[
+                  const SizedBox(height: AppTokens.s24),
+                  SectionHeader(title: l10n.toolbox_fail2banBase),
+                  SplitListGroup(
+                    children: [
+                      _confTile('port', l10n.toolbox_port, numeric: true),
+                      _confTile(
+                        'maxRetry',
+                        l10n.toolbox_maxRetry,
+                        numeric: true,
+                      ),
+                      _confTile('banTime', l10n.toolbox_banTime),
+                      _confTile('findTime', l10n.toolbox_findTime),
+                      SplitListTile(
+                        title: l10n.toolbox_banAction,
+                        subtitle: '${_base['banAction'] ?? '-'}',
+                        trailing: const Icon(TablerIcons.edit),
+                        onTap: _editBanAction,
+                      ),
+                      _confTile('logPath', l10n.toolbox_logPath),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: AppTokens.s24),
+                SectionHeader(title: l10n.toolbox_sshBan),
+                if (_banned.isEmpty)
+                  EmptyState(
+                    icon: TablerIcons.shield_check,
+                    title: l10n.toolbox_sshBan,
+                    message: l10n.state_empty,
+                    compact: true,
+                  )
+                else
+                  SplitListGroup(
+                    children: [
+                      for (final ip in _banned)
+                        SplitListTile(
+                          leading: const Icon(TablerIcons.ban),
+                          title: ip,
+                          trailing: TextButton(
+                            onPressed: () => _unban(ip),
+                            child: Text(l10n.toolbox_unban),
+                          ),
+                        ),
+                    ],
                   ),
               ],
             ),
-        ],
-      ),
     );
   }
 }

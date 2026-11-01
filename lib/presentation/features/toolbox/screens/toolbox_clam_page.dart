@@ -287,7 +287,7 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
                 ),
                 title: const Text('ClamAV'),
                 subtitle: Text(
-                  active ? l10n.toolbox_running : l10n.toolbox_installed,
+                  active ? l10n.toolbox_running : l10n.toolbox_stopped,
                 ),
                 value: active,
                 onChanged: _base['isExist'] == true ? _toggle : null,

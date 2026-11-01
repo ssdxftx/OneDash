@@ -262,20 +262,20 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
                 child: _diskCard(disk, system: true),
               ),
           ],
-          if (_disks.unpartitionedDisks.isNotEmpty) ...[
-            SectionHeader(title: l10n.host_diskUnpartitioned),
-            for (final disk in _disks.unpartitionedDisks)
-              Padding(
-                padding: const EdgeInsets.only(bottom: AppTokens.s12),
-                child: _unpartitionedCard(disk),
-              ),
-          ],
           if (_disks.disks.isNotEmpty) ...[
             SectionHeader(title: l10n.host_diskNormal),
             for (final disk in _disks.disks)
               Padding(
                 padding: const EdgeInsets.only(bottom: AppTokens.s12),
                 child: _diskCard(disk),
+              ),
+          ],
+          if (_disks.unpartitionedDisks.isNotEmpty) ...[
+            SectionHeader(title: l10n.host_diskUnpartitioned),
+            for (final disk in _disks.unpartitionedDisks)
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                child: _unpartitionedCard(disk),
               ),
           ],
         ],
@@ -408,6 +408,20 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
             ),
           ],
         ),
+        const SizedBox(height: AppTokens.s8),
+        LinearProgressIndicator(
+          value: (partition.usePercent.clamp(0, 100)) / 100,
+          minHeight: 4,
+          borderRadius: BorderRadius.circular(AppTokens.rFull),
+          backgroundColor: scheme.surfaceContainerHighest,
+          valueColor: AlwaysStoppedAnimation(
+            partition.usePercent >= 90
+                ? context.appColors.danger
+                : partition.usePercent >= 80
+                ? context.appColors.warning
+                : scheme.primary,
+          ),
+        ),
         const SizedBox(height: AppTokens.s4),
         Wrap(
           spacing: AppTokens.s12,
@@ -429,14 +443,18 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
           const SizedBox(height: AppTokens.s4),
           Align(
             alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: mounted
-                  ? () => _unmount(partition)
-                  : () => _mount(partition),
-              child: Text(
-                mounted ? l10n.host_diskUnmount : l10n.host_diskMount,
-              ),
-            ),
+            child: mounted
+                ? DangerButton(
+                    label: l10n.host_diskUnmount,
+                    filled: false,
+                    expanded: false,
+                    onPressed: () => _unmount(partition),
+                  )
+                : SecondaryButton(
+                    label: l10n.host_diskMount,
+                    expanded: false,
+                    onPressed: () => _mount(partition),
+                  ),
           ),
         ],
       ],

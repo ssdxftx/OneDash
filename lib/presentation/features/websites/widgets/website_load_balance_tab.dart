@@ -412,26 +412,40 @@ class _WebsiteLoadBalanceTabState extends ConsumerState<WebsiteLoadBalanceTab> {
                     for (final server in upstream.servers)
                       Padding(
                         padding: const EdgeInsets.only(bottom: AppTokens.s4),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Text(
-                                server.server,
-                                style: AppTextStyles.bodyM,
-                              ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    server.server,
+                                    style: AppTextStyles.bodyM,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: AppTokens.s8),
+                                Text(
+                                  _flagLabel(l10n, server.flag),
+                                  style: AppTextStyles.bodyS.copyWith(
+                                    color: context.scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
                             ),
+                            const SizedBox(height: 2),
                             Text(
-                              '${l10n.websites_lbWeight} ${server.weight}',
+                              '${l10n.websites_lbWeight} ${server.weight} · '
+                              '${l10n.websites_lbMaxFails} ${server.maxFails} · '
+                              '${l10n.websites_lbFailTimeout} '
+                              '${server.failTimeout}${server.failTimeoutUnit} · '
+                              '${l10n.websites_lbMaxConns} ${server.maxConns}',
                               style: AppTextStyles.bodyS.copyWith(
                                 color: context.scheme.onSurfaceVariant,
                               ),
-                            ),
-                            const SizedBox(width: AppTokens.s8),
-                            Text(
-                              _flagLabel(l10n, server.flag),
-                              style: AppTextStyles.bodyS.copyWith(
-                                color: context.scheme.onSurfaceVariant,
-                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),

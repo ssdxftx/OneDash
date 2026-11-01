@@ -1,8 +1,8 @@
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
-import '../dto/common/task_log_dto.dart';
 import '../dto/firewall/firewall_base_info_dto.dart';
 import '../dto/firewall/firewall_v2_dto.dart';
+import 'task_waiter.dart';
 
 /// 1Panel v2.4.2 防火墙 API。
 ///
@@ -287,26 +287,10 @@ class FirewallApi {
 
   Future<void> _awaitTask(FirewallTaskResult task) async {
     if (!task.queued || task.taskID.isEmpty) return;
-    for (var attempt = 0; attempt < 20; attempt++) {
-      final response = await _client.post<Map<String, dynamic>>(
-        '/api/v2/logs/tasks/read',
-        data: {
-          'taskID': task.taskID,
-          'page': 1,
-          'pageSize': 200,
-          'latest': true,
-        },
-      );
-      final log = ApiResponseParser.object(response, TaskLogDto.fromJson);
-      final status = log.taskStatus.toLowerCase();
-      if (status == 'success') return;
-      if (status == 'failed' || status == 'error') {
-        final detail = log.lines.isEmpty ? '' : log.lines.last;
-        throw StateError('防火墙任务执行失败 $detail'.trim());
-      }
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-    }
-    throw StateError('防火墙任务仍在执行，请稍后刷新');
+    await TaskWaiter(
+      _client,
+      maxAttempts: 20,
+    ).waitFor(task.taskID, subject: '防火墙任务');
   }
 
   static Map<String, dynamic> _fileMap(Map<dynamic, dynamic> file) =>

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens.dart';
 
-class AppFilterChips<T> extends StatelessWidget {
+class AppFilterChips<T> extends StatefulWidget {
   const AppFilterChips({
     super.key,
     required this.options,
@@ -23,49 +23,92 @@ class AppFilterChips<T> extends StatelessWidget {
   final bool multiSelect;
   final EdgeInsetsGeometry padding;
 
+  @override
+  State<AppFilterChips<T>> createState() => _AppFilterChipsState<T>();
+}
+
+class _AppFilterChipsState<T> extends State<AppFilterChips<T>> {
+  final ScrollController _controller = ScrollController();
+  bool _canScrollLeft = false;
+  bool _canScrollRight = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_updateEdges);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateEdges());
+  }
+
+  @override
+  void dispose() {
+    _controller
+      ..removeListener(_updateEdges)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _updateEdges() {
+    if (!mounted || !_controller.hasClients) return;
+    final position = _controller.position;
+    final canLeft = position.pixels > 0.5;
+    final canRight = position.pixels < position.maxScrollExtent - 0.5;
+    if (canLeft == _canScrollLeft && canRight == _canScrollRight) return;
+    setState(() {
+      _canScrollLeft = canLeft;
+      _canScrollRight = canRight;
+    });
+  }
+
   void _toggle(T option) {
-    if (multiSelect) {
-      final next = Set<T>.of(selected);
+    if (widget.multiSelect) {
+      final next = Set<T>.of(widget.selected);
       if (!next.add(option)) next.remove(option);
-      onChanged(next);
+      widget.onChanged(next);
       return;
     }
-    onChanged({option});
+    widget.onChanged({option});
   }
 
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
-    final resolvedPadding = padding.resolve(Directionality.of(context));
+    final resolvedPadding = widget.padding.resolve(Directionality.of(context));
     return SizedBox(
       height: 48,
       child: ShaderMask(
         blendMode: BlendMode.dstIn,
         shaderCallback: (bounds) => LinearGradient(
           colors: [
-            scheme.surface.withValues(alpha: 0),
+            if (_canScrollLeft)
+              scheme.surface.withValues(alpha: 0)
+            else
+              scheme.surface,
             scheme.surface,
             scheme.surface,
-            scheme.surface.withValues(alpha: 0),
+            if (_canScrollRight)
+              scheme.surface.withValues(alpha: 0)
+            else
+              scheme.surface,
           ],
           stops: const [0, 0.08, 0.92, 1],
         ).createShader(bounds),
         child: ListView.separated(
+          controller: _controller,
           scrollDirection: Axis.horizontal,
           padding: EdgeInsets.only(
             left: resolvedPadding.left,
             right: resolvedPadding.right,
           ),
-          itemCount: options.length,
+          itemCount: widget.options.length,
           separatorBuilder: (_, _) => const SizedBox(width: AppTokens.s8),
           itemBuilder: (context, index) {
-            final option = options[index];
-            final isSelected = selected.contains(option);
+            final option = widget.options[index];
+            final isSelected = widget.selected.contains(option);
             return Center(
               child: FilterChip(
                 selected: isSelected,
                 showCheckmark: false,
-                label: Text(labelOf(option)),
+                label: Text(widget.labelOf(option)),
                 onSelected: (_) => _toggle(option),
                 backgroundColor: scheme.surfaceContainerLow,
                 selectedColor: scheme.primaryContainer,

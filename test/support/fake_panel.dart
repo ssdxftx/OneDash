@@ -73,6 +73,7 @@ class FakePanel {
         'pingStatus': 'Enable',
       }),
       '/api/v2/hosts/firewall/search' => _page(const []),
+      '/api/v2/logs/tasks/read' => _taskLog(),
       _ => null,
     };
 
@@ -244,4 +245,17 @@ class FakePanel {
     'createdAt': '2026-01-01',
     'updatedAt': '2026-01-01',
   };
+
+  Map<String, dynamic> _taskLog() {
+    final failed = scenario == 'taskFailed';
+    return _envelope({
+      'end': true,
+      'path': '/tmp/task.log',
+      'total': failed ? 1 : 0,
+      'taskStatus': failed ? 'Failed' : 'Success',
+      'lines': failed ? ['image not found'] : <String>[],
+      'scope': 'container',
+      'totalLines': failed ? 1 : 0,
+    });
+  }
 }

@@ -22,6 +22,7 @@ import '../dto/container/compose_template_dto.dart';
 import '../dto/container/image_dtos.dart';
 import '../dto/container/network_dtos.dart';
 import '../dto/common/page_result.dart';
+import 'task_waiter.dart';
 
 /// 容器 API。
 ///
@@ -348,12 +349,24 @@ class ContainerApi {
 
   /// 创建容器。
   /// POST /api/v2/containers
-  Future<void> createContainer(Map<String, dynamic> data) async {
+  ///
+  /// 1Panel 在后台线程执行创建任务，接口本身立即返回；
+  /// 任务 ID 由请求体携带，需调用 [waitForTask] 等待最终结果。
+  Future<String> createContainer(Map<String, dynamic> data) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/containers',
       data: data,
     );
     ApiResponseParser.ok(resp);
+    return '${data['taskID'] ?? ''}';
+  }
+
+  /// 等待容器创建任务结束。
+  Future<void> waitForTask(String taskID) async {
+    await TaskWaiter(
+      _client,
+      maxAttempts: 240,
+    ).waitFor(taskID, subject: '容器任务');
   }
 
   /// 更新容器。

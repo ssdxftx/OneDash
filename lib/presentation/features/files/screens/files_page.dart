@@ -744,9 +744,31 @@ class _FilesPageState extends ConsumerState<FilesPage> {
           ? SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(AppTokens.s16),
-                child: Row(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.files_selectCount(_selected.length),
+                            style: AppTextStyles.caption.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => _selectAll(
+                            ref.read(filesProvider(_path)).valueOrNull?.items ??
+                                const [],
+                          ),
+                          child: Text(l10n.files_selectAll),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTokens.s8),
+                    SizedBox(
+                      width: double.infinity,
                       child: FilledButton.icon(
                         onPressed: () => _batchDelete(
                           ref.read(filesProvider(_path)).valueOrNull?.items ??
@@ -780,7 +802,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                   ),
                   const Spacer(),
                   Text(
-                    stateText(files),
+                    l10n.files_itemCount(files.valueOrNull?.items.length ?? 0),
                     style: AppTextStyles.caption.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
@@ -789,12 +811,6 @@ class _FilesPageState extends ConsumerState<FilesPage> {
               ),
             ],
     );
-  }
-
-  String stateText(AsyncValue<FilesState> value) {
-    final data = value.valueOrNull;
-    if (data == null) return '';
-    return '${data.items.length} / ${data.total}';
   }
 }
 

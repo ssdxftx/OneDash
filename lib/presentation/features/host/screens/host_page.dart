@@ -193,7 +193,11 @@ class _HostPageState extends ConsumerState<HostPage> {
               leading: const Icon(TablerIcons.settings),
               title: l10n.host_monitorSettings,
               subtitle:
-                  '${_setting['monitorInterval'] ?? '-'}s · ${_setting['monitorStoreDays'] ?? '-'}d',
+                  _setting['monitorInterval'] == null &&
+                      _setting['monitorStoreDays'] == null
+                  ? null
+                  : '${_setting['monitorInterval'] ?? '-'}s · '
+                        '${_setting['monitorStoreDays'] ?? '-'}d',
               trailing: const Icon(TablerIcons.chevron_right),
               onTap: _editMonitorSettings,
             ),
@@ -308,7 +312,8 @@ class _HostPageState extends ConsumerState<HostPage> {
                 ),
                 SplitListTile(
                   title: l10n.host_rootLogin,
-                  subtitle: info.permitRootLogin,
+                  subtitle: _sshValue(l10n, info.permitRootLogin),
+                  subtitleStyle: _sshValueStyle(info.permitRootLogin),
                   trailing: const Icon(TablerIcons.edit),
                   onTap: () => _editSsh(
                     'PermitRootLogin',
@@ -318,7 +323,8 @@ class _HostPageState extends ConsumerState<HostPage> {
                 ),
                 SplitListTile(
                   title: l10n.host_passwordAuth,
-                  subtitle: info.passwordAuthentication,
+                  subtitle: _sshValue(l10n, info.passwordAuthentication),
+                  subtitleStyle: _sshValueStyle(info.passwordAuthentication),
                   trailing: const Icon(TablerIcons.edit),
                   onTap: () => _editSsh(
                     'PasswordAuthentication',
@@ -328,7 +334,8 @@ class _HostPageState extends ConsumerState<HostPage> {
                 ),
                 SplitListTile(
                   title: l10n.host_pubkeyAuth,
-                  subtitle: info.pubkeyAuthentication,
+                  subtitle: _sshValue(l10n, info.pubkeyAuthentication),
+                  subtitleStyle: _sshValueStyle(info.pubkeyAuthentication),
                   trailing: const Icon(TablerIcons.edit),
                   onTap: () => _editSsh(
                     'PubkeyAuthentication',
@@ -634,5 +641,32 @@ class _HostPageState extends ConsumerState<HostPage> {
       if (!mounted) return;
       showErrorToast(context, error);
     }
+  }
+
+  String _sshValue(AppLocalizations l10n, String raw) {
+    return switch (raw.trim().toLowerCase()) {
+      'yes' || 'enable' || 'enabled' => l10n.host_sshValueOn,
+      'no' || 'disable' || 'disabled' => l10n.host_sshValueOff,
+      'prohibit-password' => l10n.host_sshValueKeyOnly,
+      'forbid-password' => l10n.host_sshValuePasswordForbidden,
+      _ => raw,
+    };
+  }
+
+  TextStyle? _sshValueStyle(String raw) {
+    final value = raw.trim().toLowerCase();
+    const known = {
+      'yes',
+      'enable',
+      'enabled',
+      'no',
+      'disable',
+      'disabled',
+      'prohibit-password',
+      'forbid-password',
+    };
+    return known.contains(value)
+        ? null
+        : AppTextStyles.bodyS.copyWith(fontFamily: 'monospace');
   }
 }

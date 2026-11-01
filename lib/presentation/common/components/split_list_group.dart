@@ -50,6 +50,7 @@ class SplitListTile extends StatelessWidget {
     super.key,
     required this.title,
     this.subtitle,
+    this.subtitleStyle,
     this.leading,
     this.trailing,
     this.onTap,
@@ -61,6 +62,7 @@ class SplitListTile extends StatelessWidget {
 
   final String title;
   final String? subtitle;
+  final TextStyle? subtitleStyle;
   final Widget? leading;
   final Widget? trailing;
   final VoidCallback? onTap;
@@ -123,7 +125,7 @@ class SplitListTile extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitle!,
-                        style: AppTextStyles.bodyS.copyWith(
+                        style: (subtitleStyle ?? AppTextStyles.bodyS).copyWith(
                           color: subtitleColor,
                         ),
                         maxLines: 2,

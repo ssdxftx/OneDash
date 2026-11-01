@@ -3206,4 +3206,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get host_sshCheckAfterSave =>
       'SSH port saved, but the local connection check still fails. Verify the new port.';
+
+  @override
+  String get containers_creating => 'Creating container…';
+
+  @override
+  String get host_sshValueOn => 'On';
+
+  @override
+  String get host_sshValueOff => 'Off';
+
+  @override
+  String get host_sshValueKeyOnly => 'Key only';
+
+  @override
+  String get host_sshValuePasswordForbidden => 'Password disabled';
+
+  @override
+  String get toolbox_stopped => 'Stopped';
+
+  @override
+  String get toolbox_notInstalledHint =>
+      'Fail2ban is not installed. Install it from the panel app store first.';
+
+  @override
+  String get dashboard_networkTrend => 'Network trend (last 5 minutes)';
+
+  @override
+  String get dashboard_networkCollectHint =>
+      'The curve appears after 3 samples are collected.';
+
+  @override
+  String get websites_openFailed => 'Failed to open the website';
 }

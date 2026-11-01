@@ -365,7 +365,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                   children: [
                     Expanded(
                       child: Text(
-                        l10n.dashboard_network,
+                        l10n.dashboard_networkTrend,
                         style: AppTextStyles.titleM,
                       ),
                     ),
@@ -381,16 +381,33 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                   ],
                 ),
                 const SizedBox(height: AppTokens.s16),
-                SizedBox(
-                  height: 160,
-                  child: AreaChart(
-                    seriesA: state.netDownHistory,
-                    seriesB: state.netUpHistory,
-                    colorA: context.appColors.chart1,
-                    colorB: context.appColors.chart2,
-                    placeholder: l10n.dashboard_collecting,
+                if (state.netDownHistory.length < 3 &&
+                    state.netUpHistory.length < 3) ...[
+                  const SkeletonShimmer(
+                    child: SkeletonBox(
+                      width: double.infinity,
+                      height: 72,
+                      borderRadius: AppTokens.rSm,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: AppTokens.s8),
+                  Text(
+                    l10n.dashboard_networkCollectHint,
+                    style: AppTextStyles.caption.copyWith(
+                      color: context.scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ] else
+                  SizedBox(
+                    height: 160,
+                    child: AreaChart(
+                      seriesA: state.netDownHistory,
+                      seriesB: state.netUpHistory,
+                      colorA: context.appColors.chart1,
+                      colorB: context.appColors.chart2,
+                      placeholder: l10n.dashboard_collecting,
+                    ),
+                  ),
               ],
             ),
           ),

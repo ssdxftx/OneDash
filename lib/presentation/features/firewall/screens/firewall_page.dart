@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -127,6 +128,7 @@ class FirewallPage extends ConsumerStatefulWidget {
 class _FirewallPageState extends ConsumerState<FirewallPage> {
   final _searchController = TextEditingController();
   int _tab = 0;
+  bool _fabVisible = true;
   bool _searching = false;
   bool _operating = false;
   String _filter = 'all';
@@ -160,8 +162,8 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
           ),
         ],
       ),
-      floatingActionButton: _tab == 0 || _tab == 1
-          ? FloatingActionButton(
+      floatingActionButton: (_tab == 0 || _tab == 1) && _fabVisible
+          ? FloatingActionButton.small(
               tooltip: _tab == 0
                   ? l10n.firewall_add_rule
                   : l10n.firewall_addForward,
@@ -169,110 +171,122 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
               child: const Icon(TablerIcons.plus),
             )
           : null,
-      body: AsyncStateView(
-        value: firewall,
-        onRetry: () => ref.invalidate(_firewallProvider),
-        loading: const SkeletonList(itemCount: 6),
-        builder: (data) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppTokens.s16,
-                AppTokens.s8,
-                AppTokens.s16,
-                AppTokens.s16,
-              ),
-              child: _StatusCard(
-                data: data,
-                operating: _operating,
-                onToggle: (value) => _toggleService(data, value),
-              ),
-            ),
-            SegmentedTabs(
-              labels: [
-                l10n.firewall_tabRules,
-                l10n.firewall_tabForward,
-                l10n.firewall_tabDocker,
-                l10n.firewall_tabSettings,
-              ],
-              selectedIndex: _tab,
-              onChanged: (value) => setState(() => _tab = value),
-            ),
-            if (_tab == 0) ...[
-              if (_searching)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppTokens.s16,
-                    vertical: AppTokens.s8,
-                  ),
-                  child: SearchField(
-                    controller: _searchController,
-                    hint: l10n.firewall_searchHint,
-                    autofocus: true,
-                    onChanged: (_) => setState(() {}),
-                  ),
+      body: NotificationListener<UserScrollNotification>(
+        onNotification: (notification) {
+          final visible = notification.direction != ScrollDirection.reverse;
+          if (visible != _fabVisible && mounted) {
+            setState(() => _fabVisible = visible);
+          }
+          return false;
+        },
+        child: AsyncStateView(
+          value: firewall,
+          onRetry: () => ref.invalidate(_firewallProvider),
+          loading: const SkeletonList(itemCount: 6),
+          builder: (data) => Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppTokens.s16,
+                  AppTokens.s8,
+                  AppTokens.s16,
+                  AppTokens.s16,
                 ),
-              AppFilterChips<String>(
-                options: const ['all', 'ipv4', 'ipv6', 'allow', 'deny'],
-                labelOf: (value) => switch (value) {
-                  'ipv4' => l10n.firewall_filterIpv4,
-                  'ipv6' => l10n.firewall_filterIpv6,
-                  'allow' => l10n.firewall_filterAllow,
-                  'deny' => l10n.firewall_filterDeny,
-                  _ => l10n.firewall_filterAll,
-                },
-                selected: {_filter},
-                onChanged: (selection) {
-                  if (selection.isEmpty) return;
-                  setState(() => _filter = selection.first);
+                child: _StatusCard(
+                  data: data,
+                  operating: _operating,
+                  onToggle: (value) => _toggleService(data, value),
+                ),
+              ),
+              SegmentedTabs(
+                labels: [
+                  l10n.firewall_tabRules,
+                  l10n.firewall_tabForward,
+                  l10n.firewall_tabDocker,
+                  l10n.firewall_tabSettings,
+                ],
+                selectedIndex: _tab,
+                onChanged: (value) => setState(() {
+                  _tab = value;
+                  _fabVisible = true;
+                }),
+              ),
+              if (_tab == 0) ...[
+                if (_searching)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTokens.s16,
+                      vertical: AppTokens.s8,
+                    ),
+                    child: SearchField(
+                      controller: _searchController,
+                      hint: l10n.firewall_searchHint,
+                      autofocus: true,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                  ),
+                AppFilterChips<String>(
+                  options: const ['all', 'ipv4', 'ipv6', 'allow', 'deny'],
+                  labelOf: (value) => switch (value) {
+                    'ipv4' => l10n.firewall_filterIpv4,
+                    'ipv6' => l10n.firewall_filterIpv6,
+                    'allow' => l10n.firewall_filterAllow,
+                    'deny' => l10n.firewall_filterDeny,
+                    _ => l10n.firewall_filterAll,
+                  },
+                  selected: {_filter},
+                  onChanged: (selection) {
+                    if (selection.isEmpty) return;
+                    setState(() => _filter = selection.first);
+                  },
+                ),
+              ],
+              Expanded(
+                child: switch (_tab) {
+                  0 => _RulesTab(
+                    data: data,
+                    query: _searchController.text.trim().toLowerCase(),
+                    filter: _filter,
+                    onSearchToggle: () {
+                      setState(() {
+                        _searching = !_searching;
+                        if (!_searching) _searchController.clear();
+                      });
+                    },
+                    onEdit: (item) => _showRuleSheet(data, item: item),
+                    onDelete: _deleteRule,
+                    onReorder: _reorderRule,
+                    onAdd: () => _showRuleSheet(data),
+                    onRefresh: _refresh,
+                  ),
+                  1 => _ForwardTab(
+                    data: data,
+                    onAdd: () => _showForwardSheet(data),
+                    onEdit: (rule) => _showForwardSheet(data, rule: rule),
+                    onDelete: _deleteForward,
+                    onEnable: _enableForward,
+                  ),
+                  2 => _DockerTab(
+                    data: data,
+                    operating: _operating,
+                    onToggle: _toggleDockerGuard,
+                  ),
+                  _ => _SettingsTab(
+                    data: data,
+                    onIpv6Changed: _updateIpv6,
+                    onAddWhitelist: _showWhitelistSheet,
+                    onEditWhitelist: (rule) =>
+                        _showWhitelistSheet(existing: rule),
+                    onDeleteWhitelist: _deleteWhitelist,
+                    onSelectBackend: _selectBackend,
+                    onResetRules: _resetRules,
+                    onRestoreBackup: (file) => _resetRules(backupFile: file),
+                    onNativeDetail: _showNativeDetail,
+                  ),
                 },
               ),
             ],
-            Expanded(
-              child: switch (_tab) {
-                0 => _RulesTab(
-                  data: data,
-                  query: _searchController.text.trim().toLowerCase(),
-                  filter: _filter,
-                  onSearchToggle: () {
-                    setState(() {
-                      _searching = !_searching;
-                      if (!_searching) _searchController.clear();
-                    });
-                  },
-                  onEdit: (item) => _showRuleSheet(data, item: item),
-                  onDelete: _deleteRule,
-                  onReorder: _reorderRule,
-                  onAdd: () => _showRuleSheet(data),
-                  onRefresh: _refresh,
-                ),
-                1 => _ForwardTab(
-                  data: data,
-                  onAdd: () => _showForwardSheet(data),
-                  onEdit: (rule) => _showForwardSheet(data, rule: rule),
-                  onDelete: _deleteForward,
-                  onEnable: _enableForward,
-                ),
-                2 => _DockerTab(
-                  data: data,
-                  operating: _operating,
-                  onToggle: _toggleDockerGuard,
-                ),
-                _ => _SettingsTab(
-                  data: data,
-                  onIpv6Changed: _updateIpv6,
-                  onAddWhitelist: _showWhitelistSheet,
-                  onEditWhitelist: (rule) =>
-                      _showWhitelistSheet(existing: rule),
-                  onDeleteWhitelist: _deleteWhitelist,
-                  onSelectBackend: _selectBackend,
-                  onResetRules: _resetRules,
-                  onRestoreBackup: (file) => _resetRules(backupFile: file),
-                  onNativeDetail: _showNativeDetail,
-                ),
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -315,6 +329,7 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
       title: l10n.firewall_ruleDeleteTitle(title),
       message: l10n.firewall_ruleDeleteMessage,
       confirmLabel: l10n.action_delete,
+      danger: true,
     );
     if (!confirmed || !mounted) return;
     try {
@@ -519,6 +534,7 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
       title: l10n.firewall_settingsBackend,
       message: selected,
       confirmLabel: l10n.action_switch,
+      requireText: group.current,
       danger: true,
     );
     if (!confirmed || !mounted) return;
@@ -864,7 +880,12 @@ class _RuleTile extends StatelessWidget {
     final rule = item.rule;
     final scheme = context.scheme;
     final canManage = item.canDelete && !item.isWhitelist;
+    final port = rule.displayPort.isEmpty
+        ? l10n.firewall_anyPort
+        : rule.displayPort;
+    final protocol = rule.protocol.isEmpty ? 'all' : rule.protocol;
     final subtitle = [
+      '$port/$protocol',
       if (rule.description.isNotEmpty) rule.description,
       if (rule.interface.isNotEmpty) rule.interface,
       if (item.isWhitelist) 'whitelist',
@@ -877,8 +898,8 @@ class _RuleTile extends StatelessWidget {
             ? context.appColors.success
             : context.appColors.danger,
       ),
-      title: _ruleTitle(rule, l10n),
-      subtitle: subtitle.isEmpty ? null : subtitle,
+      title: _ruleAddress(rule, l10n),
+      subtitle: subtitle,
       trailing: canManage
           ? PopupMenuButton<String>(
               tooltip: l10n.action_more,
@@ -917,15 +938,27 @@ class _RuleTile extends StatelessWidget {
   }
 }
 
-String _ruleTitle(FirewallRuleInfo rule, AppLocalizations l10n) {
-  final address = rule.sourceAddress.isEmpty
+String _ruleAddress(FirewallRuleInfo rule, AppLocalizations l10n) {
+  return rule.sourceAddress.isEmpty
       ? l10n.firewall_anyAddress
       : rule.sourceAddress;
+}
+
+String _ruleTitle(FirewallRuleInfo rule, AppLocalizations l10n) {
+  final address = _ruleAddress(rule, l10n);
   final port = rule.displayPort.isEmpty
       ? l10n.firewall_anyPort
       : rule.displayPort;
   final protocol = rule.protocol.isEmpty ? 'all' : rule.protocol;
   return '$address · $port/$protocol';
+}
+
+String _familyLabel(String family) {
+  return switch (family.toLowerCase()) {
+    'ipv4' => 'IPv4',
+    'ipv6' => 'IPv6',
+    _ => family,
+  };
 }
 
 class _ForwardTab extends StatelessWidget {
@@ -1003,7 +1036,7 @@ class _ForwardTab extends StatelessWidget {
                   title:
                       '${rule.port}/${rule.protocol} → ${rule.targetIP}:${rule.targetPort}',
                   subtitle: [
-                    rule.family.toUpperCase(),
+                    _familyLabel(rule.family),
                     if (rule.interface.isNotEmpty) rule.interface,
                   ].join(' · '),
                   trailing: PopupMenuButton<String>(

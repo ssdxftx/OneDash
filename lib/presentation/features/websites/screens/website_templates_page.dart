@@ -180,48 +180,97 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                                         child: Text(
                                           template.name,
                                           style: AppTextStyles.titleS,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
-                                      IconButton(
-                                        tooltip: l10n.action_edit,
-                                        icon: const Icon(TablerIcons.edit),
-                                        onPressed: () => _openEditor(template),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: AppTokens.s8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: context
+                                              .scheme
+                                              .surfaceContainerHighest,
+                                          borderRadius: BorderRadius.circular(
+                                            AppTokens.rFull,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          _typeLabel(l10n, template.type),
+                                          style: AppTextStyles.caption.copyWith(
+                                            color:
+                                                context.scheme.onSurfaceVariant,
+                                          ),
+                                        ),
                                       ),
-                                      IconButton(
-                                        tooltip: l10n.websites_templateDelete,
-                                        icon: const Icon(TablerIcons.trash),
-                                        onPressed: () => _delete(template),
+                                      PopupMenuButton<String>(
+                                        tooltip: l10n.action_more,
+                                        icon: Icon(
+                                          TablerIcons.dots_vertical,
+                                          color:
+                                              context.scheme.onSurfaceVariant,
+                                        ),
+                                        onSelected: (value) {
+                                          if (value == 'edit') {
+                                            _openEditor(template);
+                                          } else if (value == 'delete') {
+                                            _delete(template);
+                                          }
+                                        },
+                                        itemBuilder: (context) => [
+                                          PopupMenuItem(
+                                            value: 'edit',
+                                            child: Text(l10n.action_edit),
+                                          ),
+                                          PopupMenuItem(
+                                            value: 'delete',
+                                            child: Text(
+                                              l10n.websites_templateDelete,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
-                                  ),
-                                  Text(
-                                    '${_typeLabel(l10n, template.type)} · '
-                                    '${template.parsedVariables.length} '
-                                    '${l10n.websites_templateVariables}',
-                                    style: AppTextStyles.bodyS.copyWith(
-                                      color: context.scheme.onSurfaceVariant,
-                                    ),
                                   ),
                                   if (template.remark.isNotEmpty) ...[
                                     const SizedBox(height: AppTokens.s4),
                                     Text(
                                       template.remark,
                                       style: AppTextStyles.bodyS,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                   const SizedBox(height: AppTokens.s8),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: TextButton.icon(
-                                      onPressed: () => _generate(template),
-                                      icon: const Icon(
-                                        TablerIcons.player_play,
-                                        size: AppTokens.iconList,
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          '${template.parsedVariables.length} '
+                                          '${l10n.websites_templateVariables}',
+                                          style: AppTextStyles.bodyS.copyWith(
+                                            color:
+                                                context.scheme.onSurfaceVariant,
+                                          ),
+                                        ),
                                       ),
-                                      label: Text(
-                                        l10n.websites_templateGenerate,
+                                      FilledButton.icon(
+                                        style: FilledButton.styleFrom(
+                                          visualDensity: VisualDensity.compact,
+                                          textStyle: AppTextStyles.label,
+                                        ),
+                                        onPressed: () => _generate(template),
+                                        icon: const Icon(
+                                          TablerIcons.player_play,
+                                          size: AppTokens.iconList,
+                                        ),
+                                        label: Text(
+                                          l10n.websites_templateGenerate,
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ],
                               ),
