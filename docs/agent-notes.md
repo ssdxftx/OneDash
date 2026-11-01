@@ -162,3 +162,16 @@ is absent from the working tree.
   AI enabled. The app never stores or asks for model credentials; it uses the
   panel's existing AI account setting. The separate Agent/model/GPU/MCP module
   is outside this batch.
+
+## v6 验收回执
+
+- v6 报告称 `POST /containers` 返回 `{taskID}`；v2.4.2 源码
+  `agent/app/api/v2/container.go` 的 `ContainerCreate` 调用
+  `helper.Success(c)`，任务 ID 来自请求体 `dto.ContainerOperate.taskID`，
+  后台任务由 `ContainerService.ContainerCreate(req, true)` 启动。客户端因此
+  使用请求体 taskID 轮询 `/logs/tasks/read`。
+- 容器任务最长等待 2 分钟（240 次、500ms 间隔）；失败时保留表单并展示最后
+  一行任务日志。
+- 页签滚动使用 `Scrollable.ensureVisible`，筛选芯片只共享边缘渐隐实现。
+- 网站删除保留选项页，再追加一次域名输入确认。
+- 模板 DTO 没有版本字段，模板卡 chip 显示单页/多文件类型。
