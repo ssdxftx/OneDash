@@ -17,6 +17,7 @@ import '../dto/website/website_detail_dto.dart';
 import '../dto/website/website_dir_dto.dart';
 import '../dto/website/website_index_config_dto.dart';
 import '../dto/website/website_limit_config_dto.dart';
+import '../dto/website/website_load_balance_dto.dart';
 import '../dto/website/website_log_dto.dart';
 import '../dto/website/website_proxy_dto.dart';
 import '../dto/website/website_auth_dto.dart';
@@ -26,6 +27,7 @@ import '../dto/website/website_dto.dart';
 import '../dto/website/website_group_dto.dart';
 import '../dto/website/website_search_req.dart';
 import '../dto/website/website_ssl_dto.dart';
+import '../dto/website/website_template_dto.dart';
 import '../dto/website/website_leech_dto.dart';
 import '../dto/website/website_real_ip_dto.dart';
 import '../dto/website/website_cors_dto.dart';
@@ -217,6 +219,81 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
     String name,
     String content,
   ) => _websiteApi.updateWebsiteProxyFile(websiteId, name, content);
+
+  @override
+  Future<PageResult<WebsiteTemplateDto>> searchTemplates({
+    int page = 1,
+    int pageSize = 100,
+    String name = '',
+    String type = '',
+  }) => _websiteApi.searchTemplates(
+    page: page,
+    pageSize: pageSize,
+    name: name,
+    type: type,
+  );
+
+  @override
+  Future<WebsiteTemplateDto> getTemplate(int id) => _websiteApi.getTemplate(id);
+
+  @override
+  Future<void> createTemplate(WebsiteTemplateReq req) =>
+      _websiteApi.createTemplate(req);
+
+  @override
+  Future<void> updateTemplate(WebsiteTemplateReq req) =>
+      _websiteApi.updateTemplate(req);
+
+  @override
+  Future<void> deleteTemplate(int id) => _websiteApi.deleteTemplate(id);
+
+  @override
+  Future<Map<String, dynamic>> uploadTemplateZip({
+    required String fileName,
+    required List<int> bytes,
+  }) => _websiteApi.uploadTemplateZip(fileName: fileName, bytes: bytes);
+
+  @override
+  Future<PageResult<WebsiteTemplateOutputDto>> searchTemplateOutputs({
+    int page = 1,
+    int pageSize = 100,
+    int templateID = 0,
+  }) => _websiteApi.searchTemplateOutputs(
+    page: page,
+    pageSize: pageSize,
+    templateID: templateID,
+  );
+
+  @override
+  Future<void> createTemplateOutput({
+    required int templateID,
+    required String name,
+    required Map<String, String> variableValues,
+  }) => _websiteApi.createTemplateOutput(
+    templateID: templateID,
+    name: name,
+    variableValues: variableValues,
+  );
+
+  @override
+  Future<void> deleteTemplateOutput(int id) =>
+      _websiteApi.deleteTemplateOutput(id);
+
+  @override
+  Future<List<WebsiteLoadBalanceDto>> listLoadBalances(int websiteId) =>
+      _websiteApi.listLoadBalances(websiteId);
+
+  @override
+  Future<void> createLoadBalance(WebsiteLoadBalanceReq req) =>
+      _websiteApi.createLoadBalance(req);
+
+  @override
+  Future<void> updateLoadBalance(WebsiteLoadBalanceReq req) =>
+      _websiteApi.updateLoadBalance(req);
+
+  @override
+  Future<void> deleteLoadBalance(int websiteId, String name) =>
+      _websiteApi.deleteLoadBalance(websiteId, name);
 
   @override
   Future<WebsiteAuthDto> getWebsiteAuth(int websiteId) =>

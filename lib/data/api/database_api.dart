@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
 import '../dto/common/page_result.dart';
@@ -80,6 +82,32 @@ class DatabaseApi {
     );
   }
 
+  /// 搜索 MongoDB 实例中的数据库列表。
+  Future<PageResult<DatabaseSearchItemDto>> searchMongoDatabases({
+    required String database,
+    int page = 1,
+    int pageSize = 20,
+    String info = '',
+    String orderBy = 'createdAt',
+    String? order,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/mongodb/search',
+      data: {
+        'page': page,
+        'pageSize': pageSize,
+        'info': info,
+        'database': database,
+        'orderBy': orderBy,
+        'order': order ?? 'null',
+      },
+    );
+    return PageResult<DatabaseSearchItemDto>.fromJson(
+      ApiResponseParser.map(resp),
+      DatabaseSearchItemDto.fromJson,
+    );
+  }
+
   /// 从 PostgreSQL 服务器同步数据库列表到面板。
   ///
   /// [database] 为 PG 实例名（URL 路径参数）。
@@ -110,8 +138,9 @@ class DatabaseApi {
     required String type,
     required String database,
   }) async {
+    final path = _typePath(type, '/del/check');
     final resp = await _client.post<Map<String, dynamic>>(
-      '/api/v2/databases/del/check',
+      '/api/v2/databases$path',
       data: {'id': id, 'type': type, 'database': database},
     );
     final data = resp.data?['data'];
@@ -131,7 +160,7 @@ class DatabaseApi {
     bool deleteBackup = false,
   }) async {
     await _client.post<Map<String, dynamic>>(
-      '/api/v2/databases/del',
+      '/api/v2/databases${_typePath(type, '/del')}',
       data: {
         'id': id,
         'type': type,
@@ -144,14 +173,40 @@ class DatabaseApi {
 
   /// 修改数据库密码。
   ///
-  /// [value] 为 Base64 编码后的新密码。
+  /// [value] 为明文新密码，方法内部按 1Panel 要求做 Base64 编码。
   Future<void> changePassword({
     required int id,
     required String from,
     required String type,
     required String database,
     required String value,
+    String? name,
   }) async {
+    final encoded = _base64(value);
+    if (type == 'mongodb') {
+      await _client.post<Map<String, dynamic>>(
+        '/api/v2/databases/mongodb/password',
+        data: {
+          'database': database,
+          'name': name ?? database,
+          'password': encoded,
+        },
+      );
+      return;
+    }
+    if (type.startsWith('postgresql')) {
+      await _client.post<Map<String, dynamic>>(
+        '/api/v2/databases/pg/password',
+        data: {
+          'id': id,
+          'from': from,
+          'type': type,
+          'database': database,
+          'value': encoded,
+        },
+      );
+      return;
+    }
     await _client.post<Map<String, dynamic>>(
       '/api/v2/databases/change/password',
       data: {
@@ -159,7 +214,7 @@ class DatabaseApi {
         'from': from,
         'type': type,
         'database': database,
-        'value': value,
+        'value': encoded,
       },
     );
   }
@@ -295,14 +350,15 @@ class DatabaseApi {
 
   /// 创建数据库。
   Future<void> createDatabase(Map<String, dynamic> body) async {
-    await _client.post<Map<String, dynamic>>('/api/v2/databases', data: body);
+    final data = _withEncodedPassword(body);
+    await _client.post<Map<String, dynamic>>('/api/v2/databases', data: data);
   }
 
   /// 创建 PostgreSQL 数据库。
   Future<void> createPgDatabase(Map<String, dynamic> body) async {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/databases/pg',
-      data: body,
+      data: _withEncodedPassword(body),
     );
   }
 
@@ -510,11 +566,284 @@ class DatabaseApi {
     ApiResponseParser.ok(resp);
   }
 
+  /// 创建 MongoDB 数据库。
+  Future<void> createMongoDatabase(Map<String, dynamic> body) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/mongodb',
+      data: _withEncodedPassword(body),
+    );
+  }
+
+  /// 删除 PostgreSQL 数据库。
+  Future<void> deletePgDatabase({
+    required int id,
+    required String type,
+    required String database,
+    bool forceDelete = false,
+    bool deleteBackup = false,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/pg/del',
+      data: {
+        'id': id,
+        'type': type,
+        'database': database,
+        'forceDelete': forceDelete,
+        'deleteBackup': deleteBackup,
+      },
+    );
+  }
+
+  /// 删除 MongoDB 数据库。
+  Future<void> deleteMongoDatabase({
+    required int id,
+    required String database,
+    bool forceDelete = false,
+    bool deleteBackup = false,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/mongodb/del',
+      data: {
+        'id': id,
+        'type': 'mongodb',
+        'database': database,
+        'forceDelete': forceDelete,
+        'deleteBackup': deleteBackup,
+      },
+    );
+  }
+
+  /// 修改 PostgreSQL 用户权限。
+  Future<void> changePgPrivileges({
+    required String database,
+    required String name,
+    required String username,
+    required bool superUser,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/pg/privileges',
+      data: {
+        'database': database,
+        'name': name,
+        'username': username,
+        'superUser': superUser,
+      },
+    );
+  }
+
+  /// 为 PostgreSQL 数据库绑定用户。
+  Future<void> bindPgUser({
+    required String database,
+    required String name,
+    required String username,
+    required String password,
+    bool superUser = false,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/pg/bind',
+      data: {
+        'database': database,
+        'name': name,
+        'username': username,
+        'password': password,
+        'superUser': superUser,
+      },
+    );
+  }
+
+  /// 读取 MongoDB 用户权限。
+  Future<String> loadMongoPrivileges({
+    required String database,
+    required String name,
+    required String username,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/mongodb/privileges',
+      data: {'database': database, 'name': name, 'username': username},
+    );
+    return ApiResponseParser.primitive<String>(resp);
+  }
+
+  /// 修改 MongoDB 用户权限。
+  Future<void> changeMongoPrivileges({
+    required String database,
+    required String name,
+    required String username,
+    required String permission,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/mongodb/privileges/change',
+      data: {
+        'database': database,
+        'name': name,
+        'username': username,
+        'permission': permission,
+      },
+    );
+  }
+
+  /// 为 MongoDB 数据库绑定用户。
+  Future<void> bindMongoUser({
+    required String database,
+    required String name,
+    required String username,
+    required String password,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/mongodb/bind',
+      data: {
+        'database': database,
+        'name': name,
+        'username': username,
+        'password': _base64(password),
+      },
+    );
+  }
+
+  // ── 通用用户与授权 ──────────────────────────────────────────
+
+  /// 搜索数据库实例下的用户。
+  Future<List<Map<String, dynamic>>> searchUsers({
+    required String database,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/users/search',
+      data: {'database': database},
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data
+        .whereType<Map>()
+        .map((e) => e.cast<String, dynamic>())
+        .toList(growable: false);
+  }
+
+  /// 创建数据库用户。
+  Future<void> createUser({
+    required String database,
+    required String username,
+    required String host,
+    required String password,
+    List<String> dbs = const [],
+    String description = '',
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/users',
+      data: {
+        'database': database,
+        'username': username,
+        'host': host,
+        'password': _base64(password),
+        'dbs': dbs,
+        'description': description,
+      },
+    );
+  }
+
+  /// 删除数据库用户。
+  Future<void> deleteUser({
+    required String database,
+    required String username,
+    required String host,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/users/del',
+      data: {'database': database, 'username': username, 'host': host},
+    );
+  }
+
+  /// 修改数据库用户密码。
+  Future<void> changeUserPassword({
+    required String database,
+    required String username,
+    required String host,
+    required String password,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/users/password',
+      data: {
+        'database': database,
+        'username': username,
+        'host': host,
+        'password': _base64(password),
+      },
+    );
+  }
+
+  /// 查询用户授权。
+  Future<List<Map<String, dynamic>>> searchGrants({
+    required String database,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/grants/search',
+      data: {'database': database},
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data
+        .whereType<Map>()
+        .map((e) => e.cast<String, dynamic>())
+        .toList(growable: false);
+  }
+
+  /// 授予用户数据库权限。
+  Future<void> grantUser({
+    required String database,
+    required String db,
+    required String username,
+    required String host,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/grants',
+      data: {
+        'database': database,
+        'db': db,
+        'username': username,
+        'host': host,
+      },
+    );
+  }
+
+  /// 回收用户数据库权限。
+  Future<void> revokeGrant({
+    required String database,
+    required String db,
+    required String username,
+    required String host,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/grants/del',
+      data: {
+        'database': database,
+        'db': db,
+        'username': username,
+        'host': host,
+      },
+    );
+  }
+
   /// 获取数据库项列表（按类型，用于计划任务表单选择）。
   Future<List<DatabaseItemDto>> loadDatabaseItems(String dbType) async {
     final resp = await _client.get<Map<String, dynamic>>(
       '/api/v2/databases/db/item/$dbType',
     );
     return ApiResponseParser.list(resp, DatabaseItemDto.fromJson);
+  }
+
+  static String _base64(String value) => base64Encode(utf8.encode(value));
+
+  static Map<String, dynamic> _withEncodedPassword(Map<String, dynamic> body) {
+    final data = Map<String, dynamic>.from(body);
+    final password = data['password'];
+    if (password is String && password.isNotEmpty) {
+      data['password'] = _base64(password);
+    }
+    return data;
+  }
+
+  static String _typePath(String type, String suffix) {
+    if (type.startsWith('postgresql')) return '/pg$suffix';
+    if (type == 'mongodb') return '/mongodb$suffix';
+    return suffix;
   }
 }

@@ -9,6 +9,7 @@ import '../../data/dto/website/website_detail_dto.dart';
 import '../../data/dto/website/website_dir_dto.dart';
 import '../../data/dto/website/website_index_config_dto.dart';
 import '../../data/dto/website/website_limit_config_dto.dart';
+import '../../data/dto/website/website_load_balance_dto.dart';
 import '../../data/dto/website/website_log_dto.dart';
 import '../../data/dto/website/website_proxy_dto.dart';
 import '../../data/dto/website/website_auth_dto.dart';
@@ -18,6 +19,7 @@ import '../../data/dto/website/website_dto.dart';
 import '../../data/dto/website/website_group_dto.dart';
 import '../../data/dto/website/website_search_req.dart';
 import '../../data/dto/website/website_ssl_dto.dart';
+import '../../data/dto/website/website_template_dto.dart';
 import '../../data/dto/website/website_leech_dto.dart';
 import '../../data/dto/website/website_real_ip_dto.dart';
 import '../../data/dto/website/website_cors_dto.dart';
@@ -153,6 +155,61 @@ abstract interface class WebsiteRepository {
     String name,
     String content,
   );
+
+  /// 搜索网站模板。
+  Future<PageResult<WebsiteTemplateDto>> searchTemplates({
+    int page,
+    int pageSize,
+    String name,
+    String type,
+  });
+
+  /// 查询模板详情。
+  Future<WebsiteTemplateDto> getTemplate(int id);
+
+  /// 创建模板。
+  Future<void> createTemplate(WebsiteTemplateReq req);
+
+  /// 更新模板。
+  Future<void> updateTemplate(WebsiteTemplateReq req);
+
+  /// 删除模板。
+  Future<void> deleteTemplate(int id);
+
+  /// 上传 ZIP 模板，返回 filePath 与 variables。
+  Future<Map<String, dynamic>> uploadTemplateZip({
+    required String fileName,
+    required List<int> bytes,
+  });
+
+  /// 搜索模板输出。
+  Future<PageResult<WebsiteTemplateOutputDto>> searchTemplateOutputs({
+    int page,
+    int pageSize,
+    int templateID,
+  });
+
+  /// 生成模板输出。
+  Future<void> createTemplateOutput({
+    required int templateID,
+    required String name,
+    required Map<String, String> variableValues,
+  });
+
+  /// 删除模板输出。
+  Future<void> deleteTemplateOutput(int id);
+
+  /// 查询负载均衡上游列表。
+  Future<List<WebsiteLoadBalanceDto>> listLoadBalances(int websiteId);
+
+  /// 创建负载均衡上游。
+  Future<void> createLoadBalance(WebsiteLoadBalanceReq req);
+
+  /// 更新负载均衡上游。
+  Future<void> updateLoadBalance(WebsiteLoadBalanceReq req);
+
+  /// 删除负载均衡上游。
+  Future<void> deleteLoadBalance(int websiteId, String name);
 
   /// 查询网站密码访问配置 (全局)
   Future<WebsiteAuthDto> getWebsiteAuth(int websiteId);

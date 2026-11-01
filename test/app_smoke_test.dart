@@ -84,6 +84,28 @@ void main() {
     );
     expect(tester.takeException(), isNull);
 
+    for (final route in [
+      '/s/1/files/history?path=%2Ftmp',
+      '/s/1/files/ai-search?path=%2Ftmp',
+      '/s/1/websites/templates',
+      '/s/1/more/host',
+      '/s/1/more/runtimes/1?type=php&name=php',
+      '/s/1/more/toolbox/device',
+      '/s/1/more/toolbox/clam',
+      '/s/1/more/toolbox/fail2ban',
+      '/s/1/more/toolbox/ftp',
+    ]) {
+      appRouter.go(route);
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      expect(
+        appRouter.routerDelegate.currentConfiguration.uri.path,
+        route.split('?').first,
+        reason: '$route 路由没有解析到预期路径',
+      );
+      expect(tester.takeException(), isNull, reason: '$route 渲染异常');
+    }
+
     appRouter.go('/s/1/more');
     await tester.pump();
     expect(appContainer.read(activeServerIdProvider), 1);

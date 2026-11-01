@@ -15,6 +15,7 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
+import '../widgets/website_load_balance_tab.dart';
 import '../widgets/website_ssl_sheet.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
@@ -97,6 +98,7 @@ class WebsiteDetailPage extends ConsumerWidget {
             l10n.websites_domains,
             l10n.websites_sslCertificate,
             l10n.websites_proxySettings,
+            l10n.websites_loadBalance,
             l10n.websites_logs,
           ],
           children: [
@@ -104,6 +106,7 @@ class WebsiteDetailPage extends ConsumerWidget {
             _DomainsTab(detail: data),
             _SslTab(detail: data),
             _ProxyTab(detail: data),
+            WebsiteLoadBalanceTab(websiteId: data.website.id),
             _LogsTab(serverId: serverId, detail: data),
           ],
         ),

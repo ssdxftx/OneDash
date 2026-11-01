@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,6 +26,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../providers/files_provider.dart';
+import '../widgets/file_permission_sheet.dart';
 import '../../../common/states/error_toast.dart';
 
 class FilesPage extends ConsumerStatefulWidget {
@@ -44,6 +47,11 @@ class _FilesPageState extends ConsumerState<FilesPage> {
   final _searchController = TextEditingController();
   bool _searching = false;
   bool _uploading = false;
+  final Set<String> _selected = {};
+  final Map<String, int> _dirSizes = {};
+  final Set<String> _calculating = {};
+
+  bool get _selectionMode => _selected.isNotEmpty;
 
   String get _path => widget.initialPath.isEmpty ? '/' : widget.initialPath;
 
@@ -75,54 +83,34 @@ class _FilesPageState extends ConsumerState<FilesPage> {
   }
 
   Future<void> _upload() async {
-    final l10n = AppLocalizations.of(context);
     final result = await FilePicker.pickFiles(allowMultiple: true);
     if (result == null || result.files.isEmpty) return;
     setState(() => _uploading = true);
-    final progress = ValueNotifier<double>(0);
-    if (mounted) {
-      unawaited(
-        showDialog<void>(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            content: ValueListenableBuilder<double>(
-              valueListenable: progress,
-              builder: (context, value, _) => Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.files_upload, style: AppTextStyles.titleM),
-                  const SizedBox(height: AppTokens.s16),
-                  LinearProgressIndicator(value: value),
-                  const SizedBox(height: AppTokens.s8),
-                  Text('${(value * 100).toStringAsFixed(0)}%'),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+    var uploadedAny = false;
     try {
-      final repository = await ref.read(fileRepositoryProvider.future);
       for (final file in result.files) {
+        if (!mounted) return;
         final localPath = file.path;
         if (localPath == null) continue;
-        await repository.uploadFile(
-          filePath: localPath,
-          targetPath: _path,
-          onProgress: (value) => progress.value = value,
+        final uploaded = await showAppSheet<bool>(
+          context: context,
+          isDismissible: false,
+          enableDrag: false,
+          builder: (sheetContext) => _UploadSheet(
+            filePath: localPath,
+            fileName: file.name,
+            fileSize: file.size,
+            targetPath: _path,
+          ),
         );
+        if (uploaded == true) uploadedAny = true;
+        if (uploaded != true) break;
       }
       if (!mounted) return;
-      Navigator.of(context).pop();
-      AppToast.success(context, l10n.action_done);
-      ref.invalidate(filesProvider(_path));
-    } catch (error) {
-      if (!mounted) return;
-      Navigator.of(context).pop();
-      showErrorToast(context, error);
+      if (uploadedAny) {
+        AppToast.success(context, AppLocalizations.of(context).action_done);
+        ref.invalidate(filesProvider(_path));
+      }
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
@@ -384,6 +372,85 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     }
   }
 
+  void _toggleSelection(FileItemDto item) {
+    setState(() {
+      if (!_selected.remove(item.path)) _selected.add(item.path);
+    });
+  }
+
+  void _clearSelection() => setState(_selected.clear);
+
+  void _selectAll(List<FileItemDto> items) {
+    setState(() {
+      _selected
+        ..clear()
+        ..addAll(items.map((item) => item.path));
+    });
+  }
+
+  Future<void> _permission(FileItemDto item) async {
+    final updated = await showFilePermissionSheet(context, item: item);
+    if (updated && mounted) {
+      ref.invalidate(filesProvider(_path));
+    }
+  }
+
+  Future<void> _calculateDirSize(FileItemDto item) async {
+    if (_calculating.contains(item.path)) return;
+    setState(() => _calculating.add(item.path));
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      final size = await repository.getDepthSize(item.path);
+      if (!mounted) return;
+      setState(() => _dirSizes[item.path] = size);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    } finally {
+      if (mounted) setState(() => _calculating.remove(item.path));
+    }
+  }
+
+  Future<void> _batchDelete(List<FileItemDto> items) async {
+    final l10n = AppLocalizations.of(context);
+    final selected = items
+        .where((item) => _selected.contains(item.path))
+        .toList(growable: false);
+    if (selected.isEmpty) return;
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.files_batchDelete,
+      message: l10n.files_batchDeleteMessage(selected.length),
+      confirmLabel: l10n.action_delete,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      final dirs = selected
+          .where((item) => item.isDir)
+          .map((item) => item.path)
+          .toList(growable: false);
+      final files = selected
+          .where((item) => !item.isDir)
+          .map((item) => item.path)
+          .toList(growable: false);
+      if (dirs.isNotEmpty) {
+        await repository.batchDeleteFiles(paths: dirs, isDir: true);
+      }
+      if (files.isNotEmpty) {
+        await repository.batchDeleteFiles(paths: files, isDir: false);
+      }
+      if (!mounted) return;
+      _clearSelection();
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(filesProvider(_path));
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _showActions(FileItemDto item) async {
     final l10n = AppLocalizations.of(context);
     await showAppSheet<void>(
@@ -459,6 +526,22 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                   },
                 ),
               SplitListTile(
+                leading: const Icon(TablerIcons.shield_lock),
+                title: l10n.files_permission,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _permission(item);
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.checkbox),
+                title: l10n.files_selectAll,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _toggleSelection(item);
+                },
+              ),
+              SplitListTile(
                 leading: const Icon(TablerIcons.pencil),
                 title: l10n.files_rename,
                 onTap: () {
@@ -494,41 +577,80 @@ class _FilesPageState extends ConsumerState<FilesPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(folderName, style: AppTextStyles.titleM),
-        leading: _path == '/'
+        title: Text(
+          _selectionMode
+              ? l10n.files_selectCount(_selected.length)
+              : folderName,
+          style: AppTextStyles.titleM,
+        ),
+        leading: _selectionMode
+            ? IconButton(
+                tooltip: l10n.files_cancelSelection,
+                icon: const Icon(TablerIcons.x),
+                onPressed: _clearSelection,
+              )
+            : _path == '/'
             ? null
             : IconButton(
                 tooltip: l10n.files_parent,
                 icon: const Icon(TablerIcons.arrow_up),
                 onPressed: () => _openPath(_parentOf(_path)),
               ),
-        actions: [
-          AppIconButton(
-            icon: _searching ? TablerIcons.x : TablerIcons.search,
-            tooltip: l10n.action_search,
-            onPressed: () {
-              setState(() => _searching = !_searching);
-              if (!_searching) {
-                _searchController.clear();
-                ref.read(filesProvider(_path).notifier).search('');
-              }
-            },
-          ),
-          PopupMenuButton<String>(
-            tooltip: l10n.files_sort,
-            icon: const Icon(TablerIcons.arrows_sort),
-            onSelected: (value) =>
-                ref.read(filesProvider(_path).notifier).setSort(value),
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'name', child: Text(l10n.files_sortName)),
-              PopupMenuItem(value: 'size', child: Text(l10n.files_sortSize)),
-              PopupMenuItem(
-                value: 'modTime',
-                child: Text(l10n.files_sortModifiedTime),
-              ),
-            ],
-          ),
-        ],
+        actions: _selectionMode
+            ? [
+                TextButton(
+                  onPressed: () => _selectAll(
+                    ref.read(filesProvider(_path)).valueOrNull?.items ??
+                        const [],
+                  ),
+                  child: Text(l10n.files_selectAll),
+                ),
+                TextButton(
+                  onPressed: _clearSelection,
+                  child: Text(l10n.files_cancelSelection),
+                ),
+              ]
+            : [
+                AppIconButton(
+                  icon: TablerIcons.sparkles,
+                  tooltip: l10n.files_aiSearch,
+                  onPressed: () => context.push(
+                    '/s/${widget.serverId}/files/ai-search'
+                    '?path=${Uri.encodeComponent(_path)}',
+                  ),
+                ),
+                AppIconButton(
+                  icon: _searching ? TablerIcons.x : TablerIcons.search,
+                  tooltip: l10n.action_search,
+                  onPressed: () {
+                    setState(() => _searching = !_searching);
+                    if (!_searching) {
+                      _searchController.clear();
+                      ref.read(filesProvider(_path).notifier).search('');
+                    }
+                  },
+                ),
+                PopupMenuButton<String>(
+                  tooltip: l10n.files_sort,
+                  icon: const Icon(TablerIcons.arrows_sort),
+                  onSelected: (value) =>
+                      ref.read(filesProvider(_path).notifier).setSort(value),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'name',
+                      child: Text(l10n.files_sortName),
+                    ),
+                    PopupMenuItem(
+                      value: 'size',
+                      child: Text(l10n.files_sortSize),
+                    ),
+                    PopupMenuItem(
+                      value: 'modTime',
+                      child: Text(l10n.files_sortModifiedTime),
+                    ),
+                  ],
+                ),
+              ],
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(_searching ? 60 : 44),
           child: Column(
@@ -553,17 +675,19 @@ class _FilesPageState extends ConsumerState<FilesPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: l10n.files_upload,
-        onPressed: _uploading ? null : _upload,
-        child: _uploading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Icon(TablerIcons.upload),
-      ),
+      floatingActionButton: _selectionMode
+          ? null
+          : FloatingActionButton(
+              tooltip: l10n.files_upload,
+              onPressed: _uploading ? null : _upload,
+              child: _uploading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(TablerIcons.upload),
+            ),
       body: AsyncStateView(
         value: files,
         onRetry: () => ref.read(filesProvider(_path).notifier).refresh(),
@@ -593,44 +717,77 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                 final item = state.items[index];
                 return _FileTile(
                   item: item,
-                  onTap: item.isDir
+                  selected: _selected.contains(item.path),
+                  dirSize: _dirSizes[item.path],
+                  calculating: _calculating.contains(item.path),
+                  onTap: _selectionMode
+                      ? () => _toggleSelection(item)
+                      : item.isDir
                       ? () => _openPath(item.path)
                       : FileTypeUtils.isEditable(item)
                       ? () => context.push(
                           '/s/${widget.serverId}/files/edit?path=${Uri.encodeComponent(item.path)}',
                         )
                       : () => _showActions(item),
-                  onLongPress: () => _showActions(item),
+                  onLongPress: () => _toggleSelection(item),
+                  onMore: () => _showActions(item),
+                  onCalculateSize: item.isDir
+                      ? () => _calculateDirSize(item)
+                      : null,
                 );
               },
             ),
           ),
         ),
       ),
-      bottomNavigationBar: null,
-      persistentFooterButtons: [
-        Row(
-          children: [
-            TextButton.icon(
-              onPressed: () => _create(isDir: true),
-              icon: const Icon(TablerIcons.folder_plus),
-              label: Text(l10n.files_new_folder),
-            ),
-            TextButton.icon(
-              onPressed: () => _create(isDir: false),
-              icon: const Icon(TablerIcons.file_plus),
-              label: Text(l10n.files_new_file),
-            ),
-            const Spacer(),
-            Text(
-              stateText(files),
-              style: AppTextStyles.caption.copyWith(
-                color: scheme.onSurfaceVariant,
+      bottomNavigationBar: _selectionMode
+          ? SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppTokens.s16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => _batchDelete(
+                          ref.read(filesProvider(_path)).valueOrNull?.items ??
+                              const [],
+                        ),
+                        icon: const Icon(TablerIcons.trash),
+                        label: Text(
+                          '${l10n.files_batchDelete} (${_selected.length})',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            )
+          : null,
+      persistentFooterButtons: _selectionMode
+          ? null
+          : [
+              Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: () => _create(isDir: true),
+                    icon: const Icon(TablerIcons.folder_plus),
+                    label: Text(l10n.files_new_folder),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => _create(isDir: false),
+                    icon: const Icon(TablerIcons.file_plus),
+                    label: Text(l10n.files_new_file),
+                  ),
+                  const Spacer(),
+                  Text(
+                    stateText(files),
+                    style: AppTextStyles.caption.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ],
     );
   }
 
@@ -703,11 +860,21 @@ class _FileTile extends StatelessWidget {
     required this.item,
     required this.onTap,
     required this.onLongPress,
+    required this.onMore,
+    this.selected = false,
+    this.dirSize,
+    this.calculating = false,
+    this.onCalculateSize,
   });
 
   final FileItemDto item;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final VoidCallback onMore;
+  final bool selected;
+  final int? dirSize;
+  final bool calculating;
+  final VoidCallback? onCalculateSize;
 
   @override
   Widget build(BuildContext context) {
@@ -725,10 +892,20 @@ class _FileTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       onLongPress: onLongPress,
-      child: Padding(
+      child: Container(
+        color: selected ? scheme.primaryContainer.withValues(alpha: 0.5) : null,
         padding: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
         child: Row(
           children: [
+            if (selected)
+              Padding(
+                padding: const EdgeInsets.only(right: AppTokens.s8),
+                child: Icon(
+                  TablerIcons.circle_check_filled,
+                  size: AppTokens.iconList,
+                  color: scheme.primary,
+                ),
+              ),
             Icon(
               icon,
               size: AppTokens.iconLeading,
@@ -770,6 +947,180 @@ class _FileTile extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+enum _UploadStatus { uploading, paused, failed }
+
+class _UploadSheet extends ConsumerStatefulWidget {
+  const _UploadSheet({
+    required this.filePath,
+    required this.fileName,
+    required this.fileSize,
+    required this.targetPath,
+  });
+
+  final String filePath;
+  final String fileName;
+  final int fileSize;
+  final String targetPath;
+
+  @override
+  ConsumerState<_UploadSheet> createState() => _UploadSheetState();
+}
+
+class _UploadSheetState extends ConsumerState<_UploadSheet> {
+  static const _chunkThreshold = 10 * 1024 * 1024;
+  late final bool _chunked;
+  late final String? _uploadId;
+
+  CancelToken? _cancelToken;
+  _UploadStatus _status = _UploadStatus.uploading;
+  double _progress = 0;
+  int _offset = 0;
+  String? _error;
+
+  String _newUploadId() {
+    final random = Random.secure();
+    return List<int>.generate(
+      16,
+      (_) => random.nextInt(256),
+    ).map((value) => value.toRadixString(16).padLeft(2, '0')).join();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _chunked = widget.fileSize > _chunkThreshold;
+    _uploadId = _chunked ? _newUploadId() : null;
+    unawaited(_start());
+  }
+
+  Future<void> _start() async {
+    final token = CancelToken();
+    _cancelToken = token;
+    setState(() {
+      _status = _UploadStatus.uploading;
+      _error = null;
+    });
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      await repository.uploadFile(
+        filePath: widget.filePath,
+        targetPath: widget.targetPath,
+        uploadId: _uploadId,
+        startOffset: _offset,
+        cancelToken: token,
+        onProgress: (value) {
+          if (mounted) setState(() => _progress = value);
+        },
+        onChunkUploaded: (value) {
+          _offset = value;
+        },
+      );
+      if (!mounted || token.isCancelled) return;
+      Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted || token.isCancelled) return;
+      setState(() {
+        _status = _UploadStatus.failed;
+        _error = describeError(error, AppLocalizations.of(context));
+      });
+    }
+  }
+
+  void _pause() {
+    setState(() => _status = _UploadStatus.paused);
+    _cancelToken?.cancel();
+  }
+
+  void _resume() {
+    unawaited(_start());
+  }
+
+  Future<void> _cancel() async {
+    _cancelToken?.cancel();
+    final uploadId = _uploadId;
+    if (uploadId != null) {
+      try {
+        final repository = await ref.read(fileRepositoryProvider.future);
+        await repository.stopChunkUpload(uploadId);
+      } catch (_) {
+        // The panel may have already cleaned the temporary chunks.
+      }
+    }
+    if (mounted) Navigator.of(context).pop(false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final statusText = switch (_status) {
+      _UploadStatus.uploading => l10n.files_uploading,
+      _UploadStatus.paused => l10n.files_uploadPaused,
+      _UploadStatus.failed => l10n.files_uploadFailed,
+    };
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.files_upload, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s4),
+        Text(
+          widget.fileName,
+          style: AppTextStyles.bodyS.copyWith(
+            color: context.scheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: AppTokens.s20),
+        LinearProgressIndicator(
+          value: _status == _UploadStatus.failed ? null : _progress,
+        ),
+        const SizedBox(height: AppTokens.s8),
+        Text(
+          '${(_progress * 100).toStringAsFixed(0)}% · $statusText',
+          style: AppTextStyles.bodyS.copyWith(
+            color: _status == _UploadStatus.failed
+                ? context.scheme.error
+                : context.scheme.onSurfaceVariant,
+          ),
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: AppTokens.s8),
+          Text(
+            _error!,
+            style: AppTextStyles.bodyS.copyWith(color: context.scheme.error),
+          ),
+        ],
+        const SizedBox(height: AppTokens.s24),
+        Row(
+          children: [
+            Expanded(
+              child: SecondaryButton(
+                label: l10n.action_cancel,
+                onPressed: _cancel,
+              ),
+            ),
+            const SizedBox(width: AppTokens.s12),
+            Expanded(
+              child: _status == _UploadStatus.uploading
+                  ? PrimaryButton(
+                      label: _chunked
+                          ? l10n.files_uploadPause
+                          : l10n.files_uploading,
+                      onPressed: _chunked ? _pause : null,
+                    )
+                  : _status == _UploadStatus.paused
+                  ? PrimaryButton(
+                      label: l10n.files_uploadResume,
+                      onPressed: _resume,
+                    )
+                  : PrimaryButton(label: l10n.action_retry, onPressed: _resume),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

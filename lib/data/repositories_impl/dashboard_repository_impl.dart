@@ -40,6 +40,10 @@ class DashboardRepositoryImpl implements DashboardRepository {
   );
 
   @override
+  Future<void> restartSystem(String operation) =>
+      _dashboardApi.restartSystem(operation);
+
+  @override
   Future<List<String>> getMonitorIoOptions() => _hostApi.getMonitorIoOptions();
 
   @override

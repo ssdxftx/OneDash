@@ -172,7 +172,9 @@ class OverviewController
       };
       final latest = state.valueOrNull;
       if (latest != null) {
-        state = AsyncData(latest.copyWith(stale: true, lastError: '$error'));
+        state = AsyncData(
+          latest.copyWith(stale: true, lastError: error.runtimeType.toString()),
+        );
       }
       _schedule(delay);
     } finally {

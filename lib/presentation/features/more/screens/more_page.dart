@@ -8,9 +8,12 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/repository_providers.dart';
 import '../../../../domain/entities/dashboard.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_toast.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/split_list_group.dart';
+import '../../../common/states/error_toast.dart';
 import '../../servers/providers/servers_provider.dart';
 
 final _panelCountsProvider = FutureProvider.autoDispose
@@ -150,6 +153,13 @@ class MorePage extends ConsumerWidget {
                       ),
                       _tile(
                         context,
+                        icon: TablerIcons.server,
+                        title: l10n.host_title,
+                        subtitle: l10n.host_monitor,
+                        onTap: () => context.push('/s/$serverId/more/host'),
+                      ),
+                      _tile(
+                        context,
                         icon: TablerIcons.cloud_upload,
                         title: l10n.more_backups,
                         onTap: () => context.push('/s/$serverId/more/backups'),
@@ -180,6 +190,35 @@ class MorePage extends ConsumerWidget {
                   SectionHeader(title: l10n.more_group_system),
                   SplitListGroup(
                     children: [
+                      _tile(
+                        context,
+                        icon: TablerIcons.refresh,
+                        title: l10n.system_restartPanel,
+                        subtitle: l10n.system_restartPanelSubtitle,
+                        onTap: () => _restart(
+                          context,
+                          ref,
+                          operation: '1panel',
+                          title: l10n.system_restartPanel,
+                          message: l10n.system_restartPanelMessage,
+                        ),
+                      ),
+                      _tile(
+                        context,
+                        icon: TablerIcons.server,
+                        title: l10n.system_restartServer,
+                        subtitle: l10n.system_restartServerSubtitle,
+                        onTap: server == null
+                            ? null
+                            : () => _restart(
+                                context,
+                                ref,
+                                operation: 'system',
+                                title: l10n.system_restartServer,
+                                message: l10n.system_restartServerMessage,
+                                requireText: server.displayName,
+                              ),
+                      ),
                       _tile(
                         context,
                         icon: TablerIcons.settings,
@@ -214,12 +253,42 @@ class MorePage extends ConsumerWidget {
     );
   }
 
+  Future<void> _restart(
+    BuildContext context,
+    WidgetRef ref, {
+    required String operation,
+    required String title,
+    required String message,
+    String? requireText,
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: title,
+      message: message,
+      confirmLabel: l10n.action_restart,
+      requireText: requireText,
+    );
+    if (!confirmed) return;
+    try {
+      final repository = await ref.read(
+        dashboardRepositoryForServerProvider(serverId).future,
+      );
+      await repository.restartSystem(operation);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.system_restartSubmitted);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Widget _tile(
     BuildContext context, {
     required IconData icon,
     required String title,
     String? subtitle,
-    required VoidCallback onTap,
+    VoidCallback? onTap,
   }) {
     return SplitListTile(
       leading: Icon(icon),

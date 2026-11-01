@@ -18,12 +18,18 @@ import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../widgets/database_create_sheet.dart';
 
 class _DatabasesState {
-  const _DatabasesState({required this.items, required this.types});
+  const _DatabasesState({
+    required this.items,
+    required this.types,
+    required this.instances,
+  });
 
   final List<DatabaseSearchItemDto> items;
   final List<String> types;
+  final List<DatabaseInstanceDto> instances;
 }
 
 final _databasesProvider = FutureProvider.autoDispose<_DatabasesState>((
@@ -44,12 +50,25 @@ final _databasesProvider = FutureProvider.autoDispose<_DatabasesState>((
   final results = await Future.wait<List<DatabaseSearchItemDto>>(
     types.map((type) async {
       try {
-        final page = await repository.searchDatabases(
-          database: type,
-          page: 1,
-          pageSize: 100,
-        );
-        return page.items;
+        final page = switch (type) {
+          'postgresql' ||
+          'postgresql-cluster' => await repository.searchPgDatabases(
+            database: type,
+            page: 1,
+            pageSize: 100,
+          ),
+          'mongodb' => await repository.searchMongoDatabases(
+            database: type,
+            page: 1,
+            pageSize: 100,
+          ),
+          _ => await repository.searchDatabases(
+            database: type,
+            page: 1,
+            pageSize: 100,
+          ),
+        };
+        return page.items.map((item) => item.withType(type)).toList();
       } catch (_) {
         return <DatabaseSearchItemDto>[];
       }
@@ -58,6 +77,7 @@ final _databasesProvider = FutureProvider.autoDispose<_DatabasesState>((
   return _DatabasesState(
     items: results.expand((e) => e).toList(),
     types: types,
+    instances: instances,
   );
 }, name: 'databasesProvider');
 
@@ -83,14 +103,17 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
         ? const <DatabaseSearchItemDto>[]
         : _type.isEmpty
         ? state.items
-        : state.items
-              .where((e) => e.instanceName == _type || e.from == _type)
-              .toList();
+        : state.items.where((e) => e.dbType == _type).toList();
 
     return Scaffold(
       appBar: AppBarLarge(
         title: l10n.databases_title,
         actions: [
+          AppIconButton(
+            icon: TablerIcons.plus,
+            tooltip: l10n.databases_create,
+            onPressed: () => _showCreateType(state),
+          ),
           AppIconButton(
             icon: TablerIcons.refresh,
             tooltip: l10n.action_refresh,
@@ -102,7 +125,8 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
         children: [
           AppFilterChips<String>(
             options: types,
-            labelOf: (value) => value.isEmpty ? l10n.websites_all : value,
+            labelOf: (value) =>
+                value.isEmpty ? l10n.websites_all : _typeLabel(value),
             selected: {_type},
             onChanged: (selection) {
               if (selection.isEmpty) return;
@@ -130,7 +154,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                     child: _DatabaseCard(
                       item: item,
                       onTap: () => context.push(
-                        '/s/${widget.serverId}/more/databases/${Uri.encodeComponent(item.name)}?type=${Uri.encodeComponent(item.from)}',
+                        '/s/${widget.serverId}/more/databases/${Uri.encodeComponent(item.name)}?type=${Uri.encodeComponent(item.dbType)}&instance=${Uri.encodeComponent(item.instanceName)}',
                       ),
                       onLongPress: () => _showActions(item),
                     ),
@@ -142,6 +166,60 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
         ],
       ),
     );
+  }
+
+  String _typeLabel(String type) {
+    return switch (type) {
+      'mysql' => 'MySQL',
+      'mariadb' => 'MariaDB',
+      'postgresql' => 'PostgreSQL',
+      'postgresql-cluster' => 'PostgreSQL Cluster',
+      'mongodb' => 'MongoDB',
+      'redis' => 'Redis',
+      'redis-cluster' => 'Redis Cluster',
+      _ => type,
+    };
+  }
+
+  Future<void> _showCreateType(_DatabasesState? state) async {
+    final l10n = AppLocalizations.of(context);
+    final instances = state?.instances ?? const <DatabaseInstanceDto>[];
+    final type = await showAppSheet<String>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.databases_createType, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          SplitListGroup(
+            children: [
+              for (final option in [
+                ('mysql', 'MySQL', TablerIcons.brand_mysql),
+                ('postgresql', 'PostgreSQL', TablerIcons.database),
+                ('mongodb', 'MongoDB', TablerIcons.leaf),
+                ('redis', 'Redis', TablerIcons.stack_2),
+              ])
+                SplitListTile(
+                  leading: Icon(option.$3),
+                  title: option.$2,
+                  onTap: () => Navigator.of(sheetContext).pop(option.$1),
+                ),
+            ],
+          ),
+          const SizedBox(height: AppTokens.s8),
+        ],
+      ),
+    );
+    if (type == null || !mounted) return;
+    final created = await showDatabaseCreateSheet(
+      context,
+      type: type,
+      instances: instances,
+    );
+    if (!created || !mounted) return;
+    AppToast.success(context, l10n.databases_created);
+    ref.invalidate(_databasesProvider);
   }
 
   Future<void> _showActions(DatabaseSearchItemDto item) async {

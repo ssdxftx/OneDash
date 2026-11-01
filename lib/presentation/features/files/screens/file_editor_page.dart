@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:re_editor/re_editor.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
@@ -126,6 +127,13 @@ class _FileEditorPageState extends ConsumerState<FileEditorPage> {
         appBar: AppBar(
           title: Text(widget.path.split('/').last, style: AppTextStyles.titleM),
           actions: [
+            IconButton(
+              tooltip: l10n.files_history,
+              icon: const Icon(Icons.history),
+              onPressed: () => context.push(
+                '/s/${widget.serverId}/files/history?path=${Uri.encodeComponent(widget.path)}',
+              ),
+            ),
             TextButton(
               onPressed: _dirty && !_saving ? _save : null,
               child: _saving

@@ -98,7 +98,9 @@ class DatabaseSearchItemDto {
     required this.isDelete,
     required this.description,
     this.pgName,
+    this.mongodbName,
     this.superUser,
+    this.dbType = '',
   });
 
   final int id;
@@ -114,11 +116,37 @@ class DatabaseSearchItemDto {
   final bool isDelete;
   final String description;
   final String? pgName;
+  final String? mongodbName;
   final bool? superUser;
 
-  /// 实例名：PG 优先用 [pgName]，否则回退到 [mysqlName]。
-  String get instanceName =>
-      (pgName != null && pgName!.isNotEmpty) ? pgName! : mysqlName;
+  /// 列表分组用的数据库类型（mysql/postgresql/mongodb/redis）。
+  final String dbType;
+
+  /// 实例名：PG/Mongo 优先用各自字段，否则回退到 [mysqlName]。
+  String get instanceName {
+    if (pgName != null && pgName!.isNotEmpty) return pgName!;
+    if (mongodbName != null && mongodbName!.isNotEmpty) return mongodbName!;
+    return mysqlName;
+  }
+
+  DatabaseSearchItemDto withType(String type) => DatabaseSearchItemDto(
+    id: id,
+    createdAt: createdAt,
+    name: name,
+    from: from,
+    mysqlName: mysqlName,
+    format: format,
+    collation: collation,
+    username: username,
+    password: password,
+    permission: permission,
+    isDelete: isDelete,
+    description: description,
+    pgName: pgName,
+    mongodbName: mongodbName,
+    superUser: superUser,
+    dbType: type,
+  );
 
   factory DatabaseSearchItemDto.fromJson(Map<String, dynamic> json) {
     return DatabaseSearchItemDto(
@@ -135,6 +163,7 @@ class DatabaseSearchItemDto {
       isDelete: json['isDelete'] as bool? ?? false,
       description: json['description'] as String? ?? '',
       pgName: json['postgresqlName'] as String?,
+      mongodbName: json['mongodbName'] as String?,
       superUser: json['superUser'] as bool?,
     );
   }

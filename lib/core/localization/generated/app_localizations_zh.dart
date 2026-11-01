@@ -2162,4 +2162,976 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get containers_advancedHint => '命令、入口、工作目录、网络与资源限制';
+
+  @override
+  String get action_restart => '重启';
+
+  @override
+  String get system_restartPanel => '重启面板';
+
+  @override
+  String get system_restartPanelSubtitle => '仅重启面板服务';
+
+  @override
+  String get system_restartPanelMessage => '面板将在几秒内重启，连接可能中断 10 到 30 秒。';
+
+  @override
+  String get system_restartServer => '重启服务器';
+
+  @override
+  String get system_restartServerSubtitle => '所有服务都会中断';
+
+  @override
+  String get system_restartServerMessage =>
+      '服务器将立即重启，所有服务会停止，连接通常需要 10 到 30 秒恢复。';
+
+  @override
+  String get system_restartSubmitted => '已提交重启，连接可能短暂中断。';
+
+  @override
+  String get databases_create => '创建数据库';
+
+  @override
+  String get databases_createType => '选择数据库类型';
+
+  @override
+  String get databases_databaseName => '数据库名';
+
+  @override
+  String get databases_instance => '实例';
+
+  @override
+  String get databases_noInstance => '该类型还没有已安装的实例，请先在应用商店安装。';
+
+  @override
+  String get databases_charset => '字符集';
+
+  @override
+  String get databases_collation => '排序规则';
+
+  @override
+  String get databases_template => '模板库';
+
+  @override
+  String get databases_host => '允许来源';
+
+  @override
+  String get databases_hostHint => '% 表示任意主机，也可以填写指定 IP';
+
+  @override
+  String get databases_superUser => '超级用户';
+
+  @override
+  String get databases_permission => '权限';
+
+  @override
+  String get databases_permissionRead => '只读';
+
+  @override
+  String get databases_permissionReadWrite => '读写';
+
+  @override
+  String get databases_permissionDbOwner => '库所有者';
+
+  @override
+  String get databases_permissionUserAdmin => '用户管理';
+
+  @override
+  String get databases_nameRequired => '请输入数据库名';
+
+  @override
+  String get databases_usernameRequired => '请输入用户名';
+
+  @override
+  String get databases_passwordRequired => '请输入密码';
+
+  @override
+  String get databases_created => '数据库已创建';
+
+  @override
+  String get databases_usersGrants => '用户与授权';
+
+  @override
+  String get databases_addUser => '添加用户';
+
+  @override
+  String get databases_bindUser => '绑定用户';
+
+  @override
+  String get databases_noUsers => '暂无用户';
+
+  @override
+  String get databases_userHost => '允许来源';
+
+  @override
+  String get databases_deleteUser => '删除用户';
+
+  @override
+  String get databases_grant => '授权';
+
+  @override
+  String get databases_grantDatabase => '授权数据库';
+
+  @override
+  String get databases_revoke => '取消授权';
+
+  @override
+  String get databases_permissionUpdated => '权限已更新';
+
+  @override
+  String get databases_redisRemote => 'Redis 连接';
+
+  @override
+  String get databases_redisHint => '本地 Redis 通过应用安装。此表单用于登记远程 Redis 连接。';
+
+  @override
+  String get databases_normalUser => '普通用户';
+
+  @override
+  String get databases_description => '描述';
+
+  @override
+  String get databases_userDescription => '用户描述';
+
+  @override
+  String get databases_userCreated => '用户已创建';
+
+  @override
+  String get databases_grantedDatabases => '已授权数据库';
+
+  @override
+  String get databases_noGrants => '暂无授权';
+
+  @override
+  String get files_permission => '权限';
+
+  @override
+  String get files_permissionOwner => '所有者';
+
+  @override
+  String get files_permissionGroup => '用户组';
+
+  @override
+  String get files_permissionPublic => '公共';
+
+  @override
+  String get files_permissionRead => '读';
+
+  @override
+  String get files_permissionWrite => '写';
+
+  @override
+  String get files_permissionExecute => '执行';
+
+  @override
+  String get files_permissionMode => '权限值';
+
+  @override
+  String get files_permissionUser => '用户';
+
+  @override
+  String get files_permissionGroupName => '用户组';
+
+  @override
+  String get files_permissionUpdated => '权限已更新';
+
+  @override
+  String files_selectCount(int count) {
+    return '已选 $count 项';
+  }
+
+  @override
+  String get files_selectAll => '全选';
+
+  @override
+  String get files_cancelSelection => '取消';
+
+  @override
+  String get files_batchDelete => '删除所选';
+
+  @override
+  String files_batchDeleteMessage(int count) {
+    return '确定删除选中的 $count 项？';
+  }
+
+  @override
+  String get files_calculateSize => '计算体积';
+
+  @override
+  String files_sizeCalculated(String size) {
+    return '体积：$size';
+  }
+
+  @override
+  String get files_history => '历史';
+
+  @override
+  String get files_historyEmpty => '暂无历史版本';
+
+  @override
+  String get files_historyRestore => '回滚';
+
+  @override
+  String get files_historyRestoreConfirm => '回滚到这个版本？当前文件内容会被替换。';
+
+  @override
+  String get files_historyDelete => '删除版本';
+
+  @override
+  String get files_historyRestored => '版本已回滚';
+
+  @override
+  String get files_moreActions => '更多操作';
+
+  @override
+  String get host_title => '主机';
+
+  @override
+  String get host_monitor => '监控';
+
+  @override
+  String get host_ssh => 'SSH';
+
+  @override
+  String get host_range1h => '1 小时';
+
+  @override
+  String get host_range6h => '6 小时';
+
+  @override
+  String get host_range24h => '24 小时';
+
+  @override
+  String get host_cpu => 'CPU';
+
+  @override
+  String get host_memory => '内存';
+
+  @override
+  String get host_load => '负载';
+
+  @override
+  String get host_sshPort => 'SSH 端口';
+
+  @override
+  String get host_rootLogin => '允许 root 登录';
+
+  @override
+  String get host_passwordAuth => '密码登录';
+
+  @override
+  String get host_pubkeyAuth => '公钥登录';
+
+  @override
+  String get host_sshStatus => 'SSH 服务';
+
+  @override
+  String get host_sshUpdated => 'SSH 配置已更新';
+
+  @override
+  String get host_monitorEmpty => '暂无监控数据';
+
+  @override
+  String get runtime_detail => '运行环境';
+
+  @override
+  String get runtime_extensions => '扩展';
+
+  @override
+  String get runtime_phpIni => 'php.ini';
+
+  @override
+  String get runtime_fpm => 'FPM';
+
+  @override
+  String get runtime_modules => '模块';
+
+  @override
+  String get runtime_install => '安装';
+
+  @override
+  String get runtime_uninstall => '卸载';
+
+  @override
+  String get runtime_update => '更新';
+
+  @override
+  String get runtime_installed => '已安装';
+
+  @override
+  String get runtime_notInstalled => '未安装';
+
+  @override
+  String get runtime_moduleHint => '包名';
+
+  @override
+  String get runtime_restartPhpHint => '修改后需要重启 PHP 才会生效。';
+
+  @override
+  String get runtime_saved => '已保存';
+
+  @override
+  String get toolbox_group_system => '系统';
+
+  @override
+  String get toolbox_group_security => '安全';
+
+  @override
+  String get toolbox_group_service => '服务';
+
+  @override
+  String get toolbox_group_maintenance => '维护';
+
+  @override
+  String get toolbox_time => '时区与时间';
+
+  @override
+  String get toolbox_swapDns => 'Swap 与 DNS';
+
+  @override
+  String get toolbox_clam => 'ClamAV 病毒扫描';
+
+  @override
+  String get toolbox_fail2ban => 'Fail2ban';
+
+  @override
+  String get toolbox_ftp => 'FTP 账户';
+
+  @override
+  String get toolbox_timezone => '时区';
+
+  @override
+  String get toolbox_dns => 'DNS';
+
+  @override
+  String get toolbox_swap => 'Swap';
+
+  @override
+  String get toolbox_addSwap => '添加 Swap';
+
+  @override
+  String get toolbox_swapPath => 'Swap 文件路径';
+
+  @override
+  String get toolbox_swapSize => '大小（MB）';
+
+  @override
+  String get toolbox_sshBan => '封禁 IP';
+
+  @override
+  String get toolbox_unban => '解封';
+
+  @override
+  String get toolbox_sshProtection => 'SSH 防护';
+
+  @override
+  String get toolbox_ftpAdd => '添加 FTP 账户';
+
+  @override
+  String get toolbox_ftpUser => 'FTP 用户';
+
+  @override
+  String get toolbox_ftpPassword => 'FTP 密码';
+
+  @override
+  String get toolbox_ftpPath => 'FTP 根目录';
+
+  @override
+  String get toolbox_scanPath => '扫描路径';
+
+  @override
+  String get toolbox_scanName => '扫描名称';
+
+  @override
+  String get toolbox_startScan => '开始扫描';
+
+  @override
+  String get toolbox_stopScan => '停止扫描';
+
+  @override
+  String get toolbox_scanRecords => '扫描任务';
+
+  @override
+  String get toolbox_noScans => '暂无扫描任务';
+
+  @override
+  String get server_edit_diag_failed => '检查失败';
+
+  @override
+  String get host_monitorSettings => '监控设置';
+
+  @override
+  String get host_monitorInterval => '采集间隔（秒）';
+
+  @override
+  String get host_monitorStoreDays => '保留天数';
+
+  @override
+  String get host_monitorEnabled => '启用监控';
+
+  @override
+  String get host_sshKeys => 'SSH 密钥';
+
+  @override
+  String get host_generateKey => '生成密钥';
+
+  @override
+  String get host_keyName => '密钥名称';
+
+  @override
+  String get host_keyType => '密钥类型';
+
+  @override
+  String get host_keyPassphrase => '口令';
+
+  @override
+  String get host_keyGenerated => 'SSH 密钥已生成';
+
+  @override
+  String get host_deleteKey => '删除密钥';
+
+  @override
+  String get host_publicKey => '公钥';
+
+  @override
+  String get toolbox_clamRecords => '扫描结果';
+
+  @override
+  String get toolbox_clamNoRecords => '暂无扫描结果';
+
+  @override
+  String get runtime_fpmConfig => 'FPM 配置';
+
+  @override
+  String get runtime_pm => '进程管理模式';
+
+  @override
+  String get runtime_maxChildren => '最大子进程';
+
+  @override
+  String get runtime_startServers => '启动进程数';
+
+  @override
+  String get runtime_minSpare => '最小空闲进程';
+
+  @override
+  String get runtime_maxSpare => '最大空闲进程';
+
+  @override
+  String get host_disks => '磁盘';
+
+  @override
+  String get host_diagnostics => '诊断';
+
+  @override
+  String get host_diskSystem => '系统磁盘';
+
+  @override
+  String get host_diskUnpartitioned => '未分区磁盘';
+
+  @override
+  String get host_diskNormal => '数据磁盘';
+
+  @override
+  String get host_diskPartitions => '分区';
+
+  @override
+  String get host_diskFilesystem => '文件系统';
+
+  @override
+  String get host_diskUsed => '已用';
+
+  @override
+  String get host_diskAvail => '可用';
+
+  @override
+  String get host_diskMountPoint => '挂载点';
+
+  @override
+  String get host_diskUnmounted => '未挂载';
+
+  @override
+  String get host_diskSystemHint => '系统磁盘分区在此只读。';
+
+  @override
+  String get host_diskPartition => '分区';
+
+  @override
+  String get host_diskMount => '挂载';
+
+  @override
+  String get host_diskUnmount => '卸载';
+
+  @override
+  String get host_diskAutoMount => '开机自动挂载';
+
+  @override
+  String get host_diskNoFail => '磁盘缺失时允许开机';
+
+  @override
+  String get host_diskMountPointField => '挂载点路径';
+
+  @override
+  String get host_diskLabel => '卷标';
+
+  @override
+  String get host_diskActionDone => '磁盘操作已完成';
+
+  @override
+  String get host_diskPartitionWarning => '分区会清除该磁盘上的数据，请只对可重建的磁盘继续。';
+
+  @override
+  String get host_diagSummary => '运行时概览';
+
+  @override
+  String get host_diagRss => '常驻内存';
+
+  @override
+  String get host_diagHeap => '堆内存占用';
+
+  @override
+  String get host_diagObjects => '堆对象数';
+
+  @override
+  String get host_diagGoroutines => '协程数';
+
+  @override
+  String get host_diagSnapshot => '协程快照';
+
+  @override
+  String get host_diagCapturedAt => '抓取时间';
+
+  @override
+  String get host_diagTotal => '总数';
+
+  @override
+  String get host_diagGroups => '分组';
+
+  @override
+  String get host_diagTruncated => '快照已被面板截断。';
+
+  @override
+  String get host_diagStack => '调用栈';
+
+  @override
+  String get toolbox_fail2banBase => '基础规则';
+
+  @override
+  String get toolbox_maxRetry => '最大重试次数';
+
+  @override
+  String get toolbox_banTime => '封禁时长';
+
+  @override
+  String get toolbox_findTime => '检测窗口';
+
+  @override
+  String get toolbox_banAction => '封禁动作';
+
+  @override
+  String get toolbox_logPath => '日志路径';
+
+  @override
+  String get toolbox_durationHint => '请带单位，例如 300s、10m、1h 或 -1。';
+
+  @override
+  String get toolbox_fail2banChanged => '更新 Fail2ban 规则';
+
+  @override
+  String get host_diagCapture => '手动抓取';
+
+  @override
+  String get host_diagProfileType => '分析类型';
+
+  @override
+  String get host_diagProfileCpu => 'CPU 分析';
+
+  @override
+  String get host_diagProfileHeap => '堆分析';
+
+  @override
+  String get host_diagProfileGoroutine => '协程分析';
+
+  @override
+  String get host_diagProfileMutex => '互斥锁分析';
+
+  @override
+  String get host_diagProfileBlock => '阻塞分析';
+
+  @override
+  String get host_diagDuration => '持续时长（秒）';
+
+  @override
+  String get host_diagStartCapture => '开始抓取';
+
+  @override
+  String get host_diagProfileSaved => '分析文件已保存';
+
+  @override
+  String get host_diagComponent => '组件检测';
+
+  @override
+  String get host_diagComponentName => '组件名称';
+
+  @override
+  String get host_diagCheck => '检测';
+
+  @override
+  String get host_diagComponentExists => '状态';
+
+  @override
+  String get host_diagComponentPath => '路径';
+
+  @override
+  String get host_diagComponentMissing => '未找到可执行文件';
+
+  @override
+  String get websites_loadBalance => '负载均衡';
+
+  @override
+  String get websites_lbAdd => '添加上游';
+
+  @override
+  String get websites_lbEmpty => '暂无上游';
+
+  @override
+  String get websites_lbName => '上游名称';
+
+  @override
+  String get websites_lbAlgorithm => '算法';
+
+  @override
+  String get websites_lbDefault => '默认（轮询）';
+
+  @override
+  String get websites_lbIpHash => 'IP 哈希';
+
+  @override
+  String get websites_lbLeastConn => '最少连接';
+
+  @override
+  String get websites_lbServers => '服务器';
+
+  @override
+  String get websites_lbAddServer => '添加服务器';
+
+  @override
+  String get websites_lbServerAddress => '服务器地址';
+
+  @override
+  String get websites_lbWeight => '权重';
+
+  @override
+  String get websites_lbFlag => '状态';
+
+  @override
+  String get websites_lbFlagNone => '启用';
+
+  @override
+  String get websites_lbFlagDown => '下线';
+
+  @override
+  String get websites_lbFlagBackup => '备用';
+
+  @override
+  String get websites_lbMaxFails => '最大失败次数';
+
+  @override
+  String get websites_lbFailTimeout => '失败超时';
+
+  @override
+  String get websites_lbMaxConns => '最大连接数';
+
+  @override
+  String get websites_lbDelete => '删除上游';
+
+  @override
+  String get websites_lbSaved => '负载均衡已保存';
+
+  @override
+  String get websites_templates => '网站模板';
+
+  @override
+  String get websites_templateAdd => '新建模板';
+
+  @override
+  String get websites_templateEdit => '编辑模板';
+
+  @override
+  String get websites_templateEmpty => '暂无模板';
+
+  @override
+  String get websites_templateName => '模板名称';
+
+  @override
+  String get websites_templateType => '模板类型';
+
+  @override
+  String get websites_templateSingle => '单页模板';
+
+  @override
+  String get websites_templateMulti => '多文件模板';
+
+  @override
+  String get websites_templateContent => 'HTML 内容';
+
+  @override
+  String get websites_templateUpload => '上传 ZIP';
+
+  @override
+  String get websites_templateUploaded => '模板已上传';
+
+  @override
+  String get websites_templateFilePath => '模板包';
+
+  @override
+  String get websites_templateRemark => '备注';
+
+  @override
+  String get websites_templateVariables => '变量';
+
+  @override
+  String get websites_templateAddVariable => '添加变量';
+
+  @override
+  String get websites_templateVariableKey => '变量键';
+
+  @override
+  String get websites_templateVariableLabel => '显示名称';
+
+  @override
+  String get websites_templateVariableType => '类型';
+
+  @override
+  String get websites_templateVariableDefault => '默认值';
+
+  @override
+  String get websites_templateVariableOptions => '可选项';
+
+  @override
+  String get websites_templateVariableRequired => '必填';
+
+  @override
+  String get websites_templateAutoDetect => '识别变量';
+
+  @override
+  String get websites_templateSaved => '模板已保存';
+
+  @override
+  String get websites_templateDelete => '删除模板';
+
+  @override
+  String get websites_templateGenerate => '生成';
+
+  @override
+  String get websites_templateOutputs => '已生成站点';
+
+  @override
+  String get websites_templateOutputName => '输出名称';
+
+  @override
+  String get websites_templateOutputEmpty => '暂无生成站点';
+
+  @override
+  String get websites_templateOutputGenerated => '站点已生成';
+
+  @override
+  String get websites_templateOutputDelete => '删除生成站点';
+
+  @override
+  String get websites_templateNoVariables => '无变量';
+
+  @override
+  String get websites_templateVariableTypeText => '文本';
+
+  @override
+  String get websites_templateVariableTypeTextarea => '长文本';
+
+  @override
+  String get websites_templateVariableTypeNumber => '数字';
+
+  @override
+  String get websites_templateVariableTypeSelect => '下拉选择';
+
+  @override
+  String get websites_templateVariableTypeColor => '颜色';
+
+  @override
+  String get files_aiSearch => 'AI 搜索';
+
+  @override
+  String get files_aiQuery => '搜索内容';
+
+  @override
+  String get files_aiQueryHint => '要查找的文件内容';
+
+  @override
+  String get files_aiContainSub => '包含子目录';
+
+  @override
+  String get files_aiMatchCase => '区分大小写';
+
+  @override
+  String get files_aiWholeWord => '全字匹配';
+
+  @override
+  String get files_aiUseRegex => '使用正则表达式';
+
+  @override
+  String get files_aiGrepMode => '面板未启用 AI，当前仅显示内容匹配结果。';
+
+  @override
+  String get files_aiSummary => 'AI 摘要';
+
+  @override
+  String get files_aiHits => '匹配结果';
+
+  @override
+  String get files_aiScanned => '扫描文件数';
+
+  @override
+  String get files_aiTokens => 'Token 用量';
+
+  @override
+  String get files_aiDuration => '耗时';
+
+  @override
+  String get files_aiTruncated => '结果已被面板截断。';
+
+  @override
+  String get files_aiEmpty => '没有匹配内容';
+
+  @override
+  String get files_aiLine => '行';
+
+  @override
+  String get terminal_sessions => '终端会话';
+
+  @override
+  String get terminal_sessionsEmpty => '暂无终端会话';
+
+  @override
+  String get terminal_sessionAttached => '已连接';
+
+  @override
+  String get terminal_sessionDetached => '已断开';
+
+  @override
+  String get terminal_closeSession => '关闭';
+
+  @override
+  String get terminal_closeAllSessions => '全部关闭';
+
+  @override
+  String get terminal_closeAllConfirm => '将断开全部终端会话且无法恢复。';
+
+  @override
+  String get terminal_kindLocal => '本地';
+
+  @override
+  String get terminal_kindSsh => 'SSH';
+
+  @override
+  String get terminal_kindContainer => '容器';
+
+  @override
+  String get files_uploading => '上传中';
+
+  @override
+  String get files_uploadPaused => '已暂停';
+
+  @override
+  String get files_uploadPause => '暂停';
+
+  @override
+  String get files_uploadResume => '继续';
+
+  @override
+  String get files_uploadFailed => '上传失败';
+
+  @override
+  String get toolbox_infectedStrategy => '感染文件处理';
+
+  @override
+  String get toolbox_infectedNone => '不处理';
+
+  @override
+  String get toolbox_infectedRemove => '删除';
+
+  @override
+  String get toolbox_infectedMove => '移动';
+
+  @override
+  String get toolbox_infectedCopy => '复制';
+
+  @override
+  String get toolbox_infectedDir => '感染文件目录';
+
+  @override
+  String get toolbox_infectedDirRequired => '请输入感染文件目录';
+
+  @override
+  String get firewall_whitelistEdit => '编辑白名单规则';
+
+  @override
+  String get firewall_backendUnavailable => '没有可切换的后端';
+
+  @override
+  String get action_switch => '切换';
+
+  @override
+  String get firewall_resetRules => '重置规则';
+
+  @override
+  String get firewall_resetRulesMessage => '将重置面板管理的防火墙规则，是否继续？';
+
+  @override
+  String get firewall_restoreBackup => '恢复备份';
+
+  @override
+  String firewall_restoreBackupMessage(String name) {
+    return '将从备份 $name 恢复规则，是否继续？';
+  }
+
+  @override
+  String get firewall_nativeDetail => '原生规则详情';
+
+  @override
+  String get firewall_nativeDetailHint => '读取 firewalld 或 ufw 的原生规则定义';
+
+  @override
+  String get firewall_ruleBackups => '规则备份';
+
+  @override
+  String get firewall_noBackups => '暂无规则备份';
+
+  @override
+  String get firewall_nativeNameRequired => '请输入原生规则名称';
+
+  @override
+  String get firewall_nativeKind => '原生类型';
+
+  @override
+  String get firewall_nativeZoneService => '区域服务';
+
+  @override
+  String get firewall_nativeUfwApplication => 'UFW 应用';
+
+  @override
+  String get firewall_nativeName => '原生名称';
+
+  @override
+  String get firewall_nativePermanent => '永久生效';
+
+  @override
+  String get firewall_nativeLoad => '读取原生详情';
+
+  @override
+  String get firewall_settingsBackendHint => '点击切换面板管理的防火墙后端';
+
+  @override
+  String get host_sshCheckFailed => '本地 SSH 连通性检查失败，已取消保存。';
+
+  @override
+  String get host_sshCheckAfterSave => 'SSH 端口已保存，但本地连通性检查仍未通过，请确认新端口。';
 }

@@ -12,6 +12,8 @@ import '../../core/utils/file_icon_path_cache.dart';
 import '../../domain/repositories/file_repository.dart';
 import '../../presentation/features/server_detail/providers/active_server_provider.dart';
 import '../api/file_api.dart';
+import '../dto/common/page_result.dart';
+import '../dto/file/file_ai_search_dto.dart';
 import '../dto/file/file_favorite_dto.dart';
 import '../dto/file/file_item_dto.dart';
 import '../dto/file/user_group_dto.dart';
@@ -48,6 +50,25 @@ class FileRepositoryImpl implements FileRepository {
     containSub: containSub,
     sortBy: sortBy,
     sortOrder: sortOrder,
+  );
+
+  @override
+  Future<FileAiSearchResultDto> aiSearch({
+    required String path,
+    required String query,
+    bool containSub = true,
+    bool matchCase = false,
+    bool wholeWord = false,
+    bool useRegex = false,
+    int maxItems = 100,
+  }) => _fileApi.aiSearch(
+    path: path,
+    query: query,
+    containSub: containSub,
+    matchCase: matchCase,
+    wholeWord: wholeWord,
+    useRegex: useRegex,
+    maxItems: maxItems,
   );
 
   @override
@@ -202,10 +223,13 @@ class FileRepositoryImpl implements FileRepository {
     required String targetPath,
     bool overwrite = true,
     void Function(double progress)? onProgress,
+    void Function(int uploadedBytes)? onChunkUploaded,
+    String? uploadId,
+    int startOffset = 0,
     CancelToken? cancelToken,
   }) async {
     final fileSize = await File(filePath).length();
-    if (fileSize <= _maxSingleFileSize) {
+    if (fileSize <= _maxSingleFileSize && startOffset == 0) {
       await _fileApi.uploadFiles(
         filePaths: [filePath],
         targetPath: targetPath,
@@ -220,24 +244,43 @@ class FileRepositoryImpl implements FileRepository {
         filePath: filePath,
         targetPath: targetPath,
         fileSize: fileSize,
+        uploadId: uploadId ?? _newUploadId(),
+        startOffset: startOffset,
         overwrite: overwrite,
         onProgress: onProgress,
+        onChunkUploaded: onChunkUploaded,
         cancelToken: cancelToken,
       );
     }
+  }
+
+  @override
+  Future<void> stopChunkUpload(String uploadId) =>
+      _fileApi.stopChunkUpload(uploadId);
+
+  String _newUploadId() {
+    final random = Random.secure();
+    return List<int>.generate(
+      16,
+      (_) => random.nextInt(256),
+    ).map((value) => value.toRadixString(16).padLeft(2, '0')).join();
   }
 
   Future<void> _uploadChunked({
     required String filePath,
     required String targetPath,
     required int fileSize,
+    required String uploadId,
+    int startOffset = 0,
     bool overwrite = true,
     void Function(double progress)? onProgress,
+    void Function(int uploadedBytes)? onChunkUploaded,
     CancelToken? cancelToken,
   }) async {
     final filename = filePath.split('/').last;
     final chunkCount = (fileSize / _chunkSize).ceil();
-    for (int i = 0; i < chunkCount; i++) {
+    final firstChunk = min(startOffset ~/ _chunkSize, chunkCount - 1);
+    for (int i = firstChunk; i < chunkCount; i++) {
       if (cancelToken?.isCancelled == true) return;
       final start = i * _chunkSize;
       final end = min(start + _chunkSize, fileSize);
@@ -249,10 +292,13 @@ class FileRepositoryImpl implements FileRepository {
         chunkCount: chunkCount,
         chunkStart: start,
         chunkEnd: end,
+        uploadId: uploadId,
+        fileSize: fileSize,
         overwrite: overwrite,
         cancelToken: cancelToken,
       );
-      onProgress?.call((i + 1) / chunkCount);
+      onChunkUploaded?.call(end);
+      onProgress?.call(end / fileSize);
     }
   }
 
@@ -276,6 +322,54 @@ class FileRepositoryImpl implements FileRepository {
     content: content,
     sub: sub,
   );
+
+  @override
+  Future<void> changeMode({
+    required String path,
+    required int mode,
+    bool sub = false,
+  }) => _fileApi.changeMode(path: path, mode: mode, sub: sub);
+
+  @override
+  Future<void> changeOwner({
+    required String path,
+    required String user,
+    required String group,
+    bool sub = false,
+  }) => _fileApi.changeOwner(path: path, user: user, group: group, sub: sub);
+
+  @override
+  Future<void> batchDeleteFiles({
+    required List<String> paths,
+    required bool isDir,
+  }) => _fileApi.batchDeleteFiles(paths: paths, isDir: isDir);
+
+  @override
+  Future<int> getDepthSize(String path) => _fileApi.getDepthSize(path);
+
+  @override
+  Future<PageResult<Map<String, dynamic>>> searchHistory({
+    required String path,
+    String scope = 'current',
+    int page = 1,
+    int pageSize = 50,
+  }) => _fileApi.searchHistory(
+    path: path,
+    scope: scope,
+    page: page,
+    pageSize: pageSize,
+  );
+
+  @override
+  Future<Map<String, dynamic>> getHistoryContent(int id) =>
+      _fileApi.getHistoryContent(id);
+
+  @override
+  Future<Map<String, dynamic>> restoreHistory(int id) =>
+      _fileApi.restoreHistory(id);
+
+  @override
+  Future<void> deleteHistory(List<int> ids) => _fileApi.deleteHistory(ids);
 
   @override
   Future<FileShareDto> createFileShare({

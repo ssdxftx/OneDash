@@ -43,6 +43,7 @@ abstract interface class DatabaseRepository {
     required String type,
     required String database,
     required String value,
+    String? name,
   });
   Future<void> changeAccess({
     required int id,
@@ -137,4 +138,87 @@ abstract interface class DatabaseRepository {
     required String save,
   });
   Future<void> installRedisCli();
+
+  Future<PageResult<DatabaseSearchItemDto>> searchMongoDatabases({
+    required String database,
+    int page,
+    int pageSize,
+  });
+  Future<void> createMongoDatabase(Map<String, dynamic> body);
+  Future<void> deletePgDatabase({
+    required int id,
+    required String type,
+    required String database,
+    bool forceDelete,
+    bool deleteBackup,
+  });
+  Future<void> deleteMongoDatabase({
+    required int id,
+    required String database,
+    bool forceDelete,
+    bool deleteBackup,
+  });
+  Future<void> changePgPrivileges({
+    required String database,
+    required String name,
+    required String username,
+    required bool superUser,
+  });
+  Future<void> bindPgUser({
+    required String database,
+    required String name,
+    required String username,
+    required String password,
+    bool superUser,
+  });
+  Future<String> loadMongoPrivileges({
+    required String database,
+    required String name,
+    required String username,
+  });
+  Future<void> changeMongoPrivileges({
+    required String database,
+    required String name,
+    required String username,
+    required String permission,
+  });
+  Future<void> bindMongoUser({
+    required String database,
+    required String name,
+    required String username,
+    required String password,
+  });
+  Future<List<Map<String, dynamic>>> searchUsers({required String database});
+  Future<void> createUser({
+    required String database,
+    required String username,
+    required String host,
+    required String password,
+    List<String> dbs,
+    String description,
+  });
+  Future<void> deleteUser({
+    required String database,
+    required String username,
+    required String host,
+  });
+  Future<void> changeUserPassword({
+    required String database,
+    required String username,
+    required String host,
+    required String password,
+  });
+  Future<List<Map<String, dynamic>>> searchGrants({required String database});
+  Future<void> grantUser({
+    required String database,
+    required String db,
+    required String username,
+    required String host,
+  });
+  Future<void> revokeGrant({
+    required String database,
+    required String db,
+    required String username,
+    required String host,
+  });
 }

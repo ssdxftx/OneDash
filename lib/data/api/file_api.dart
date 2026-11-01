@@ -8,6 +8,7 @@ import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
 import '../dto/common/task_log_dto.dart';
 import '../dto/common/page_result.dart';
+import '../dto/file/file_ai_search_dto.dart';
 import '../dto/file/file_favorite_dto.dart';
 import '../dto/file/file_item_dto.dart';
 import '../dto/file/user_group_dto.dart';
@@ -81,6 +82,32 @@ class FileApi {
       },
     );
     return ApiResponseParser.object(resp, FileItemDto.fromJson);
+  }
+
+  /// 文件内容搜索，可选 AI 摘要；未启用 AI 时返回 grep 模式。
+  /// POST /api/v2/files/ai-search
+  Future<FileAiSearchResultDto> aiSearch({
+    required String path,
+    required String query,
+    bool containSub = true,
+    bool matchCase = false,
+    bool wholeWord = false,
+    bool useRegex = false,
+    int maxItems = 100,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/ai-search',
+      data: {
+        'path': path,
+        'query': query,
+        'containSub': containSub,
+        'maxItems': maxItems,
+        'matchCase': matchCase,
+        'wholeWord': wholeWord,
+        'useRegex': useRegex,
+      },
+    );
+    return ApiResponseParser.object(resp, FileAiSearchResultDto.fromJson);
   }
 
   /// 查询 OpenResty 网站根目录。
@@ -392,6 +419,115 @@ class FileApi {
     );
   }
 
+  /// 修改文件/目录权限。
+  /// POST /api/v2/files/mode
+  Future<void> changeMode({
+    required String path,
+    required int mode,
+    bool sub = false,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/mode',
+      data: {'path': path, 'mode': mode, 'sub': sub},
+    );
+  }
+
+  /// 修改文件/目录所有者。
+  /// POST /api/v2/files/owner
+  Future<void> changeOwner({
+    required String path,
+    required String user,
+    required String group,
+    bool sub = false,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/owner',
+      data: {'path': path, 'user': user, 'group': group, 'sub': sub},
+    );
+  }
+
+  /// 批量删除文件/目录。
+  /// POST /api/v2/files/batch/del
+  Future<void> batchDeleteFiles({
+    required List<String> paths,
+    required bool isDir,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/batch/del',
+      data: {'paths': paths, 'isDir': isDir},
+    );
+  }
+
+  /// 计算目录体积。
+  /// POST /api/v2/files/depth/size
+  Future<int> getDepthSize(String path) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/depth/size',
+      data: {'path': path},
+    );
+    final data = resp.data?['data'];
+    if (data is List) {
+      for (final item in data.whereType<Map>()) {
+        if ('${item['path'] ?? ''}' == path) {
+          return (item['size'] as num?)?.toInt() ?? 0;
+        }
+      }
+      if (data.isNotEmpty && data.last is Map) {
+        return ((data.last as Map)['size'] as num?)?.toInt() ?? 0;
+      }
+      return 0;
+    }
+    if (data is Map) return (data['size'] as num?)?.toInt() ?? 0;
+    return (data as num?)?.toInt() ?? 0;
+  }
+
+  /// 查询文件历史。
+  /// POST /api/v2/files/history/search
+  Future<PageResult<Map<String, dynamic>>> searchHistory({
+    required String path,
+    String scope = 'current',
+    int page = 1,
+    int pageSize = 50,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/history/search',
+      data: {'path': path, 'scope': scope, 'page': page, 'pageSize': pageSize},
+    );
+    return PageResult<Map<String, dynamic>>.fromJson(
+      ApiResponseParser.map(resp),
+      (json) => json,
+    );
+  }
+
+  /// 读取历史版本内容。
+  /// POST /api/v2/files/history/content
+  Future<Map<String, dynamic>> getHistoryContent(int id) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/history/content',
+      data: {'id': id},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 回滚到历史版本。
+  /// POST /api/v2/files/history/restore
+  Future<Map<String, dynamic>> restoreHistory(int id) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/history/restore',
+      data: {'id': id},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 删除历史版本。
+  /// POST /api/v2/files/history/del
+  Future<void> deleteHistory(List<int> ids) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/history/del',
+      data: {'ids': ids},
+    );
+  }
+
   /// 检查文件/目录是否存在。
   /// POST /api/v2/files/check
   Future<bool> checkFileExists(String path) async {
@@ -475,6 +611,8 @@ class FileApi {
     required int chunkCount,
     required int chunkStart,
     required int chunkEnd,
+    required String uploadId,
+    required int fileSize,
     bool overwrite = true,
     CancelToken? cancelToken,
   }) async {
@@ -486,8 +624,11 @@ class FileApi {
       final formData = FormData.fromMap({
         'path': targetPath,
         'filename': filename,
+        'uploadID': uploadId,
         'chunkIndex': chunkIndex.toString(),
         'chunkCount': chunkCount.toString(),
+        'offset': chunkStart.toString(),
+        'fileSize': fileSize.toString(),
         'overwrite': overwrite.toString(),
         'chunk': MultipartFile.fromBytes(chunkBytes, filename: filename),
       });
@@ -499,6 +640,14 @@ class FileApi {
     } finally {
       await raf.close();
     }
+  }
+
+  /// POST /api/v2/files/chunkupload/stop — 清理已暂停的分片临时文件。
+  Future<void> stopChunkUpload(String uploadId) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/chunkupload/stop',
+      data: {'key': uploadId},
+    );
   }
 
   /// 远程下载。

@@ -229,7 +229,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
         _DiagnosisStep(
           l10n.server_edit_diag_network,
           state: _StepState.failed,
-          detail: '$error',
+          detail: l10n.server_edit_diag_failed,
         ),
       );
       if (mounted) setState(() => _diagnosing = false);
@@ -261,7 +261,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
           _DiagnosisStep(
             l10n.server_edit_diag_tls,
             state: _StepState.failed,
-            detail: '$error',
+            detail: l10n.server_edit_diag_failed,
           ),
         );
       }
@@ -300,7 +300,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
         _DiagnosisStep(
           l10n.server_edit_diag_auth,
           state: _StepState.failed,
-          detail: '$error',
+          detail: l10n.server_edit_diag_failed,
         ),
       );
       client?.dispose();

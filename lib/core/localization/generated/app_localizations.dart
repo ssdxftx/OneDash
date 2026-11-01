@@ -4207,6 +4207,1932 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Command, entrypoint, working directory, network and limits'**
   String get containers_advancedHint;
+
+  /// Restart action label.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get action_restart;
+
+  /// Restart the 1Panel service.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart panel'**
+  String get system_restartPanel;
+
+  /// Subtitle for restarting the panel service.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the panel service restarts'**
+  String get system_restartPanelSubtitle;
+
+  /// Confirmation message before restarting the panel.
+  ///
+  /// In en, this message translates to:
+  /// **'The panel will restart in a few seconds. The connection may drop for 10 to 30 seconds.'**
+  String get system_restartPanelMessage;
+
+  /// Restart the whole server.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart server'**
+  String get system_restartServer;
+
+  /// Subtitle for restarting the server.
+  ///
+  /// In en, this message translates to:
+  /// **'All services will be interrupted'**
+  String get system_restartServerSubtitle;
+
+  /// Confirmation message before restarting the server.
+  ///
+  /// In en, this message translates to:
+  /// **'The server will reboot immediately. All services stop and the connection usually recovers in 10 to 30 seconds.'**
+  String get system_restartServerMessage;
+
+  /// Toast shown after a restart request is accepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart requested. The connection may drop briefly.'**
+  String get system_restartSubmitted;
+
+  /// Create database action.
+  ///
+  /// In en, this message translates to:
+  /// **'Create database'**
+  String get databases_create;
+
+  /// Sheet title for selecting a database type.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose database type'**
+  String get databases_createType;
+
+  /// Database name field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Database name'**
+  String get databases_databaseName;
+
+  /// Database instance selector label.
+  ///
+  /// In en, this message translates to:
+  /// **'Instance'**
+  String get databases_instance;
+
+  /// Shown when no database instance is available for the selected type.
+  ///
+  /// In en, this message translates to:
+  /// **'No installed instance of this type. Install it from the app store first.'**
+  String get databases_noInstance;
+
+  /// MySQL character set field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Character set'**
+  String get databases_charset;
+
+  /// MySQL collation field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Collation'**
+  String get databases_collation;
+
+  /// PostgreSQL template/encoding field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Template database'**
+  String get databases_template;
+
+  /// Allowed source host for a database user.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed host'**
+  String get databases_host;
+
+  /// Hint for the allowed host field.
+  ///
+  /// In en, this message translates to:
+  /// **'% for any host, or a specific IP'**
+  String get databases_hostHint;
+
+  /// PostgreSQL superuser toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Superuser'**
+  String get databases_superUser;
+
+  /// MongoDB permission field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission'**
+  String get databases_permission;
+
+  /// MongoDB read permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Read only'**
+  String get databases_permissionRead;
+
+  /// MongoDB readWrite permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Read and write'**
+  String get databases_permissionReadWrite;
+
+  /// MongoDB dbOwner permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Database owner'**
+  String get databases_permissionDbOwner;
+
+  /// MongoDB userAdmin permission.
+  ///
+  /// In en, this message translates to:
+  /// **'User admin'**
+  String get databases_permissionUserAdmin;
+
+  /// Validation message for database name.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a database name'**
+  String get databases_nameRequired;
+
+  /// Validation message for database username.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a username'**
+  String get databases_usernameRequired;
+
+  /// Validation message for database password.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a password'**
+  String get databases_passwordRequired;
+
+  /// Toast after creating a database.
+  ///
+  /// In en, this message translates to:
+  /// **'Database created'**
+  String get databases_created;
+
+  /// Users and grants tab title.
+  ///
+  /// In en, this message translates to:
+  /// **'Users and grants'**
+  String get databases_usersGrants;
+
+  /// Add user action.
+  ///
+  /// In en, this message translates to:
+  /// **'Add user'**
+  String get databases_addUser;
+
+  /// Bind an existing database user.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind user'**
+  String get databases_bindUser;
+
+  /// Empty state for database users.
+  ///
+  /// In en, this message translates to:
+  /// **'No users'**
+  String get databases_noUsers;
+
+  /// Host label for a database user.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed from'**
+  String get databases_userHost;
+
+  /// Delete database user action.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete user'**
+  String get databases_deleteUser;
+
+  /// Grant database access action.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant access'**
+  String get databases_grant;
+
+  /// Database name field for granting access.
+  ///
+  /// In en, this message translates to:
+  /// **'Database to grant'**
+  String get databases_grantDatabase;
+
+  /// Revoke database access action.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke access'**
+  String get databases_revoke;
+
+  /// Toast after changing a database permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission updated'**
+  String get databases_permissionUpdated;
+
+  /// Title for creating a remote Redis connection.
+  ///
+  /// In en, this message translates to:
+  /// **'Redis connection'**
+  String get databases_redisRemote;
+
+  /// Explains Redis creation behavior.
+  ///
+  /// In en, this message translates to:
+  /// **'Local Redis is installed as an app. This form registers a remote Redis connection.'**
+  String get databases_redisHint;
+
+  /// Label for a non-superuser database account.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal user'**
+  String get databases_normalUser;
+
+  /// Description field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get databases_description;
+
+  /// Description field for a database user.
+  ///
+  /// In en, this message translates to:
+  /// **'User description'**
+  String get databases_userDescription;
+
+  /// Toast after creating a database user.
+  ///
+  /// In en, this message translates to:
+  /// **'User created'**
+  String get databases_userCreated;
+
+  /// Title for the granted database list.
+  ///
+  /// In en, this message translates to:
+  /// **'Granted databases'**
+  String get databases_grantedDatabases;
+
+  /// Empty state for database grants.
+  ///
+  /// In en, this message translates to:
+  /// **'No granted databases'**
+  String get databases_noGrants;
+
+  /// File permission sheet title.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission'**
+  String get files_permission;
+
+  /// Owner permission row.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get files_permissionOwner;
+
+  /// Group permission row.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get files_permissionGroup;
+
+  /// Public permission row.
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get files_permissionPublic;
+
+  /// Read permission bit.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get files_permissionRead;
+
+  /// Write permission bit.
+  ///
+  /// In en, this message translates to:
+  /// **'Write'**
+  String get files_permissionWrite;
+
+  /// Execute permission bit.
+  ///
+  /// In en, this message translates to:
+  /// **'Execute'**
+  String get files_permissionExecute;
+
+  /// Numeric file mode field.
+  ///
+  /// In en, this message translates to:
+  /// **'Mode'**
+  String get files_permissionMode;
+
+  /// File owner user field.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get files_permissionUser;
+
+  /// File owner group field.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get files_permissionGroupName;
+
+  /// Toast after updating file permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission updated'**
+  String get files_permissionUpdated;
+
+  /// Selection mode title.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String files_selectCount(int count);
+
+  /// Select all files action.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get files_selectAll;
+
+  /// Leave selection mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get files_cancelSelection;
+
+  /// Batch delete action.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete selected'**
+  String get files_batchDelete;
+
+  /// Batch delete confirmation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} selected items?'**
+  String files_batchDeleteMessage(int count);
+
+  /// Calculate directory size action.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate size'**
+  String get files_calculateSize;
+
+  /// Calculated directory size.
+  ///
+  /// In en, this message translates to:
+  /// **'Size: {size}'**
+  String files_sizeCalculated(String size);
+
+  /// File history action.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get files_history;
+
+  /// Empty state for file history.
+  ///
+  /// In en, this message translates to:
+  /// **'No history versions'**
+  String get files_historyEmpty;
+
+  /// Restore a history version.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get files_historyRestore;
+
+  /// Confirmation before restoring a file history version.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore this version? The current file content will be replaced.'**
+  String get files_historyRestoreConfirm;
+
+  /// Delete a history version.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete version'**
+  String get files_historyDelete;
+
+  /// Toast after restoring a file version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version restored'**
+  String get files_historyRestored;
+
+  /// Tooltip for opening the file action sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get files_moreActions;
+
+  /// Host tools page title.
+  ///
+  /// In en, this message translates to:
+  /// **'Host'**
+  String get host_title;
+
+  /// Monitoring tab title.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitoring'**
+  String get host_monitor;
+
+  /// SSH tab title.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH'**
+  String get host_ssh;
+
+  /// One hour monitor range.
+  ///
+  /// In en, this message translates to:
+  /// **'1h'**
+  String get host_range1h;
+
+  /// Six hour monitor range.
+  ///
+  /// In en, this message translates to:
+  /// **'6h'**
+  String get host_range6h;
+
+  /// Twenty four hour monitor range.
+  ///
+  /// In en, this message translates to:
+  /// **'24h'**
+  String get host_range24h;
+
+  /// CPU chart title.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU'**
+  String get host_cpu;
+
+  /// Memory chart title.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get host_memory;
+
+  /// Load chart title.
+  ///
+  /// In en, this message translates to:
+  /// **'Load'**
+  String get host_load;
+
+  /// SSH port label.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH port'**
+  String get host_sshPort;
+
+  /// SSH root login label.
+  ///
+  /// In en, this message translates to:
+  /// **'Root login'**
+  String get host_rootLogin;
+
+  /// SSH password authentication label.
+  ///
+  /// In en, this message translates to:
+  /// **'Password login'**
+  String get host_passwordAuth;
+
+  /// SSH public key authentication label.
+  ///
+  /// In en, this message translates to:
+  /// **'Public key login'**
+  String get host_pubkeyAuth;
+
+  /// SSH service status label.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH service'**
+  String get host_sshStatus;
+
+  /// Toast after updating SSH configuration.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH configuration updated'**
+  String get host_sshUpdated;
+
+  /// Empty monitoring chart message.
+  ///
+  /// In en, this message translates to:
+  /// **'No monitoring data yet'**
+  String get host_monitorEmpty;
+
+  /// Runtime detail page title.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime'**
+  String get runtime_detail;
+
+  /// PHP extensions tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Extensions'**
+  String get runtime_extensions;
+
+  /// PHP configuration file tab.
+  ///
+  /// In en, this message translates to:
+  /// **'php.ini'**
+  String get runtime_phpIni;
+
+  /// PHP FPM tab.
+  ///
+  /// In en, this message translates to:
+  /// **'FPM'**
+  String get runtime_fpm;
+
+  /// Node modules tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Modules'**
+  String get runtime_modules;
+
+  /// Install extension action.
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get runtime_install;
+
+  /// Uninstall extension action.
+  ///
+  /// In en, this message translates to:
+  /// **'Uninstall'**
+  String get runtime_uninstall;
+
+  /// Update module action.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get runtime_update;
+
+  /// Installed state label.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get runtime_installed;
+
+  /// Not installed state label.
+  ///
+  /// In en, this message translates to:
+  /// **'Not installed'**
+  String get runtime_notInstalled;
+
+  /// Node module package name hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Package name'**
+  String get runtime_moduleHint;
+
+  /// Hint after saving php.ini.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart PHP for changes to take effect.'**
+  String get runtime_restartPhpHint;
+
+  /// Toast after saving runtime configuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get runtime_saved;
+
+  /// Toolbox system group.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get toolbox_group_system;
+
+  /// Toolbox security group.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get toolbox_group_security;
+
+  /// Toolbox service group.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get toolbox_group_service;
+
+  /// Toolbox maintenance group.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance'**
+  String get toolbox_group_maintenance;
+
+  /// Time and timezone entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Time and timezone'**
+  String get toolbox_time;
+
+  /// Swap and DNS entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap and DNS'**
+  String get toolbox_swapDns;
+
+  /// ClamAV entry.
+  ///
+  /// In en, this message translates to:
+  /// **'ClamAV'**
+  String get toolbox_clam;
+
+  /// Fail2ban entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Fail2ban'**
+  String get toolbox_fail2ban;
+
+  /// FTP accounts entry.
+  ///
+  /// In en, this message translates to:
+  /// **'FTP accounts'**
+  String get toolbox_ftp;
+
+  /// Timezone field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Timezone'**
+  String get toolbox_timezone;
+
+  /// DNS field label.
+  ///
+  /// In en, this message translates to:
+  /// **'DNS'**
+  String get toolbox_dns;
+
+  /// Swap section label.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap'**
+  String get toolbox_swap;
+
+  /// Create swap action.
+  ///
+  /// In en, this message translates to:
+  /// **'Add swap'**
+  String get toolbox_addSwap;
+
+  /// Swap file path field.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap file path'**
+  String get toolbox_swapPath;
+
+  /// Swap size field.
+  ///
+  /// In en, this message translates to:
+  /// **'Size (MB)'**
+  String get toolbox_swapSize;
+
+  /// Fail2ban banned IP list title.
+  ///
+  /// In en, this message translates to:
+  /// **'Banned IPs'**
+  String get toolbox_sshBan;
+
+  /// Unban action.
+  ///
+  /// In en, this message translates to:
+  /// **'Unban'**
+  String get toolbox_unban;
+
+  /// Fail2ban sshd protection toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH protection'**
+  String get toolbox_sshProtection;
+
+  /// Add FTP account action.
+  ///
+  /// In en, this message translates to:
+  /// **'Add FTP account'**
+  String get toolbox_ftpAdd;
+
+  /// FTP user field.
+  ///
+  /// In en, this message translates to:
+  /// **'FTP user'**
+  String get toolbox_ftpUser;
+
+  /// FTP password field.
+  ///
+  /// In en, this message translates to:
+  /// **'FTP password'**
+  String get toolbox_ftpPassword;
+
+  /// FTP root path field.
+  ///
+  /// In en, this message translates to:
+  /// **'FTP root path'**
+  String get toolbox_ftpPath;
+
+  /// ClamAV scan path field.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan path'**
+  String get toolbox_scanPath;
+
+  /// ClamAV scan task name.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan name'**
+  String get toolbox_scanName;
+
+  /// Start ClamAV scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Start scan'**
+  String get toolbox_startScan;
+
+  /// Stop ClamAV scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop scan'**
+  String get toolbox_stopScan;
+
+  /// ClamAV scan task list title.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan tasks'**
+  String get toolbox_scanRecords;
+
+  /// Empty ClamAV scan task list.
+  ///
+  /// In en, this message translates to:
+  /// **'No scan tasks'**
+  String get toolbox_noScans;
+
+  /// Generic diagnosis failure detail.
+  ///
+  /// In en, this message translates to:
+  /// **'Check failed'**
+  String get server_edit_diag_failed;
+
+  /// Monitor settings entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor settings'**
+  String get host_monitorSettings;
+
+  /// Monitor sampling interval.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval (seconds)'**
+  String get host_monitorInterval;
+
+  /// Monitor data retention days.
+  ///
+  /// In en, this message translates to:
+  /// **'Retention (days)'**
+  String get host_monitorStoreDays;
+
+  /// Monitor status toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitoring enabled'**
+  String get host_monitorEnabled;
+
+  /// SSH key management section.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH keys'**
+  String get host_sshKeys;
+
+  /// Generate an SSH key action.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate key'**
+  String get host_generateKey;
+
+  /// SSH key name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Key name'**
+  String get host_keyName;
+
+  /// SSH key type field.
+  ///
+  /// In en, this message translates to:
+  /// **'Key type'**
+  String get host_keyType;
+
+  /// SSH key passphrase field.
+  ///
+  /// In en, this message translates to:
+  /// **'Passphrase'**
+  String get host_keyPassphrase;
+
+  /// Toast after generating an SSH key.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH key generated'**
+  String get host_keyGenerated;
+
+  /// Delete SSH key action.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete key'**
+  String get host_deleteKey;
+
+  /// SSH public key label.
+  ///
+  /// In en, this message translates to:
+  /// **'Public key'**
+  String get host_publicKey;
+
+  /// ClamAV scan result list.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan results'**
+  String get toolbox_clamRecords;
+
+  /// Empty ClamAV scan result list.
+  ///
+  /// In en, this message translates to:
+  /// **'No scan results'**
+  String get toolbox_clamNoRecords;
+
+  /// PHP FPM configuration section.
+  ///
+  /// In en, this message translates to:
+  /// **'FPM configuration'**
+  String get runtime_fpmConfig;
+
+  /// PHP FPM pm setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Process manager'**
+  String get runtime_pm;
+
+  /// PHP FPM max_children setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Max children'**
+  String get runtime_maxChildren;
+
+  /// PHP FPM start_servers setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Start servers'**
+  String get runtime_startServers;
+
+  /// PHP FPM min_spare_servers setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Min spare servers'**
+  String get runtime_minSpare;
+
+  /// PHP FPM max_spare_servers setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Max spare servers'**
+  String get runtime_maxSpare;
+
+  /// Host disks tab label.
+  ///
+  /// In en, this message translates to:
+  /// **'Disks'**
+  String get host_disks;
+
+  /// Host runtime diagnostics tab label.
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnostics'**
+  String get host_diagnostics;
+
+  /// System disk section title.
+  ///
+  /// In en, this message translates to:
+  /// **'System disks'**
+  String get host_diskSystem;
+
+  /// Unpartitioned disk section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpartitioned disks'**
+  String get host_diskUnpartitioned;
+
+  /// Data disk section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Data disks'**
+  String get host_diskNormal;
+
+  /// Partition count label.
+  ///
+  /// In en, this message translates to:
+  /// **'Partitions'**
+  String get host_diskPartitions;
+
+  /// Disk filesystem label.
+  ///
+  /// In en, this message translates to:
+  /// **'Filesystem'**
+  String get host_diskFilesystem;
+
+  /// Used disk space label.
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get host_diskUsed;
+
+  /// Available disk space label.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get host_diskAvail;
+
+  /// Disk mount point label.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount point'**
+  String get host_diskMountPoint;
+
+  /// Disk is not mounted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not mounted'**
+  String get host_diskUnmounted;
+
+  /// Hint for system disks.
+  ///
+  /// In en, this message translates to:
+  /// **'System disk partitions are read-only here.'**
+  String get host_diskSystemHint;
+
+  /// Partition disk action.
+  ///
+  /// In en, this message translates to:
+  /// **'Partition'**
+  String get host_diskPartition;
+
+  /// Mount disk action.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount'**
+  String get host_diskMount;
+
+  /// Unmount disk action.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmount'**
+  String get host_diskUnmount;
+
+  /// Mount disk automatically on boot.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount on boot'**
+  String get host_diskAutoMount;
+
+  /// Allow boot when the disk is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow boot without disk'**
+  String get host_diskNoFail;
+
+  /// Mount point path input label.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount point path'**
+  String get host_diskMountPointField;
+
+  /// Partition volume label input.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume label'**
+  String get host_diskLabel;
+
+  /// Disk operation success toast.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk operation completed'**
+  String get host_diskActionDone;
+
+  /// Warning before partitioning a disk.
+  ///
+  /// In en, this message translates to:
+  /// **'Partitioning erases data on this disk. Continue only with a disk you can rebuild.'**
+  String get host_diskPartitionWarning;
+
+  /// Runtime diagnostics summary section.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime summary'**
+  String get host_diagSummary;
+
+  /// Panel process resident memory.
+  ///
+  /// In en, this message translates to:
+  /// **'Resident memory'**
+  String get host_diagRss;
+
+  /// Panel process heap usage.
+  ///
+  /// In en, this message translates to:
+  /// **'Heap in use'**
+  String get host_diagHeap;
+
+  /// Panel process heap object count.
+  ///
+  /// In en, this message translates to:
+  /// **'Heap objects'**
+  String get host_diagObjects;
+
+  /// Panel process goroutine count.
+  ///
+  /// In en, this message translates to:
+  /// **'Goroutines'**
+  String get host_diagGoroutines;
+
+  /// Grouped goroutine snapshot section.
+  ///
+  /// In en, this message translates to:
+  /// **'Goroutine snapshot'**
+  String get host_diagSnapshot;
+
+  /// Snapshot capture time label.
+  ///
+  /// In en, this message translates to:
+  /// **'Captured at'**
+  String get host_diagCapturedAt;
+
+  /// Total goroutine count label.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get host_diagTotal;
+
+  /// Goroutine group count label.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get host_diagGroups;
+
+  /// Warning when goroutine snapshot is truncated.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot was truncated by the panel.'**
+  String get host_diagTruncated;
+
+  /// Goroutine call stack title.
+  ///
+  /// In en, this message translates to:
+  /// **'Call stack'**
+  String get host_diagStack;
+
+  /// Fail2ban basic configuration section.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic rules'**
+  String get toolbox_fail2banBase;
+
+  /// Fail2ban max retry setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Max retries'**
+  String get toolbox_maxRetry;
+
+  /// Fail2ban ban time setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Ban duration'**
+  String get toolbox_banTime;
+
+  /// Fail2ban find time setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Detection window'**
+  String get toolbox_findTime;
+
+  /// Fail2ban ban action setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Ban action'**
+  String get toolbox_banAction;
+
+  /// Fail2ban log path setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Log path'**
+  String get toolbox_logPath;
+
+  /// Hint for Fail2ban duration values.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a value with unit, for example 300s, 10m, 1h or -1.'**
+  String get toolbox_durationHint;
+
+  /// Confirmation title for Fail2ban rule changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Fail2ban rule'**
+  String get toolbox_fail2banChanged;
+
+  /// Runtime profile capture section.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual capture'**
+  String get host_diagCapture;
+
+  /// Runtime profile type selector.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile type'**
+  String get host_diagProfileType;
+
+  /// CPU profile type.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU profile'**
+  String get host_diagProfileCpu;
+
+  /// Heap profile type.
+  ///
+  /// In en, this message translates to:
+  /// **'Heap profile'**
+  String get host_diagProfileHeap;
+
+  /// Goroutine profile type.
+  ///
+  /// In en, this message translates to:
+  /// **'Goroutine profile'**
+  String get host_diagProfileGoroutine;
+
+  /// Mutex profile type.
+  ///
+  /// In en, this message translates to:
+  /// **'Mutex profile'**
+  String get host_diagProfileMutex;
+
+  /// Block profile type.
+  ///
+  /// In en, this message translates to:
+  /// **'Block profile'**
+  String get host_diagProfileBlock;
+
+  /// Profile capture duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration (seconds)'**
+  String get host_diagDuration;
+
+  /// Start profile capture action.
+  ///
+  /// In en, this message translates to:
+  /// **'Start capture'**
+  String get host_diagStartCapture;
+
+  /// Profile file saved toast.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile saved'**
+  String get host_diagProfileSaved;
+
+  /// Host component check section.
+  ///
+  /// In en, this message translates to:
+  /// **'Component check'**
+  String get host_diagComponent;
+
+  /// Component executable name input.
+  ///
+  /// In en, this message translates to:
+  /// **'Component name'**
+  String get host_diagComponentName;
+
+  /// Check component action.
+  ///
+  /// In en, this message translates to:
+  /// **'Check'**
+  String get host_diagCheck;
+
+  /// Component existence status label.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get host_diagComponentExists;
+
+  /// Component executable path label.
+  ///
+  /// In en, this message translates to:
+  /// **'Path'**
+  String get host_diagComponentPath;
+
+  /// Component is not installed.
+  ///
+  /// In en, this message translates to:
+  /// **'Executable not found'**
+  String get host_diagComponentMissing;
+
+  /// Website load balancing tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Load balancing'**
+  String get websites_loadBalance;
+
+  /// Create a load balancing upstream.
+  ///
+  /// In en, this message translates to:
+  /// **'Add upstream'**
+  String get websites_lbAdd;
+
+  /// Empty load balancing list.
+  ///
+  /// In en, this message translates to:
+  /// **'No upstreams yet'**
+  String get websites_lbEmpty;
+
+  /// Load balancing upstream name.
+  ///
+  /// In en, this message translates to:
+  /// **'Upstream name'**
+  String get websites_lbName;
+
+  /// Load balancing algorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'Algorithm'**
+  String get websites_lbAlgorithm;
+
+  /// Default load balancing algorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'Default (round robin)'**
+  String get websites_lbDefault;
+
+  /// IP hash load balancing algorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'IP hash'**
+  String get websites_lbIpHash;
+
+  /// Least connections load balancing algorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'Least connections'**
+  String get websites_lbLeastConn;
+
+  /// Load balancing server list.
+  ///
+  /// In en, this message translates to:
+  /// **'Servers'**
+  String get websites_lbServers;
+
+  /// Add a load balancing server.
+  ///
+  /// In en, this message translates to:
+  /// **'Add server'**
+  String get websites_lbAddServer;
+
+  /// Load balancing server address.
+  ///
+  /// In en, this message translates to:
+  /// **'Server address'**
+  String get websites_lbServerAddress;
+
+  /// Load balancing server weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get websites_lbWeight;
+
+  /// Load balancing server status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get websites_lbFlag;
+
+  /// Server is enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get websites_lbFlagNone;
+
+  /// Server is marked down.
+  ///
+  /// In en, this message translates to:
+  /// **'Down'**
+  String get websites_lbFlagDown;
+
+  /// Server is a backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get websites_lbFlagBackup;
+
+  /// Maximum failed attempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Max failures'**
+  String get websites_lbMaxFails;
+
+  /// Server fail timeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Fail timeout'**
+  String get websites_lbFailTimeout;
+
+  /// Maximum connections per server.
+  ///
+  /// In en, this message translates to:
+  /// **'Max connections'**
+  String get websites_lbMaxConns;
+
+  /// Delete load balancing upstream.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete upstream'**
+  String get websites_lbDelete;
+
+  /// Load balancing saved toast.
+  ///
+  /// In en, this message translates to:
+  /// **'Load balancing saved'**
+  String get websites_lbSaved;
+
+  /// Website template list title.
+  ///
+  /// In en, this message translates to:
+  /// **'Website templates'**
+  String get websites_templates;
+
+  /// Create a website template.
+  ///
+  /// In en, this message translates to:
+  /// **'New template'**
+  String get websites_templateAdd;
+
+  /// Edit a website template.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit template'**
+  String get websites_templateEdit;
+
+  /// Empty website template list.
+  ///
+  /// In en, this message translates to:
+  /// **'No templates yet'**
+  String get websites_templateEmpty;
+
+  /// Website template name.
+  ///
+  /// In en, this message translates to:
+  /// **'Template name'**
+  String get websites_templateName;
+
+  /// Website template type.
+  ///
+  /// In en, this message translates to:
+  /// **'Template type'**
+  String get websites_templateType;
+
+  /// Single page template type.
+  ///
+  /// In en, this message translates to:
+  /// **'Single page'**
+  String get websites_templateSingle;
+
+  /// Multi-file template type.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-file'**
+  String get websites_templateMulti;
+
+  /// Single template HTML content.
+  ///
+  /// In en, this message translates to:
+  /// **'HTML content'**
+  String get websites_templateContent;
+
+  /// Upload a multi-file template ZIP.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload ZIP'**
+  String get websites_templateUpload;
+
+  /// Template ZIP upload success.
+  ///
+  /// In en, this message translates to:
+  /// **'Template uploaded'**
+  String get websites_templateUploaded;
+
+  /// Uploaded template package path.
+  ///
+  /// In en, this message translates to:
+  /// **'Template package'**
+  String get websites_templateFilePath;
+
+  /// Website template remark.
+  ///
+  /// In en, this message translates to:
+  /// **'Remark'**
+  String get websites_templateRemark;
+
+  /// Website template variables.
+  ///
+  /// In en, this message translates to:
+  /// **'Variables'**
+  String get websites_templateVariables;
+
+  /// Add a template variable.
+  ///
+  /// In en, this message translates to:
+  /// **'Add variable'**
+  String get websites_templateAddVariable;
+
+  /// Template variable key.
+  ///
+  /// In en, this message translates to:
+  /// **'Key'**
+  String get websites_templateVariableKey;
+
+  /// Template variable label.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get websites_templateVariableLabel;
+
+  /// Template variable type.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get websites_templateVariableType;
+
+  /// Template variable default value.
+  ///
+  /// In en, this message translates to:
+  /// **'Default value'**
+  String get websites_templateVariableDefault;
+
+  /// Select variable options, comma separated.
+  ///
+  /// In en, this message translates to:
+  /// **'Options'**
+  String get websites_templateVariableOptions;
+
+  /// Template variable is required.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get websites_templateVariableRequired;
+
+  /// Detect template variables from HTML.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect variables'**
+  String get websites_templateAutoDetect;
+
+  /// Website template saved toast.
+  ///
+  /// In en, this message translates to:
+  /// **'Template saved'**
+  String get websites_templateSaved;
+
+  /// Delete website template.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete template'**
+  String get websites_templateDelete;
+
+  /// Generate a site from the template.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate'**
+  String get websites_templateGenerate;
+
+  /// Generated template site list.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated sites'**
+  String get websites_templateOutputs;
+
+  /// Generated site name.
+  ///
+  /// In en, this message translates to:
+  /// **'Output name'**
+  String get websites_templateOutputName;
+
+  /// Empty generated site list.
+  ///
+  /// In en, this message translates to:
+  /// **'No generated sites'**
+  String get websites_templateOutputEmpty;
+
+  /// Generated site success toast.
+  ///
+  /// In en, this message translates to:
+  /// **'Site generated'**
+  String get websites_templateOutputGenerated;
+
+  /// Delete generated template site.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete generated site'**
+  String get websites_templateOutputDelete;
+
+  /// Template has no variables.
+  ///
+  /// In en, this message translates to:
+  /// **'No variables'**
+  String get websites_templateNoVariables;
+
+  /// Text variable type.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get websites_templateVariableTypeText;
+
+  /// Textarea variable type.
+  ///
+  /// In en, this message translates to:
+  /// **'Long text'**
+  String get websites_templateVariableTypeTextarea;
+
+  /// Number variable type.
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get websites_templateVariableTypeNumber;
+
+  /// Select variable type.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get websites_templateVariableTypeSelect;
+
+  /// Color variable type.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get websites_templateVariableTypeColor;
+
+  /// File AI content search entry.
+  ///
+  /// In en, this message translates to:
+  /// **'AI search'**
+  String get files_aiSearch;
+
+  /// File AI search query.
+  ///
+  /// In en, this message translates to:
+  /// **'Search content'**
+  String get files_aiQuery;
+
+  /// File AI search query hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Text to find in file contents'**
+  String get files_aiQueryHint;
+
+  /// Search subdirectories recursively.
+  ///
+  /// In en, this message translates to:
+  /// **'Include subdirectories'**
+  String get files_aiContainSub;
+
+  /// Case sensitive search.
+  ///
+  /// In en, this message translates to:
+  /// **'Match case'**
+  String get files_aiMatchCase;
+
+  /// Match whole words only.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole word'**
+  String get files_aiWholeWord;
+
+  /// Treat the query as a regular expression.
+  ///
+  /// In en, this message translates to:
+  /// **'Use regular expression'**
+  String get files_aiUseRegex;
+
+  /// Shown when the panel returns grep mode.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is not enabled on the panel. Showing content matches only.'**
+  String get files_aiGrepMode;
+
+  /// AI generated search summary.
+  ///
+  /// In en, this message translates to:
+  /// **'AI summary'**
+  String get files_aiSummary;
+
+  /// Content search matches.
+  ///
+  /// In en, this message translates to:
+  /// **'Matches'**
+  String get files_aiHits;
+
+  /// Number of files scanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Files scanned'**
+  String get files_aiScanned;
+
+  /// AI token usage.
+  ///
+  /// In en, this message translates to:
+  /// **'Tokens'**
+  String get files_aiTokens;
+
+  /// Search duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get files_aiDuration;
+
+  /// Search results truncated warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Results were truncated by the panel.'**
+  String get files_aiTruncated;
+
+  /// Empty AI search result.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching content'**
+  String get files_aiEmpty;
+
+  /// Line number label.
+  ///
+  /// In en, this message translates to:
+  /// **'Line'**
+  String get files_aiLine;
+
+  /// Terminal session list entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal sessions'**
+  String get terminal_sessions;
+
+  /// Empty terminal session list.
+  ///
+  /// In en, this message translates to:
+  /// **'No terminal sessions'**
+  String get terminal_sessionsEmpty;
+
+  /// Terminal session is attached.
+  ///
+  /// In en, this message translates to:
+  /// **'Attached'**
+  String get terminal_sessionAttached;
+
+  /// Terminal session is detached.
+  ///
+  /// In en, this message translates to:
+  /// **'Detached'**
+  String get terminal_sessionDetached;
+
+  /// Close a terminal session.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get terminal_closeSession;
+
+  /// Close all terminal sessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Close all'**
+  String get terminal_closeAllSessions;
+
+  /// Confirmation for closing all terminal sessions.
+  ///
+  /// In en, this message translates to:
+  /// **'All terminal sessions will be disconnected and cannot be recovered.'**
+  String get terminal_closeAllConfirm;
+
+  /// Local terminal session kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Local'**
+  String get terminal_kindLocal;
+
+  /// SSH terminal session kind.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH'**
+  String get terminal_kindSsh;
+
+  /// Container terminal session kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Container'**
+  String get terminal_kindContainer;
+
+  /// Upload in progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading'**
+  String get files_uploading;
+
+  /// Upload paused.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get files_uploadPaused;
+
+  /// Pause upload.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get files_uploadPause;
+
+  /// Resume upload.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get files_uploadResume;
+
+  /// Upload failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed'**
+  String get files_uploadFailed;
+
+  /// ClamAV infected file strategy.
+  ///
+  /// In en, this message translates to:
+  /// **'Infected file handling'**
+  String get toolbox_infectedStrategy;
+
+  /// Keep infected files.
+  ///
+  /// In en, this message translates to:
+  /// **'Take no action'**
+  String get toolbox_infectedNone;
+
+  /// Delete infected files.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get toolbox_infectedRemove;
+
+  /// Move infected files.
+  ///
+  /// In en, this message translates to:
+  /// **'Move'**
+  String get toolbox_infectedMove;
+
+  /// Copy infected files.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get toolbox_infectedCopy;
+
+  /// Directory for moved or copied infected files.
+  ///
+  /// In en, this message translates to:
+  /// **'Infected directory'**
+  String get toolbox_infectedDir;
+
+  /// Infected directory is required.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an infected directory'**
+  String get toolbox_infectedDirRequired;
+
+  /// Edit a port whitelist rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit whitelist rule'**
+  String get firewall_whitelistEdit;
+
+  /// No supported firewall backend is available.
+  ///
+  /// In en, this message translates to:
+  /// **'No selectable backend'**
+  String get firewall_backendUnavailable;
+
+  /// Switch action.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch'**
+  String get action_switch;
+
+  /// Reset firewall rules.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset rules'**
+  String get firewall_resetRules;
+
+  /// Confirmation for resetting firewall rules.
+  ///
+  /// In en, this message translates to:
+  /// **'Managed firewall rules will be reset. Continue?'**
+  String get firewall_resetRulesMessage;
+
+  /// Restore firewall rule backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup'**
+  String get firewall_restoreBackup;
+
+  /// Confirmation for restoring a firewall backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore rules from backup {name}?'**
+  String firewall_restoreBackupMessage(String name);
+
+  /// Show the native firewall rule text.
+  ///
+  /// In en, this message translates to:
+  /// **'Native rule detail'**
+  String get firewall_nativeDetail;
+
+  /// Native rule detail description.
+  ///
+  /// In en, this message translates to:
+  /// **'Read the native firewalld or ufw definition'**
+  String get firewall_nativeDetailHint;
+
+  /// Firewall rule backups.
+  ///
+  /// In en, this message translates to:
+  /// **'Rule backups'**
+  String get firewall_ruleBackups;
+
+  /// Empty firewall backup list.
+  ///
+  /// In en, this message translates to:
+  /// **'No rule backups'**
+  String get firewall_noBackups;
+
+  /// Native rule name is required.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a native rule name'**
+  String get firewall_nativeNameRequired;
+
+  /// Native rule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Native kind'**
+  String get firewall_nativeKind;
+
+  /// firewalld zone service.
+  ///
+  /// In en, this message translates to:
+  /// **'Zone service'**
+  String get firewall_nativeZoneService;
+
+  /// ufw application profile.
+  ///
+  /// In en, this message translates to:
+  /// **'UFW application'**
+  String get firewall_nativeUfwApplication;
+
+  /// Native rule or application name.
+  ///
+  /// In en, this message translates to:
+  /// **'Native name'**
+  String get firewall_nativeName;
+
+  /// Whether the native rule is permanent.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent'**
+  String get firewall_nativePermanent;
+
+  /// Load native firewall detail.
+  ///
+  /// In en, this message translates to:
+  /// **'Load native detail'**
+  String get firewall_nativeLoad;
+
+  /// Firewall backend switch hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to switch the managed backend'**
+  String get firewall_settingsBackendHint;
+
+  /// Shown when pre-save SSH connectivity check fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Local SSH connection check failed. Save cancelled.'**
+  String get host_sshCheckFailed;
+
+  /// Shown when post-save SSH connectivity check fails.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH port saved, but the local connection check still fails. Verify the new port.'**
+  String get host_sshCheckAfterSave;
 }
 
 class _AppLocalizationsDelegate

@@ -76,6 +76,13 @@ abstract interface class FirewallRepository {
 
   Future<List<Map<String, dynamic>>> listRuleBackups();
 
+  Future<String> getNativeRuleDetail({
+    required String provider,
+    required String nativeKind,
+    required String name,
+    required bool permanent,
+  });
+
   Future<void> resetRules({String? backupFile});
 
   Future<List<Map<String, dynamic>>> getListeningProcesses();

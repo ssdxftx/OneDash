@@ -98,6 +98,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                   },
                 ),
                 AppIconButton(
+                  icon: TablerIcons.layout,
+                  tooltip: l10n.websites_templates,
+                  onPressed: () =>
+                      context.push('/s/${widget.serverId}/websites/templates'),
+                ),
+                AppIconButton(
                   icon: TablerIcons.plus,
                   tooltip: l10n.websites_create,
                   onPressed: () =>

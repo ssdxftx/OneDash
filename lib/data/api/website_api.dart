@@ -11,6 +11,7 @@ import '../dto/website/website_detail_dto.dart';
 import '../dto/website/website_dir_dto.dart';
 import '../dto/website/website_index_config_dto.dart';
 import '../dto/website/website_limit_config_dto.dart';
+import '../dto/website/website_load_balance_dto.dart';
 import '../dto/website/website_log_dto.dart';
 import '../dto/website/website_proxy_dto.dart';
 import '../dto/website/website_auth_dto.dart';
@@ -22,6 +23,7 @@ import '../dto/website/openresty_performance_dto.dart';
 import '../dto/website/website_https_dto.dart';
 import '../dto/website/website_search_req.dart';
 import '../dto/website/website_ssl_dto.dart';
+import '../dto/website/website_template_dto.dart';
 import '../dto/website/website_leech_dto.dart';
 import '../dto/website/website_real_ip_dto.dart';
 import '../dto/website/website_cors_dto.dart';
@@ -309,6 +311,144 @@ class WebsiteApi {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/proxies/file',
       data: {'websiteID': websiteId, 'name': name, 'content': content},
+    );
+  }
+
+  // ── 网站模板 ──────────────────────────────────────────────────────────
+
+  /// POST /api/v2/websites/templates/search
+  Future<PageResult<WebsiteTemplateDto>> searchTemplates({
+    int page = 1,
+    int pageSize = 100,
+    String name = '',
+    String type = '',
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/templates/search',
+      data: {'page': page, 'pageSize': pageSize, 'name': name, 'type': type},
+    );
+    return PageResult<WebsiteTemplateDto>.fromJson(
+      ApiResponseParser.map(resp),
+      WebsiteTemplateDto.fromJson,
+    );
+  }
+
+  /// POST /api/v2/websites/templates/get
+  Future<WebsiteTemplateDto> getTemplate(int id) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/templates/get',
+      data: {'id': id},
+    );
+    return ApiResponseParser.object(resp, WebsiteTemplateDto.fromJson);
+  }
+
+  /// POST /api/v2/websites/templates
+  Future<void> createTemplate(WebsiteTemplateReq req) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/templates',
+      data: req.toJson(),
+    );
+  }
+
+  /// POST /api/v2/websites/templates/update
+  Future<void> updateTemplate(WebsiteTemplateReq req) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/templates/update',
+      data: req.toJson(),
+    );
+  }
+
+  /// POST /api/v2/websites/templates/del
+  Future<void> deleteTemplate(int id) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/templates/del',
+      data: {'id': id},
+    );
+  }
+
+  /// POST /api/v2/websites/templates/upload — 上传 ZIP 模板。
+  Future<Map<String, dynamic>> uploadTemplateZip({
+    required String fileName,
+    required List<int> bytes,
+  }) async {
+    final resp = await _client.postMultipart<Map<String, dynamic>>(
+      '/api/v2/websites/templates/upload',
+      formData: FormData.fromMap({
+        'file': MultipartFile.fromBytes(bytes, filename: fileName),
+      }),
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/websites/templates/outputs/search
+  Future<PageResult<WebsiteTemplateOutputDto>> searchTemplateOutputs({
+    int page = 1,
+    int pageSize = 100,
+    int templateID = 0,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/templates/outputs/search',
+      data: {'page': page, 'pageSize': pageSize, 'templateID': templateID},
+    );
+    return PageResult<WebsiteTemplateOutputDto>.fromJson(
+      ApiResponseParser.map(resp),
+      WebsiteTemplateOutputDto.fromJson,
+    );
+  }
+
+  /// POST /api/v2/websites/templates/outputs
+  Future<void> createTemplateOutput({
+    required int templateID,
+    required String name,
+    required Map<String, String> variableValues,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/templates/outputs',
+      data: {
+        'templateID': templateID,
+        'name': name,
+        'variableValues': variableValues,
+      },
+    );
+  }
+
+  /// POST /api/v2/websites/templates/outputs/del
+  Future<void> deleteTemplateOutput(int id) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/templates/outputs/del',
+      data: {'id': id},
+    );
+  }
+
+  /// 查询网站负载均衡上游列表。
+  Future<List<WebsiteLoadBalanceDto>> listLoadBalances(int websiteId) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/websites/$websiteId/lbs',
+    );
+    return ApiResponseParser.list(resp, WebsiteLoadBalanceDto.fromJson);
+  }
+
+  /// 创建负载均衡上游。
+  Future<void> createLoadBalance(WebsiteLoadBalanceReq req) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/lbs/create',
+      data: req.toJson(),
+    );
+  }
+
+  /// 更新负载均衡上游。
+  Future<void> updateLoadBalance(WebsiteLoadBalanceReq req) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/lbs/update',
+      data: req.toJson(),
+    );
+  }
+
+  /// 删除负载均衡上游。
+  Future<void> deleteLoadBalance(int websiteId, String name) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/lbs/del',
+      data: {'websiteID': websiteId, 'name': name},
     );
   }
 

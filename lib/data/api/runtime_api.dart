@@ -85,6 +85,110 @@ class RuntimeApi {
     return ApiResponseParser.list(resp, NodeScriptDto.fromJson);
   }
 
+  /// GET /api/v2/runtimes/php/:id/extensions
+  Future<Map<String, dynamic>> getPhpExtensions(int id) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/runtimes/php/$id/extensions',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/runtimes/php/extensions/install
+  Future<void> installPhpExtension(int id, String name, String taskId) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/runtimes/php/extensions/install',
+      data: {'ID': id, 'name': name, 'taskID': taskId},
+    );
+  }
+
+  /// POST /api/v2/runtimes/php/extensions/uninstall
+  Future<void> uninstallPhpExtension(int id, String name) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/runtimes/php/extensions/uninstall',
+      data: {'ID': id, 'name': name},
+    );
+  }
+
+  /// POST /api/v2/runtimes/php/file
+  Future<String> getPhpFile(int id, String type) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/runtimes/php/file',
+      data: {'id': id, 'type': type},
+    );
+    final data = resp.data?['data'];
+    if (data is Map) return '${data['content'] ?? ''}';
+    return '$data';
+  }
+
+  /// POST /api/v2/runtimes/php/update
+  Future<void> updatePhpFile(int id, String type, String content) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/runtimes/php/update',
+      data: {'id': id, 'type': type, 'content': content},
+    );
+  }
+
+  /// GET /api/v2/runtimes/php/fpm/status/:id
+  Future<List<Map<String, dynamic>>> getFpmStatus(int id) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/runtimes/php/fpm/status/$id',
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data
+        .whereType<Map>()
+        .map((e) => e.cast<String, dynamic>())
+        .toList(growable: false);
+  }
+
+  /// GET /api/v2/runtimes/php/fpm/config/:id
+  Future<Map<String, dynamic>> getFpmConfig(int id) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/runtimes/php/fpm/config/$id',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/runtimes/php/fpm/config
+  Future<void> updateFpmConfig(int id, Map<String, dynamic> params) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/runtimes/php/fpm/config',
+      data: {'id': id, 'params': params},
+    );
+  }
+
+  /// POST /api/v2/runtimes/node/modules
+  Future<List<Map<String, dynamic>>> getNodeModules(int id) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/runtimes/node/modules',
+      data: {'ID': id},
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data
+        .whereType<Map>()
+        .map((e) => e.cast<String, dynamic>())
+        .toList(growable: false);
+  }
+
+  /// POST /api/v2/runtimes/node/modules/operate
+  Future<void> operateNodeModule({
+    required int id,
+    required String operate,
+    required String module,
+    required String packageManager,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/runtimes/node/modules/operate',
+      data: {
+        'ID': id,
+        'Operate': operate,
+        'Module': module,
+        'PkgManager': packageManager,
+      },
+    );
+  }
+
   /// 搜索 PHP 扩展预设组。
   Future<PageResult<PhpExtensionGroupDto>> searchPhpExtensions({
     int page = 1,

@@ -259,6 +259,24 @@ class FirewallApi {
     return files.whereType<Map>().map(_fileMap).toList(growable: false);
   }
 
+  Future<String> getNativeRuleDetail({
+    required String provider,
+    required String nativeKind,
+    required String name,
+    required bool permanent,
+  }) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/firewall/rules/native/detail',
+      data: {
+        'provider': provider,
+        'nativeKind': nativeKind,
+        'name': name,
+        'permanent': permanent,
+      },
+    );
+    return ApiResponseParser.primitive<String>(response);
+  }
+
   Future<void> resetRules({String? backupFile}) async {
     final response = await _client.post<Map<String, dynamic>>(
       '/api/v2/hosts/firewall/rules/reset',

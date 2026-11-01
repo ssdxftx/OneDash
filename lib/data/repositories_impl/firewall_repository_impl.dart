@@ -142,6 +142,19 @@ class FirewallRepositoryImpl implements FirewallRepository {
       _api.listRuleBackups();
 
   @override
+  Future<String> getNativeRuleDetail({
+    required String provider,
+    required String nativeKind,
+    required String name,
+    required bool permanent,
+  }) => _api.getNativeRuleDetail(
+    provider: provider,
+    nativeKind: nativeKind,
+    name: name,
+    permanent: permanent,
+  );
+
+  @override
   Future<void> resetRules({String? backupFile}) =>
       _api.resetRules(backupFile: backupFile);
 

@@ -17,6 +17,8 @@ abstract class DashboardRepository {
     required String netOption,
   });
 
+  Future<void> restartSystem(String operation);
+
   Future<List<String>> getMonitorIoOptions();
 
   Future<List<String>> getMonitorNetOptions();

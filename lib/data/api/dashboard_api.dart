@@ -73,6 +73,15 @@ class DashboardApi {
     return DashboardDto.parseBase(ApiResponseParser.map(resp));
   }
 
+  /// 重启服务器、面板或面板代理。
+  ///
+  /// [operation] 取值 `system`、`1panel`、`1panel-agent`。
+  Future<void> restartSystem(String operation) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/dashboard/system/restart/$operation',
+    );
+  }
+
   /// 获取实时指标。
   Future<DashboardCurrent> getDashboardCurrent({
     String ioOption = 'all',

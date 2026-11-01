@@ -4,6 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../data/api/firewall_api.dart';
 import '../../../../data/dto/firewall/firewall_base_info_dto.dart';
 import '../../../../data/dto/firewall/firewall_v2_dto.dart';
@@ -33,6 +34,7 @@ class _FirewallData {
     required this.forwardBase,
     required this.forward,
     required this.docker,
+    required this.backups,
   });
 
   final FirewallBaseInfoDto base;
@@ -41,6 +43,7 @@ class _FirewallData {
   final FirewallBaseInfoDto forwardBase;
   final FirewallForwardPage forward;
   final DockerGuardInfo docker;
+  final List<Map<String, dynamic>> backups;
 
   String get provider => base.name.isEmpty ? 'iptables' : base.name;
 }
@@ -90,6 +93,13 @@ final _firewallProvider = FutureProvider.autoDispose<_FirewallData>(
       // Docker guard is optional.
     }
 
+    List<Map<String, dynamic>> backups = const [];
+    try {
+      backups = await repository.listRuleBackups();
+    } catch (_) {
+      // Backups are optional on panels that do not keep rule snapshots.
+    }
+
     final inventory = await repository.searchRules(provider: provider);
     return _FirewallData(
       base: base,
@@ -98,6 +108,7 @@ final _firewallProvider = FutureProvider.autoDispose<_FirewallData>(
       forwardBase: forwardBase,
       forward: forward,
       docker: docker,
+      backups: backups,
     );
   },
   dependencies: [firewallRepositoryProvider],
@@ -251,7 +262,13 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
                   data: data,
                   onIpv6Changed: _updateIpv6,
                   onAddWhitelist: _showWhitelistSheet,
+                  onEditWhitelist: (rule) =>
+                      _showWhitelistSheet(existing: rule),
                   onDeleteWhitelist: _deleteWhitelist,
+                  onSelectBackend: _selectBackend,
+                  onResetRules: _resetRules,
+                  onRestoreBackup: (file) => _resetRules(backupFile: file),
+                  onNativeDetail: _showNativeDetail,
                 ),
               },
             ),
@@ -457,11 +474,110 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
     }
   }
 
-  Future<void> _showWhitelistSheet() async {
+  Future<void> _selectBackend() async {
+    final data = ref.read(_firewallProvider).valueOrNull;
+    if (data == null) return;
     final l10n = AppLocalizations.of(context);
-    final portController = TextEditingController();
-    final sourcesController = TextEditingController();
-    String protocol = 'tcp';
+    final group = data.settings.system;
+    final options = group.options
+        .where((option) => option.supported && option.installed)
+        .toList();
+    if (options.isEmpty) {
+      AppToast.warning(context, l10n.firewall_backendUnavailable);
+      return;
+    }
+    final selected = await showAppSheet<String>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.firewall_settingsBackend, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          SplitListGroup(
+            children: [
+              for (final option in options)
+                SplitListTile(
+                  leading: const Icon(TablerIcons.server),
+                  title: option.name,
+                  subtitle: option.implementation.isEmpty
+                      ? option.name
+                      : option.implementation,
+                  trailing: option.name == group.current
+                      ? const Icon(TablerIcons.check)
+                      : null,
+                  onTap: () => Navigator.of(sheetContext).pop(option.name),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+    if (selected == null || selected == group.current || !mounted) return;
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.firewall_settingsBackend,
+      message: selected,
+      confirmLabel: l10n.action_switch,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(firewallRepositoryProvider.future);
+      await repository.operateBackend(
+        subsystem: 'system',
+        backend: selected,
+        operation: 'select',
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(_firewallProvider);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _resetRules({String? backupFile}) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.firewall_resetRules,
+      message: backupFile == null
+          ? l10n.firewall_resetRulesMessage
+          : l10n.firewall_restoreBackupMessage(backupFile),
+      confirmLabel: backupFile == null
+          ? l10n.firewall_resetRules
+          : l10n.firewall_restoreBackup,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(firewallRepositoryProvider.future);
+      await repository.resetRules(backupFile: backupFile);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(_firewallProvider);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showNativeDetail() async {
+    await showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => const _NativeDetailSheet(),
+    );
+  }
+
+  Future<void> _showWhitelistSheet({FirewallWhitelistRule? existing}) async {
+    final l10n = AppLocalizations.of(context);
+    final portController = TextEditingController(text: existing?.port ?? '');
+    final sourcesController = TextEditingController(
+      text: existing?.sources.join(', ') ?? '',
+    );
+    String protocol = existing?.protocol == 'udp' ? 'udp' : 'tcp';
     final rule = await showAppSheet<FirewallWhitelistRule>(
       context: context,
       builder: (sheetContext) => StatefulBuilder(
@@ -469,7 +585,12 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.firewall_whitelistAdd, style: AppTextStyles.titleL),
+            Text(
+              existing == null
+                  ? l10n.firewall_whitelistAdd
+                  : l10n.firewall_whitelistEdit,
+              style: AppTextStyles.titleL,
+            ),
             const SizedBox(height: AppTokens.s16),
             AppTextField(
               controller: portController,
@@ -514,6 +635,8 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
                   FirewallWhitelistRule({
                     'port': port,
                     'protocol': protocol,
+                    if (existing != null && existing.type.isNotEmpty)
+                      'type': existing.type,
                     'sources': sources,
                   }),
                 );
@@ -528,7 +651,11 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
     if (rule == null || !mounted) return;
     try {
       final repository = await ref.read(firewallRepositoryProvider.future);
-      await repository.createWhitelist(rule);
+      if (existing == null) {
+        await repository.createWhitelist(rule);
+      } else {
+        await repository.updateWhitelist(oldRule: existing, rule: rule);
+      }
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
       ref.invalidate(_firewallProvider);
@@ -1003,13 +1130,34 @@ class _SettingsTab extends StatelessWidget {
     required this.data,
     required this.onIpv6Changed,
     required this.onAddWhitelist,
+    required this.onEditWhitelist,
     required this.onDeleteWhitelist,
+    required this.onSelectBackend,
+    required this.onResetRules,
+    required this.onRestoreBackup,
+    required this.onNativeDetail,
   });
 
   final _FirewallData data;
   final ValueChanged<bool> onIpv6Changed;
   final VoidCallback onAddWhitelist;
+  final ValueChanged<FirewallWhitelistRule> onEditWhitelist;
   final ValueChanged<FirewallWhitelistRule> onDeleteWhitelist;
+  final VoidCallback onSelectBackend;
+  final VoidCallback onResetRules;
+  final ValueChanged<String> onRestoreBackup;
+  final VoidCallback onNativeDetail;
+
+  String _backupTime(Object? value) {
+    if (value is num) {
+      return formatLocalDateTime(
+        DateTime.fromMillisecondsSinceEpoch(
+          value.toInt() * 1000,
+        ).toIso8601String(),
+      );
+    }
+    return formatLocalDateTime('${value ?? ''}');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1029,16 +1177,31 @@ class _SettingsTab extends StatelessWidget {
             SplitListTile(
               leading: const Icon(TablerIcons.server),
               title: l10n.firewall_settingsBackend,
-              trailing: Text(
-                settings.system.current.isEmpty
-                    ? data.base.backend
-                    : settings.system.current,
+              subtitle: l10n.firewall_settingsBackendHint,
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    settings.system.current.isEmpty
+                        ? data.base.backend
+                        : settings.system.current,
+                  ),
+                  const Icon(TablerIcons.chevron_right),
+                ],
               ),
+              onTap: onSelectBackend,
             ),
             SplitListTile(
               leading: const Icon(TablerIcons.info_circle),
               title: l10n.firewall_settingsVersion,
               trailing: Text(data.base.version),
+            ),
+            SplitListTile(
+              leading: const Icon(TablerIcons.file_code),
+              title: l10n.firewall_nativeDetail,
+              subtitle: l10n.firewall_nativeDetailHint,
+              trailing: const Icon(TablerIcons.chevron_right),
+              onTap: onNativeDetail,
             ),
             SplitListTile(
               leading: const Icon(TablerIcons.network),
@@ -1085,11 +1248,48 @@ class _SettingsTab extends StatelessWidget {
                   leading: const Icon(TablerIcons.list),
                   title: '${rule.port}/${rule.protocol}',
                   subtitle: rule.sources.join(', '),
+                  onTap: () => onEditWhitelist(rule),
                   trailing: IconButton(
                     tooltip: l10n.action_delete,
                     onPressed: () => onDeleteWhitelist(rule),
                     icon: const Icon(TablerIcons.trash),
                   ),
+                ),
+            ],
+          ),
+        const SizedBox(height: AppTokens.s24),
+        SectionHeader(
+          title: l10n.firewall_ruleBackups,
+          trailing: TextButton(
+            onPressed: onResetRules,
+            child: Text(l10n.firewall_resetRules),
+          ),
+        ),
+        if (data.backups.isEmpty)
+          EmptyState(
+            icon: TablerIcons.archive,
+            title: l10n.firewall_ruleBackups,
+            message: l10n.firewall_noBackups,
+            actionLabel: l10n.firewall_resetRules,
+            onAction: onResetRules,
+            compact: true,
+          )
+        else
+          SplitListGroup(
+            children: [
+              for (final backup in data.backups)
+                SplitListTile(
+                  leading: const Icon(TablerIcons.archive),
+                  title: '${backup['name'] ?? ''}',
+                  subtitle: [
+                    '${backup['provider'] ?? ''}',
+                    l10n.firewall_rulesCount(
+                      (backup['ruleCount'] as num?)?.toInt() ?? 0,
+                    ),
+                    _backupTime(backup['modifiedAt']),
+                  ].where((value) => value.isNotEmpty).join(' · '),
+                  trailing: const Icon(TablerIcons.restore),
+                  onTap: () => onRestoreBackup('${backup['name'] ?? ''}'),
                 ),
             ],
           ),
@@ -1458,6 +1658,156 @@ class _ForwardSheetState extends State<_ForwardSheet> {
             );
           },
         ),
+      ],
+    );
+  }
+}
+
+class _NativeDetailSheet extends ConsumerStatefulWidget {
+  const _NativeDetailSheet();
+
+  @override
+  ConsumerState<_NativeDetailSheet> createState() => _NativeDetailSheetState();
+}
+
+class _NativeDetailSheetState extends ConsumerState<_NativeDetailSheet> {
+  final _name = TextEditingController();
+  String _provider = 'firewalld';
+  String _kind = 'zone_service';
+  bool _permanent = true;
+  bool _loading = false;
+  String? _content;
+  String? _error;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    final l10n = AppLocalizations.of(context);
+    final name = _name.text.trim();
+    if (name.isEmpty) {
+      AppToast.warning(context, l10n.firewall_nativeNameRequired);
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final repository = await ref.read(firewallRepositoryProvider.future);
+      final content = await repository.getNativeRuleDetail(
+        provider: _provider,
+        nativeKind: _kind,
+        name: name,
+        permanent: _permanent,
+      );
+      if (!mounted) return;
+      setState(() => _content = content);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = describeError(error, l10n));
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.firewall_nativeDetail, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s4),
+        Text(
+          l10n.firewall_nativeDetailHint,
+          style: AppTextStyles.bodyS.copyWith(
+            color: context.scheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: AppTokens.s16),
+        DropdownButtonFormField<String>(
+          initialValue: _provider,
+          decoration: InputDecoration(labelText: l10n.firewall_settingsBackend),
+          items: const [
+            DropdownMenuItem(value: 'firewalld', child: Text('firewalld')),
+            DropdownMenuItem(value: 'ufw', child: Text('ufw')),
+          ],
+          onChanged: (value) {
+            if (value == null) return;
+            setState(() {
+              _provider = value;
+              _kind = value == 'ufw' ? 'ufw_application' : 'zone_service';
+              _content = null;
+              _error = null;
+            });
+          },
+        ),
+        const SizedBox(height: AppTokens.s12),
+        DropdownButtonFormField<String>(
+          initialValue: _kind,
+          decoration: InputDecoration(labelText: l10n.firewall_nativeKind),
+          items: [
+            DropdownMenuItem(
+              value: 'zone_service',
+              child: Text(l10n.firewall_nativeZoneService),
+            ),
+            DropdownMenuItem(
+              value: 'ufw_application',
+              child: Text(l10n.firewall_nativeUfwApplication),
+            ),
+          ],
+          onChanged: (value) {
+            if (value != null) setState(() => _kind = value);
+          },
+        ),
+        const SizedBox(height: AppTokens.s12),
+        AppTextField(
+          controller: _name,
+          label: l10n.firewall_nativeName,
+          onSubmitted: (_) => _load(),
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.firewall_nativePermanent),
+          value: _permanent,
+          onChanged: (value) => setState(() => _permanent = value),
+        ),
+        const SizedBox(height: AppTokens.s8),
+        PrimaryButton(
+          label: l10n.firewall_nativeLoad,
+          loading: _loading,
+          onPressed: _load,
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: AppTokens.s12),
+          Text(
+            _error!,
+            style: AppTextStyles.bodyS.copyWith(color: context.scheme.error),
+          ),
+        ],
+        if (_content != null) ...[
+          const SizedBox(height: AppTokens.s16),
+          Container(
+            width: double.infinity,
+            constraints: const BoxConstraints(maxHeight: 260),
+            padding: const EdgeInsets.all(AppTokens.s12),
+            decoration: BoxDecoration(
+              color: context.scheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(AppTokens.rMd),
+            ),
+            child: SingleChildScrollView(
+              child: SelectableText(
+                _content!,
+                style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

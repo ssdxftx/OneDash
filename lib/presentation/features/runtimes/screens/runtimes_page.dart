@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
@@ -22,7 +23,7 @@ final _runtimesProvider = FutureProvider.autoDispose<PageResult<RuntimeDto>>((
   ref,
 ) async {
   final repository = await ref.watch(runtimeRepositoryProvider.future);
-  return repository.searchRuntimes(const {});
+  return repository.searchRuntimes(const {'page': 1, 'pageSize': 100});
 }, name: 'runtimesProvider');
 
 class RuntimesPage extends ConsumerWidget {
@@ -63,6 +64,9 @@ class RuntimesPage extends ConsumerWidget {
             return Padding(
               padding: const EdgeInsets.only(bottom: AppTokens.s12),
               child: TonalCard(
+                onTap: () => context.push(
+                  '/s/$serverId/more/runtimes/${runtime.id}?type=${Uri.encodeComponent(runtime.type)}&name=${Uri.encodeComponent(runtime.name)}',
+                ),
                 onLongPress: () => _showActions(context, ref, runtime),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

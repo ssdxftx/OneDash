@@ -15,6 +15,12 @@ import '../../../../core/network/one_panel_auth.dart';
 import '../../../../core/network/web_socket_connector.dart';
 import '../../../../core/storage/storage_service.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/format_utils.dart';
+import '../../../../data/repositories_impl/host_repository_impl.dart';
+import '../../../common/components/app_toast.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/split_list_group.dart';
+import '../../../common/states/empty_state.dart';
 
 enum _TerminalStatus { connecting, connected, disconnected, error }
 
@@ -172,6 +178,14 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
     }
   }
 
+  Future<void> _showSessions() async {
+    await showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) =>
+          _TerminalSessionsSheet(serverId: widget.serverId),
+    );
+  }
+
   Future<void> _disconnect() async {
     await _subscription?.cancel();
     await _channel?.sink.close();
@@ -292,6 +306,11 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
             ],
           ),
           actions: [
+            IconButton(
+              tooltip: l10n.terminal_sessions,
+              onPressed: _showSessions,
+              icon: const Icon(TablerIcons.list),
+            ),
             IconButton(
               tooltip: l10n.action_refresh,
               onPressed: () async {
@@ -438,6 +457,162 @@ class _KeyButton extends StatelessWidget {
           child: Text(label, style: AppTextStyles.caption),
         ),
       ),
+    );
+  }
+}
+
+class _TerminalSessionsSheet extends ConsumerStatefulWidget {
+  const _TerminalSessionsSheet({required this.serverId});
+
+  final int serverId;
+
+  @override
+  ConsumerState<_TerminalSessionsSheet> createState() =>
+      _TerminalSessionsSheetState();
+}
+
+class _TerminalSessionsSheetState
+    extends ConsumerState<_TerminalSessionsSheet> {
+  List<Map<String, dynamic>> _sessions = const [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_load());
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      final sessions = await repository.searchTerminalSessions();
+      if (!mounted) return;
+      setState(() => _sessions = sessions);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _close(String id) async {
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      await repository.closeTerminalSession(id);
+      if (!mounted) return;
+      AppToast.success(context, AppLocalizations.of(context).action_done);
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _closeAll() async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.terminal_closeAllSessions,
+      message: l10n.terminal_closeAllConfirm,
+      confirmLabel: l10n.terminal_closeAllSessions,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      await repository.closeAllTerminalSessions();
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  String _kindLabel(AppLocalizations l10n, String kind) {
+    return switch (kind) {
+      'local' => l10n.terminal_kindLocal,
+      'ssh' => l10n.terminal_kindSsh,
+      'container' => l10n.terminal_kindContainer,
+      _ => kind,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(l10n.terminal_sessions, style: AppTextStyles.titleL),
+            ),
+            if (_sessions.isNotEmpty)
+              TextButton(
+                onPressed: _closeAll,
+                child: Text(l10n.terminal_closeAllSessions),
+              ),
+          ],
+        ),
+        const SizedBox(height: AppTokens.s12),
+        if (_loading)
+          const Padding(
+            padding: EdgeInsets.all(AppTokens.s24),
+            child: Center(child: CircularProgressIndicator()),
+          )
+        else if (_sessions.isEmpty)
+          EmptyState(
+            icon: TablerIcons.terminal_2,
+            title: l10n.terminal_sessions,
+            message: l10n.terminal_sessionsEmpty,
+            compact: true,
+          )
+        else
+          SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.5,
+            child: ListView(
+              children: [
+                SplitListGroup(
+                  children: [
+                    for (final session in _sessions)
+                      SplitListTile(
+                        leading: const Icon(TablerIcons.terminal_2),
+                        title: '${session['title'] ?? ''}'.isEmpty
+                            ? _kindLabel(l10n, '${session['kind'] ?? ''}')
+                            : '${session['title']}',
+                        subtitle: [
+                          _kindLabel(l10n, '${session['kind'] ?? ''}'),
+                          session['attached'] == true
+                              ? l10n.terminal_sessionAttached
+                              : l10n.terminal_sessionDetached,
+                          formatLocalDateTime(
+                            '${session['createdAt'] ?? ''}',
+                            fallback: '',
+                          ),
+                        ].where((value) => value.isNotEmpty).join(' · '),
+                        trailing: TextButton(
+                          onPressed: () => _close('${session['id'] ?? ''}'),
+                          child: Text(l10n.terminal_closeSession),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

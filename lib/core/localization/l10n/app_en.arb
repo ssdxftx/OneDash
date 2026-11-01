@@ -3007,4 +3007,1308 @@
   "@containers_advancedHint": {
     "description": "Container advanced settings summary."
   }
+  ,"action_restart": "Restart",
+  "@action_restart": {
+    "description": "Restart action label."
+  },
+  "system_restartPanel": "Restart panel",
+  "@system_restartPanel": {
+    "description": "Restart the 1Panel service."
+  },
+  "system_restartPanelSubtitle": "Only the panel service restarts",
+  "@system_restartPanelSubtitle": {
+    "description": "Subtitle for restarting the panel service."
+  },
+  "system_restartPanelMessage": "The panel will restart in a few seconds. The connection may drop for 10 to 30 seconds.",
+  "@system_restartPanelMessage": {
+    "description": "Confirmation message before restarting the panel."
+  },
+  "system_restartServer": "Restart server",
+  "@system_restartServer": {
+    "description": "Restart the whole server."
+  },
+  "system_restartServerSubtitle": "All services will be interrupted",
+  "@system_restartServerSubtitle": {
+    "description": "Subtitle for restarting the server."
+  },
+  "system_restartServerMessage": "The server will reboot immediately. All services stop and the connection usually recovers in 10 to 30 seconds.",
+  "@system_restartServerMessage": {
+    "description": "Confirmation message before restarting the server."
+  },
+  "system_restartSubmitted": "Restart requested. The connection may drop briefly.",
+  "@system_restartSubmitted": {
+    "description": "Toast shown after a restart request is accepted."
+  }
+  ,"databases_create": "Create database",
+  "@databases_create": {
+    "description": "Create database action."
+  },
+  "databases_createType": "Choose database type",
+  "@databases_createType": {
+    "description": "Sheet title for selecting a database type."
+  },
+  "databases_databaseName": "Database name",
+  "@databases_databaseName": {
+    "description": "Database name field label."
+  },
+  "databases_instance": "Instance",
+  "@databases_instance": {
+    "description": "Database instance selector label."
+  },
+  "databases_noInstance": "No installed instance of this type. Install it from the app store first.",
+  "@databases_noInstance": {
+    "description": "Shown when no database instance is available for the selected type."
+  },
+  "databases_charset": "Character set",
+  "@databases_charset": {
+    "description": "MySQL character set field label."
+  },
+  "databases_collation": "Collation",
+  "@databases_collation": {
+    "description": "MySQL collation field label."
+  },
+  "databases_template": "Template database",
+  "@databases_template": {
+    "description": "PostgreSQL template/encoding field label."
+  },
+  "databases_host": "Allowed host",
+  "@databases_host": {
+    "description": "Allowed source host for a database user."
+  },
+  "databases_hostHint": "% for any host, or a specific IP",
+  "@databases_hostHint": {
+    "description": "Hint for the allowed host field."
+  },
+  "databases_superUser": "Superuser",
+  "@databases_superUser": {
+    "description": "PostgreSQL superuser toggle."
+  },
+  "databases_permission": "Permission",
+  "@databases_permission": {
+    "description": "MongoDB permission field label."
+  },
+  "databases_permissionRead": "Read only",
+  "@databases_permissionRead": {
+    "description": "MongoDB read permission."
+  },
+  "databases_permissionReadWrite": "Read and write",
+  "@databases_permissionReadWrite": {
+    "description": "MongoDB readWrite permission."
+  },
+  "databases_permissionDbOwner": "Database owner",
+  "@databases_permissionDbOwner": {
+    "description": "MongoDB dbOwner permission."
+  },
+  "databases_permissionUserAdmin": "User admin",
+  "@databases_permissionUserAdmin": {
+    "description": "MongoDB userAdmin permission."
+  },
+  "databases_nameRequired": "Enter a database name",
+  "@databases_nameRequired": {
+    "description": "Validation message for database name."
+  },
+  "databases_usernameRequired": "Enter a username",
+  "@databases_usernameRequired": {
+    "description": "Validation message for database username."
+  },
+  "databases_passwordRequired": "Enter a password",
+  "@databases_passwordRequired": {
+    "description": "Validation message for database password."
+  },
+  "databases_created": "Database created",
+  "@databases_created": {
+    "description": "Toast after creating a database."
+  },
+  "databases_usersGrants": "Users and grants",
+  "@databases_usersGrants": {
+    "description": "Users and grants tab title."
+  },
+  "databases_addUser": "Add user",
+  "@databases_addUser": {
+    "description": "Add user action."
+  },
+  "databases_bindUser": "Bind user",
+  "@databases_bindUser": {
+    "description": "Bind an existing database user."
+  },
+  "databases_noUsers": "No users",
+  "@databases_noUsers": {
+    "description": "Empty state for database users."
+  },
+  "databases_userHost": "Allowed from",
+  "@databases_userHost": {
+    "description": "Host label for a database user."
+  },
+  "databases_deleteUser": "Delete user",
+  "@databases_deleteUser": {
+    "description": "Delete database user action."
+  },
+  "databases_grant": "Grant access",
+  "@databases_grant": {
+    "description": "Grant database access action."
+  },
+  "databases_grantDatabase": "Database to grant",
+  "@databases_grantDatabase": {
+    "description": "Database name field for granting access."
+  },
+  "databases_revoke": "Revoke access",
+  "@databases_revoke": {
+    "description": "Revoke database access action."
+  },
+  "databases_permissionUpdated": "Permission updated",
+  "@databases_permissionUpdated": {
+    "description": "Toast after changing a database permission."
+  },
+  "databases_redisRemote": "Redis connection",
+  "@databases_redisRemote": {
+    "description": "Title for creating a remote Redis connection."
+  },
+  "databases_redisHint": "Local Redis is installed as an app. This form registers a remote Redis connection.",
+  "@databases_redisHint": {
+    "description": "Explains Redis creation behavior."
+  }
+  ,"databases_normalUser": "Normal user",
+  "@databases_normalUser": {
+    "description": "Label for a non-superuser database account."
+  },
+  "databases_description": "Description",
+  "@databases_description": {
+    "description": "Description field label."
+  },
+  "databases_userDescription": "User description",
+  "@databases_userDescription": {
+    "description": "Description field for a database user."
+  },
+  "databases_userCreated": "User created",
+  "@databases_userCreated": {
+    "description": "Toast after creating a database user."
+  },
+  "databases_grantedDatabases": "Granted databases",
+  "@databases_grantedDatabases": {
+    "description": "Title for the granted database list."
+  },
+  "databases_noGrants": "No granted databases",
+  "@databases_noGrants": {
+    "description": "Empty state for database grants."
+  }
+  ,"files_permission": "Permission",
+  "@files_permission": {
+    "description": "File permission sheet title."
+  },
+  "files_permissionOwner": "Owner",
+  "@files_permissionOwner": {
+    "description": "Owner permission row."
+  },
+  "files_permissionGroup": "Group",
+  "@files_permissionGroup": {
+    "description": "Group permission row."
+  },
+  "files_permissionPublic": "Public",
+  "@files_permissionPublic": {
+    "description": "Public permission row."
+  },
+  "files_permissionRead": "Read",
+  "@files_permissionRead": {
+    "description": "Read permission bit."
+  },
+  "files_permissionWrite": "Write",
+  "@files_permissionWrite": {
+    "description": "Write permission bit."
+  },
+  "files_permissionExecute": "Execute",
+  "@files_permissionExecute": {
+    "description": "Execute permission bit."
+  },
+  "files_permissionMode": "Mode",
+  "@files_permissionMode": {
+    "description": "Numeric file mode field."
+  },
+  "files_permissionUser": "User",
+  "@files_permissionUser": {
+    "description": "File owner user field."
+  },
+  "files_permissionGroupName": "Group name",
+  "@files_permissionGroupName": {
+    "description": "File owner group field."
+  },
+  "files_permissionUpdated": "Permission updated",
+  "@files_permissionUpdated": {
+    "description": "Toast after updating file permission."
+  },
+  "files_selectCount": "{count} selected",
+  "@files_selectCount": {
+    "description": "Selection mode title.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "files_selectAll": "Select all",
+  "@files_selectAll": {
+    "description": "Select all files action."
+  },
+  "files_cancelSelection": "Cancel",
+  "@files_cancelSelection": {
+    "description": "Leave selection mode."
+  },
+  "files_batchDelete": "Delete selected",
+  "@files_batchDelete": {
+    "description": "Batch delete action."
+  },
+  "files_batchDeleteMessage": "Delete {count} selected items?",
+  "@files_batchDeleteMessage": {
+    "description": "Batch delete confirmation message.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "files_calculateSize": "Calculate size",
+  "@files_calculateSize": {
+    "description": "Calculate directory size action."
+  },
+  "files_sizeCalculated": "Size: {size}",
+  "@files_sizeCalculated": {
+    "description": "Calculated directory size.",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "files_history": "History",
+  "@files_history": {
+    "description": "File history action."
+  },
+  "files_historyEmpty": "No history versions",
+  "@files_historyEmpty": {
+    "description": "Empty state for file history."
+  },
+  "files_historyRestore": "Restore",
+  "@files_historyRestore": {
+    "description": "Restore a history version."
+  },
+  "files_historyRestoreConfirm": "Restore this version? The current file content will be replaced.",
+  "@files_historyRestoreConfirm": {
+    "description": "Confirmation before restoring a file history version."
+  },
+  "files_historyDelete": "Delete version",
+  "@files_historyDelete": {
+    "description": "Delete a history version."
+  },
+  "files_historyRestored": "Version restored",
+  "@files_historyRestored": {
+    "description": "Toast after restoring a file version."
+  },
+  "files_moreActions": "More actions",
+  "@files_moreActions": {
+    "description": "Tooltip for opening the file action sheet."
+  }
+  ,"host_title": "Host",
+  "@host_title": {
+    "description": "Host tools page title."
+  },
+  "host_monitor": "Monitoring",
+  "@host_monitor": {
+    "description": "Monitoring tab title."
+  },
+  "host_ssh": "SSH",
+  "@host_ssh": {
+    "description": "SSH tab title."
+  },
+  "host_range1h": "1h",
+  "@host_range1h": {
+    "description": "One hour monitor range."
+  },
+  "host_range6h": "6h",
+  "@host_range6h": {
+    "description": "Six hour monitor range."
+  },
+  "host_range24h": "24h",
+  "@host_range24h": {
+    "description": "Twenty four hour monitor range."
+  },
+  "host_cpu": "CPU",
+  "@host_cpu": {
+    "description": "CPU chart title."
+  },
+  "host_memory": "Memory",
+  "@host_memory": {
+    "description": "Memory chart title."
+  },
+  "host_load": "Load",
+  "@host_load": {
+    "description": "Load chart title."
+  },
+  "host_sshPort": "SSH port",
+  "@host_sshPort": {
+    "description": "SSH port label."
+  },
+  "host_rootLogin": "Root login",
+  "@host_rootLogin": {
+    "description": "SSH root login label."
+  },
+  "host_passwordAuth": "Password login",
+  "@host_passwordAuth": {
+    "description": "SSH password authentication label."
+  },
+  "host_pubkeyAuth": "Public key login",
+  "@host_pubkeyAuth": {
+    "description": "SSH public key authentication label."
+  },
+  "host_sshStatus": "SSH service",
+  "@host_sshStatus": {
+    "description": "SSH service status label."
+  },
+  "host_sshUpdated": "SSH configuration updated",
+  "@host_sshUpdated": {
+    "description": "Toast after updating SSH configuration."
+  },
+  "host_monitorEmpty": "No monitoring data yet",
+  "@host_monitorEmpty": {
+    "description": "Empty monitoring chart message."
+  }
+  ,"runtime_detail": "Runtime",
+  "@runtime_detail": {
+    "description": "Runtime detail page title."
+  },
+  "runtime_extensions": "Extensions",
+  "@runtime_extensions": {
+    "description": "PHP extensions tab."
+  },
+  "runtime_phpIni": "php.ini",
+  "@runtime_phpIni": {
+    "description": "PHP configuration file tab."
+  },
+  "runtime_fpm": "FPM",
+  "@runtime_fpm": {
+    "description": "PHP FPM tab."
+  },
+  "runtime_modules": "Modules",
+  "@runtime_modules": {
+    "description": "Node modules tab."
+  },
+  "runtime_install": "Install",
+  "@runtime_install": {
+    "description": "Install extension action."
+  },
+  "runtime_uninstall": "Uninstall",
+  "@runtime_uninstall": {
+    "description": "Uninstall extension action."
+  },
+  "runtime_update": "Update",
+  "@runtime_update": {
+    "description": "Update module action."
+  },
+  "runtime_installed": "Installed",
+  "@runtime_installed": {
+    "description": "Installed state label."
+  },
+  "runtime_notInstalled": "Not installed",
+  "@runtime_notInstalled": {
+    "description": "Not installed state label."
+  },
+  "runtime_moduleHint": "Package name",
+  "@runtime_moduleHint": {
+    "description": "Node module package name hint."
+  },
+  "runtime_restartPhpHint": "Restart PHP for changes to take effect.",
+  "@runtime_restartPhpHint": {
+    "description": "Hint after saving php.ini."
+  },
+  "runtime_saved": "Saved",
+  "@runtime_saved": {
+    "description": "Toast after saving runtime configuration."
+  }
+  ,"toolbox_group_system": "System",
+  "@toolbox_group_system": {
+    "description": "Toolbox system group."
+  },
+  "toolbox_group_security": "Security",
+  "@toolbox_group_security": {
+    "description": "Toolbox security group."
+  },
+  "toolbox_group_service": "Services",
+  "@toolbox_group_service": {
+    "description": "Toolbox service group."
+  },
+  "toolbox_group_maintenance": "Maintenance",
+  "@toolbox_group_maintenance": {
+    "description": "Toolbox maintenance group."
+  },
+  "toolbox_time": "Time and timezone",
+  "@toolbox_time": {
+    "description": "Time and timezone entry."
+  },
+  "toolbox_swapDns": "Swap and DNS",
+  "@toolbox_swapDns": {
+    "description": "Swap and DNS entry."
+  },
+  "toolbox_clam": "ClamAV",
+  "@toolbox_clam": {
+    "description": "ClamAV entry."
+  },
+  "toolbox_fail2ban": "Fail2ban",
+  "@toolbox_fail2ban": {
+    "description": "Fail2ban entry."
+  },
+  "toolbox_ftp": "FTP accounts",
+  "@toolbox_ftp": {
+    "description": "FTP accounts entry."
+  },
+  "toolbox_timezone": "Timezone",
+  "@toolbox_timezone": {
+    "description": "Timezone field label."
+  },
+  "toolbox_dns": "DNS",
+  "@toolbox_dns": {
+    "description": "DNS field label."
+  },
+  "toolbox_swap": "Swap",
+  "@toolbox_swap": {
+    "description": "Swap section label."
+  },
+  "toolbox_addSwap": "Add swap",
+  "@toolbox_addSwap": {
+    "description": "Create swap action."
+  },
+  "toolbox_swapPath": "Swap file path",
+  "@toolbox_swapPath": {
+    "description": "Swap file path field."
+  },
+  "toolbox_swapSize": "Size (MB)",
+  "@toolbox_swapSize": {
+    "description": "Swap size field."
+  },
+  "toolbox_sshBan": "Banned IPs",
+  "@toolbox_sshBan": {
+    "description": "Fail2ban banned IP list title."
+  },
+  "toolbox_unban": "Unban",
+  "@toolbox_unban": {
+    "description": "Unban action."
+  },
+  "toolbox_sshProtection": "SSH protection",
+  "@toolbox_sshProtection": {
+    "description": "Fail2ban sshd protection toggle."
+  },
+  "toolbox_ftpAdd": "Add FTP account",
+  "@toolbox_ftpAdd": {
+    "description": "Add FTP account action."
+  },
+  "toolbox_ftpUser": "FTP user",
+  "@toolbox_ftpUser": {
+    "description": "FTP user field."
+  },
+  "toolbox_ftpPassword": "FTP password",
+  "@toolbox_ftpPassword": {
+    "description": "FTP password field."
+  },
+  "toolbox_ftpPath": "FTP root path",
+  "@toolbox_ftpPath": {
+    "description": "FTP root path field."
+  },
+  "toolbox_scanPath": "Scan path",
+  "@toolbox_scanPath": {
+    "description": "ClamAV scan path field."
+  },
+  "toolbox_scanName": "Scan name",
+  "@toolbox_scanName": {
+    "description": "ClamAV scan task name."
+  },
+  "toolbox_startScan": "Start scan",
+  "@toolbox_startScan": {
+    "description": "Start ClamAV scan."
+  },
+  "toolbox_stopScan": "Stop scan",
+  "@toolbox_stopScan": {
+    "description": "Stop ClamAV scan."
+  },
+  "toolbox_scanRecords": "Scan tasks",
+  "@toolbox_scanRecords": {
+    "description": "ClamAV scan task list title."
+  },
+  "toolbox_noScans": "No scan tasks",
+  "@toolbox_noScans": {
+    "description": "Empty ClamAV scan task list."
+  }
+  ,"server_edit_diag_failed": "Check failed",
+  "@server_edit_diag_failed": {
+    "description": "Generic diagnosis failure detail."
+  }
+  ,"host_monitorSettings": "Monitor settings",
+  "@host_monitorSettings": {
+    "description": "Monitor settings entry."
+  },
+  "host_monitorInterval": "Interval (seconds)",
+  "@host_monitorInterval": {
+    "description": "Monitor sampling interval."
+  },
+  "host_monitorStoreDays": "Retention (days)",
+  "@host_monitorStoreDays": {
+    "description": "Monitor data retention days."
+  },
+  "host_monitorEnabled": "Monitoring enabled",
+  "@host_monitorEnabled": {
+    "description": "Monitor status toggle."
+  }
+  ,"host_sshKeys": "SSH keys",
+  "@host_sshKeys": {
+    "description": "SSH key management section."
+  },
+  "host_generateKey": "Generate key",
+  "@host_generateKey": {
+    "description": "Generate an SSH key action."
+  },
+  "host_keyName": "Key name",
+  "@host_keyName": {
+    "description": "SSH key name field."
+  },
+  "host_keyType": "Key type",
+  "@host_keyType": {
+    "description": "SSH key type field."
+  },
+  "host_keyPassphrase": "Passphrase",
+  "@host_keyPassphrase": {
+    "description": "SSH key passphrase field."
+  },
+  "host_keyGenerated": "SSH key generated",
+  "@host_keyGenerated": {
+    "description": "Toast after generating an SSH key."
+  },
+  "host_deleteKey": "Delete key",
+  "@host_deleteKey": {
+    "description": "Delete SSH key action."
+  },
+  "host_publicKey": "Public key",
+  "@host_publicKey": {
+    "description": "SSH public key label."
+  },
+  "toolbox_clamRecords": "Scan results",
+  "@toolbox_clamRecords": {
+    "description": "ClamAV scan result list."
+  },
+  "toolbox_clamNoRecords": "No scan results",
+  "@toolbox_clamNoRecords": {
+    "description": "Empty ClamAV scan result list."
+  },
+  "runtime_fpmConfig": "FPM configuration",
+  "@runtime_fpmConfig": {
+    "description": "PHP FPM configuration section."
+  },
+  "runtime_pm": "Process manager",
+  "@runtime_pm": {
+    "description": "PHP FPM pm setting."
+  },
+  "runtime_maxChildren": "Max children",
+  "@runtime_maxChildren": {
+    "description": "PHP FPM max_children setting."
+  },
+  "runtime_startServers": "Start servers",
+  "@runtime_startServers": {
+    "description": "PHP FPM start_servers setting."
+  },
+  "runtime_minSpare": "Min spare servers",
+  "@runtime_minSpare": {
+    "description": "PHP FPM min_spare_servers setting."
+  },
+  "runtime_maxSpare": "Max spare servers",
+  "@runtime_maxSpare": {
+    "description": "PHP FPM max_spare_servers setting."
+  },
+  "host_disks": "Disks",
+  "@host_disks": {
+    "description": "Host disks tab label."
+  },
+  "host_diagnostics": "Diagnostics",
+  "@host_diagnostics": {
+    "description": "Host runtime diagnostics tab label."
+  },
+  "host_diskSystem": "System disks",
+  "@host_diskSystem": {
+    "description": "System disk section title."
+  },
+  "host_diskUnpartitioned": "Unpartitioned disks",
+  "@host_diskUnpartitioned": {
+    "description": "Unpartitioned disk section title."
+  },
+  "host_diskNormal": "Data disks",
+  "@host_diskNormal": {
+    "description": "Data disk section title."
+  },
+  "host_diskPartitions": "Partitions",
+  "@host_diskPartitions": {
+    "description": "Partition count label."
+  },
+  "host_diskFilesystem": "Filesystem",
+  "@host_diskFilesystem": {
+    "description": "Disk filesystem label."
+  },
+  "host_diskUsed": "Used",
+  "@host_diskUsed": {
+    "description": "Used disk space label."
+  },
+  "host_diskAvail": "Available",
+  "@host_diskAvail": {
+    "description": "Available disk space label."
+  },
+  "host_diskMountPoint": "Mount point",
+  "@host_diskMountPoint": {
+    "description": "Disk mount point label."
+  },
+  "host_diskUnmounted": "Not mounted",
+  "@host_diskUnmounted": {
+    "description": "Disk is not mounted."
+  },
+  "host_diskSystemHint": "System disk partitions are read-only here.",
+  "@host_diskSystemHint": {
+    "description": "Hint for system disks."
+  },
+  "host_diskPartition": "Partition",
+  "@host_diskPartition": {
+    "description": "Partition disk action."
+  },
+  "host_diskMount": "Mount",
+  "@host_diskMount": {
+    "description": "Mount disk action."
+  },
+  "host_diskUnmount": "Unmount",
+  "@host_diskUnmount": {
+    "description": "Unmount disk action."
+  },
+  "host_diskAutoMount": "Mount on boot",
+  "@host_diskAutoMount": {
+    "description": "Mount disk automatically on boot."
+  },
+  "host_diskNoFail": "Allow boot without disk",
+  "@host_diskNoFail": {
+    "description": "Allow boot when the disk is missing."
+  },
+  "host_diskMountPointField": "Mount point path",
+  "@host_diskMountPointField": {
+    "description": "Mount point path input label."
+  },
+  "host_diskLabel": "Volume label",
+  "@host_diskLabel": {
+    "description": "Partition volume label input."
+  },
+  "host_diskActionDone": "Disk operation completed",
+  "@host_diskActionDone": {
+    "description": "Disk operation success toast."
+  },
+  "host_diskPartitionWarning": "Partitioning erases data on this disk. Continue only with a disk you can rebuild.",
+  "@host_diskPartitionWarning": {
+    "description": "Warning before partitioning a disk."
+  },
+  "host_diagSummary": "Runtime summary",
+  "@host_diagSummary": {
+    "description": "Runtime diagnostics summary section."
+  },
+  "host_diagRss": "Resident memory",
+  "@host_diagRss": {
+    "description": "Panel process resident memory."
+  },
+  "host_diagHeap": "Heap in use",
+  "@host_diagHeap": {
+    "description": "Panel process heap usage."
+  },
+  "host_diagObjects": "Heap objects",
+  "@host_diagObjects": {
+    "description": "Panel process heap object count."
+  },
+  "host_diagGoroutines": "Goroutines",
+  "@host_diagGoroutines": {
+    "description": "Panel process goroutine count."
+  },
+  "host_diagSnapshot": "Goroutine snapshot",
+  "@host_diagSnapshot": {
+    "description": "Grouped goroutine snapshot section."
+  },
+  "host_diagCapturedAt": "Captured at",
+  "@host_diagCapturedAt": {
+    "description": "Snapshot capture time label."
+  },
+  "host_diagTotal": "Total",
+  "@host_diagTotal": {
+    "description": "Total goroutine count label."
+  },
+  "host_diagGroups": "Groups",
+  "@host_diagGroups": {
+    "description": "Goroutine group count label."
+  },
+  "host_diagTruncated": "Snapshot was truncated by the panel.",
+  "@host_diagTruncated": {
+    "description": "Warning when goroutine snapshot is truncated."
+  },
+  "host_diagStack": "Call stack",
+  "@host_diagStack": {
+    "description": "Goroutine call stack title."
+  },
+  "toolbox_fail2banBase": "Basic rules",
+  "@toolbox_fail2banBase": {
+    "description": "Fail2ban basic configuration section."
+  },
+  "toolbox_maxRetry": "Max retries",
+  "@toolbox_maxRetry": {
+    "description": "Fail2ban max retry setting."
+  },
+  "toolbox_banTime": "Ban duration",
+  "@toolbox_banTime": {
+    "description": "Fail2ban ban time setting."
+  },
+  "toolbox_findTime": "Detection window",
+  "@toolbox_findTime": {
+    "description": "Fail2ban find time setting."
+  },
+  "toolbox_banAction": "Ban action",
+  "@toolbox_banAction": {
+    "description": "Fail2ban ban action setting."
+  },
+  "toolbox_logPath": "Log path",
+  "@toolbox_logPath": {
+    "description": "Fail2ban log path setting."
+  },
+  "toolbox_durationHint": "Use a value with unit, for example 300s, 10m, 1h or -1.",
+  "@toolbox_durationHint": {
+    "description": "Hint for Fail2ban duration values."
+  },
+  "toolbox_fail2banChanged": "Update Fail2ban rule",
+  "@toolbox_fail2banChanged": {
+    "description": "Confirmation title for Fail2ban rule changes."
+  },
+  "host_diagCapture": "Manual capture",
+  "@host_diagCapture": {
+    "description": "Runtime profile capture section."
+  },
+  "host_diagProfileType": "Profile type",
+  "@host_diagProfileType": {
+    "description": "Runtime profile type selector."
+  },
+  "host_diagProfileCpu": "CPU profile",
+  "@host_diagProfileCpu": {
+    "description": "CPU profile type."
+  },
+  "host_diagProfileHeap": "Heap profile",
+  "@host_diagProfileHeap": {
+    "description": "Heap profile type."
+  },
+  "host_diagProfileGoroutine": "Goroutine profile",
+  "@host_diagProfileGoroutine": {
+    "description": "Goroutine profile type."
+  },
+  "host_diagProfileMutex": "Mutex profile",
+  "@host_diagProfileMutex": {
+    "description": "Mutex profile type."
+  },
+  "host_diagProfileBlock": "Block profile",
+  "@host_diagProfileBlock": {
+    "description": "Block profile type."
+  },
+  "host_diagDuration": "Duration (seconds)",
+  "@host_diagDuration": {
+    "description": "Profile capture duration."
+  },
+  "host_diagStartCapture": "Start capture",
+  "@host_diagStartCapture": {
+    "description": "Start profile capture action."
+  },
+  "host_diagProfileSaved": "Profile saved",
+  "@host_diagProfileSaved": {
+    "description": "Profile file saved toast."
+  },
+  "host_diagComponent": "Component check",
+  "@host_diagComponent": {
+    "description": "Host component check section."
+  },
+  "host_diagComponentName": "Component name",
+  "@host_diagComponentName": {
+    "description": "Component executable name input."
+  },
+  "host_diagCheck": "Check",
+  "@host_diagCheck": {
+    "description": "Check component action."
+  },
+  "host_diagComponentExists": "Status",
+  "@host_diagComponentExists": {
+    "description": "Component existence status label."
+  },
+  "host_diagComponentPath": "Path",
+  "@host_diagComponentPath": {
+    "description": "Component executable path label."
+  },
+  "host_diagComponentMissing": "Executable not found",
+  "@host_diagComponentMissing": {
+    "description": "Component is not installed."
+  },
+  "websites_loadBalance": "Load balancing",
+  "@websites_loadBalance": {
+    "description": "Website load balancing tab."
+  },
+  "websites_lbAdd": "Add upstream",
+  "@websites_lbAdd": {
+    "description": "Create a load balancing upstream."
+  },
+  "websites_lbEmpty": "No upstreams yet",
+  "@websites_lbEmpty": {
+    "description": "Empty load balancing list."
+  },
+  "websites_lbName": "Upstream name",
+  "@websites_lbName": {
+    "description": "Load balancing upstream name."
+  },
+  "websites_lbAlgorithm": "Algorithm",
+  "@websites_lbAlgorithm": {
+    "description": "Load balancing algorithm."
+  },
+  "websites_lbDefault": "Default (round robin)",
+  "@websites_lbDefault": {
+    "description": "Default load balancing algorithm."
+  },
+  "websites_lbIpHash": "IP hash",
+  "@websites_lbIpHash": {
+    "description": "IP hash load balancing algorithm."
+  },
+  "websites_lbLeastConn": "Least connections",
+  "@websites_lbLeastConn": {
+    "description": "Least connections load balancing algorithm."
+  },
+  "websites_lbServers": "Servers",
+  "@websites_lbServers": {
+    "description": "Load balancing server list."
+  },
+  "websites_lbAddServer": "Add server",
+  "@websites_lbAddServer": {
+    "description": "Add a load balancing server."
+  },
+  "websites_lbServerAddress": "Server address",
+  "@websites_lbServerAddress": {
+    "description": "Load balancing server address."
+  },
+  "websites_lbWeight": "Weight",
+  "@websites_lbWeight": {
+    "description": "Load balancing server weight."
+  },
+  "websites_lbFlag": "Status",
+  "@websites_lbFlag": {
+    "description": "Load balancing server status."
+  },
+  "websites_lbFlagNone": "Enabled",
+  "@websites_lbFlagNone": {
+    "description": "Server is enabled."
+  },
+  "websites_lbFlagDown": "Down",
+  "@websites_lbFlagDown": {
+    "description": "Server is marked down."
+  },
+  "websites_lbFlagBackup": "Backup",
+  "@websites_lbFlagBackup": {
+    "description": "Server is a backup."
+  },
+  "websites_lbMaxFails": "Max failures",
+  "@websites_lbMaxFails": {
+    "description": "Maximum failed attempts."
+  },
+  "websites_lbFailTimeout": "Fail timeout",
+  "@websites_lbFailTimeout": {
+    "description": "Server fail timeout."
+  },
+  "websites_lbMaxConns": "Max connections",
+  "@websites_lbMaxConns": {
+    "description": "Maximum connections per server."
+  },
+  "websites_lbDelete": "Delete upstream",
+  "@websites_lbDelete": {
+    "description": "Delete load balancing upstream."
+  },
+  "websites_lbSaved": "Load balancing saved",
+  "@websites_lbSaved": {
+    "description": "Load balancing saved toast."
+  },
+  "websites_templates": "Website templates",
+  "@websites_templates": {
+    "description": "Website template list title."
+  },
+  "websites_templateAdd": "New template",
+  "@websites_templateAdd": {
+    "description": "Create a website template."
+  },
+  "websites_templateEdit": "Edit template",
+  "@websites_templateEdit": {
+    "description": "Edit a website template."
+  },
+  "websites_templateEmpty": "No templates yet",
+  "@websites_templateEmpty": {
+    "description": "Empty website template list."
+  },
+  "websites_templateName": "Template name",
+  "@websites_templateName": {
+    "description": "Website template name."
+  },
+  "websites_templateType": "Template type",
+  "@websites_templateType": {
+    "description": "Website template type."
+  },
+  "websites_templateSingle": "Single page",
+  "@websites_templateSingle": {
+    "description": "Single page template type."
+  },
+  "websites_templateMulti": "Multi-file",
+  "@websites_templateMulti": {
+    "description": "Multi-file template type."
+  },
+  "websites_templateContent": "HTML content",
+  "@websites_templateContent": {
+    "description": "Single template HTML content."
+  },
+  "websites_templateUpload": "Upload ZIP",
+  "@websites_templateUpload": {
+    "description": "Upload a multi-file template ZIP."
+  },
+  "websites_templateUploaded": "Template uploaded",
+  "@websites_templateUploaded": {
+    "description": "Template ZIP upload success."
+  },
+  "websites_templateFilePath": "Template package",
+  "@websites_templateFilePath": {
+    "description": "Uploaded template package path."
+  },
+  "websites_templateRemark": "Remark",
+  "@websites_templateRemark": {
+    "description": "Website template remark."
+  },
+  "websites_templateVariables": "Variables",
+  "@websites_templateVariables": {
+    "description": "Website template variables."
+  },
+  "websites_templateAddVariable": "Add variable",
+  "@websites_templateAddVariable": {
+    "description": "Add a template variable."
+  },
+  "websites_templateVariableKey": "Key",
+  "@websites_templateVariableKey": {
+    "description": "Template variable key."
+  },
+  "websites_templateVariableLabel": "Label",
+  "@websites_templateVariableLabel": {
+    "description": "Template variable label."
+  },
+  "websites_templateVariableType": "Type",
+  "@websites_templateVariableType": {
+    "description": "Template variable type."
+  },
+  "websites_templateVariableDefault": "Default value",
+  "@websites_templateVariableDefault": {
+    "description": "Template variable default value."
+  },
+  "websites_templateVariableOptions": "Options",
+  "@websites_templateVariableOptions": {
+    "description": "Select variable options, comma separated."
+  },
+  "websites_templateVariableRequired": "Required",
+  "@websites_templateVariableRequired": {
+    "description": "Template variable is required."
+  },
+  "websites_templateAutoDetect": "Detect variables",
+  "@websites_templateAutoDetect": {
+    "description": "Detect template variables from HTML."
+  },
+  "websites_templateSaved": "Template saved",
+  "@websites_templateSaved": {
+    "description": "Website template saved toast."
+  },
+  "websites_templateDelete": "Delete template",
+  "@websites_templateDelete": {
+    "description": "Delete website template."
+  },
+  "websites_templateGenerate": "Generate",
+  "@websites_templateGenerate": {
+    "description": "Generate a site from the template."
+  },
+  "websites_templateOutputs": "Generated sites",
+  "@websites_templateOutputs": {
+    "description": "Generated template site list."
+  },
+  "websites_templateOutputName": "Output name",
+  "@websites_templateOutputName": {
+    "description": "Generated site name."
+  },
+  "websites_templateOutputEmpty": "No generated sites",
+  "@websites_templateOutputEmpty": {
+    "description": "Empty generated site list."
+  },
+  "websites_templateOutputGenerated": "Site generated",
+  "@websites_templateOutputGenerated": {
+    "description": "Generated site success toast."
+  },
+  "websites_templateOutputDelete": "Delete generated site",
+  "@websites_templateOutputDelete": {
+    "description": "Delete generated template site."
+  },
+  "websites_templateNoVariables": "No variables",
+  "@websites_templateNoVariables": {
+    "description": "Template has no variables."
+  },
+  "websites_templateVariableTypeText": "Text",
+  "@websites_templateVariableTypeText": {
+    "description": "Text variable type."
+  },
+  "websites_templateVariableTypeTextarea": "Long text",
+  "@websites_templateVariableTypeTextarea": {
+    "description": "Textarea variable type."
+  },
+  "websites_templateVariableTypeNumber": "Number",
+  "@websites_templateVariableTypeNumber": {
+    "description": "Number variable type."
+  },
+  "websites_templateVariableTypeSelect": "Select",
+  "@websites_templateVariableTypeSelect": {
+    "description": "Select variable type."
+  },
+  "websites_templateVariableTypeColor": "Color",
+  "@websites_templateVariableTypeColor": {
+    "description": "Color variable type."
+  },
+  "files_aiSearch": "AI search",
+  "@files_aiSearch": {
+    "description": "File AI content search entry."
+  },
+  "files_aiQuery": "Search content",
+  "@files_aiQuery": {
+    "description": "File AI search query."
+  },
+  "files_aiQueryHint": "Text to find in file contents",
+  "@files_aiQueryHint": {
+    "description": "File AI search query hint."
+  },
+  "files_aiContainSub": "Include subdirectories",
+  "@files_aiContainSub": {
+    "description": "Search subdirectories recursively."
+  },
+  "files_aiMatchCase": "Match case",
+  "@files_aiMatchCase": {
+    "description": "Case sensitive search."
+  },
+  "files_aiWholeWord": "Whole word",
+  "@files_aiWholeWord": {
+    "description": "Match whole words only."
+  },
+  "files_aiUseRegex": "Use regular expression",
+  "@files_aiUseRegex": {
+    "description": "Treat the query as a regular expression."
+  },
+  "files_aiGrepMode": "AI is not enabled on the panel. Showing content matches only.",
+  "@files_aiGrepMode": {
+    "description": "Shown when the panel returns grep mode."
+  },
+  "files_aiSummary": "AI summary",
+  "@files_aiSummary": {
+    "description": "AI generated search summary."
+  },
+  "files_aiHits": "Matches",
+  "@files_aiHits": {
+    "description": "Content search matches."
+  },
+  "files_aiScanned": "Files scanned",
+  "@files_aiScanned": {
+    "description": "Number of files scanned."
+  },
+  "files_aiTokens": "Tokens",
+  "@files_aiTokens": {
+    "description": "AI token usage."
+  },
+  "files_aiDuration": "Duration",
+  "@files_aiDuration": {
+    "description": "Search duration."
+  },
+  "files_aiTruncated": "Results were truncated by the panel.",
+  "@files_aiTruncated": {
+    "description": "Search results truncated warning."
+  },
+  "files_aiEmpty": "No matching content",
+  "@files_aiEmpty": {
+    "description": "Empty AI search result."
+  },
+  "files_aiLine": "Line",
+  "@files_aiLine": {
+    "description": "Line number label."
+  },
+  "terminal_sessions": "Terminal sessions",
+  "@terminal_sessions": {
+    "description": "Terminal session list entry."
+  },
+  "terminal_sessionsEmpty": "No terminal sessions",
+  "@terminal_sessionsEmpty": {
+    "description": "Empty terminal session list."
+  },
+  "terminal_sessionAttached": "Attached",
+  "@terminal_sessionAttached": {
+    "description": "Terminal session is attached."
+  },
+  "terminal_sessionDetached": "Detached",
+  "@terminal_sessionDetached": {
+    "description": "Terminal session is detached."
+  },
+  "terminal_closeSession": "Close",
+  "@terminal_closeSession": {
+    "description": "Close a terminal session."
+  },
+  "terminal_closeAllSessions": "Close all",
+  "@terminal_closeAllSessions": {
+    "description": "Close all terminal sessions."
+  },
+  "terminal_closeAllConfirm": "All terminal sessions will be disconnected and cannot be recovered.",
+  "@terminal_closeAllConfirm": {
+    "description": "Confirmation for closing all terminal sessions."
+  },
+  "terminal_kindLocal": "Local",
+  "@terminal_kindLocal": {
+    "description": "Local terminal session kind."
+  },
+  "terminal_kindSsh": "SSH",
+  "@terminal_kindSsh": {
+    "description": "SSH terminal session kind."
+  },
+  "terminal_kindContainer": "Container",
+  "@terminal_kindContainer": {
+    "description": "Container terminal session kind."
+  },
+  "files_uploading": "Uploading",
+  "@files_uploading": {
+    "description": "Upload in progress."
+  },
+  "files_uploadPaused": "Paused",
+  "@files_uploadPaused": {
+    "description": "Upload paused."
+  },
+  "files_uploadPause": "Pause",
+  "@files_uploadPause": {
+    "description": "Pause upload."
+  },
+  "files_uploadResume": "Resume",
+  "@files_uploadResume": {
+    "description": "Resume upload."
+  },
+  "files_uploadFailed": "Upload failed",
+  "@files_uploadFailed": {
+    "description": "Upload failed."
+  },
+  "toolbox_infectedStrategy": "Infected file handling",
+  "@toolbox_infectedStrategy": {
+    "description": "ClamAV infected file strategy."
+  },
+  "toolbox_infectedNone": "Take no action",
+  "@toolbox_infectedNone": {
+    "description": "Keep infected files."
+  },
+  "toolbox_infectedRemove": "Delete",
+  "@toolbox_infectedRemove": {
+    "description": "Delete infected files."
+  },
+  "toolbox_infectedMove": "Move",
+  "@toolbox_infectedMove": {
+    "description": "Move infected files."
+  },
+  "toolbox_infectedCopy": "Copy",
+  "@toolbox_infectedCopy": {
+    "description": "Copy infected files."
+  },
+  "toolbox_infectedDir": "Infected directory",
+  "@toolbox_infectedDir": {
+    "description": "Directory for moved or copied infected files."
+  },
+  "toolbox_infectedDirRequired": "Enter an infected directory",
+  "@toolbox_infectedDirRequired": {
+    "description": "Infected directory is required."
+  },
+  "firewall_whitelistEdit": "Edit whitelist rule",
+  "@firewall_whitelistEdit": {
+    "description": "Edit a port whitelist rule."
+  },
+  "firewall_backendUnavailable": "No selectable backend",
+  "@firewall_backendUnavailable": {
+    "description": "No supported firewall backend is available."
+  },
+  "action_switch": "Switch",
+  "@action_switch": {
+    "description": "Switch action."
+  },
+  "firewall_resetRules": "Reset rules",
+  "@firewall_resetRules": {
+    "description": "Reset firewall rules."
+  },
+  "firewall_resetRulesMessage": "Managed firewall rules will be reset. Continue?",
+  "@firewall_resetRulesMessage": {
+    "description": "Confirmation for resetting firewall rules."
+  },
+  "firewall_restoreBackup": "Restore backup",
+  "@firewall_restoreBackup": {
+    "description": "Restore firewall rule backup."
+  },
+  "firewall_restoreBackupMessage": "Restore rules from backup {name}?",
+  "@firewall_restoreBackupMessage": {
+    "description": "Confirmation for restoring a firewall backup.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "firewall_nativeDetail": "Native rule detail",
+  "@firewall_nativeDetail": {
+    "description": "Show the native firewall rule text."
+  },
+  "firewall_nativeDetailHint": "Read the native firewalld or ufw definition",
+  "@firewall_nativeDetailHint": {
+    "description": "Native rule detail description."
+  },
+  "firewall_ruleBackups": "Rule backups",
+  "@firewall_ruleBackups": {
+    "description": "Firewall rule backups."
+  },
+  "firewall_noBackups": "No rule backups",
+  "@firewall_noBackups": {
+    "description": "Empty firewall backup list."
+  },
+  "firewall_nativeNameRequired": "Enter a native rule name",
+  "@firewall_nativeNameRequired": {
+    "description": "Native rule name is required."
+  },
+  "firewall_nativeKind": "Native kind",
+  "@firewall_nativeKind": {
+    "description": "Native rule kind."
+  },
+  "firewall_nativeZoneService": "Zone service",
+  "@firewall_nativeZoneService": {
+    "description": "firewalld zone service."
+  },
+  "firewall_nativeUfwApplication": "UFW application",
+  "@firewall_nativeUfwApplication": {
+    "description": "ufw application profile."
+  },
+  "firewall_nativeName": "Native name",
+  "@firewall_nativeName": {
+    "description": "Native rule or application name."
+  },
+  "firewall_nativePermanent": "Permanent",
+  "@firewall_nativePermanent": {
+    "description": "Whether the native rule is permanent."
+  },
+  "firewall_nativeLoad": "Load native detail",
+  "@firewall_nativeLoad": {
+    "description": "Load native firewall detail."
+  },
+  "firewall_settingsBackendHint": "Tap to switch the managed backend",
+  "@firewall_settingsBackendHint": {
+    "description": "Firewall backend switch hint."
+  },
+  "host_sshCheckFailed": "Local SSH connection check failed. Save cancelled.",
+  "@host_sshCheckFailed": {
+    "description": "Shown when pre-save SSH connectivity check fails."
+  },
+  "host_sshCheckAfterSave": "SSH port saved, but the local connection check still fails. Verify the new port.",
+  "@host_sshCheckAfterSave": {
+    "description": "Shown when post-save SSH connectivity check fails."
+  }
 }

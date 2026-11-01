@@ -57,6 +57,53 @@ class RuntimeRepositoryImpl implements RuntimeRepository {
   @override
   Future<TaskLogDto> readRuntimeLog({required int id, required String type}) =>
       _fileApi.readRuntimeLog(id: id, type: type);
+
+  @override
+  Future<Map<String, dynamic>> getPhpExtensions(int id) =>
+      _api.getPhpExtensions(id);
+
+  @override
+  Future<void> installPhpExtension(int id, String name, String taskId) =>
+      _api.installPhpExtension(id, name, taskId);
+
+  @override
+  Future<void> uninstallPhpExtension(int id, String name) =>
+      _api.uninstallPhpExtension(id, name);
+
+  @override
+  Future<String> getPhpFile(int id, String type) => _api.getPhpFile(id, type);
+
+  @override
+  Future<void> updatePhpFile(int id, String type, String content) =>
+      _api.updatePhpFile(id, type, content);
+
+  @override
+  Future<List<Map<String, dynamic>>> getFpmStatus(int id) =>
+      _api.getFpmStatus(id);
+
+  @override
+  Future<Map<String, dynamic>> getFpmConfig(int id) => _api.getFpmConfig(id);
+
+  @override
+  Future<void> updateFpmConfig(int id, Map<String, dynamic> params) =>
+      _api.updateFpmConfig(id, params);
+
+  @override
+  Future<List<Map<String, dynamic>>> getNodeModules(int id) =>
+      _api.getNodeModules(id);
+
+  @override
+  Future<void> operateNodeModule({
+    required int id,
+    required String operate,
+    required String module,
+    required String packageManager,
+  }) => _api.operateNodeModule(
+    id: id,
+    operate: operate,
+    module: module,
+    packageManager: packageManager,
+  );
 }
 
 /// 基于当前激活服务器的仓库 Provider。

@@ -2218,4 +2218,992 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get containers_advancedHint =>
       'Command, entrypoint, working directory, network and limits';
+
+  @override
+  String get action_restart => 'Restart';
+
+  @override
+  String get system_restartPanel => 'Restart panel';
+
+  @override
+  String get system_restartPanelSubtitle => 'Only the panel service restarts';
+
+  @override
+  String get system_restartPanelMessage =>
+      'The panel will restart in a few seconds. The connection may drop for 10 to 30 seconds.';
+
+  @override
+  String get system_restartServer => 'Restart server';
+
+  @override
+  String get system_restartServerSubtitle => 'All services will be interrupted';
+
+  @override
+  String get system_restartServerMessage =>
+      'The server will reboot immediately. All services stop and the connection usually recovers in 10 to 30 seconds.';
+
+  @override
+  String get system_restartSubmitted =>
+      'Restart requested. The connection may drop briefly.';
+
+  @override
+  String get databases_create => 'Create database';
+
+  @override
+  String get databases_createType => 'Choose database type';
+
+  @override
+  String get databases_databaseName => 'Database name';
+
+  @override
+  String get databases_instance => 'Instance';
+
+  @override
+  String get databases_noInstance =>
+      'No installed instance of this type. Install it from the app store first.';
+
+  @override
+  String get databases_charset => 'Character set';
+
+  @override
+  String get databases_collation => 'Collation';
+
+  @override
+  String get databases_template => 'Template database';
+
+  @override
+  String get databases_host => 'Allowed host';
+
+  @override
+  String get databases_hostHint => '% for any host, or a specific IP';
+
+  @override
+  String get databases_superUser => 'Superuser';
+
+  @override
+  String get databases_permission => 'Permission';
+
+  @override
+  String get databases_permissionRead => 'Read only';
+
+  @override
+  String get databases_permissionReadWrite => 'Read and write';
+
+  @override
+  String get databases_permissionDbOwner => 'Database owner';
+
+  @override
+  String get databases_permissionUserAdmin => 'User admin';
+
+  @override
+  String get databases_nameRequired => 'Enter a database name';
+
+  @override
+  String get databases_usernameRequired => 'Enter a username';
+
+  @override
+  String get databases_passwordRequired => 'Enter a password';
+
+  @override
+  String get databases_created => 'Database created';
+
+  @override
+  String get databases_usersGrants => 'Users and grants';
+
+  @override
+  String get databases_addUser => 'Add user';
+
+  @override
+  String get databases_bindUser => 'Bind user';
+
+  @override
+  String get databases_noUsers => 'No users';
+
+  @override
+  String get databases_userHost => 'Allowed from';
+
+  @override
+  String get databases_deleteUser => 'Delete user';
+
+  @override
+  String get databases_grant => 'Grant access';
+
+  @override
+  String get databases_grantDatabase => 'Database to grant';
+
+  @override
+  String get databases_revoke => 'Revoke access';
+
+  @override
+  String get databases_permissionUpdated => 'Permission updated';
+
+  @override
+  String get databases_redisRemote => 'Redis connection';
+
+  @override
+  String get databases_redisHint =>
+      'Local Redis is installed as an app. This form registers a remote Redis connection.';
+
+  @override
+  String get databases_normalUser => 'Normal user';
+
+  @override
+  String get databases_description => 'Description';
+
+  @override
+  String get databases_userDescription => 'User description';
+
+  @override
+  String get databases_userCreated => 'User created';
+
+  @override
+  String get databases_grantedDatabases => 'Granted databases';
+
+  @override
+  String get databases_noGrants => 'No granted databases';
+
+  @override
+  String get files_permission => 'Permission';
+
+  @override
+  String get files_permissionOwner => 'Owner';
+
+  @override
+  String get files_permissionGroup => 'Group';
+
+  @override
+  String get files_permissionPublic => 'Public';
+
+  @override
+  String get files_permissionRead => 'Read';
+
+  @override
+  String get files_permissionWrite => 'Write';
+
+  @override
+  String get files_permissionExecute => 'Execute';
+
+  @override
+  String get files_permissionMode => 'Mode';
+
+  @override
+  String get files_permissionUser => 'User';
+
+  @override
+  String get files_permissionGroupName => 'Group name';
+
+  @override
+  String get files_permissionUpdated => 'Permission updated';
+
+  @override
+  String files_selectCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get files_selectAll => 'Select all';
+
+  @override
+  String get files_cancelSelection => 'Cancel';
+
+  @override
+  String get files_batchDelete => 'Delete selected';
+
+  @override
+  String files_batchDeleteMessage(int count) {
+    return 'Delete $count selected items?';
+  }
+
+  @override
+  String get files_calculateSize => 'Calculate size';
+
+  @override
+  String files_sizeCalculated(String size) {
+    return 'Size: $size';
+  }
+
+  @override
+  String get files_history => 'History';
+
+  @override
+  String get files_historyEmpty => 'No history versions';
+
+  @override
+  String get files_historyRestore => 'Restore';
+
+  @override
+  String get files_historyRestoreConfirm =>
+      'Restore this version? The current file content will be replaced.';
+
+  @override
+  String get files_historyDelete => 'Delete version';
+
+  @override
+  String get files_historyRestored => 'Version restored';
+
+  @override
+  String get files_moreActions => 'More actions';
+
+  @override
+  String get host_title => 'Host';
+
+  @override
+  String get host_monitor => 'Monitoring';
+
+  @override
+  String get host_ssh => 'SSH';
+
+  @override
+  String get host_range1h => '1h';
+
+  @override
+  String get host_range6h => '6h';
+
+  @override
+  String get host_range24h => '24h';
+
+  @override
+  String get host_cpu => 'CPU';
+
+  @override
+  String get host_memory => 'Memory';
+
+  @override
+  String get host_load => 'Load';
+
+  @override
+  String get host_sshPort => 'SSH port';
+
+  @override
+  String get host_rootLogin => 'Root login';
+
+  @override
+  String get host_passwordAuth => 'Password login';
+
+  @override
+  String get host_pubkeyAuth => 'Public key login';
+
+  @override
+  String get host_sshStatus => 'SSH service';
+
+  @override
+  String get host_sshUpdated => 'SSH configuration updated';
+
+  @override
+  String get host_monitorEmpty => 'No monitoring data yet';
+
+  @override
+  String get runtime_detail => 'Runtime';
+
+  @override
+  String get runtime_extensions => 'Extensions';
+
+  @override
+  String get runtime_phpIni => 'php.ini';
+
+  @override
+  String get runtime_fpm => 'FPM';
+
+  @override
+  String get runtime_modules => 'Modules';
+
+  @override
+  String get runtime_install => 'Install';
+
+  @override
+  String get runtime_uninstall => 'Uninstall';
+
+  @override
+  String get runtime_update => 'Update';
+
+  @override
+  String get runtime_installed => 'Installed';
+
+  @override
+  String get runtime_notInstalled => 'Not installed';
+
+  @override
+  String get runtime_moduleHint => 'Package name';
+
+  @override
+  String get runtime_restartPhpHint =>
+      'Restart PHP for changes to take effect.';
+
+  @override
+  String get runtime_saved => 'Saved';
+
+  @override
+  String get toolbox_group_system => 'System';
+
+  @override
+  String get toolbox_group_security => 'Security';
+
+  @override
+  String get toolbox_group_service => 'Services';
+
+  @override
+  String get toolbox_group_maintenance => 'Maintenance';
+
+  @override
+  String get toolbox_time => 'Time and timezone';
+
+  @override
+  String get toolbox_swapDns => 'Swap and DNS';
+
+  @override
+  String get toolbox_clam => 'ClamAV';
+
+  @override
+  String get toolbox_fail2ban => 'Fail2ban';
+
+  @override
+  String get toolbox_ftp => 'FTP accounts';
+
+  @override
+  String get toolbox_timezone => 'Timezone';
+
+  @override
+  String get toolbox_dns => 'DNS';
+
+  @override
+  String get toolbox_swap => 'Swap';
+
+  @override
+  String get toolbox_addSwap => 'Add swap';
+
+  @override
+  String get toolbox_swapPath => 'Swap file path';
+
+  @override
+  String get toolbox_swapSize => 'Size (MB)';
+
+  @override
+  String get toolbox_sshBan => 'Banned IPs';
+
+  @override
+  String get toolbox_unban => 'Unban';
+
+  @override
+  String get toolbox_sshProtection => 'SSH protection';
+
+  @override
+  String get toolbox_ftpAdd => 'Add FTP account';
+
+  @override
+  String get toolbox_ftpUser => 'FTP user';
+
+  @override
+  String get toolbox_ftpPassword => 'FTP password';
+
+  @override
+  String get toolbox_ftpPath => 'FTP root path';
+
+  @override
+  String get toolbox_scanPath => 'Scan path';
+
+  @override
+  String get toolbox_scanName => 'Scan name';
+
+  @override
+  String get toolbox_startScan => 'Start scan';
+
+  @override
+  String get toolbox_stopScan => 'Stop scan';
+
+  @override
+  String get toolbox_scanRecords => 'Scan tasks';
+
+  @override
+  String get toolbox_noScans => 'No scan tasks';
+
+  @override
+  String get server_edit_diag_failed => 'Check failed';
+
+  @override
+  String get host_monitorSettings => 'Monitor settings';
+
+  @override
+  String get host_monitorInterval => 'Interval (seconds)';
+
+  @override
+  String get host_monitorStoreDays => 'Retention (days)';
+
+  @override
+  String get host_monitorEnabled => 'Monitoring enabled';
+
+  @override
+  String get host_sshKeys => 'SSH keys';
+
+  @override
+  String get host_generateKey => 'Generate key';
+
+  @override
+  String get host_keyName => 'Key name';
+
+  @override
+  String get host_keyType => 'Key type';
+
+  @override
+  String get host_keyPassphrase => 'Passphrase';
+
+  @override
+  String get host_keyGenerated => 'SSH key generated';
+
+  @override
+  String get host_deleteKey => 'Delete key';
+
+  @override
+  String get host_publicKey => 'Public key';
+
+  @override
+  String get toolbox_clamRecords => 'Scan results';
+
+  @override
+  String get toolbox_clamNoRecords => 'No scan results';
+
+  @override
+  String get runtime_fpmConfig => 'FPM configuration';
+
+  @override
+  String get runtime_pm => 'Process manager';
+
+  @override
+  String get runtime_maxChildren => 'Max children';
+
+  @override
+  String get runtime_startServers => 'Start servers';
+
+  @override
+  String get runtime_minSpare => 'Min spare servers';
+
+  @override
+  String get runtime_maxSpare => 'Max spare servers';
+
+  @override
+  String get host_disks => 'Disks';
+
+  @override
+  String get host_diagnostics => 'Diagnostics';
+
+  @override
+  String get host_diskSystem => 'System disks';
+
+  @override
+  String get host_diskUnpartitioned => 'Unpartitioned disks';
+
+  @override
+  String get host_diskNormal => 'Data disks';
+
+  @override
+  String get host_diskPartitions => 'Partitions';
+
+  @override
+  String get host_diskFilesystem => 'Filesystem';
+
+  @override
+  String get host_diskUsed => 'Used';
+
+  @override
+  String get host_diskAvail => 'Available';
+
+  @override
+  String get host_diskMountPoint => 'Mount point';
+
+  @override
+  String get host_diskUnmounted => 'Not mounted';
+
+  @override
+  String get host_diskSystemHint =>
+      'System disk partitions are read-only here.';
+
+  @override
+  String get host_diskPartition => 'Partition';
+
+  @override
+  String get host_diskMount => 'Mount';
+
+  @override
+  String get host_diskUnmount => 'Unmount';
+
+  @override
+  String get host_diskAutoMount => 'Mount on boot';
+
+  @override
+  String get host_diskNoFail => 'Allow boot without disk';
+
+  @override
+  String get host_diskMountPointField => 'Mount point path';
+
+  @override
+  String get host_diskLabel => 'Volume label';
+
+  @override
+  String get host_diskActionDone => 'Disk operation completed';
+
+  @override
+  String get host_diskPartitionWarning =>
+      'Partitioning erases data on this disk. Continue only with a disk you can rebuild.';
+
+  @override
+  String get host_diagSummary => 'Runtime summary';
+
+  @override
+  String get host_diagRss => 'Resident memory';
+
+  @override
+  String get host_diagHeap => 'Heap in use';
+
+  @override
+  String get host_diagObjects => 'Heap objects';
+
+  @override
+  String get host_diagGoroutines => 'Goroutines';
+
+  @override
+  String get host_diagSnapshot => 'Goroutine snapshot';
+
+  @override
+  String get host_diagCapturedAt => 'Captured at';
+
+  @override
+  String get host_diagTotal => 'Total';
+
+  @override
+  String get host_diagGroups => 'Groups';
+
+  @override
+  String get host_diagTruncated => 'Snapshot was truncated by the panel.';
+
+  @override
+  String get host_diagStack => 'Call stack';
+
+  @override
+  String get toolbox_fail2banBase => 'Basic rules';
+
+  @override
+  String get toolbox_maxRetry => 'Max retries';
+
+  @override
+  String get toolbox_banTime => 'Ban duration';
+
+  @override
+  String get toolbox_findTime => 'Detection window';
+
+  @override
+  String get toolbox_banAction => 'Ban action';
+
+  @override
+  String get toolbox_logPath => 'Log path';
+
+  @override
+  String get toolbox_durationHint =>
+      'Use a value with unit, for example 300s, 10m, 1h or -1.';
+
+  @override
+  String get toolbox_fail2banChanged => 'Update Fail2ban rule';
+
+  @override
+  String get host_diagCapture => 'Manual capture';
+
+  @override
+  String get host_diagProfileType => 'Profile type';
+
+  @override
+  String get host_diagProfileCpu => 'CPU profile';
+
+  @override
+  String get host_diagProfileHeap => 'Heap profile';
+
+  @override
+  String get host_diagProfileGoroutine => 'Goroutine profile';
+
+  @override
+  String get host_diagProfileMutex => 'Mutex profile';
+
+  @override
+  String get host_diagProfileBlock => 'Block profile';
+
+  @override
+  String get host_diagDuration => 'Duration (seconds)';
+
+  @override
+  String get host_diagStartCapture => 'Start capture';
+
+  @override
+  String get host_diagProfileSaved => 'Profile saved';
+
+  @override
+  String get host_diagComponent => 'Component check';
+
+  @override
+  String get host_diagComponentName => 'Component name';
+
+  @override
+  String get host_diagCheck => 'Check';
+
+  @override
+  String get host_diagComponentExists => 'Status';
+
+  @override
+  String get host_diagComponentPath => 'Path';
+
+  @override
+  String get host_diagComponentMissing => 'Executable not found';
+
+  @override
+  String get websites_loadBalance => 'Load balancing';
+
+  @override
+  String get websites_lbAdd => 'Add upstream';
+
+  @override
+  String get websites_lbEmpty => 'No upstreams yet';
+
+  @override
+  String get websites_lbName => 'Upstream name';
+
+  @override
+  String get websites_lbAlgorithm => 'Algorithm';
+
+  @override
+  String get websites_lbDefault => 'Default (round robin)';
+
+  @override
+  String get websites_lbIpHash => 'IP hash';
+
+  @override
+  String get websites_lbLeastConn => 'Least connections';
+
+  @override
+  String get websites_lbServers => 'Servers';
+
+  @override
+  String get websites_lbAddServer => 'Add server';
+
+  @override
+  String get websites_lbServerAddress => 'Server address';
+
+  @override
+  String get websites_lbWeight => 'Weight';
+
+  @override
+  String get websites_lbFlag => 'Status';
+
+  @override
+  String get websites_lbFlagNone => 'Enabled';
+
+  @override
+  String get websites_lbFlagDown => 'Down';
+
+  @override
+  String get websites_lbFlagBackup => 'Backup';
+
+  @override
+  String get websites_lbMaxFails => 'Max failures';
+
+  @override
+  String get websites_lbFailTimeout => 'Fail timeout';
+
+  @override
+  String get websites_lbMaxConns => 'Max connections';
+
+  @override
+  String get websites_lbDelete => 'Delete upstream';
+
+  @override
+  String get websites_lbSaved => 'Load balancing saved';
+
+  @override
+  String get websites_templates => 'Website templates';
+
+  @override
+  String get websites_templateAdd => 'New template';
+
+  @override
+  String get websites_templateEdit => 'Edit template';
+
+  @override
+  String get websites_templateEmpty => 'No templates yet';
+
+  @override
+  String get websites_templateName => 'Template name';
+
+  @override
+  String get websites_templateType => 'Template type';
+
+  @override
+  String get websites_templateSingle => 'Single page';
+
+  @override
+  String get websites_templateMulti => 'Multi-file';
+
+  @override
+  String get websites_templateContent => 'HTML content';
+
+  @override
+  String get websites_templateUpload => 'Upload ZIP';
+
+  @override
+  String get websites_templateUploaded => 'Template uploaded';
+
+  @override
+  String get websites_templateFilePath => 'Template package';
+
+  @override
+  String get websites_templateRemark => 'Remark';
+
+  @override
+  String get websites_templateVariables => 'Variables';
+
+  @override
+  String get websites_templateAddVariable => 'Add variable';
+
+  @override
+  String get websites_templateVariableKey => 'Key';
+
+  @override
+  String get websites_templateVariableLabel => 'Label';
+
+  @override
+  String get websites_templateVariableType => 'Type';
+
+  @override
+  String get websites_templateVariableDefault => 'Default value';
+
+  @override
+  String get websites_templateVariableOptions => 'Options';
+
+  @override
+  String get websites_templateVariableRequired => 'Required';
+
+  @override
+  String get websites_templateAutoDetect => 'Detect variables';
+
+  @override
+  String get websites_templateSaved => 'Template saved';
+
+  @override
+  String get websites_templateDelete => 'Delete template';
+
+  @override
+  String get websites_templateGenerate => 'Generate';
+
+  @override
+  String get websites_templateOutputs => 'Generated sites';
+
+  @override
+  String get websites_templateOutputName => 'Output name';
+
+  @override
+  String get websites_templateOutputEmpty => 'No generated sites';
+
+  @override
+  String get websites_templateOutputGenerated => 'Site generated';
+
+  @override
+  String get websites_templateOutputDelete => 'Delete generated site';
+
+  @override
+  String get websites_templateNoVariables => 'No variables';
+
+  @override
+  String get websites_templateVariableTypeText => 'Text';
+
+  @override
+  String get websites_templateVariableTypeTextarea => 'Long text';
+
+  @override
+  String get websites_templateVariableTypeNumber => 'Number';
+
+  @override
+  String get websites_templateVariableTypeSelect => 'Select';
+
+  @override
+  String get websites_templateVariableTypeColor => 'Color';
+
+  @override
+  String get files_aiSearch => 'AI search';
+
+  @override
+  String get files_aiQuery => 'Search content';
+
+  @override
+  String get files_aiQueryHint => 'Text to find in file contents';
+
+  @override
+  String get files_aiContainSub => 'Include subdirectories';
+
+  @override
+  String get files_aiMatchCase => 'Match case';
+
+  @override
+  String get files_aiWholeWord => 'Whole word';
+
+  @override
+  String get files_aiUseRegex => 'Use regular expression';
+
+  @override
+  String get files_aiGrepMode =>
+      'AI is not enabled on the panel. Showing content matches only.';
+
+  @override
+  String get files_aiSummary => 'AI summary';
+
+  @override
+  String get files_aiHits => 'Matches';
+
+  @override
+  String get files_aiScanned => 'Files scanned';
+
+  @override
+  String get files_aiTokens => 'Tokens';
+
+  @override
+  String get files_aiDuration => 'Duration';
+
+  @override
+  String get files_aiTruncated => 'Results were truncated by the panel.';
+
+  @override
+  String get files_aiEmpty => 'No matching content';
+
+  @override
+  String get files_aiLine => 'Line';
+
+  @override
+  String get terminal_sessions => 'Terminal sessions';
+
+  @override
+  String get terminal_sessionsEmpty => 'No terminal sessions';
+
+  @override
+  String get terminal_sessionAttached => 'Attached';
+
+  @override
+  String get terminal_sessionDetached => 'Detached';
+
+  @override
+  String get terminal_closeSession => 'Close';
+
+  @override
+  String get terminal_closeAllSessions => 'Close all';
+
+  @override
+  String get terminal_closeAllConfirm =>
+      'All terminal sessions will be disconnected and cannot be recovered.';
+
+  @override
+  String get terminal_kindLocal => 'Local';
+
+  @override
+  String get terminal_kindSsh => 'SSH';
+
+  @override
+  String get terminal_kindContainer => 'Container';
+
+  @override
+  String get files_uploading => 'Uploading';
+
+  @override
+  String get files_uploadPaused => 'Paused';
+
+  @override
+  String get files_uploadPause => 'Pause';
+
+  @override
+  String get files_uploadResume => 'Resume';
+
+  @override
+  String get files_uploadFailed => 'Upload failed';
+
+  @override
+  String get toolbox_infectedStrategy => 'Infected file handling';
+
+  @override
+  String get toolbox_infectedNone => 'Take no action';
+
+  @override
+  String get toolbox_infectedRemove => 'Delete';
+
+  @override
+  String get toolbox_infectedMove => 'Move';
+
+  @override
+  String get toolbox_infectedCopy => 'Copy';
+
+  @override
+  String get toolbox_infectedDir => 'Infected directory';
+
+  @override
+  String get toolbox_infectedDirRequired => 'Enter an infected directory';
+
+  @override
+  String get firewall_whitelistEdit => 'Edit whitelist rule';
+
+  @override
+  String get firewall_backendUnavailable => 'No selectable backend';
+
+  @override
+  String get action_switch => 'Switch';
+
+  @override
+  String get firewall_resetRules => 'Reset rules';
+
+  @override
+  String get firewall_resetRulesMessage =>
+      'Managed firewall rules will be reset. Continue?';
+
+  @override
+  String get firewall_restoreBackup => 'Restore backup';
+
+  @override
+  String firewall_restoreBackupMessage(String name) {
+    return 'Restore rules from backup $name?';
+  }
+
+  @override
+  String get firewall_nativeDetail => 'Native rule detail';
+
+  @override
+  String get firewall_nativeDetailHint =>
+      'Read the native firewalld or ufw definition';
+
+  @override
+  String get firewall_ruleBackups => 'Rule backups';
+
+  @override
+  String get firewall_noBackups => 'No rule backups';
+
+  @override
+  String get firewall_nativeNameRequired => 'Enter a native rule name';
+
+  @override
+  String get firewall_nativeKind => 'Native kind';
+
+  @override
+  String get firewall_nativeZoneService => 'Zone service';
+
+  @override
+  String get firewall_nativeUfwApplication => 'UFW application';
+
+  @override
+  String get firewall_nativeName => 'Native name';
+
+  @override
+  String get firewall_nativePermanent => 'Permanent';
+
+  @override
+  String get firewall_nativeLoad => 'Load native detail';
+
+  @override
+  String get firewall_settingsBackendHint =>
+      'Tap to switch the managed backend';
+
+  @override
+  String get host_sshCheckFailed =>
+      'Local SSH connection check failed. Save cancelled.';
+
+  @override
+  String get host_sshCheckAfterSave =>
+      'SSH port saved, but the local connection check still fails. Verify the new port.';
 }

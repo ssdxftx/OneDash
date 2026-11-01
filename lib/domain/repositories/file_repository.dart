@@ -5,6 +5,8 @@ import 'package:dio/dio.dart';
 import '../../data/dto/file/file_item_dto.dart';
 import '../../data/dto/file/user_group_dto.dart';
 import '../../data/dto/file/file_share_dto.dart';
+import '../../data/dto/common/page_result.dart';
+import '../../data/dto/file/file_ai_search_dto.dart';
 import '../../data/dto/file/file_favorite_dto.dart';
 
 /// 文件管理仓库接口。
@@ -20,6 +22,17 @@ abstract class FileRepository {
     bool containSub = false,
     String sortBy = 'name',
     String? sortOrder,
+  });
+
+  /// 文件内容搜索，可选 AI 摘要。
+  Future<FileAiSearchResultDto> aiSearch({
+    required String path,
+    required String query,
+    bool containSub,
+    bool matchCase,
+    bool wholeWord,
+    bool useRegex,
+    int maxItems,
   });
 
   /// 获取文件内容。
@@ -122,8 +135,13 @@ abstract class FileRepository {
     required String targetPath,
     bool overwrite = true,
     void Function(double progress)? onProgress,
+    void Function(int uploadedBytes)? onChunkUploaded,
+    String? uploadId,
+    int startOffset = 0,
     CancelToken? cancelToken,
   });
+
+  Future<void> stopChunkUpload(String uploadId);
 
   /// 创建文件或目录。
   Future<void> createFileOrDir({
@@ -149,6 +167,43 @@ abstract class FileRepository {
 
   /// 重命名文件或目录。
   Future<void> renameFile({required String oldPath, required String newPath});
+
+  /// 修改文件/目录权限。
+  Future<void> changeMode({required String path, required int mode, bool sub});
+
+  /// 修改文件/目录所有者。
+  Future<void> changeOwner({
+    required String path,
+    required String user,
+    required String group,
+    bool sub,
+  });
+
+  /// 批量删除文件/目录。
+  Future<void> batchDeleteFiles({
+    required List<String> paths,
+    required bool isDir,
+  });
+
+  /// 计算目录体积。
+  Future<int> getDepthSize(String path);
+
+  /// 查询文件历史。
+  Future<PageResult<Map<String, dynamic>>> searchHistory({
+    required String path,
+    String scope,
+    int page,
+    int pageSize,
+  });
+
+  /// 读取历史版本内容。
+  Future<Map<String, dynamic>> getHistoryContent(int id);
+
+  /// 回滚到历史版本。
+  Future<Map<String, dynamic>> restoreHistory(int id);
+
+  /// 删除历史版本。
+  Future<void> deleteHistory(List<int> ids);
 
   /// 获取文件分享详情。
   Future<FileShareDto?> getFileShareDetail(String path);

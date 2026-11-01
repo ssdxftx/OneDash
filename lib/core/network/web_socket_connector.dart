@@ -90,10 +90,10 @@ Future<void> checkAppWebSocketAuth(
         throw ApiBusinessException(code, message);
       }
     }
-  } on SocketException catch (error) {
-    throw NetworkConnectionException('WebSocket 预检失败: $error');
-  } on TimeoutException catch (error) {
-    throw NetworkConnectionException('WebSocket 预检超时: $error');
+  } on SocketException {
+    throw const NetworkConnectionException('WebSocket preflight failed');
+  } on TimeoutException {
+    throw const NetworkConnectionException('WebSocket preflight timed out');
   } finally {
     client.close(force: true);
   }

@@ -17,6 +17,9 @@ import '../../presentation/features/dashboard/screens/overview_page.dart';
 import '../../presentation/features/databases/screens/database_detail_page.dart';
 import '../../presentation/features/databases/screens/databases_page.dart';
 import '../../presentation/features/files/screens/file_editor_page.dart';
+import '../../presentation/features/files/screens/file_ai_search_page.dart';
+import '../../presentation/features/files/screens/file_history_page.dart';
+import '../../presentation/features/host/screens/host_page.dart';
 import '../../presentation/features/files/screens/files_page.dart';
 import '../../presentation/features/firewall/screens/firewall_page.dart';
 import '../../presentation/features/gallery/screens/gallery_page.dart';
@@ -24,16 +27,22 @@ import '../../presentation/features/log/screens/log_hub_page.dart';
 import '../../presentation/features/more/screens/more_page.dart';
 import '../../presentation/features/panel_settings/screens/panel_settings_page.dart';
 import '../../presentation/features/process/screens/process_page.dart';
+import '../../presentation/features/runtimes/screens/runtime_detail_page.dart';
 import '../../presentation/features/runtimes/screens/runtimes_page.dart';
 import '../../presentation/features/server_detail/providers/active_server_provider.dart';
 import '../../presentation/features/servers/screens/server_edit_page.dart';
 import '../../presentation/features/servers/screens/servers_page.dart';
 import '../../presentation/features/settings/screens/app_settings_page.dart';
 import '../../presentation/features/supervisor/screens/supervisor_page.dart';
+import '../../presentation/features/toolbox/screens/toolbox_clam_page.dart';
+import '../../presentation/features/toolbox/screens/toolbox_device_page.dart';
+import '../../presentation/features/toolbox/screens/toolbox_fail2ban_page.dart';
+import '../../presentation/features/toolbox/screens/toolbox_ftp_page.dart';
 import '../../presentation/features/toolbox/screens/toolbox_page.dart';
 import '../../presentation/features/terminal/screens/terminal_page.dart';
 import '../../presentation/features/websites/screens/website_create_wizard.dart';
 import '../../presentation/features/websites/screens/website_groups_page.dart';
+import '../../presentation/features/websites/screens/website_templates_page.dart';
 import '../../presentation/features/websites/screens/website_detail_page.dart';
 import '../../presentation/features/websites/screens/websites_page.dart';
 import '../../presentation/shell/server_shell.dart';
@@ -123,10 +132,40 @@ final appRouter = GoRouter(
           ),
         ),
         GoRoute(
+          path: 'files/history',
+          parentNavigatorKey: _rootNavigatorKey,
+          pageBuilder: (context, state) => slidePage(
+            state,
+            FileHistoryPage(
+              serverId: _serverId(state),
+              path: state.uri.queryParameters['path'] ?? '/',
+            ),
+          ),
+        ),
+        GoRoute(
+          path: 'files/ai-search',
+          parentNavigatorKey: _rootNavigatorKey,
+          pageBuilder: (context, state) => slidePage(
+            state,
+            FileAiSearchPage(
+              serverId: _serverId(state),
+              initialPath: state.uri.queryParameters['path'] ?? '/',
+            ),
+          ),
+        ),
+        GoRoute(
           path: 'websites/create',
           parentNavigatorKey: _rootNavigatorKey,
           pageBuilder: (context, state) =>
               slidePage(state, WebsiteCreateWizard(serverId: _serverId(state))),
+        ),
+        GoRoute(
+          path: 'websites/templates',
+          parentNavigatorKey: _rootNavigatorKey,
+          pageBuilder: (context, state) => slidePage(
+            state,
+            WebsiteTemplatesPage(serverId: _serverId(state)),
+          ),
         ),
         GoRoute(
           path: 'containers/create',
@@ -276,6 +315,8 @@ final appRouter = GoRouter(
                               serverId: _serverId(state),
                               databaseName: state.pathParameters['name'] ?? '',
                               type: state.uri.queryParameters['type'] ?? '',
+                              instance:
+                                  state.uri.queryParameters['instance'] ?? '',
                             ),
                           ),
                         ),
@@ -345,6 +386,27 @@ final appRouter = GoRouter(
                       ),
                     ),
                     GoRoute(
+                      path: 'host',
+                      pageBuilder: (context, state) => slidePage(
+                        state,
+                        HostPage(serverId: _serverId(state)),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'runtimes/:id',
+                      pageBuilder: (context, state) => slidePage(
+                        state,
+                        RuntimeDetailPage(
+                          serverId: _serverId(state),
+                          id:
+                              int.tryParse(state.pathParameters['id'] ?? '') ??
+                              0,
+                          type: state.uri.queryParameters['type'] ?? '',
+                          name: state.uri.queryParameters['name'] ?? '',
+                        ),
+                      ),
+                    ),
+                    GoRoute(
                       path: 'host-tools',
                       pageBuilder: (context, state) => slidePage(
                         state,
@@ -357,6 +419,26 @@ final appRouter = GoRouter(
                         state,
                         ToolboxPage(serverId: _serverId(state)),
                       ),
+                    ),
+                    GoRoute(
+                      path: 'toolbox/device',
+                      pageBuilder: (context, state) =>
+                          slidePage(state, const ToolboxDevicePage()),
+                    ),
+                    GoRoute(
+                      path: 'toolbox/clam',
+                      pageBuilder: (context, state) =>
+                          slidePage(state, const ToolboxClamPage()),
+                    ),
+                    GoRoute(
+                      path: 'toolbox/fail2ban',
+                      pageBuilder: (context, state) =>
+                          slidePage(state, const ToolboxFail2banPage()),
+                    ),
+                    GoRoute(
+                      path: 'toolbox/ftp',
+                      pageBuilder: (context, state) =>
+                          slidePage(state, const ToolboxFtpPage()),
                     ),
                     GoRoute(
                       path: 'groups',

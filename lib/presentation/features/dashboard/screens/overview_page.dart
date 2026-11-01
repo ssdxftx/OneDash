@@ -547,6 +547,23 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                     onTap: () =>
                         context.push('/s/${widget.serverId}/more/firewall'),
                   ),
+                  _QuickAction(
+                    icon: TablerIcons.world,
+                    label: l10n.websites_title,
+                    onTap: () => context.push('/s/${widget.serverId}/websites'),
+                  ),
+                  _QuickAction(
+                    icon: TablerIcons.box_multiple,
+                    label: l10n.containers_title,
+                    onTap: () =>
+                        context.push('/s/${widget.serverId}/containers'),
+                  ),
+                  _QuickAction(
+                    icon: TablerIcons.apps,
+                    label: l10n.more_installed_apps,
+                    onTap: () =>
+                        context.push('/s/${widget.serverId}/more/apps'),
+                  ),
                 ],
               ),
             ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
@@ -82,109 +83,83 @@ class ToolboxPage extends ConsumerWidget {
         builder: (value) => ListView(
           padding: const EdgeInsets.all(AppTokens.s16),
           children: [
-            SectionHeader(title: l10n.toolbox_device_info),
-            SplitListGroup(
-              children: [
-                _info(l10n.toolbox_hostname, value.device['hostname']),
-                _info(l10n.toolbox_systemUser, value.device['user']),
-                _info(l10n.toolbox_timeZone, value.device['timeZone']),
-                _info(l10n.toolbox_localTime, value.device['localTime']),
-                _info(
-                  'DNS',
-                  ((value.device['dns'] as List?) ?? const [])
-                      .map((item) => '$item')
-                      .join(', '),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: AppTokens.s8,
-                left: AppTokens.s4,
-              ),
-              child: Text(
-                l10n.toolbox_readOnlyHint,
-                style: AppTextStyles.caption.copyWith(
-                  color: context.scheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-            const SizedBox(height: AppTokens.s24),
-            SectionHeader(title: l10n.toolbox_actions),
+            SectionHeader(title: l10n.toolbox_group_system),
             SplitListGroup(
               children: [
                 SplitListTile(
-                  leading: const Icon(TablerIcons.scan),
-                  title: l10n.toolbox_scan,
+                  leading: const Icon(TablerIcons.clock),
+                  title: l10n.toolbox_time,
+                  subtitle: '${value.device['timeZone'] ?? '-'}',
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: () => context.push('/s/$serverId/more/toolbox/device'),
+                ),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.arrows_exchange),
+                  title: l10n.toolbox_swapDns,
+                  subtitle: ((value.device['dns'] as List?) ?? const [])
+                      .map((item) => '$item')
+                      .join(', '),
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: () => context.push('/s/$serverId/more/toolbox/device'),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTokens.s24),
+            SectionHeader(title: l10n.toolbox_group_security),
+            SplitListGroup(
+              children: [
+                SplitListTile(
+                  leading: const Icon(TablerIcons.virus),
+                  title: l10n.toolbox_clam,
+                  subtitle: value.clam['isExist'] == true
+                      ? l10n.toolbox_installed
+                      : l10n.runtime_notInstalled,
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: () => context.push('/s/$serverId/more/toolbox/clam'),
+                ),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.ban),
+                  title: l10n.toolbox_fail2ban,
+                  subtitle: value.fail2ban['isActive'] == true
+                      ? l10n.toolbox_running
+                      : l10n.runtime_notInstalled,
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: () =>
+                      context.push('/s/$serverId/more/toolbox/fail2ban'),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTokens.s24),
+            SectionHeader(title: l10n.toolbox_group_service),
+            SplitListGroup(
+              children: [
+                SplitListTile(
+                  leading: const Icon(TablerIcons.folder),
+                  title: l10n.toolbox_ftp,
+                  subtitle: value.ftp['isActive'] == true
+                      ? l10n.toolbox_running
+                      : l10n.runtime_notInstalled,
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: () => context.push('/s/$serverId/more/toolbox/ftp'),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTokens.s24),
+            SectionHeader(title: l10n.toolbox_group_maintenance),
+            SplitListGroup(
+              children: [
+                SplitListTile(
+                  leading: const Icon(TablerIcons.trash),
+                  title: l10n.toolbox_cacheClean,
                   trailing: const Icon(TablerIcons.chevron_right),
                   onTap: () => _scan(context, ref),
                 ),
-              ],
-            ),
-            const SizedBox(height: AppTokens.s24),
-            const SectionHeader(title: 'Fail2ban'),
-            SplitListGroup(
-              children: [
-                _boolInfo(
-                  l10n.toolbox_installed,
-                  value.fail2ban['isExist'],
-                  l10n,
-                ),
-                _boolInfo(
-                  l10n.toolbox_running,
-                  value.fail2ban['isActive'],
-                  l10n,
-                ),
-                _boolInfo(
-                  l10n.toolbox_enabled,
-                  value.fail2ban['isEnable'],
-                  l10n,
-                ),
-                _info(l10n.toolbox_version, value.fail2ban['version']),
-                _info(l10n.toolbox_port, value.fail2ban['port']),
-              ],
-            ),
-            const SizedBox(height: AppTokens.s24),
-            const SectionHeader(title: 'FTP'),
-            SplitListGroup(
-              children: [
-                _boolInfo(l10n.toolbox_installed, value.ftp['isExist'], l10n),
-                _boolInfo(l10n.toolbox_running, value.ftp['isActive'], l10n),
-              ],
-            ),
-            const SizedBox(height: AppTokens.s24),
-            SectionHeader(title: l10n.toolbox_virusScan),
-            SplitListGroup(
-              children: [
-                _boolInfo('ClamAV', value.clam['isExist'], l10n),
-                _boolInfo(
-                  l10n.toolbox_clamAvRunning,
-                  value.clam['isActive'],
-                  l10n,
-                ),
-                _boolInfo('FreshClam', value.clam['freshIsExist'], l10n),
-                _boolInfo(
-                  l10n.toolbox_freshClamRunning,
-                  value.clam['freshIsActive'],
-                  l10n,
-                ),
-                _info(l10n.toolbox_version, value.clam['version']),
-                _info(l10n.toolbox_virusDatabase, value.clam['freshVersion']),
               ],
             ),
           ],
         ),
       ),
     );
-  }
-
-  Widget _info(String label, Object? value) {
-    final text = value?.toString().trim() ?? '';
-    return SplitListTile(title: label, subtitle: text.isEmpty ? '-' : text);
-  }
-
-  Widget _boolInfo(String label, Object? value, AppLocalizations l10n) {
-    return _info(label, value == true ? l10n.common_yes : l10n.common_no);
   }
 
   Future<void> _scan(BuildContext context, WidgetRef ref) async {

@@ -93,12 +93,14 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
     required String type,
     required String database,
     required String value,
+    String? name,
   }) => _api.changePassword(
     id: id,
     from: from,
     type: type,
     database: database,
     value: value,
+    name: name,
   );
 
   @override
@@ -292,6 +294,185 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
 
   @override
   Future<void> installRedisCli() => _api.installRedisCli();
+
+  @override
+  Future<PageResult<DatabaseSearchItemDto>> searchMongoDatabases({
+    required String database,
+    int page = 1,
+    int pageSize = 20,
+  }) => _api.searchMongoDatabases(
+    database: database,
+    page: page,
+    pageSize: pageSize,
+  );
+
+  @override
+  Future<void> createMongoDatabase(Map<String, dynamic> body) =>
+      _api.createMongoDatabase(body);
+
+  @override
+  Future<void> deletePgDatabase({
+    required int id,
+    required String type,
+    required String database,
+    bool forceDelete = false,
+    bool deleteBackup = false,
+  }) => _api.deletePgDatabase(
+    id: id,
+    type: type,
+    database: database,
+    forceDelete: forceDelete,
+    deleteBackup: deleteBackup,
+  );
+
+  @override
+  Future<void> deleteMongoDatabase({
+    required int id,
+    required String database,
+    bool forceDelete = false,
+    bool deleteBackup = false,
+  }) => _api.deleteMongoDatabase(
+    id: id,
+    database: database,
+    forceDelete: forceDelete,
+    deleteBackup: deleteBackup,
+  );
+
+  @override
+  Future<void> changePgPrivileges({
+    required String database,
+    required String name,
+    required String username,
+    required bool superUser,
+  }) => _api.changePgPrivileges(
+    database: database,
+    name: name,
+    username: username,
+    superUser: superUser,
+  );
+
+  @override
+  Future<void> bindPgUser({
+    required String database,
+    required String name,
+    required String username,
+    required String password,
+    bool superUser = false,
+  }) => _api.bindPgUser(
+    database: database,
+    name: name,
+    username: username,
+    password: password,
+    superUser: superUser,
+  );
+
+  @override
+  Future<String> loadMongoPrivileges({
+    required String database,
+    required String name,
+    required String username,
+  }) => _api.loadMongoPrivileges(
+    database: database,
+    name: name,
+    username: username,
+  );
+
+  @override
+  Future<void> changeMongoPrivileges({
+    required String database,
+    required String name,
+    required String username,
+    required String permission,
+  }) => _api.changeMongoPrivileges(
+    database: database,
+    name: name,
+    username: username,
+    permission: permission,
+  );
+
+  @override
+  Future<void> bindMongoUser({
+    required String database,
+    required String name,
+    required String username,
+    required String password,
+  }) => _api.bindMongoUser(
+    database: database,
+    name: name,
+    username: username,
+    password: password,
+  );
+
+  @override
+  Future<List<Map<String, dynamic>>> searchUsers({required String database}) =>
+      _api.searchUsers(database: database);
+
+  @override
+  Future<void> createUser({
+    required String database,
+    required String username,
+    required String host,
+    required String password,
+    List<String> dbs = const [],
+    String description = '',
+  }) => _api.createUser(
+    database: database,
+    username: username,
+    host: host,
+    password: password,
+    dbs: dbs,
+    description: description,
+  );
+
+  @override
+  Future<void> deleteUser({
+    required String database,
+    required String username,
+    required String host,
+  }) => _api.deleteUser(database: database, username: username, host: host);
+
+  @override
+  Future<void> changeUserPassword({
+    required String database,
+    required String username,
+    required String host,
+    required String password,
+  }) => _api.changeUserPassword(
+    database: database,
+    username: username,
+    host: host,
+    password: password,
+  );
+
+  @override
+  Future<List<Map<String, dynamic>>> searchGrants({required String database}) =>
+      _api.searchGrants(database: database);
+
+  @override
+  Future<void> grantUser({
+    required String database,
+    required String db,
+    required String username,
+    required String host,
+  }) => _api.grantUser(
+    database: database,
+    db: db,
+    username: username,
+    host: host,
+  );
+
+  @override
+  Future<void> revokeGrant({
+    required String database,
+    required String db,
+    required String username,
+    required String host,
+  }) => _api.revokeGrant(
+    database: database,
+    db: db,
+    username: username,
+    host: host,
+  );
 }
 
 /// 基于当前激活服务器的仓库 Provider。

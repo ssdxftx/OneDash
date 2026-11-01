@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/dto/database/database_instance_dto.dart';
 import '../../../../data/repositories_impl/database_repository_impl.dart';
 
-typedef DatabaseKey = ({String name, String type});
+typedef DatabaseKey = ({String name, String type, String instance});
 
 class DatabaseDetailState {
   const DatabaseDetailState({
@@ -20,11 +20,24 @@ class DatabaseDetailState {
 final databaseDetailProvider = FutureProvider.autoDispose
     .family<DatabaseDetailState, DatabaseKey>((ref, key) async {
       final repository = await ref.watch(databaseRepositoryProvider.future);
-      final page = await repository.searchDatabases(
-        database: key.type,
-        page: 1,
-        pageSize: 100,
-      );
+      final page = switch (key.type) {
+        'postgresql' ||
+        'postgresql-cluster' => await repository.searchPgDatabases(
+          database: key.instance,
+          page: 1,
+          pageSize: 100,
+        ),
+        'mongodb' => await repository.searchMongoDatabases(
+          database: key.instance,
+          page: 1,
+          pageSize: 100,
+        ),
+        _ => await repository.searchDatabases(
+          database: key.instance,
+          page: 1,
+          pageSize: 100,
+        ),
+      };
       DatabaseSearchItemDto? item;
       for (final candidate in page.items) {
         if (candidate.name == key.name) {
@@ -39,7 +52,7 @@ final databaseDetailProvider = FutureProvider.autoDispose
       try {
         connection = await repository.getConnInfo(
           type: key.type,
-          name: key.name,
+          name: key.instance,
         );
       } catch (_) {
         // 部分数据库类型不提供连接信息，保留空映射。
@@ -48,7 +61,7 @@ final databaseDetailProvider = FutureProvider.autoDispose
       try {
         remote = await repository.getRemoteAccess(
           type: key.type,
-          name: key.name,
+          name: key.instance,
         );
       } catch (_) {
         // 忽略不支持远程访问的类型。

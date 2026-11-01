@@ -14,10 +14,12 @@ import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/skeleton.dart';
+import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../providers/database_detail_provider.dart';
+import '../widgets/database_users_tab.dart';
 import '../../../common/states/error_toast.dart';
 
 class DatabaseDetailPage extends ConsumerStatefulWidget {
@@ -26,11 +28,13 @@ class DatabaseDetailPage extends ConsumerStatefulWidget {
     required this.serverId,
     required this.databaseName,
     required this.type,
+    required this.instance,
   });
 
   final int serverId;
   final String databaseName;
   final String type;
+  final String instance;
 
   @override
   ConsumerState<DatabaseDetailPage> createState() => _DatabaseDetailPageState();
@@ -40,7 +44,8 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
   bool _showPassword = false;
   Timer? _hideTimer;
 
-  DatabaseKey get _key => (name: widget.databaseName, type: widget.type);
+  DatabaseKey get _key =>
+      (name: widget.databaseName, type: widget.type, instance: widget.instance);
 
   @override
   void dispose() {
@@ -86,98 +91,114 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
         value: detail,
         onRetry: () => ref.invalidate(databaseDetailProvider(_key)),
         loading: const SkeletonList(itemCount: 6),
-        builder: (state) => ListView(
-          padding: const EdgeInsets.all(AppTokens.s16),
+        builder: (state) => SegmentedTabsView(
+          labels: [l10n.databases_title, l10n.databases_usersGrants],
           children: [
-            TonalCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(state.item.name, style: AppTextStyles.titleL),
-                  const SizedBox(height: AppTokens.s4),
-                  Text(
-                    '${state.item.from} · ${state.item.format}',
+            ListView(
+              padding: const EdgeInsets.all(AppTokens.s16),
+              children: [
+                TonalCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(state.item.name, style: AppTextStyles.titleL),
+                      const SizedBox(height: AppTokens.s4),
+                      Text(
+                        '${state.item.from} · ${state.item.format}',
+                        style: AppTextStyles.bodyS.copyWith(
+                          color: context.scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppTokens.s24),
+                SplitListGroup(
+                  children: [
+                    _CopyRow(
+                      label: l10n.databases_address,
+                      value: _conn('host', state),
+                      onCopy: _copy,
+                    ),
+                    _CopyRow(
+                      label: l10n.databases_port,
+                      value: _conn('port', state),
+                      onCopy: _copy,
+                    ),
+                    _CopyRow(
+                      label: l10n.databases_username,
+                      value: state.item.username,
+                      onCopy: _copy,
+                    ),
+                    _PasswordRow(
+                      label: l10n.databases_password,
+                      value: state.item.password,
+                      visible: _showPassword,
+                      onToggle: _togglePassword,
+                      onCopy: _copy,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppTokens.s24),
+                SwitchListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppTokens.s8,
+                  ),
+                  title: Text(
+                    l10n.databases_remoteAccess,
+                    style: AppTextStyles.bodyM,
+                  ),
+                  subtitle: Text(
+                    state.remoteAccess
+                        ? l10n.databases_enabled
+                        : l10n.databases_disabled,
                     style: AppTextStyles.bodyS.copyWith(
                       color: context.scheme.onSurfaceVariant,
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppTokens.s24),
-            SplitListGroup(
-              children: [
-                _CopyRow(
-                  label: l10n.databases_address,
-                  value: _conn('host', state),
-                  onCopy: _copy,
+                  value: state.remoteAccess,
+                  onChanged: _setRemoteAccess,
                 ),
-                _CopyRow(
-                  label: l10n.databases_port,
-                  value: _conn('port', state),
-                  onCopy: _copy,
-                ),
-                _CopyRow(
-                  label: l10n.databases_username,
-                  value: state.item.username,
-                  onCopy: _copy,
-                ),
-                _PasswordRow(
-                  label: l10n.databases_password,
-                  value: state.item.password,
-                  visible: _showPassword,
-                  onToggle: _togglePassword,
-                  onCopy: _copy,
-                ),
-              ],
-            ),
-            const SizedBox(height: AppTokens.s24),
-            SwitchListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppTokens.s8,
-              ),
-              title: Text(
-                l10n.databases_remoteAccess,
-                style: AppTextStyles.bodyM,
-              ),
-              subtitle: Text(
-                state.remoteAccess
-                    ? l10n.databases_enabled
-                    : l10n.databases_disabled,
-                style: AppTextStyles.bodyS.copyWith(
-                  color: context.scheme.onSurfaceVariant,
-                ),
-              ),
-              value: state.remoteAccess,
-              onChanged: _setRemoteAccess,
-            ),
-            const SizedBox(height: AppTokens.s16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _changePassword(state.item.id),
-                    icon: const Icon(TablerIcons.key),
-                    label: Text(l10n.databases_changePassword),
-                  ),
-                ),
-                const SizedBox(width: AppTokens.s12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _delete,
-                    icon: const Icon(TablerIcons.trash),
-                    label: Text(l10n.databases_deleteDatabase),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: context.appColors.danger,
+                const SizedBox(height: AppTokens.s16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _changePassword(state.item.id),
+                        icon: const Icon(TablerIcons.key),
+                        label: Text(l10n.databases_changePassword),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: AppTokens.s12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _delete,
+                        icon: const Icon(TablerIcons.trash),
+                        label: Text(l10n.databases_deleteDatabase),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: context.appColors.danger,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
+            ),
+            DatabaseUsersTab(
+              item: state.item,
+              type: widget.type,
+              instance: widget.instance,
             ),
           ],
         ),
       ),
     );
+  }
+
+  String get _from {
+    final state = ref.read(databaseDetailProvider(_key)).valueOrNull;
+    final from = state?.item.from ?? '';
+    return from.isEmpty ? 'local' : from;
   }
 
   String _conn(String key, DatabaseDetailState state) {
@@ -191,7 +212,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
       final repository = await ref.read(databaseRepositoryProvider.future);
       await repository.updateRemoteAccess(
         type: widget.type,
-        database: widget.databaseName,
+        database: widget.instance,
         remote: value,
       );
       if (!mounted) return;
@@ -237,10 +258,11 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
       final repository = await ref.read(databaseRepositoryProvider.future);
       await repository.changePassword(
         id: id,
-        from: widget.type,
+        from: _from,
         type: widget.type,
-        database: widget.databaseName,
+        database: widget.instance,
         value: value,
+        name: widget.databaseName,
       );
       if (!mounted) return;
       AppToast.success(context, l10n.databases_passwordChanged);
@@ -262,7 +284,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
         final resources = await repository.checkDelete(
           id: state.item.id,
           type: widget.type,
-          database: widget.databaseName,
+          database: widget.instance,
         );
         related = resources.length;
       } catch (_) {
@@ -282,7 +304,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
       await repository.deleteDatabase(
         id: state.item.id,
         type: widget.type,
-        database: widget.databaseName,
+        database: widget.instance,
         forceDelete: false,
         deleteBackup: false,
       );

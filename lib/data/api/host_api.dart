@@ -1,6 +1,10 @@
+import 'package:dio/dio.dart';
+
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
 import '../dto/common/page_result.dart';
+import '../dto/host/disk_dto.dart';
+import '../dto/host/host_diagnostics_dto.dart';
 import '../dto/host/ssh_cert_dto.dart';
 import '../dto/host/ssh_info_dto.dart';
 
@@ -22,6 +26,57 @@ class HostApi {
   Future<List<String>> getMonitorNetOptions() async {
     final resp = await _client.get<dynamic>('/api/v2/hosts/monitor/netoptions');
     return _optionsFromResponse(resp.data);
+  }
+
+  /// GET /api/v2/hosts/monitor/setting
+  Future<Map<String, dynamic>> getMonitorSetting() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/hosts/monitor/setting',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/hosts/monitor/setting/update
+  Future<void> updateMonitorSetting(String key, String value) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/monitor/setting/update',
+      data: {'key': key, 'value': value},
+    );
+  }
+
+  /// POST /api/v2/hosts/monitor/search
+  Future<List<Map<String, dynamic>>> searchMonitor({
+    String param = 'all',
+    required DateTime startTime,
+    required DateTime endTime,
+    String io = 'all',
+    String network = 'all',
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/monitor/search',
+      data: {
+        'param': param,
+        'startTime': startTime.toIso8601String(),
+        'endTime': endTime.toIso8601String(),
+        'io': io,
+        'network': network,
+      },
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data
+        .whereType<Map>()
+        .map((e) => e.cast<String, dynamic>())
+        .toList(growable: false);
+  }
+
+  /// POST /api/v2/hosts/test/byinfo
+  Future<bool> testHostConnection(Map<String, dynamic> body) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/test/byinfo',
+      data: body,
+    );
+    return resp.data?['data'] == true;
   }
 
   /// POST /api/v2/hosts/ssh/search
@@ -47,6 +102,15 @@ class HostApi {
       '/api/v2/hosts/ssh/update',
       data: {'key': key, 'newValue': newValue},
     );
+  }
+
+  /// POST /api/v2/settings/ssh/check — 检查面板本地 SSH 连接是否可用。
+  Future<bool> checkLocalSshConnection() async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/settings/ssh/check',
+      data: const {},
+    );
+    return resp.data?['data'] == true;
   }
 
   /// POST /api/v2/hosts/ssh/file — 读取 SSH 配置文件内容。
@@ -117,10 +181,60 @@ class HostApi {
     );
   }
 
+  // ── 终端会话 ──────────────────────────────────────────────────────────
+
+  /// POST /api/v2/hosts/terminal/sessions/search
+  Future<List<Map<String, dynamic>>> searchTerminalSessions() async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/terminal/sessions/search',
+      data: const {},
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data
+        .whereType<Map>()
+        .map((e) => e.cast<String, dynamic>())
+        .toList(growable: false);
+  }
+
+  /// POST /api/v2/hosts/terminal/sessions/close
+  Future<void> closeTerminalSession(String id) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/terminal/sessions/close',
+      data: {'id': id},
+    );
+  }
+
+  /// POST /api/v2/hosts/terminal/sessions/closeAll
+  Future<void> closeAllTerminalSessions() async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/terminal/sessions/closeAll',
+      data: const {},
+    );
+  }
+
+  // ── 磁盘与分区 ────────────────────────────────────────────────────────
+
   /// GET /api/v2/hosts/disks
-  Future<Map<String, dynamic>> listDisks() async {
+  Future<CompleteDiskDto> listDisks() async {
     final resp = await _client.get<Map<String, dynamic>>('/api/v2/hosts/disks');
-    return ApiResponseParser.map(resp);
+    return ApiResponseParser.object(resp, CompleteDiskDto.fromJson);
+  }
+
+  /// POST /api/v2/hosts/disks/mount
+  Future<void> mountDisk(DiskMountReq req) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/disks/mount',
+      data: req.toJson(),
+    );
+  }
+
+  /// POST /api/v2/hosts/disks/partition
+  Future<void> partitionDisk(DiskPartitionReq req) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/disks/partition',
+      data: req.toJson(),
+    );
   }
 
   /// POST /api/v2/hosts/disks/unmount
@@ -129,6 +243,45 @@ class HostApi {
       '/api/v2/hosts/disks/unmount',
       data: {'mountPoint': mountPoint},
     );
+  }
+
+  // ── 运行时诊断 ────────────────────────────────────────────────────────
+
+  /// GET /api/v2/hosts/diagnostics/summary
+  Future<DiagnosticsSummaryDto> getDiagnosticsSummary() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/hosts/diagnostics/summary',
+    );
+    return ApiResponseParser.object(resp, DiagnosticsSummaryDto.fromJson);
+  }
+
+  /// GET /api/v2/hosts/diagnostics/goroutines
+  Future<GoroutineSnapshotDto> getGoroutineSnapshot() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/hosts/diagnostics/goroutines',
+    );
+    return ApiResponseParser.object(resp, GoroutineSnapshotDto.fromJson);
+  }
+
+  /// GET /api/v2/hosts/components/:name — 检测主机组件。
+  Future<ComponentInfoDto> getComponentInfo(String name) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/hosts/components/${Uri.encodeComponent(name)}',
+    );
+    return ApiResponseParser.object(resp, ComponentInfoDto.fromJson);
+  }
+
+  /// POST /api/v2/hosts/diagnostics/profiles — 返回 pprof 二进制内容。
+  Future<List<int>> createDiagnosticsProfile({
+    required String type,
+    required int duration,
+  }) async {
+    final resp = await _client.post<List<int>>(
+      '/api/v2/hosts/diagnostics/profiles',
+      data: {'type': type, 'duration': duration},
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return resp.data ?? const [];
   }
 
   static List<String> _optionsFromResponse(Object? body) {
