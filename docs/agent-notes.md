@@ -74,3 +74,91 @@ is absent from the working tree.
 - No Android device or emulator is available in this workspace, so the new
   full-screen forms were validated by analyzer, tests, route smoke coverage and
   real API calls rather than device screenshots.
+
+## 1Panel v2.4.2 P1
+
+- The lab panel has only MySQL instances installed (one local, one remote).
+  PostgreSQL and MongoDB create/delete/password/bind paths were implemented
+  against the v2.4.2 Swagger contract but could not be exercised on the lab
+  panel without installing two additional apps.
+- `POST /files/depth/size` returns an array of per-child sizes plus the
+  requested directory. The client picks the entry whose `path` matches the
+  requested directory, so the directory row shows the aggregate size.
+- Terminal sessions are listed and closed from the terminal app bar. The
+  endpoints are `/hosts/terminal/sessions/search`, `/close` and `/closeAll`
+  (`agent/router/ro_host.go:91-93`). The list only shows sessions for the current
+  auth session, matching the panel frontend.
+- SSH changes are saved through `/hosts/ssh/update`. `/hosts/test/byid` tests a
+  saved host record and the current panel server is not one, so port changes use
+  the panel-local `/settings/ssh/check` endpoint before and after saving. The
+  form still validates the port as a number.
+- ClamAV and Fail2ban are not installed on the lab panel. Their pages, scan task
+  creation (including the none/remove/move/copy infected-file strategy),
+  service toggles, unban actions and scan record lists are implemented but the
+  install / EICAR / ban acceptance flow still needs a panel with those tools
+  installed. ClamAV installation itself is an OS package step; the panel API
+  only starts, stops and restarts the installed service.
+- Chunked upload uses the v2.4.2 resumable fields `uploadID`, `offset` and
+  `fileSize`. Pause cancels the in-flight request and keeps the temporary part;
+  resume continues from the last completed offset. Cancel calls
+  `/files/chunkupload/stop` to remove the temporary part.
+- SSH key generation and deletion are available in the host page. The generated
+  private key is never rendered; only the key name and type are listed.
+- PHP FPM configuration is edited through the five `pm.*` fields that the panel
+  frontend exposes. Arbitrary FPM parameters are outside this form.
+- The PHP extension tab has an explicit refresh action so installed state can be
+  reloaded. The panel has no per-extension version-update endpoint; updates are
+  install/uninstall plus this refresh.
+- No Android device or emulator is available. New pages are covered by
+  analyzer, unit/widget tests, route smoke tests, and read-only real API probes.
+
+## 1Panel v2.4.2 P2
+
+- The host page now has four tabs: monitoring, SSH, disks and diagnostics.
+- Firewall settings now expose backend switching, whitelist editing, rule
+  backups/restore/reset and the native firewalld/ufw detail reader. Native detail
+  is only meaningful when the panel uses firewalld or ufw; the lab uses
+  iptables, so that path is contract-tested only.
+  Disks read `/hosts/disks`; diagnostics read `/hosts/diagnostics/summary` and
+  `/hosts/diagnostics/goroutines`.
+- Disk partition, mount and unmount follow the v2.4.2 request shapes. Partition
+  and unmount require typing the device or mount point before submission, and
+  mount also asks for confirmation. These destructive paths were not executed
+  against the shared lab panel; only `GET /hosts/disks` was exercised.
+- Runtime profile capture uses `POST /hosts/diagnostics/profiles` with
+  `ResponseType.bytes` and saves the returned pprof file through the system
+  save dialog. No new dependency was added.
+- `/hosts/components/:name` has no standalone page in v2.4.2; the panel only
+  uses it from file AI search to check `ffmpeg`. The diagnostics tab now exposes
+  a small component check with an editable name, defaulting to `ffmpeg`. The
+  raw executable error string is not rendered; a localized "not found" label is
+  shown instead.
+- Fail2ban basic rules can be edited from the toolbox page: port, max retries,
+  ban time, find time, ban action and log path. The lab panel does not have
+  Fail2ban installed, so these writes could not be exercised end to end.
+- No Android device or emulator is available. New tabs are covered by analyzer,
+  DTO unit tests, route smoke tests and read-only API probes.
+
+## 1Panel v2.4.2 D batch (partial)
+
+- The dashboard quick-action grid now has nine entries, adding websites,
+  containers and installed apps to the existing six.
+- Website detail has a load-balancing tab backed by `/websites/:id/lbs` and the
+  create, update and delete endpoints. The form covers name, algorithm, server
+  address, weight, status, max failures, fail timeout and max connections.
+- Load balancing was exercised read-only on the lab panel. The two probed sites
+  returned `data: null` for `/lbs`, which the client renders as an empty list.
+  Create, update and delete were not executed because they would modify an
+  existing site.
+- Website templates are available from the websites app bar. The page supports
+  listing, filtering, create/edit/delete, single-page HTML with variable
+  auto-detection, multi-file ZIP upload, variable metadata, and generating a
+  site from a template. Generated sites are listed in a sheet and can be
+  deleted. Template preview is not rendered in the app because there is no
+  WebView dependency; generation still uses the panel API.
+- AI is implemented as file content search from the files app bar. It calls
+  `/files/ai-search`, supports recursive search, case, whole-word and regex
+  options, shows grep hits, and renders the AI summary when the panel has file
+  AI enabled. The app never stores or asks for model credentials; it uses the
+  panel's existing AI account setting. The separate Agent/model/GPU/MCP module
+  is outside this batch.
