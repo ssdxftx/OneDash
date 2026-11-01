@@ -1,5 +1,6 @@
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/network/network_exceptions.dart';
 import '../dto/common/task_log_dto.dart';
 
 /// 轮询 `/logs/tasks/read`，等待 1Panel 后台任务结束。
@@ -26,10 +27,10 @@ class TaskWaiter {
       if (status == 'success') return;
       if (status == 'failed' || status == 'error' || status == 'canceled') {
         final detail = log.lines.isEmpty ? '' : log.lines.last;
-        throw StateError('$subject执行失败 $detail'.trim());
+        throw TaskFailedException(subject: subject, detail: detail);
       }
       await Future<void>.delayed(interval);
     }
-    throw StateError('$subject仍在执行，请稍后刷新');
+    throw TaskFailedException(subject: subject, timedOut: true);
   }
 }

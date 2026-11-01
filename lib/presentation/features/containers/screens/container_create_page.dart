@@ -466,12 +466,25 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
       ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.all(AppTokens.s16),
-        child: PrimaryButton(
-          label: _submitting
-              ? l10n.containers_creating
-              : l10n.containers_createSubmit,
-          loading: _submitting,
-          onPressed: _canSubmit && !_submitting ? _submit : null,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PrimaryButton(
+              label: _submitting
+                  ? l10n.containers_creating
+                  : l10n.containers_createSubmit,
+              loading: _submitting,
+              onPressed: _canSubmit && !_submitting ? _submit : null,
+            ),
+            if (_submitting) ...[
+              const SizedBox(height: AppTokens.s8),
+              SecondaryButton(
+                label: l10n.containers_continueInBackground,
+                icon: TablerIcons.arrow_back,
+                onPressed: () => context.pop(),
+              ),
+            ],
+          ],
         ),
       ),
     );

@@ -4,7 +4,7 @@ import 'dart:io';
 
 /// 轻量 1Panel 假服务，用于四态与重试测试。
 ///
-/// 支持场景：normal / empty / error / slow / unauthorized。
+/// 支持场景：normal / empty / error / slow / unauthorized / taskFailed / taskRunning。
 class FakePanel {
   FakePanel._(this._server, this.port);
 
@@ -248,11 +248,16 @@ class FakePanel {
 
   Map<String, dynamic> _taskLog() {
     final failed = scenario == 'taskFailed';
+    final running = scenario == 'taskRunning';
     return _envelope({
-      'end': true,
+      'end': !running,
       'path': '/tmp/task.log',
       'total': failed ? 1 : 0,
-      'taskStatus': failed ? 'Failed' : 'Success',
+      'taskStatus': failed
+          ? 'Failed'
+          : running
+          ? 'Executing'
+          : 'Success',
       'lines': failed ? ['image not found'] : <String>[],
       'scope': 'container',
       'totalLines': failed ? 1 : 0,

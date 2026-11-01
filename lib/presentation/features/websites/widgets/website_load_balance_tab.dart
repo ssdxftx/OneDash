@@ -409,47 +409,54 @@ class _WebsiteLoadBalanceTabState extends ConsumerState<WebsiteLoadBalanceTab> {
                       ),
                     ),
                     const SizedBox(height: AppTokens.s8),
-                    for (final server in upstream.servers)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: AppTokens.s4),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    server.server,
-                                    style: AppTextStyles.bodyM,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const SizedBox(width: AppTokens.s8),
-                                Text(
-                                  _flagLabel(l10n, server.flag),
-                                  style: AppTextStyles.bodyS.copyWith(
-                                    color: context.scheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${l10n.websites_lbWeight} ${server.weight} · '
-                              '${l10n.websites_lbMaxFails} ${server.maxFails} · '
-                              '${l10n.websites_lbFailTimeout} '
-                              '${server.failTimeout}${server.failTimeoutUnit} · '
-                              '${l10n.websites_lbMaxConns} ${server.maxConns}',
-                              style: AppTextStyles.bodyS.copyWith(
-                                color: context.scheme.onSurfaceVariant,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                    for (final (index, server) in upstream.servers.indexed) ...[
+                      if (index > 0)
+                        Divider(
+                          height: AppTokens.s16,
+                          color: context.scheme.outlineVariant,
                         ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  server.server,
+                                  style: AppTextStyles.bodyM,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: AppTokens.s8),
+                              Text(
+                                _flagLabel(l10n, server.flag),
+                                style: AppTextStyles.bodyS.copyWith(
+                                  color: context.scheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${l10n.websites_lbWeight} '
+                            '${server.weight} · '
+                            '${l10n.websites_lbMaxFails} '
+                            '${server.maxFails} · '
+                            '${l10n.websites_lbFailTimeout} '
+                            '${server.failTimeout}'
+                            '${server.failTimeoutUnit} · '
+                            '${l10n.websites_lbMaxConns} '
+                            '${server.maxConns}',
+                            style: AppTextStyles.bodyS.copyWith(
+                              color: context.scheme.onSurfaceVariant,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
+                    ],
                   ],
                 ),
               ),

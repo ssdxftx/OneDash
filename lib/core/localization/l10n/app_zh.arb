@@ -1017,4 +1017,10 @@
   ,"dashboard_networkTrend": "网络趋势（近 5 分钟）"
   ,"dashboard_networkCollectHint": "采集 3 个采样点后显示曲线"
   ,"websites_openFailed": "打开网站失败"
+  ,"task_failedTitle": "任务执行失败"
+  ,"task_timeoutTitle": "任务超时"
+  ,"task_failedNoDetail": "任务执行失败，请查看面板日志。"
+  ,"task_timeoutMessage": "任务仍在执行，请稍后刷新列表。"
+  ,"firewall_whitelist": "白名单"
+  ,"containers_continueInBackground": "转到后台继续"
 }

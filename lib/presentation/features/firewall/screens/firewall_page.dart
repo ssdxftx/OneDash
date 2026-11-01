@@ -820,7 +820,7 @@ class _RulesTab extends StatelessWidget {
           AppTokens.s16,
           AppTokens.s8,
           AppTokens.s16,
-          AppTokens.s32 + AppTokens.buttonHeight,
+          AppTokens.s32 + AppTokens.buttonHeight + AppTokens.s48,
         ),
         children: [
           Row(
@@ -885,10 +885,10 @@ class _RuleTile extends StatelessWidget {
         : rule.displayPort;
     final protocol = rule.protocol.isEmpty ? 'all' : rule.protocol;
     final subtitle = [
-      '$port/$protocol',
+      rule.displayPort.isEmpty ? port : '$port/$protocol',
       if (rule.description.isNotEmpty) rule.description,
       if (rule.interface.isNotEmpty) rule.interface,
-      if (item.isWhitelist) 'whitelist',
+      if (item.isWhitelist) l10n.firewall_whitelist,
     ].join(' · ');
 
     return SplitListTile(

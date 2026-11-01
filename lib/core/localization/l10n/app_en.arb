@@ -4350,5 +4350,29 @@
   "websites_openFailed": "Failed to open the website",
   "@websites_openFailed": {
     "description": "Shown when launching a website in the browser fails."
+  },
+  "task_failedTitle": "Task failed",
+  "@task_failedTitle": {
+    "description": "Title for a failed 1Panel background task."
+  },
+  "task_timeoutTitle": "Task timed out",
+  "@task_timeoutTitle": {
+    "description": "Title for a background task that is still running."
+  },
+  "task_failedNoDetail": "The task failed. Check the panel logs for details.",
+  "@task_failedNoDetail": {
+    "description": "Fallback when a failed task has no log line."
+  },
+  "task_timeoutMessage": "The task is still running. Refresh the list later.",
+  "@task_timeoutMessage": {
+    "description": "Message for a background task that exceeded the wait time."
+  },
+  "firewall_whitelist": "Whitelist",
+  "@firewall_whitelist": {
+    "description": "Label for a firewall whitelist rule."
+  },
+  "containers_continueInBackground": "Continue in background",
+  "@containers_continueInBackground": {
+    "description": "Leave the create page while the container task keeps running."
   }
 }

@@ -3164,4 +3164,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_openFailed => '打开网站失败';
+
+  @override
+  String get task_failedTitle => '任务执行失败';
+
+  @override
+  String get task_timeoutTitle => '任务超时';
+
+  @override
+  String get task_failedNoDetail => '任务执行失败，请查看面板日志。';
+
+  @override
+  String get task_timeoutMessage => '任务仍在执行，请稍后刷新列表。';
+
+  @override
+  String get firewall_whitelist => '白名单';
+
+  @override
+  String get containers_continueInBackground => '转到后台继续';
 }

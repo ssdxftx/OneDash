@@ -12,6 +12,7 @@ abstract final class AppTokens {
   static const double s24 = 24;
   static const double s32 = 32;
   static const double s40 = 40;
+  static const double s48 = 48;
 
   static const double rXs = 6;
   static const double rSm = 10;

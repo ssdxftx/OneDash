@@ -47,3 +47,20 @@ class ApiBusinessException extends AppNetworkException {
 class ApiFormatException extends AppNetworkException {
   const ApiFormatException(super.message);
 }
+
+/// 1Panel 后台任务执行失败或等待超时。
+class TaskFailedException implements Exception {
+  const TaskFailedException({
+    required this.subject,
+    this.detail = '',
+    this.timedOut = false,
+  });
+
+  final String subject;
+  final String detail;
+  final bool timedOut;
+
+  @override
+  String toString() =>
+      'TaskFailedException(subject: $subject, timedOut: $timedOut): $detail';
+}

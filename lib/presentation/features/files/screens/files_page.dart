@@ -802,7 +802,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                   ),
                   const Spacer(),
                   Text(
-                    l10n.files_itemCount(files.valueOrNull?.items.length ?? 0),
+                    l10n.files_itemCount(files.valueOrNull?.total ?? 0),
                     style: AppTextStyles.caption.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),

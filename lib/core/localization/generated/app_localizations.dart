@@ -6193,6 +6193,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to open the website'**
   String get websites_openFailed;
+
+  /// Title for a failed 1Panel background task.
+  ///
+  /// In en, this message translates to:
+  /// **'Task failed'**
+  String get task_failedTitle;
+
+  /// Title for a background task that is still running.
+  ///
+  /// In en, this message translates to:
+  /// **'Task timed out'**
+  String get task_timeoutTitle;
+
+  /// Fallback when a failed task has no log line.
+  ///
+  /// In en, this message translates to:
+  /// **'The task failed. Check the panel logs for details.'**
+  String get task_failedNoDetail;
+
+  /// Message for a background task that exceeded the wait time.
+  ///
+  /// In en, this message translates to:
+  /// **'The task is still running. Refresh the list later.'**
+  String get task_timeoutMessage;
+
+  /// Label for a firewall whitelist rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Whitelist'**
+  String get firewall_whitelist;
+
+  /// Leave the create page while the container task keeps running.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue in background'**
+  String get containers_continueInBackground;
 }
 
 class _AppLocalizationsDelegate

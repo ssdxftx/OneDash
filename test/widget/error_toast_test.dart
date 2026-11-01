@@ -21,4 +21,24 @@ void main() {
     expect(text.trim(), isNotEmpty);
     expect(text, isNot(contains('internal stack trace marker')));
   });
+
+  test('task failure shows the panel log line', () {
+    final text = describeError(
+      const TaskFailedException(subject: '容器任务', detail: 'image not found'),
+      l10n,
+    );
+
+    expect(text, contains('image not found'));
+    expect(text, contains('Task failed'));
+  });
+
+  test('task timeout uses the timeout message', () {
+    final text = describeError(
+      const TaskFailedException(subject: '容器任务', timedOut: true),
+      l10n,
+    );
+
+    expect(text, contains('Task timed out'));
+    expect(text, contains('still running'));
+  });
 }

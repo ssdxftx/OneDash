@@ -125,6 +125,25 @@ ErrorViewData mapError(Object error, AppLocalizations l10n) {
       kind: ErrorKind.format,
     );
   }
+  if (error is TaskFailedException) {
+    final detail = error.detail.trim();
+    final title = error.timedOut
+        ? l10n.task_timeoutTitle
+        : l10n.task_failedTitle;
+    final message = switch ((error.timedOut, detail.isEmpty)) {
+      (true, _) => l10n.task_timeoutMessage,
+      (false, true) => l10n.task_failedNoDetail,
+      (false, false) => detail,
+    };
+    return ErrorViewData(
+      icon: TablerIcons.alert_triangle,
+      title: title,
+      message: message,
+      detail: raw,
+      actionLabel: l10n.common_retry,
+      kind: ErrorKind.business,
+    );
+  }
   return ErrorViewData(
     icon: TablerIcons.alert_circle,
     title: l10n.error_unknown_title,

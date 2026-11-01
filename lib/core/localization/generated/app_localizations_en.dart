@@ -3238,4 +3238,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_openFailed => 'Failed to open the website';
+
+  @override
+  String get task_failedTitle => 'Task failed';
+
+  @override
+  String get task_timeoutTitle => 'Task timed out';
+
+  @override
+  String get task_failedNoDetail =>
+      'The task failed. Check the panel logs for details.';
+
+  @override
+  String get task_timeoutMessage =>
+      'The task is still running. Refresh the list later.';
+
+  @override
+  String get firewall_whitelist => 'Whitelist';
+
+  @override
+  String get containers_continueInBackground => 'Continue in background';
 }
