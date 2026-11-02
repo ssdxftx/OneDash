@@ -55,9 +55,10 @@ class InstalledAppPage extends ConsumerWidget {
     final info = ref.watch(installedInfoProvider(id));
     final ignored = ref.watch(_installedIgnoredProvider(id)).valueOrNull;
     final container = info.valueOrNull?.container;
+    final appName = info.valueOrNull?.name ?? '';
     return Scaffold(
       appBar: AppBarLarge(
-        title: info.valueOrNull?.name ?? l10n.apps_installed,
+        title: appName.trim().isEmpty ? l10n.apps_installed : appName,
         actions: [
           AppIconButton(
             icon: TablerIcons.terminal_2,

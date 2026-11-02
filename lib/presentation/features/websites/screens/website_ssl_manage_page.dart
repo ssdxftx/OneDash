@@ -18,6 +18,7 @@ import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -76,6 +77,8 @@ class WebsiteSslManagePage extends ConsumerWidget {
           icon: TablerIcons.shield_off,
           title: l10n.websites_noSslCertificate,
           message: l10n.websites_sslManageHint,
+          actionLabel: l10n.websites_uploadSsl,
+          onAction: () => _upload(context, ref),
         ),
         builder: (items) => ListView.separated(
           padding: const EdgeInsets.all(AppTokens.s16),
@@ -83,6 +86,7 @@ class WebsiteSslManagePage extends ConsumerWidget {
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {
             final cert = items[index];
+            final expiry = _expiryState(context, cert, l10n);
             return TonalCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,28 +105,46 @@ class WebsiteSslManagePage extends ConsumerWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      IconButton(
-                        tooltip: l10n.websites_downloadSsl,
-                        icon: const Icon(TablerIcons.download),
-                        onPressed: () => _download(context, ref, cert),
-                      ),
-                      IconButton(
-                        tooltip: l10n.websites_checkDns,
-                        icon: const Icon(TablerIcons.world_check),
-                        onPressed: () => _checkDns(context, ref, cert),
-                      ),
-                      IconButton(
-                        tooltip: l10n.action_edit,
-                        icon: const Icon(TablerIcons.edit),
-                        onPressed: () => _edit(context, ref, cert),
-                      ),
-                      IconButton(
-                        tooltip: l10n.action_delete,
+                      PopupMenuButton<String>(
+                        tooltip: l10n.action_more,
                         icon: Icon(
-                          TablerIcons.trash,
-                          color: context.appColors.danger,
+                          TablerIcons.dots,
+                          size: AppTokens.iconList,
+                          color: context.scheme.onSurfaceVariant,
                         ),
-                        onPressed: () => _delete(context, ref, cert),
+                        onSelected: (value) {
+                          switch (value) {
+                            case 'download':
+                              _download(context, ref, cert);
+                            case 'dns':
+                              _checkDns(context, ref, cert);
+                            case 'edit':
+                              _edit(context, ref, cert);
+                            case 'delete':
+                              _delete(context, ref, cert);
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'download',
+                            child: Text(l10n.websites_downloadSsl),
+                          ),
+                          PopupMenuItem(
+                            value: 'dns',
+                            child: Text(l10n.websites_checkDns),
+                          ),
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Text(l10n.action_edit),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Text(
+                              l10n.action_delete,
+                              style: TextStyle(color: context.appColors.danger),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -131,11 +153,18 @@ class WebsiteSslManagePage extends ConsumerWidget {
                     children: [
                       SplitListTile(
                         title: l10n.websites_sslProvider,
-                        trailing: Text(cert.provider),
+                        trailing: Text(sslProviderLabel(cert.provider, l10n)),
                       ),
                       SplitListTile(
                         title: l10n.websites_sslExpire,
-                        trailing: Text(cert.expireDate),
+                        trailing: Text(
+                          expiry == null
+                              ? cert.expireDate
+                              : '${expiry.label} · ${cert.expireDate}',
+                          style: expiry == null
+                              ? null
+                              : TextStyle(color: expiry.color),
+                        ),
                       ),
                       SplitListTile(
                         title: l10n.websites_autoRenew,
@@ -154,6 +183,26 @@ class WebsiteSslManagePage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  ({String label, Color color})? _expiryState(
+    BuildContext context,
+    SslManageDto cert,
+    AppLocalizations l10n,
+  ) {
+    final date = DateTime.tryParse(cert.expireDate);
+    if (date == null) return null;
+    final days = date.difference(DateTime.now()).inDays;
+    if (days < 0) {
+      return (label: l10n.websites_sslExpired, color: context.appColors.danger);
+    }
+    if (days <= 30) {
+      return (
+        label: l10n.websites_expire_days(days),
+        color: context.appColors.warning,
+      );
+    }
+    return null;
   }
 
   Future<void> _upload(BuildContext context, WidgetRef ref) async {

@@ -36,6 +36,6 @@ void main() {
     expect(find.byType(ShaderMask), findsOneWidget);
     final list = tester.widget<ListView>(find.byType(ListView));
     final padding = list.padding!.resolve(TextDirection.ltr);
-    expect(padding.right, AppTokens.s24);
+    expect(padding.right, AppTokens.s32);
   });
 }

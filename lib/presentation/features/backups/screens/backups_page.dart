@@ -24,6 +24,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -450,7 +451,9 @@ class _BackupTab extends ConsumerWidget {
                       const SizedBox(width: AppTokens.s8),
                       Expanded(
                         child: Text(
-                          record.fileName,
+                          record.fileName.trim().isEmpty
+                              ? l10n.backups_recordUntitled
+                              : record.fileName,
                           style: AppTextStyles.titleS,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -486,7 +489,8 @@ class _BackupTab extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          record.accountName,
+                          '${taskStatusLabel(record.status, l10n)} · '
+                          '${record.accountName}',
                           style: AppTextStyles.caption.copyWith(
                             color: context.scheme.onSurfaceVariant,
                           ),

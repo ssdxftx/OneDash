@@ -12,7 +12,7 @@ class AppFilterChips<T> extends StatefulWidget {
     this.multiSelect = false,
     this.padding = const EdgeInsets.only(
       left: AppTokens.s16,
-      right: AppTokens.s24,
+      right: AppTokens.s32,
     ),
   });
 
@@ -90,7 +90,7 @@ class _AppFilterChipsState<T> extends State<AppFilterChips<T>> {
             else
               scheme.surface,
           ],
-          stops: const [0, 0.08, 0.92, 1],
+          stops: const [0, 0.12, 0.88, 1],
         ).createShader(bounds),
         child: ListView.separated(
           controller: _controller,

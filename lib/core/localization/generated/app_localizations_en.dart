@@ -690,6 +690,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get error_server_missing_message =>
+      'The selected server is no longer available. Choose another server or add it again.';
+
+  @override
   String get error_not_found_title => 'Not supported';
 
   @override
@@ -1126,6 +1130,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get apps_search_hint => 'Search apps';
 
   @override
+  String get apps_emptyTitle => 'No apps found';
+
+  @override
+  String get apps_emptyMessage => 'Try another keyword or sync the app list.';
+
+  @override
+  String get apps_installedEmptyTitle => 'No installed apps';
+
+  @override
+  String get apps_installedEmptyMessage =>
+      'Install an app from the catalog to see it here.';
+
+  @override
   String get apps_install => 'Install';
 
   @override
@@ -1173,6 +1190,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backups_empty_title => 'No backups';
+
+  @override
+  String get backups_recordUntitled => 'Untitled backup';
 
   @override
   String get backups_empty_message =>
@@ -1498,6 +1518,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_sslExpire => 'Expires';
+
+  @override
+  String get websites_sslExpired => 'Expired';
+
+  @override
+  String get websites_sslProviderDnsAccount => 'DNS account';
+
+  @override
+  String get websites_sslProviderDnsManual => 'Manual DNS';
+
+  @override
+  String get websites_sslProviderHttp => 'HTTP';
+
+  @override
+  String get websites_sslProviderSelfSigned => 'Self-signed';
+
+  @override
+  String get websites_sslProviderManual => 'Uploaded';
+
+  @override
+  String get websites_sslProviderFromMaster => 'From main node';
 
   @override
   String panelSettings_deleteAlertConfirm(String title) {
@@ -2491,6 +2532,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get host_monitorEmpty => 'No monitoring data yet';
+
+  @override
+  String get host_monitorEmptyHint =>
+      'Data appears after the first monitoring interval.';
 
   @override
   String get runtime_detail => 'Runtime';

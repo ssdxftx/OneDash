@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/network/dio_client_provider.dart';
+import '../../core/network/network_exceptions.dart';
 import '../../core/storage/storage_service.dart';
 import '../../domain/entities/server.dart';
 import '../../domain/repositories/setting_repository.dart';
@@ -187,6 +188,6 @@ Future<SettingRepository> settingRepository(Ref ref) async {
   final client = await ref.watch(dioClientProvider(serverId).future);
   final storage = ref.watch(storageServiceProvider);
   final server = await storage.getServer(serverId);
-  if (server == null) throw StateError('服务器不存在: $serverId');
+  if (server == null) throw const ServerNotFoundException();
   return SettingRepositoryImpl(SettingApi(client), server: server);
 }

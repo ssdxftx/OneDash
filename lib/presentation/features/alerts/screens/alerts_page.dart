@@ -195,59 +195,89 @@ class _AlertCard extends StatelessWidget {
     final enabled = alert.status == 'Enable';
     return TonalCard(
       onTap: onTap,
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: (enabled ? scheme.primary : scheme.onSurfaceVariant)
-                  .withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppTokens.rSm),
-            ),
-            child: Icon(
-              TablerIcons.bell,
-              size: AppTokens.iconList,
-              color: enabled ? scheme.primary : scheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(width: AppTokens.s12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  alert.title.isEmpty ? alert.type : alert.title,
-                  style: AppTextStyles.titleM,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact =
+              constraints.maxWidth < 320 ||
+              MediaQuery.textScalerOf(context).scale(1) >= 1.3;
+          return Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: (enabled ? scheme.primary : scheme.onSurfaceVariant)
+                      .withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppTokens.rSm),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  l10n.panelSettings_alertCardMeta(
-                    alertTypeLabel(alert.type, l10n),
-                    alertMethodLabel(alert.method, l10n),
-                  ),
-                  style: AppTextStyles.bodyS.copyWith(
+                child: Icon(
+                  TablerIcons.bell,
+                  size: AppTokens.iconList,
+                  color: enabled ? scheme.primary : scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: AppTokens.s12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      alert.title.isEmpty ? alert.type : alert.title,
+                      style: AppTextStyles.titleM,
+                      maxLines: compact ? 2 : 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.panelSettings_alertCardMeta(
+                        alertTypeLabel(alert.type, l10n),
+                        alertMethodLabel(alert.method, l10n),
+                      ),
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: enabled,
+                onChanged: (_) => onToggle(),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              if (compact)
+                PopupMenuButton<String>(
+                  tooltip: l10n.action_more,
+                  icon: Icon(
+                    TablerIcons.dots,
+                    size: AppTokens.iconList,
                     color: scheme.onSurfaceVariant,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  onSelected: (value) {
+                    if (value == 'delete') onDelete();
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(l10n.common_delete),
+                    ),
+                  ],
+                )
+              else
+                IconButton(
+                  tooltip: l10n.common_delete,
+                  onPressed: onDelete,
+                  icon: Icon(
+                    TablerIcons.trash,
+                    size: AppTokens.iconList,
+                    color: scheme.error,
+                  ),
                 ),
-              ],
-            ),
-          ),
-          Switch(value: enabled, onChanged: (_) => onToggle()),
-          IconButton(
-            tooltip: l10n.common_delete,
-            onPressed: onDelete,
-            icon: Icon(
-              TablerIcons.trash,
-              size: AppTokens.iconList,
-              color: scheme.error,
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }

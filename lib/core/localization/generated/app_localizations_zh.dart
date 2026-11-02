@@ -681,6 +681,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get error_server_missing_message => '当前服务器已不存在，请切换服务器或重新添加。';
+
+  @override
   String get error_not_found_title => '当前版本不支持';
 
   @override
@@ -1106,6 +1109,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get apps_search_hint => '搜索应用';
 
   @override
+  String get apps_emptyTitle => '未找到应用';
+
+  @override
+  String get apps_emptyMessage => '换个关键词，或先同步应用列表。';
+
+  @override
+  String get apps_installedEmptyTitle => '未安装应用';
+
+  @override
+  String get apps_installedEmptyMessage => '从应用商店安装后，应用会显示在这里。';
+
+  @override
   String get apps_install => '安装';
 
   @override
@@ -1152,6 +1167,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get backups_empty_title => '还没有备份';
+
+  @override
+  String get backups_recordUntitled => '未命名备份';
 
   @override
   String get backups_empty_message => '配置备份账号来保护你的数据。';
@@ -1461,6 +1479,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_sslExpire => '到期时间';
+
+  @override
+  String get websites_sslExpired => '已过期';
+
+  @override
+  String get websites_sslProviderDnsAccount => 'DNS 账号';
+
+  @override
+  String get websites_sslProviderDnsManual => '手动 DNS';
+
+  @override
+  String get websites_sslProviderHttp => 'HTTP';
+
+  @override
+  String get websites_sslProviderSelfSigned => '自签名';
+
+  @override
+  String get websites_sslProviderManual => '手动上传';
+
+  @override
+  String get websites_sslProviderFromMaster => '来自主节点';
 
   @override
   String panelSettings_deleteAlertConfirm(String title) {
@@ -2430,6 +2469,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get host_monitorEmpty => '暂无监控数据';
+
+  @override
+  String get host_monitorEmptyHint => '首次采集完成后会显示监控数据。';
 
   @override
   String get runtime_detail => '运行环境';

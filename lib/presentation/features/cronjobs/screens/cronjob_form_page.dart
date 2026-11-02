@@ -12,6 +12,7 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/form_footer.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
@@ -394,8 +395,7 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
           ),
         ],
       ),
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.all(AppTokens.s16),
+      bottomNavigationBar: FormFooter(
         child: PrimaryButton(
           label: _submitting
               ? l10n.cronjobs_saving

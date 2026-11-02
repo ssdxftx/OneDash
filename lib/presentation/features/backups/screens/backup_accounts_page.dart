@@ -74,7 +74,9 @@ class BackupAccountsPage extends ConsumerWidget {
               child: Row(
                 children: [
                   Icon(
-                    TablerIcons.cloud,
+                    '${account['type'] ?? ''}'.toLowerCase() == 'local'
+                        ? TablerIcons.folder
+                        : TablerIcons.cloud,
                     color: context.scheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: AppTokens.s12),

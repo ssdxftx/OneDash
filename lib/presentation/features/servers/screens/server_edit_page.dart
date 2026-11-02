@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/network/dio_client_provider.dart';
+import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/server_repository_impl.dart';
 import '../../../../domain/entities/server.dart';
@@ -152,7 +153,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
       late Server server;
       if (widget.isEditing) {
         final existing = await repository.find(widget.serverId!);
-        if (existing == null) throw StateError(l10n.server_edit_not_found);
+        if (existing == null) throw const ServerNotFoundException();
         existing
           ..name = name.isEmpty ? null : name
           ..host = host

@@ -32,3 +32,24 @@ String alertLogStatusLabel(String raw, AppLocalizations l10n) =>
       'pending' => l10n.alert_status_pending,
       _ => raw,
     };
+
+String sslProviderLabel(String raw, AppLocalizations l10n) =>
+    switch (raw.toLowerCase()) {
+      'dnsaccount' => l10n.websites_sslProviderDnsAccount,
+      'dnsmanual' => l10n.websites_sslProviderDnsManual,
+      'http' => l10n.websites_sslProviderHttp,
+      'selfsigned' => l10n.websites_sslProviderSelfSigned,
+      'manual' || 'upload' => l10n.websites_sslProviderManual,
+      'frommaster' => l10n.websites_sslProviderFromMaster,
+      _ => raw,
+    };
+
+String taskStatusLabel(String raw, AppLocalizations l10n) =>
+    switch (raw.toLowerCase()) {
+      'success' || 'succeeded' || 'finished' => l10n.alert_status_success,
+      'failed' || 'error' => l10n.alert_status_failed,
+      'pending' || 'waiting' || 'queued' => l10n.alert_status_pending,
+      'running' || 'doing' => l10n.containers_running,
+      'stopped' || 'exited' => l10n.containers_stopped,
+      _ => raw,
+    };

@@ -12,6 +12,7 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/form_footer.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/tonal_card.dart';
@@ -232,8 +233,7 @@ class _ComposeFormPageState extends ConsumerState<ComposeFormPage> {
             ),
         ],
       ),
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.all(AppTokens.s16),
+      bottomNavigationBar: FormFooter(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

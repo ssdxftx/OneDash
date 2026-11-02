@@ -78,4 +78,49 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('long action lists scroll instead of overflowing', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final rows = List.generate(
+      20,
+      (index) => ActionSheetRow(
+        icon: Icons.delete,
+        iconColor: Colors.red,
+        title: 'Action $index',
+        onTap: () {},
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              height: 640,
+              child: ActionSheetScaffold(
+                infoCard: const ActionSheetInfoCard(
+                  leading: Icon(Icons.inbox),
+                  title: 'demo-container',
+                  subtitle: 'nginx:alpine',
+                ),
+                child: ActionSheetSection(
+                  title: 'Lifecycle',
+                  icon: Icons.play_arrow,
+                  children: rows,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    await tester.scrollUntilVisible(find.text('Action 19'), 200);
+    expect(find.text('Action 19'), findsOneWidget);
+  });
 }

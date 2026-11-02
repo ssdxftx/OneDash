@@ -22,4 +22,19 @@ void main() {
     expect(alertLogStatusLabel('PushSuccess', l10n), 'Success');
     expect(alertLogStatusLabel('Mystery', l10n), 'Mystery');
   });
+
+  test('SSL providers are localized and unknown values pass through', () {
+    expect(sslProviderLabel('dnsAccount', l10n), 'DNS account');
+    expect(sslProviderLabel('selfSigned', l10n), 'Self-signed');
+    expect(sslProviderLabel('manual', l10n), 'Uploaded');
+    expect(sslProviderLabel('upload', l10n), 'Uploaded');
+    expect(sslProviderLabel('custom', l10n), 'custom');
+  });
+
+  test('task status labels cover snapshot and backup states', () {
+    expect(taskStatusLabel('Success', l10n), 'Success');
+    expect(taskStatusLabel('failed', l10n), 'Failed');
+    expect(taskStatusLabel('running', l10n), 'Running');
+    expect(taskStatusLabel('Mystery', l10n), 'Mystery');
+  });
 }

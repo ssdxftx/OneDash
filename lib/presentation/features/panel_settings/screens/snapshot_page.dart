@@ -17,6 +17,7 @@ import '../../../common/components/buttons.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -79,6 +80,11 @@ class SnapshotPage extends ConsumerWidget {
             final item = items[index];
             final id = (item['id'] as num?)?.toInt() ?? 0;
             final status = '${item['status'] ?? ''}';
+            final failed =
+                status.toLowerCase().contains('fail') ||
+                status.toLowerCase().contains('error');
+            final message = '${item['message'] ?? ''}'.trim();
+            final description = '${item['description'] ?? ''}'.trim();
             return TonalCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,37 +105,72 @@ class SnapshotPage extends ConsumerWidget {
                         formatBytes(item['size']),
                         style: AppTextStyles.caption,
                       ),
+                      PopupMenuButton<String>(
+                        tooltip: l10n.action_more,
+                        icon: Icon(
+                          TablerIcons.dots,
+                          size: AppTokens.iconList,
+                          color: context.scheme.onSurfaceVariant,
+                        ),
+                        onSelected: (value) {
+                          switch (value) {
+                            case 'edit':
+                              _editDescription(context, ref, id, description);
+                            case 'delete':
+                              _delete(context, ref, id);
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Text(l10n.action_edit),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Text(
+                              l10n.action_delete,
+                              style: TextStyle(color: context.appColors.danger),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppTokens.s4),
                   Text(
+                    '${taskStatusLabel(status, l10n)} · '
                     '${item['createdAt'] ?? ''} · ${item['version'] ?? ''}',
                     style: AppTextStyles.caption.copyWith(
-                      color: context.scheme.onSurfaceVariant,
+                      color: failed
+                          ? context.appColors.danger
+                          : context.scheme.onSurfaceVariant,
                     ),
                   ),
-                  if ('${item['description'] ?? ''}'.isNotEmpty) ...[
+                  if (description.isNotEmpty) ...[
                     const SizedBox(height: AppTokens.s4),
                     Text(
-                      '${item['description']}',
+                      description,
                       style: AppTextStyles.bodyS.copyWith(
                         color: context.scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                  if (message.isNotEmpty) ...[
+                    const SizedBox(height: AppTokens.s4),
+                    Text(
+                      message,
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: failed
+                            ? context.appColors.danger
+                            : context.scheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                   const SizedBox(height: AppTokens.s8),
                   Wrap(
                     spacing: AppTokens.s8,
+                    runSpacing: AppTokens.s4,
                     children: [
-                      TextButton(
-                        onPressed: () => _editDescription(
-                          context,
-                          ref,
-                          id,
-                          '${item['description'] ?? ''}',
-                        ),
-                        child: Text(l10n.action_edit),
-                      ),
                       TextButton(
                         onPressed: () => _recreate(context, ref, id),
                         child: Text(l10n.panelSettings_recreateSnapshot),
@@ -141,13 +182,6 @@ class SnapshotPage extends ConsumerWidget {
                       TextButton(
                         onPressed: () => _rollback(context, ref, id),
                         child: Text(l10n.panelSettings_rollbackSnapshot),
-                      ),
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: context.appColors.danger,
-                        ),
-                        onPressed: () => _delete(context, ref, id),
-                        child: Text(l10n.action_delete),
                       ),
                     ],
                   ),

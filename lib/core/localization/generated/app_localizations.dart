@@ -1352,6 +1352,12 @@ abstract class AppLocalizations {
   /// **'The panel returned HTTP {statusCode}.'**
   String error_server_message(int statusCode);
 
+  /// Shown when the locally stored server record is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected server is no longer available. Choose another server or add it again.'**
+  String get error_server_missing_message;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:
@@ -2186,6 +2192,30 @@ abstract class AppLocalizations {
   /// **'Search apps'**
   String get apps_search_hint;
 
+  /// Empty title when the app catalog has no matches.
+  ///
+  /// In en, this message translates to:
+  /// **'No apps found'**
+  String get apps_emptyTitle;
+
+  /// Empty message when the app catalog has no matches.
+  ///
+  /// In en, this message translates to:
+  /// **'Try another keyword or sync the app list.'**
+  String get apps_emptyMessage;
+
+  /// Empty title when no apps are installed.
+  ///
+  /// In en, this message translates to:
+  /// **'No installed apps'**
+  String get apps_installedEmptyTitle;
+
+  /// Empty message when no apps are installed.
+  ///
+  /// In en, this message translates to:
+  /// **'Install an app from the catalog to see it here.'**
+  String get apps_installedEmptyMessage;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:
@@ -2281,6 +2311,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No backups'**
   String get backups_empty_title;
+
+  /// Fallback title when a backup record has no file name.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled backup'**
+  String get backups_recordUntitled;
 
   /// OneDash UI string
   ///
@@ -2863,6 +2899,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expires'**
   String get websites_sslExpire;
+
+  /// Badge for an expired SSL certificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get websites_sslExpired;
+
+  /// SSL provider label for DNS account validation.
+  ///
+  /// In en, this message translates to:
+  /// **'DNS account'**
+  String get websites_sslProviderDnsAccount;
+
+  /// SSL provider label for manual DNS validation.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual DNS'**
+  String get websites_sslProviderDnsManual;
+
+  /// SSL provider label for HTTP validation.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTP'**
+  String get websites_sslProviderHttp;
+
+  /// SSL provider label for self-signed certificates.
+  ///
+  /// In en, this message translates to:
+  /// **'Self-signed'**
+  String get websites_sslProviderSelfSigned;
+
+  /// SSL provider label for manually uploaded certificates.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded'**
+  String get websites_sslProviderManual;
+
+  /// SSL provider label for certificates synced from the main node.
+  ///
+  /// In en, this message translates to:
+  /// **'From main node'**
+  String get websites_sslProviderFromMaster;
 
   /// Confirmation for deleting an alert rule.
   ///
@@ -4729,6 +4807,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No monitoring data yet'**
   String get host_monitorEmpty;
+
+  /// Explains when host monitoring data becomes available.
+  ///
+  /// In en, this message translates to:
+  /// **'Data appears after the first monitoring interval.'**
+  String get host_monitorEmptyHint;
 
   /// Runtime detail page title.
   ///

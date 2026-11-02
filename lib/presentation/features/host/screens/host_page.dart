@@ -223,8 +223,8 @@ class _HostPageState extends ConsumerState<HostPage> {
             if (data.cpu.isEmpty && data.memory.isEmpty && data.load.isEmpty) {
               return EmptyState(
                 icon: TablerIcons.chart_line,
-                title: l10n.host_monitor,
-                message: l10n.host_monitorEmpty,
+                title: l10n.host_monitorEmpty,
+                message: l10n.host_monitorEmptyHint,
               );
             }
             return Column(

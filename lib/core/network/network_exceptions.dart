@@ -64,3 +64,11 @@ class TaskFailedException implements Exception {
   String toString() =>
       'TaskFailedException(subject: $subject, timedOut: $timedOut): $detail';
 }
+
+/// 本地保存的服务器记录已不存在。
+class ServerNotFoundException implements Exception {
+  const ServerNotFoundException();
+
+  @override
+  String toString() => 'ServerNotFoundException';
+}

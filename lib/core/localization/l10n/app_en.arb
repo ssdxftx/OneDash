@@ -965,6 +965,10 @@
       }
     }
   },
+  "error_server_missing_message": "The selected server is no longer available. Choose another server or add it again.",
+  "@error_server_missing_message": {
+    "description": "Shown when the locally stored server record is missing."
+  },
   "error_not_found_title": "Not supported",
   "@error_not_found_title": {
     "description": "OneDash UI string"
@@ -1544,6 +1548,22 @@
   "@apps_search_hint": {
     "description": "OneDash UI string"
   },
+  "apps_emptyTitle": "No apps found",
+  "@apps_emptyTitle": {
+    "description": "Empty title when the app catalog has no matches."
+  },
+  "apps_emptyMessage": "Try another keyword or sync the app list.",
+  "@apps_emptyMessage": {
+    "description": "Empty message when the app catalog has no matches."
+  },
+  "apps_installedEmptyTitle": "No installed apps",
+  "@apps_installedEmptyTitle": {
+    "description": "Empty title when no apps are installed."
+  },
+  "apps_installedEmptyMessage": "Install an app from the catalog to see it here.",
+  "@apps_installedEmptyMessage": {
+    "description": "Empty message when no apps are installed."
+  },
   "apps_install": "Install",
   "@apps_install": {
     "description": "OneDash UI string"
@@ -1607,6 +1627,10 @@
   "backups_empty_title": "No backups",
   "@backups_empty_title": {
     "description": "OneDash UI string"
+  },
+  "backups_recordUntitled": "Untitled backup",
+  "@backups_recordUntitled": {
+    "description": "Fallback title when a backup record has no file name."
   },
   "backups_empty_message": "Configure a backup account to protect your data.",
   "@backups_empty_message": {
@@ -2043,6 +2067,34 @@
   },
   "@websites_sslExpire": {
     "description": "Field label for the SSL certificate expiry date."
+  },
+  "websites_sslExpired": "Expired",
+  "@websites_sslExpired": {
+    "description": "Badge for an expired SSL certificate."
+  },
+  "websites_sslProviderDnsAccount": "DNS account",
+  "@websites_sslProviderDnsAccount": {
+    "description": "SSL provider label for DNS account validation."
+  },
+  "websites_sslProviderDnsManual": "Manual DNS",
+  "@websites_sslProviderDnsManual": {
+    "description": "SSL provider label for manual DNS validation."
+  },
+  "websites_sslProviderHttp": "HTTP",
+  "@websites_sslProviderHttp": {
+    "description": "SSL provider label for HTTP validation."
+  },
+  "websites_sslProviderSelfSigned": "Self-signed",
+  "@websites_sslProviderSelfSigned": {
+    "description": "SSL provider label for self-signed certificates."
+  },
+  "websites_sslProviderManual": "Uploaded",
+  "@websites_sslProviderManual": {
+    "description": "SSL provider label for manually uploaded certificates."
+  },
+  "websites_sslProviderFromMaster": "From main node",
+  "@websites_sslProviderFromMaster": {
+    "description": "SSL provider label for certificates synced from the main node."
   },
   "panelSettings_deleteAlertConfirm": "Delete alert \"{title}\"?",
   "panelSettings_clearLogsConfirm": "Clear all alert logs? This cannot be undone.",
@@ -3365,6 +3417,10 @@
   "host_monitorEmpty": "No monitoring data yet",
   "@host_monitorEmpty": {
     "description": "Empty monitoring chart message."
+  },
+  "host_monitorEmptyHint": "Data appears after the first monitoring interval.",
+  "@host_monitorEmptyHint": {
+    "description": "Explains when host monitoring data becomes available."
   },
   "runtime_detail": "Runtime",
   "@runtime_detail": {

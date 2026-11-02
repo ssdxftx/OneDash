@@ -8,7 +8,10 @@ class SegmentedTabs extends StatefulWidget {
     required this.labels,
     required this.selectedIndex,
     required this.onChanged,
-    this.padding = const EdgeInsets.symmetric(horizontal: AppTokens.s16),
+    this.padding = const EdgeInsets.only(
+      left: AppTokens.s16,
+      right: AppTokens.s32,
+    ),
     this.scrollable = true,
   });
 
@@ -165,7 +168,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
                   else
                     scheme.surface,
                 ],
-                stops: const [0, 0.08, 0.92, 1],
+                stops: const [0, 0.12, 0.88, 1],
               ).createShader(bounds),
               child: SingleChildScrollView(
                 controller: _controller,

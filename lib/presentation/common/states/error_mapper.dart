@@ -84,6 +84,15 @@ ErrorViewData mapError(Object error, AppLocalizations l10n) {
       kind: ErrorKind.server,
     );
   }
+  if (error is ServerNotFoundException) {
+    return ErrorViewData(
+      icon: TablerIcons.server_off,
+      title: l10n.error_server_title,
+      message: l10n.error_server_missing_message,
+      actionLabel: l10n.common_retry,
+      kind: ErrorKind.server,
+    );
+  }
   if (error is HttpException) {
     if (error.statusCode == 404 || error.statusCode == 405) {
       return ErrorViewData(

@@ -246,8 +246,8 @@ class _CatalogTab extends ConsumerWidget {
         onRefresh: () => ref.refresh(appCatalogProvider(query).future),
         child: EmptyState(
           icon: TablerIcons.apps,
-          title: l10n.apps_title,
-          message: l10n.apps_search_hint,
+          title: l10n.apps_emptyTitle,
+          message: l10n.apps_emptyMessage,
         ),
       ),
       builder: (data) {
@@ -261,7 +261,7 @@ class _CatalogTab extends ConsumerWidget {
               crossAxisCount: 2,
               mainAxisSpacing: AppTokens.s12,
               crossAxisSpacing: AppTokens.s12,
-              mainAxisExtent: 118 + (scale - 1) * 48,
+              mainAxisExtent: 150 + (scale - 1) * 55,
             ),
             itemCount: data.items.length,
             itemBuilder: (context, index) {
@@ -298,8 +298,8 @@ class _InstalledTab extends ConsumerWidget {
         onRefresh: () => ref.refresh(installedAppsProvider.future),
         child: EmptyState(
           icon: TablerIcons.package,
-          title: l10n.apps_installed,
-          message: l10n.apps_search_hint,
+          title: l10n.apps_installedEmptyTitle,
+          message: l10n.apps_installedEmptyMessage,
         ),
       ),
       builder: (data) => RefreshIndicator(

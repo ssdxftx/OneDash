@@ -135,7 +135,7 @@ class RuntimesPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppTokens.s8),
                     Text(
-                      '${runtime.image} · ${runtime.version}',
+                      _joinNonEmpty([runtime.image, runtime.version]),
                       style: AppTextStyles.caption.copyWith(
                         color: context.scheme.onSurfaceVariant,
                         fontFamily: 'monospace',
@@ -145,7 +145,7 @@ class RuntimesPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppTokens.s4),
                     Text(
-                      '${runtime.port.isEmpty ? '-' : runtime.port} · ${runtime.path}',
+                      _joinNonEmpty([runtime.port, runtime.path]),
                       style: AppTextStyles.caption.copyWith(
                         color: context.scheme.onSurfaceVariant,
                       ),
@@ -466,4 +466,12 @@ class RuntimesPage extends ConsumerWidget {
       showErrorToast(context, error);
     }
   }
+}
+
+String _joinNonEmpty(List<String> values) {
+  final parts = values
+      .map((value) => value.trim())
+      .where((value) => value.isNotEmpty)
+      .toList(growable: false);
+  return parts.isEmpty ? '-' : parts.join(' · ');
 }

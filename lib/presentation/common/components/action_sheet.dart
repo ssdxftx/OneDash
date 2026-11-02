@@ -24,7 +24,13 @@ class ActionSheetScaffold extends StatelessWidget {
             infoCard!,
             const SizedBox(height: AppTokens.s20),
           ],
-          child,
+          Flexible(
+            fit: FlexFit.loose,
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: child,
+            ),
+          ),
         ],
       ),
     );
