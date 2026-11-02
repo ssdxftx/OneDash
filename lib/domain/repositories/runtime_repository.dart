@@ -1,6 +1,6 @@
+import '../../data/dto/file/file_log_dto.dart';
 import '../../data/api/runtime_api.dart';
 import '../../data/dto/common/page_result.dart';
-import '../../data/dto/common/task_log_dto.dart';
 import '../../data/dto/runtime/node_script_dto.dart';
 import '../../data/dto/runtime/runtime_dto.dart';
 
@@ -15,7 +15,7 @@ abstract interface class RuntimeRepository {
   Future<void> syncRuntimes();
   Future<List<PhpExtensionGroupDto>> searchPhpExtensions();
   Future<List<NodeScriptDto>> getNodeScripts(String codeDir);
-  Future<TaskLogDto> readRuntimeLog({required int id, required String type});
+  Future<FileLogDto> readRuntimeLog({required int id, required String type});
   Future<Map<String, dynamic>> getPhpExtensions(int id);
   Future<void> installPhpExtension(int id, String name, String taskId);
   Future<void> uninstallPhpExtension(int id, String name);

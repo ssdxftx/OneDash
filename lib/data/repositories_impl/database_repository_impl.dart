@@ -26,6 +26,23 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
       _api.listInstances(types);
 
   @override
+  Future<PageResult<DatabaseInstanceDto>> searchRemoteDatabases({
+    required String type,
+    int page = 1,
+    int pageSize = 100,
+    String info = '',
+    String orderBy = 'createdAt',
+    String? order,
+  }) => _api.searchRemoteDatabases(
+    type: type,
+    page: page,
+    pageSize: pageSize,
+    info: info,
+    orderBy: orderBy,
+    order: order,
+  );
+
+  @override
   Future<DatabaseCheckDto> checkInstalled({
     required String key,
     required String name,

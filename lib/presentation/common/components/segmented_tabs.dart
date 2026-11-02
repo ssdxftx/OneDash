@@ -75,61 +75,67 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
   }
 
   void _ensureSelectedVisible() {
-    if (!mounted || !widget.scrollable) return;
-    final key = _keys[widget.selectedIndex];
+    if (!mounted || !widget.scrollable || _keys.isEmpty) return;
+    final index = widget.selectedIndex.clamp(0, _keys.length - 1);
+    final key = _keys[index];
     final target = key.currentContext;
     if (target == null) return;
     Scrollable.ensureVisible(
       target,
       alignment: 0.5,
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOutCubic,
+      duration: target.motion(const Duration(milliseconds: 220)),
+      curve: AppTokens.curveFast,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
+    final selectedIndex = widget.labels.isEmpty
+        ? 0
+        : widget.selectedIndex.clamp(0, widget.labels.length - 1);
     final tabs = <Widget>[];
     for (var i = 0; i < widget.labels.length; i++) {
-      final selected = i == widget.selectedIndex;
+      final selected = i == selectedIndex;
       tabs.add(
-        InkWell(
-          key: _keys[i],
-          onTap: () {
-            widget.onChanged(i);
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) => _ensureSelectedVisible(),
-            );
-          },
-          borderRadius: BorderRadius.circular(AppTokens.rSm),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppTokens.s12,
-              vertical: AppTokens.s12,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  widget.labels[i],
-                  style: AppTextStyles.label.copyWith(
-                    color: selected ? scheme.primary : scheme.onSurfaceVariant,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+        Semantics(
+          button: true,
+          selected: selected,
+          label: widget.labels[i],
+          child: InkWell(
+            key: _keys[i],
+            onTap: () => widget.onChanged(i),
+            borderRadius: BorderRadius.circular(AppTokens.rSm),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTokens.s12,
+                vertical: AppTokens.s12,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.labels[i],
+                    style: AppTextStyles.label.copyWith(
+                      color: selected
+                          ? scheme.primary
+                          : scheme.onSurfaceVariant,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                AnimatedContainer(
-                  duration: context.motion(AppTokens.dBase),
-                  curve: AppTokens.curveBase,
-                  height: 3,
-                  width: selected ? 20 : 0,
-                  decoration: BoxDecoration(
-                    color: scheme.primary,
-                    borderRadius: BorderRadius.circular(AppTokens.rFull),
+                  const SizedBox(height: 6),
+                  AnimatedContainer(
+                    duration: context.motion(AppTokens.dBase),
+                    curve: AppTokens.curveBase,
+                    height: 3,
+                    width: selected ? 20 : 0,
+                    decoration: BoxDecoration(
+                      color: scheme.primary,
+                      borderRadius: BorderRadius.circular(AppTokens.rFull),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -204,12 +210,24 @@ class SegmentedTabsView extends StatefulWidget {
 }
 
 class _SegmentedTabsViewState extends State<SegmentedTabsView> {
-  late int _index = widget.initialIndex;
-  late final Set<int> _visited = {widget.initialIndex};
+  late int _index = widget.initialIndex.clamp(
+    0,
+    widget.children.isEmpty ? 0 : widget.children.length - 1,
+  );
+  late final Set<int> _visited = {_index};
+
+  @override
+  void didUpdateWidget(covariant SegmentedTabsView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_index >= widget.children.length && widget.children.isNotEmpty) {
+      _index = widget.children.length - 1;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     assert(widget.labels.length == widget.children.length);
+    if (widget.children.isEmpty) return const SizedBox.shrink();
     return Column(
       children: [
         SegmentedTabs(

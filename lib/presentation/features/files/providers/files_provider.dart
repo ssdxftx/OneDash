@@ -75,7 +75,7 @@ class FilesController
   }
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
+    state = const AsyncLoading<FilesState>().copyWithPrevious(state);
     state = await AsyncValue.guard(() => build(arg));
     _page = 1;
   }
@@ -83,7 +83,7 @@ class FilesController
   Future<void> search(String value) async {
     _search = value.trim();
     _page = 1;
-    state = const AsyncLoading();
+    state = const AsyncLoading<FilesState>().copyWithPrevious(state);
     state = await AsyncValue.guard(() => build(arg));
   }
 

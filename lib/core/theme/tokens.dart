@@ -4,6 +4,11 @@ import 'package:flutter/material.dart';
 abstract final class AppTokens {
   static const Color seed = Color(0xFF3F7F5F);
 
+  static const Color consoleBackground = Color(0xFF0B0F0C);
+  static const Color consoleToolbar = Color(0xFF141A16);
+  static const Color consoleForeground = Color(0xFFD7E4DA);
+  static const Color consoleMuted = Color(0xFF8A9A90);
+
   static const double s4 = 4;
   static const double s8 = 8;
   static const double s12 = 12;
@@ -56,6 +61,15 @@ abstract final class AppTokens {
   );
 
   static const int chartHistoryPoints = 120;
+  static const double chartHeight = 160;
+  static const double chartCompactHeight = 28;
+  static const double iconBadge = 32;
+  static const double miniRing = 38;
+  static const double spinner = 20;
+  static const double spinnerStroke = 2;
+  static const double chipPaddingY = 2;
+  static const double logPanelMaxHeight = 260;
+  static const double toastMargin = 12;
   static const int logBufferLines = 5000;
   static const int pageSizePhone = 20;
   static const int pageSizeTablet = 30;
@@ -119,6 +133,7 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
     return switch (status.toLowerCase()) {
       'running' || 'running ' || 'active' || 'healthy' || 'success' => success,
       'stopped' || 'inactive' || 'exited' || 'paused' => info,
+      'offline' || 'disconnected' || 'unreachable' => danger,
       'error' || 'failed' || 'failure' || 'dead' => danger,
       'pending' || 'starting' || 'waiting' || 'restarting' => warning,
       _ => info,

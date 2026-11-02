@@ -113,9 +113,7 @@ class _AppFilterChipsState<T> extends State<AppFilterChips<T>> {
                 backgroundColor: scheme.surfaceContainerLow,
                 selectedColor: scheme.primaryContainer,
                 side: BorderSide(
-                  color: isSelected
-                      ? Colors.transparent
-                      : scheme.outlineVariant,
+                  color: isSelected ? Colors.transparent : scheme.outline,
                 ),
                 labelStyle: AppTextStyles.label.copyWith(
                   color: isSelected

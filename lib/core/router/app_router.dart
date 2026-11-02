@@ -3,15 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../presentation/features/alerts/screens/alert_form_page.dart';
 import '../../presentation/features/alerts/screens/alerts_page.dart';
 import '../../presentation/features/app_store/screens/app_detail_page.dart';
 import '../../presentation/features/app_store/screens/app_store_page.dart';
 import '../../presentation/features/app_store/screens/installed_app_page.dart';
+import '../../presentation/features/backups/screens/backup_accounts_page.dart';
 import '../../presentation/features/backups/screens/backups_page.dart';
+import '../../data/dto/container/container_compose_dto.dart';
+import '../../presentation/features/containers/screens/compose_form_page.dart';
 import '../../presentation/features/containers/screens/compose_page.dart';
 import '../../presentation/features/containers/screens/container_create_page.dart';
 import '../../presentation/features/containers/screens/container_detail_page.dart';
+import '../../presentation/features/containers/screens/container_resources_page.dart';
+import '../../presentation/features/containers/screens/docker_settings_page.dart';
 import '../../presentation/features/containers/screens/containers_page.dart';
+import '../../presentation/features/cronjobs/screens/cronjob_form_page.dart';
 import '../../presentation/features/cronjobs/screens/cronjobs_page.dart';
 import '../../presentation/features/dashboard/screens/overview_page.dart';
 import '../../presentation/features/databases/screens/database_detail_page.dart';
@@ -20,12 +27,14 @@ import '../../presentation/features/files/screens/file_editor_page.dart';
 import '../../presentation/features/files/screens/file_ai_search_page.dart';
 import '../../presentation/features/files/screens/file_history_page.dart';
 import '../../presentation/features/host/screens/host_page.dart';
+import '../../presentation/features/files/screens/file_tools_page.dart';
 import '../../presentation/features/files/screens/files_page.dart';
 import '../../presentation/features/firewall/screens/firewall_page.dart';
 import '../../presentation/features/gallery/screens/gallery_page.dart';
 import '../../presentation/features/log/screens/log_hub_page.dart';
 import '../../presentation/features/more/screens/more_page.dart';
 import '../../presentation/features/panel_settings/screens/panel_settings_page.dart';
+import '../../presentation/features/panel_settings/screens/snapshot_page.dart';
 import '../../presentation/features/process/screens/process_page.dart';
 import '../../presentation/features/runtimes/screens/runtime_detail_page.dart';
 import '../../presentation/features/runtimes/screens/runtimes_page.dart';
@@ -40,7 +49,10 @@ import '../../presentation/features/toolbox/screens/toolbox_fail2ban_page.dart';
 import '../../presentation/features/toolbox/screens/toolbox_ftp_page.dart';
 import '../../presentation/features/toolbox/screens/toolbox_page.dart';
 import '../../presentation/features/terminal/screens/terminal_page.dart';
+import '../../presentation/features/websites/screens/website_accounts_page.dart';
+import '../../presentation/features/websites/screens/website_advanced_page.dart';
 import '../../presentation/features/websites/screens/website_create_wizard.dart';
+import '../../presentation/features/websites/screens/website_ssl_manage_page.dart';
 import '../../presentation/features/websites/screens/website_groups_page.dart';
 import '../../presentation/features/websites/screens/website_templates_page.dart';
 import '../../presentation/features/websites/screens/website_detail_page.dart';
@@ -202,6 +214,14 @@ final appRouter = GoRouter(
                   ),
                   routes: [
                     GoRoute(
+                      path: 'accounts',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      pageBuilder: (context, state) => slidePage(
+                        state,
+                        WebsiteAccountsPage(serverId: _serverId(state)),
+                      ),
+                    ),
+                    GoRoute(
                       path: ':siteId',
                       pageBuilder: (context, state) => slidePage(
                         state,
@@ -210,6 +230,39 @@ final appRouter = GoRouter(
                           siteId: state.pathParameters['siteId'] ?? '',
                         ),
                       ),
+                      routes: [
+                        GoRoute(
+                          path: 'advanced',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            WebsiteAdvancedPage(
+                              serverId: _serverId(state),
+                              websiteId:
+                                  int.tryParse(
+                                    state.pathParameters['siteId'] ?? '',
+                                  ) ??
+                                  0,
+                            ),
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'ssl',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            WebsiteSslManagePage(
+                              serverId: _serverId(state),
+                              websiteId:
+                                  int.tryParse(
+                                    state.pathParameters['siteId'] ?? '',
+                                  ) ??
+                                  0,
+                              domain: state.uri.queryParameters['domain'] ?? '',
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -226,6 +279,16 @@ final appRouter = GoRouter(
                       initialPath: state.uri.queryParameters['path'] ?? '/',
                     ),
                   ),
+                  routes: [
+                    GoRoute(
+                      path: 'tools',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      pageBuilder: (context, state) => slidePage(
+                        state,
+                        FileToolsPage(serverId: _serverId(state)),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -239,6 +302,22 @@ final appRouter = GoRouter(
                   ),
                   routes: [
                     GoRoute(
+                      path: 'resources',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      pageBuilder: (context, state) => slidePage(
+                        state,
+                        ContainerResourcesPage(serverId: _serverId(state)),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'docker',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      pageBuilder: (context, state) => slidePage(
+                        state,
+                        DockerSettingsPage(serverId: _serverId(state)),
+                      ),
+                    ),
+                    GoRoute(
                       path: ':name',
                       pageBuilder: (context, state) => slidePage(
                         state,
@@ -247,6 +326,19 @@ final appRouter = GoRouter(
                           containerName: state.pathParameters['name'] ?? '',
                         ),
                       ),
+                      routes: [
+                        GoRoute(
+                          path: 'edit',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            ContainerCreatePage(
+                              serverId: _serverId(state),
+                              containerName: state.pathParameters['name'] ?? '',
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -328,6 +420,21 @@ final appRouter = GoRouter(
                         state,
                         CronjobsPage(serverId: _serverId(state)),
                       ),
+                      routes: [
+                        GoRoute(
+                          path: 'form',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            CronjobFormPage(
+                              serverId: _serverId(state),
+                              cronjobId: int.tryParse(
+                                state.uri.queryParameters['id'] ?? '',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     GoRoute(
                       path: 'firewall',
@@ -349,6 +456,21 @@ final appRouter = GoRouter(
                         state,
                         ComposePage(serverId: _serverId(state)),
                       ),
+                      routes: [
+                        GoRoute(
+                          path: 'form',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            ComposeFormPage(
+                              serverId: _serverId(state),
+                              compose: state.extra is ContainerComposeDto
+                                  ? state.extra as ContainerComposeDto
+                                  : null,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     GoRoute(
                       path: 'settings',
@@ -356,6 +478,16 @@ final appRouter = GoRouter(
                         state,
                         PanelSettingsPage(serverId: _serverId(state)),
                       ),
+                      routes: [
+                        GoRoute(
+                          path: 'snapshots',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            SnapshotPage(serverId: _serverId(state)),
+                          ),
+                        ),
+                      ],
                     ),
                     GoRoute(
                       path: 'alerts',
@@ -363,6 +495,21 @@ final appRouter = GoRouter(
                         state,
                         AlertsPage(serverId: _serverId(state)),
                       ),
+                      routes: [
+                        GoRoute(
+                          path: 'form',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            AlertFormPage(
+                              serverId: _serverId(state),
+                              alertId: int.tryParse(
+                                state.uri.queryParameters['id'] ?? '',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     GoRoute(
                       path: 'process',
@@ -377,6 +524,16 @@ final appRouter = GoRouter(
                         state,
                         BackupsPage(serverId: _serverId(state)),
                       ),
+                      routes: [
+                        GoRoute(
+                          path: 'accounts',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            BackupAccountsPage(serverId: _serverId(state)),
+                          ),
+                        ),
+                      ],
                     ),
                     GoRoute(
                       path: 'runtimes',

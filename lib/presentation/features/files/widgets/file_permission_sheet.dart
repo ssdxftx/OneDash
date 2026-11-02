@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
@@ -112,6 +113,54 @@ class _FilePermissionSheetState extends ConsumerState<_FilePermissionSheet> {
     });
   }
 
+  Future<void> _pickOwner() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      final data = await repository.getUserGroups();
+      if (!mounted) return;
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (context) => SafeArea(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(AppTokens.s16),
+                child: Text(l10n.files_pickOwner, style: AppTextStyles.titleL),
+              ),
+              for (final user in data.users)
+                ListTile(
+                  leading: const Icon(TablerIcons.user),
+                  title: Text(user.username),
+                  subtitle: Text(user.group),
+                  onTap: () {
+                    _user.text = user.username;
+                    _group.text = user.group;
+                    Navigator.of(context).pop();
+                  },
+                ),
+              for (final group in data.groups)
+                ListTile(
+                  leading: const Icon(TablerIcons.users_group),
+                  title: Text(group),
+                  onTap: () {
+                    _group.text = group;
+                    Navigator.of(context).pop();
+                  },
+                ),
+            ],
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _save() async {
     final modeText = _mode.text.trim();
     if (!RegExp(r'^[0-7]{3,4}$').hasMatch(modeText)) return;
@@ -171,6 +220,14 @@ class _FilePermissionSheetState extends ConsumerState<_FilePermissionSheet> {
               ),
             ),
             const SizedBox(height: AppTokens.s20),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: _pickOwner,
+                icon: const Icon(Icons.group_outlined, size: 18),
+                label: Text(l10n.files_pickOwner),
+              ),
+            ),
             for (var group = 0; group < 3; group++) ...[
               Text(
                 group == 0

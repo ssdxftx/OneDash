@@ -101,6 +101,15 @@ class ProcessPage extends ConsumerWidget {
                       ),
                     ),
                     Text(item.user, style: AppTextStyles.caption),
+                    IconButton(
+                      tooltip: l10n.action_more,
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(
+                        TablerIcons.dots,
+                        size: AppTokens.iconList,
+                      ),
+                      onPressed: () => _showActions(context, ref, item),
+                    ),
                   ],
                 ),
               ),

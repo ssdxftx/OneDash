@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
@@ -21,6 +22,7 @@ import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/status_dot.dart';
+import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
@@ -49,23 +51,366 @@ class BackupsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBarLarge(title: l10n.backups_title),
+      appBar: AppBarLarge(
+        title: l10n.backups_title,
+        actions: [
+          AppIconButton(
+            icon: TablerIcons.cloud_cog,
+            tooltip: l10n.backups_accounts,
+            onPressed: () => context.push('/s/$serverId/more/backups/accounts'),
+          ),
+          AppIconButton(
+            icon: TablerIcons.file_upload,
+            tooltip: l10n.backups_restoreFromFile,
+            onPressed: () => _restoreFromFile(context, ref),
+          ),
+          AppIconButton(
+            icon: TablerIcons.calculator,
+            tooltip: l10n.backups_calculateSizes,
+            onPressed: () => _showSizes(context, ref),
+          ),
+          AppIconButton(
+            icon: TablerIcons.plus,
+            tooltip: l10n.backups_create,
+            onPressed: () => _create(context, ref),
+          ),
+        ],
+      ),
       body: SegmentedTabsView(
         labels: [
           l10n.backups_tabApps,
           l10n.backups_tabDatabases,
           l10n.backups_tabWebsites,
           l10n.backups_tabDirectories,
+          l10n.containers_title,
         ],
         children: const [
           _BackupTab(type: 'app'),
           _BackupTab(type: 'database'),
           _BackupTab(type: 'website'),
           _BackupTab(type: 'directory'),
+          _BackupTab(type: 'container'),
         ],
       ),
     );
   }
+}
+
+Future<void> _restoreFromFile(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context);
+  final path = TextEditingController();
+  final name = TextEditingController();
+  final detail = TextEditingController();
+  final secret = TextEditingController();
+  String type = 'mysql';
+  final saved = await showAppSheet<bool>(
+    context: context,
+    maxHeightFactor: 0.92,
+    builder: (sheetContext) => StatefulBuilder(
+      builder: (context, setState) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.backups_restoreFromFile, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s8),
+          Text(
+            l10n.backups_restoreFromFileHint,
+            style: AppTextStyles.bodyS.copyWith(
+              color: sheetContext.scheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AppTokens.s16),
+          AppTextField(
+            controller: path,
+            label: l10n.backups_serverFilePath,
+            hint: '/root/backup.tar.gz',
+          ),
+          const SizedBox(height: AppTokens.s12),
+          DropdownButtonFormField<String>(
+            initialValue: type,
+            decoration: InputDecoration(labelText: l10n.backups_type),
+            items: const [
+              DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
+              DropdownMenuItem(value: 'postgresql', child: Text('PostgreSQL')),
+              DropdownMenuItem(value: 'mongodb', child: Text('MongoDB')),
+              DropdownMenuItem(value: 'redis', child: Text('Redis')),
+              DropdownMenuItem(value: 'app', child: Text('App')),
+              DropdownMenuItem(value: 'website', child: Text('Website')),
+              DropdownMenuItem(value: 'container', child: Text('Container')),
+            ],
+            onChanged: (value) {
+              if (value != null) setState(() => type = value);
+            },
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: name, label: l10n.backups_resourceName),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: detail, label: l10n.backups_detailName),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: secret,
+            label: l10n.backups_restoreSecret,
+            obscure: true,
+          ),
+          const SizedBox(height: AppTokens.s16),
+          PrimaryButton(
+            label: l10n.backups_confirmRestore,
+            onPressed: () => Navigator.of(sheetContext).pop(true),
+          ),
+        ],
+      ),
+    ),
+  );
+  final filePath = path.text.trim();
+  final resource = name.text.trim();
+  final detailName = detail.text.trim();
+  final secretValue = secret.text.trim();
+  path.dispose();
+  name.dispose();
+  detail.dispose();
+  secret.dispose();
+  if (saved != true || !context.mounted || filePath.isEmpty) return;
+  try {
+    final repository = await ref.read(backupRepositoryProvider.future);
+    const targetDir = '/opt/1panel/backup';
+    await repository.uploadForRecover(filePath: filePath, targetDir: targetDir);
+    final fileName = filePath.split('/').last;
+    await repository.recoverByUpload(
+      downloadAccountID: 1,
+      type: type,
+      name: resource.isEmpty ? fileName : resource,
+      detailName: detailName,
+      file: fileName,
+      secret: secretValue,
+      taskID: const Uuid().v4(),
+    );
+    if (!context.mounted) return;
+    AppToast.success(context, l10n.backups_restoreSubmitted);
+  } catch (error) {
+    if (!context.mounted) return;
+    showErrorToast(context, error);
+  }
+}
+
+Future<void> _showSizes(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context);
+  try {
+    final repository = await ref.read(backupRepositoryProvider.future);
+    var total = 0;
+    var count = 0;
+    for (final type in const [
+      'app',
+      'database',
+      'website',
+      'directory',
+      'container',
+    ]) {
+      final sizes = await repository.recordSizes(
+        BackupRecordSearchReq(
+          page: 1,
+          pageSize: 1000,
+          type: type,
+          name: '',
+          detailName: '',
+        ),
+      );
+      count += sizes.length;
+      for (final item in sizes) {
+        total += item.size;
+      }
+    }
+    if (!context.mounted) return;
+    await showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.backups_calculateSizes, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          SplitListGroup(
+            children: [
+              SplitListTile(
+                title: l10n.backups_recordCount,
+                trailing: Text('$count'),
+              ),
+              SplitListTile(
+                title: l10n.backups_totalSize,
+                trailing: Text(formatBytes(total)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  } catch (error) {
+    if (!context.mounted) return;
+    showErrorToast(context, error);
+  }
+}
+
+Future<void> _create(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context);
+  final name = TextEditingController();
+  final detail = TextEditingController();
+  final secret = TextEditingController();
+  final description = TextEditingController();
+  String type = 'mysql';
+  bool stopBefore = false;
+  final confirmed = await showAppSheet<bool>(
+    context: context,
+    builder: (sheetContext) => StatefulBuilder(
+      builder: (context, setState) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.backups_create, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          DropdownButtonFormField<String>(
+            initialValue: type,
+            decoration: InputDecoration(labelText: l10n.backups_type),
+            items: [
+              DropdownMenuItem(value: 'app', child: Text(l10n.backups_tabApps)),
+              const DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
+              const DropdownMenuItem(
+                value: 'postgresql',
+                child: Text('PostgreSQL'),
+              ),
+              const DropdownMenuItem(value: 'mongodb', child: Text('MongoDB')),
+              const DropdownMenuItem(value: 'redis', child: Text('Redis')),
+              DropdownMenuItem(
+                value: 'website',
+                child: Text(l10n.backups_tabWebsites),
+              ),
+              DropdownMenuItem(
+                value: 'container',
+                child: Text(l10n.containers_title),
+              ),
+            ],
+            onChanged: (value) {
+              if (value != null) setState(() => type = value);
+            },
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: name,
+            label: l10n.backups_resourceName,
+            hint: type == 'app' ? 'app-key' : 'instance or container',
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: detail,
+            label: l10n.backups_detailName,
+            hint: type == 'app'
+                ? 'install-name'
+                : type == 'website'
+                ? 'site-alias'
+                : 'database-name',
+          ),
+          if (type == 'mysql' ||
+              type == 'postgresql' ||
+              type == 'mongodb' ||
+              type == 'redis') ...[
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: secret,
+              label: l10n.backups_dbPassword,
+              obscure: true,
+            ),
+          ],
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: description,
+            label: l10n.backups_description,
+          ),
+          if (type == 'container')
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.backups_stopBefore),
+              value: stopBefore,
+              onChanged: (value) => setState(() => stopBefore = value),
+            ),
+          const SizedBox(height: AppTokens.s16),
+          PrimaryButton(
+            label: l10n.backups_startBackup,
+            onPressed: () => Navigator.of(sheetContext).pop(true),
+          ),
+        ],
+      ),
+    ),
+  );
+  final resource = name.text.trim();
+  final detailName = detail.text.trim();
+  final dbSecret = secret.text.trim();
+  final note = description.text.trim();
+  name.dispose();
+  detail.dispose();
+  secret.dispose();
+  description.dispose();
+  if (confirmed != true || !context.mounted) return;
+  if (resource.isEmpty) return;
+  final repository = await ref.read(backupRepositoryProvider.future);
+  if (!context.mounted) return;
+  final taskID = const Uuid().v4();
+  final success = await TaskProgressSheet.run(
+    context,
+    title: l10n.backups_create,
+    task: (controller) async {
+      switch (type) {
+        case 'app':
+          await repository.backupApp(
+            name: resource,
+            detailName: detailName,
+            secret: dbSecret,
+            taskID: taskID,
+            description: note,
+          );
+        case 'mysql':
+        case 'postgresql':
+        case 'mongodb':
+        case 'redis':
+          await repository.backupDatabase(
+            type: type,
+            name: resource,
+            detailName: detailName,
+            secret: dbSecret,
+            taskID: taskID,
+            description: note,
+          );
+        case 'website':
+          await repository.backupDatabase(
+            type: 'website',
+            name: detailName.isEmpty ? resource : detailName,
+            detailName: detailName.isEmpty ? resource : detailName,
+            secret: dbSecret,
+            taskID: taskID,
+            description: note,
+          );
+        case 'container':
+          await repository.backupContainer(
+            name: resource,
+            detailName: detailName,
+            secret: dbSecret,
+            taskID: taskID,
+            description: note,
+            stopBefore: stopBefore,
+          );
+      }
+      for (var attempt = 0; attempt < 120; attempt++) {
+        final log = await repository.readTaskLog(taskID, latest: true);
+        if (log.lines.isNotEmpty) controller.log(log.lines.last);
+        final status = log.taskStatus.toLowerCase();
+        if (status == 'success') return;
+        if (status == 'failed' || status == 'error' || status == 'canceled') {
+          throw Exception(log.lines.isEmpty ? 'Task failed' : log.lines.last);
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+      }
+    },
+  );
+  if (!success || !context.mounted) return;
+  AppToast.success(context, l10n.action_done);
+  ref.invalidate(_backupRecordsProvider(type));
 }
 
 class _BackupTab extends ConsumerWidget {
@@ -114,6 +459,15 @@ class _BackupTab extends ConsumerWidget {
                       Text(
                         formatBytes(record.size),
                         style: AppTextStyles.caption,
+                      ),
+                      IconButton(
+                        tooltip: l10n.action_more,
+                        visualDensity: VisualDensity.compact,
+                        icon: const Icon(
+                          TablerIcons.dots,
+                          size: AppTokens.iconList,
+                        ),
+                        onPressed: () => _showActions(context, ref, record),
                       ),
                     ],
                   ),
@@ -260,6 +614,7 @@ class _BackupTab extends ConsumerWidget {
     final secretController = TextEditingController();
     final dbTypeController = TextEditingController(text: 'mysql');
     final isApp = type == 'app';
+    final isContainer = type == 'container';
     final confirmed = await showAppSheet<bool>(
       context: context,
       builder: (sheetContext) => Column(
@@ -280,6 +635,8 @@ class _BackupTab extends ConsumerWidget {
             label: l10n.backups_resourceName,
             hint: isApp
                 ? l10n.backups_appNameHint
+                : isContainer
+                ? l10n.backups_containerHint
                 : l10n.backups_databaseInstanceHint,
           ),
           const SizedBox(height: AppTokens.s12),
@@ -334,7 +691,18 @@ class _BackupTab extends ConsumerWidget {
     }
     try {
       final repository = await ref.read(backupRepositoryProvider.future);
-      if (isApp) {
+      if (isContainer) {
+        await repository.recoverContainer(
+          downloadAccountID: record.downloadAccountID,
+          name: name,
+          detailName: detail,
+          file: record.fileName,
+          secret: secret,
+          taskID: const Uuid().v4(),
+          backupRecordID: record.id,
+          timeout: 600,
+        );
+      } else if (isApp) {
         await repository.recoverApp(
           downloadAccountID: record.downloadAccountID,
           name: name,

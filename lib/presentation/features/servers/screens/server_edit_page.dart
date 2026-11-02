@@ -17,8 +17,11 @@ import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
+import '../../../common/components/skeleton.dart';
 import '../../../common/components/tonal_card.dart';
 import '../providers/servers_provider.dart';
+import '../../../common/states/error_mapper.dart';
+import '../../../common/states/error_state.dart';
 import '../../../common/states/error_toast.dart';
 
 enum _StepState { idle, running, ok, failed, skipped }
@@ -55,6 +58,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
   bool _saving = false;
   bool _loading = false;
   bool _diagnosing = false;
+  Object? _loadError;
 
   List<_DiagnosisStep> _steps = const [];
   String? _clockDrift;
@@ -66,20 +70,29 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
   }
 
   Future<void> _loadServer() async {
-    setState(() => _loading = true);
-    final repository = ref.read(serverRepositoryProvider);
-    final server = await repository.find(widget.serverId!);
-    final apiKey = await repository.getApiKey(widget.serverId!);
-    if (!mounted) return;
-    if (server != null) {
-      _nameController.text = server.name ?? '';
-      _hostController.text = server.host;
-      _portController.text = '${server.port}';
-      _apiKeyController.text = apiKey ?? '';
-      _isHttps = server.isHttps;
-      _allowInsecure = server.allowInsecureConnections;
+    setState(() {
+      _loading = true;
+      _loadError = null;
+    });
+    try {
+      final repository = ref.read(serverRepositoryProvider);
+      final server = await repository.find(widget.serverId!);
+      final apiKey = await repository.getApiKey(widget.serverId!);
+      if (!mounted) return;
+      if (server != null) {
+        _nameController.text = server.name ?? '';
+        _hostController.text = server.host;
+        _portController.text = '${server.port}';
+        _apiKeyController.text = apiKey ?? '';
+        _isHttps = server.isHttps;
+        _allowInsecure = server.allowInsecureConnections;
+      }
+    } catch (error) {
+      if (!mounted) return;
+      _loadError = error;
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
-    setState(() => _loading = false);
   }
 
   @override
@@ -345,7 +358,33 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
     final l10n = AppLocalizations.of(context);
     final scheme = context.scheme;
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: SkeletonShimmer(
+          child: Padding(
+            padding: EdgeInsets.all(AppTokens.s16),
+            child: Column(
+              children: [
+                SkeletonCard(height: 96),
+                SkeletonCard(height: 120),
+                SkeletonCard(height: 96),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    if (_loadError != null) {
+      return Scaffold(
+        appBar: AppBarLarge(
+          title: widget.isEditing
+              ? l10n.server_edit_edit_title
+              : l10n.server_edit_add_title,
+        ),
+        body: ErrorState(
+          data: mapError(_loadError!, l10n),
+          onRetry: _loadServer,
+        ),
+      );
     }
 
     return Scaffold(
@@ -370,32 +409,19 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
                     hint: l10n.server_edit_name_hint,
                   ),
                   const SizedBox(height: AppTokens.s16),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.server_edit_https),
+                    value: _isHttps,
+                    onChanged: (value) {
+                      setState(() {
+                        _isHttps = value;
+                        _syncDefaultPort(value);
+                      });
+                    },
+                  ),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Column(
-                          children: [
-                            Text(
-                              l10n.server_edit_https,
-                              style: AppTextStyles.bodyS.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
-                            ),
-                            Switch(
-                              value: _isHttps,
-                              onChanged: (value) {
-                                setState(() {
-                                  _isHttps = value;
-                                  _syncDefaultPort(value);
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: AppTokens.s12),
                       Expanded(
                         flex: 3,
                         child: AppTextField(

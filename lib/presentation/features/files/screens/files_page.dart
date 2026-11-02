@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/debouncer.dart';
 import '../../../../core/utils/file_type_utils.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/file/file_item_dto.dart';
@@ -25,6 +26,7 @@ import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/refreshable_empty_state.dart';
 import '../providers/files_provider.dart';
 import '../widgets/file_permission_sheet.dart';
 import '../../../common/states/error_toast.dart';
@@ -45,18 +47,21 @@ class FilesPage extends ConsumerStatefulWidget {
 
 class _FilesPageState extends ConsumerState<FilesPage> {
   final _searchController = TextEditingController();
+  final _searchDebouncer = Debouncer();
   bool _searching = false;
+  bool _selecting = false;
   bool _uploading = false;
   final Set<String> _selected = {};
   final Map<String, int> _dirSizes = {};
   final Set<String> _calculating = {};
 
-  bool get _selectionMode => _selected.isNotEmpty;
+  bool get _selectionMode => _selecting;
 
   String get _path => widget.initialPath.isEmpty ? '/' : widget.initialPath;
 
   @override
   void dispose() {
+    _searchDebouncer.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -116,6 +121,44 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     }
   }
 
+  Future<void> _checkSelection() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      final items = await repository.batchCheckFilesExists(_selected.toList());
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.files_checkExistence, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s16),
+            if (items.isEmpty)
+              Text(l10n.state_empty)
+            else
+              SplitListGroup(
+                children: [
+                  for (final item in items)
+                    SplitListTile(
+                      leading: Icon(
+                        item.isDir ? TablerIcons.folder : TablerIcons.file,
+                      ),
+                      title: item.name,
+                      subtitle: item.path,
+                    ),
+                ],
+              ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _create({required bool isDir}) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
@@ -147,7 +190,13 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     if (name == null || name.isEmpty) return;
     try {
       final repository = await ref.read(fileRepositoryProvider.future);
-      await repository.createFileOrDir(path: _join(_path, name), isDir: isDir);
+      final target = _join(_path, name);
+      if (await repository.checkFileExists(target)) {
+        if (!mounted) return;
+        AppToast.warning(context, l10n.files_alreadyExists(name));
+        return;
+      }
+      await repository.createFileOrDir(path: target, isDir: isDir);
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
       ref.invalidate(filesProvider(_path));
@@ -374,14 +423,19 @@ class _FilesPageState extends ConsumerState<FilesPage> {
 
   void _toggleSelection(FileItemDto item) {
     setState(() {
+      _selecting = true;
       if (!_selected.remove(item.path)) _selected.add(item.path);
     });
   }
 
-  void _clearSelection() => setState(_selected.clear);
+  void _clearSelection() => setState(() {
+    _selecting = false;
+    _selected.clear();
+  });
 
   void _selectAll(List<FileItemDto> items) {
     setState(() {
+      _selecting = true;
       _selected
         ..clear()
         ..addAll(items.map((item) => item.path));
@@ -392,6 +446,75 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     final updated = await showFilePermissionSheet(context, item: item);
     if (updated && mounted) {
       ref.invalidate(filesProvider(_path));
+    }
+  }
+
+  Future<void> _favorite(FileItemDto item) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      await repository.favoriteFile(item.path);
+      if (!mounted) return;
+      AppToast.success(context, l10n.files_favoriteAdded);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _moveCopy(FileItemDto item) async {
+    final l10n = AppLocalizations.of(context);
+    final request = await showAppSheet<_MoveRequest>(
+      context: context,
+      builder: (sheetContext) =>
+          _MoveSheet(sourcePath: item.path, sourceDir: _path),
+    );
+    if (request == null || !mounted) return;
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      await repository.moveCopyFiles(
+        oldPaths: [item.path],
+        newPath: request.target,
+        type: request.copy ? 'copy' : 'cut',
+        cover: request.cover,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(filesProvider(_path));
+      if (request.target != _path) {
+        ref.invalidate(filesProvider(request.target));
+      }
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _batchPermission() async {
+    final l10n = AppLocalizations.of(context);
+    final paths = _selected.toList(growable: false);
+    if (paths.isEmpty) return;
+    final request = await showAppSheet<_BatchRoleRequest>(
+      context: context,
+      builder: (sheetContext) => const _BatchRoleSheet(),
+    );
+    if (request == null || !mounted) return;
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      await repository.updatePermissions(
+        paths: paths,
+        mode: request.mode,
+        user: request.user,
+        group: request.group,
+        sub: request.sub,
+      );
+      if (!mounted) return;
+      setState(_selected.clear);
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(filesProvider(_path));
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
     }
   }
 
@@ -463,7 +586,9 @@ class _FilesPageState extends ConsumerState<FilesPage> {
           const SizedBox(height: AppTokens.s4),
           Text(
             item.isDir
-                ? l10n.files_itemCount(item.itemTotal)
+                ? (item.itemTotal > 0
+                      ? l10n.files_itemCount(item.itemTotal)
+                      : l10n.files_folder)
                 : '${formatBytes(item.size)} · ${item.modTime}',
             style: AppTextStyles.bodyS.copyWith(
               color: context.scheme.onSurfaceVariant,
@@ -490,6 +615,25 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                   onTap: () {
                     Navigator.of(sheetContext).pop();
                     _previewImage(item);
+                  },
+                ),
+              if (!item.isDir)
+                SplitListTile(
+                  leading: const Icon(TablerIcons.ruler_measure),
+                  title: l10n.files_exactSize,
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    try {
+                      final repository = await ref.read(
+                        fileRepositoryProvider.future,
+                      );
+                      final size = await repository.getFileSize(item.path);
+                      if (!mounted) return;
+                      AppToast.success(context, formatBytes(size));
+                    } catch (error) {
+                      if (!mounted) return;
+                      showErrorToast(context, error);
+                    }
                   },
                 ),
               SplitListTile(
@@ -525,6 +669,22 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                     _extract(item);
                   },
                 ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.arrows_move),
+                title: l10n.files_moveCopy,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _moveCopy(item);
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.star),
+                title: l10n.files_addFavorite,
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await _favorite(item);
+                },
+              ),
               SplitListTile(
                 leading: const Icon(TablerIcons.shield_lock),
                 title: l10n.files_permission,
@@ -598,27 +758,32 @@ class _FilesPageState extends ConsumerState<FilesPage> {
               ),
         actions: _selectionMode
             ? [
-                TextButton(
-                  onPressed: () => _selectAll(
-                    ref.read(filesProvider(_path)).valueOrNull?.items ??
-                        const [],
-                  ),
-                  child: Text(l10n.files_selectAll),
-                ),
-                TextButton(
-                  onPressed: _clearSelection,
-                  child: Text(l10n.files_cancelSelection),
+                PopupMenuButton<String>(
+                  tooltip: l10n.action_more,
+                  icon: const Icon(TablerIcons.dots),
+                  onSelected: (value) {
+                    if (value == 'all') {
+                      _selectAll(
+                        ref.read(filesProvider(_path)).valueOrNull?.items ??
+                            const [],
+                      );
+                    } else if (value == 'check') {
+                      _checkSelection();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'all',
+                      child: Text(l10n.files_selectAll),
+                    ),
+                    PopupMenuItem(
+                      value: 'check',
+                      child: Text(l10n.files_checkExistence),
+                    ),
+                  ],
                 ),
               ]
             : [
-                AppIconButton(
-                  icon: TablerIcons.sparkles,
-                  tooltip: l10n.files_aiSearch,
-                  onPressed: () => context.push(
-                    '/s/${widget.serverId}/files/ai-search'
-                    '?path=${Uri.encodeComponent(_path)}',
-                  ),
-                ),
                 AppIconButton(
                   icon: _searching ? TablerIcons.x : TablerIcons.search,
                   tooltip: l10n.action_search,
@@ -650,9 +815,49 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                     ),
                   ],
                 ),
+                PopupMenuButton<String>(
+                  tooltip: l10n.action_more,
+                  icon: const Icon(TablerIcons.dots),
+                  onSelected: (value) async {
+                    if (value == 'root') {
+                      try {
+                        final repository = await ref.read(
+                          fileRepositoryProvider.future,
+                        );
+                        final root = await repository.getWebsiteRootDir();
+                        if (!context.mounted || root.isEmpty) return;
+                        _openPath(root);
+                      } catch (error) {
+                        if (!context.mounted) return;
+                        showErrorToast(context, error);
+                      }
+                    } else if (value == 'tools') {
+                      await context.push('/s/${widget.serverId}/files/tools');
+                    } else if (value == 'ai') {
+                      await context.push(
+                        '/s/${widget.serverId}/files/ai-search'
+                        '?path=${Uri.encodeComponent(_path)}',
+                      );
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'root',
+                      child: Text(l10n.files_websiteRoot),
+                    ),
+                    PopupMenuItem(
+                      value: 'tools',
+                      child: Text(l10n.files_tools),
+                    ),
+                    PopupMenuItem(
+                      value: 'ai',
+                      child: Text(l10n.files_aiSearch),
+                    ),
+                  ],
+                ),
               ],
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(_searching ? 60 : 44),
+          preferredSize: Size.fromHeight(_searching ? 64 : 48),
           child: Column(
             children: [
               if (_searching)
@@ -666,8 +871,12 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                   child: SearchField(
                     controller: _searchController,
                     autofocus: true,
-                    onChanged: (value) =>
-                        ref.read(filesProvider(_path).notifier).search(value),
+                    onChanged: (value) {
+                      _clearSelection();
+                      _searchDebouncer(() {
+                        ref.read(filesProvider(_path).notifier).search(value);
+                      }, delay: const Duration(milliseconds: 300));
+                    },
                   ),
                 ),
               _Breadcrumb(path: _path, onTap: _openPath),
@@ -693,12 +902,15 @@ class _FilesPageState extends ConsumerState<FilesPage> {
         onRetry: () => ref.read(filesProvider(_path).notifier).refresh(),
         loading: const SkeletonList(itemCount: 10, itemHeight: 56),
         isEmpty: (state) => state.items.isEmpty,
-        empty: EmptyState(
-          icon: TablerIcons.folder_open,
-          title: l10n.files_empty_title,
-          message: l10n.files_empty_message,
-          actionLabel: l10n.files_upload,
-          onAction: _upload,
+        empty: RefreshableEmptyState(
+          onRefresh: () => ref.read(filesProvider(_path).notifier).refresh(),
+          child: EmptyState(
+            icon: TablerIcons.folder_open,
+            title: l10n.files_empty_title,
+            message: l10n.files_empty_message,
+            actionLabel: l10n.files_upload,
+            onAction: _upload,
+          ),
         ),
         builder: (state) => RefreshIndicator(
           onRefresh: () => ref.read(filesProvider(_path).notifier).refresh(),
@@ -731,6 +943,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                       : () => _showActions(item),
                   onLongPress: () => _toggleSelection(item),
                   onMore: () => _showActions(item),
+                  showMore: !_selectionMode,
                   onCalculateSize: item.isDir
                       ? () => _calculateDirSize(item)
                       : null,
@@ -752,32 +965,27 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                         Expanded(
                           child: Text(
                             l10n.files_selectCount(_selected.length),
-                            style: AppTextStyles.caption.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
+                            style: AppTextStyles.bodyM,
                           ),
                         ),
-                        TextButton(
-                          onPressed: () => _selectAll(
+                        DangerButton(
+                          expanded: false,
+                          icon: TablerIcons.trash,
+                          label: l10n.action_delete,
+                          onPressed: () => _batchDelete(
                             ref.read(filesProvider(_path)).valueOrNull?.items ??
                                 const [],
                           ),
-                          child: Text(l10n.files_selectAll),
                         ),
                       ],
                     ),
                     const SizedBox(height: AppTokens.s8),
                     SizedBox(
                       width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: () => _batchDelete(
-                          ref.read(filesProvider(_path)).valueOrNull?.items ??
-                              const [],
-                        ),
-                        icon: const Icon(TablerIcons.trash),
-                        label: Text(
-                          '${l10n.files_batchDelete} (${_selected.length})',
-                        ),
+                      child: SecondaryButton(
+                        label: l10n.files_batchPermission,
+                        icon: TablerIcons.shield_lock,
+                        onPressed: _batchPermission,
                       ),
                     ),
                   ],
@@ -790,26 +998,197 @@ class _FilesPageState extends ConsumerState<FilesPage> {
           : [
               Row(
                 children: [
-                  TextButton.icon(
+                  AppIconButton(
+                    icon: TablerIcons.folder_plus,
+                    tooltip: l10n.files_new_folder,
                     onPressed: () => _create(isDir: true),
-                    icon: const Icon(TablerIcons.folder_plus),
-                    label: Text(l10n.files_new_folder),
                   ),
-                  TextButton.icon(
+                  AppIconButton(
+                    icon: TablerIcons.file_plus,
+                    tooltip: l10n.files_new_file,
                     onPressed: () => _create(isDir: false),
-                    icon: const Icon(TablerIcons.file_plus),
-                    label: Text(l10n.files_new_file),
                   ),
                   const Spacer(),
-                  Text(
-                    l10n.files_itemCount(files.valueOrNull?.total ?? 0),
-                    style: AppTextStyles.caption.copyWith(
-                      color: scheme.onSurfaceVariant,
+                  Flexible(
+                    child: Text(
+                      l10n.files_itemCount(files.valueOrNull?.total ?? 0),
+                      style: AppTextStyles.caption.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
               ),
             ],
+    );
+  }
+}
+
+class _MoveRequest {
+  const _MoveRequest({
+    required this.target,
+    required this.copy,
+    required this.cover,
+  });
+
+  final String target;
+  final bool copy;
+  final bool cover;
+}
+
+class _MoveSheet extends StatefulWidget {
+  const _MoveSheet({required this.sourcePath, required this.sourceDir});
+
+  final String sourcePath;
+  final String sourceDir;
+
+  @override
+  State<_MoveSheet> createState() => _MoveSheetState();
+}
+
+class _MoveSheetState extends State<_MoveSheet> {
+  late final TextEditingController _target = TextEditingController(
+    text: widget.sourceDir,
+  );
+  bool _copy = false;
+  bool _cover = false;
+
+  @override
+  void dispose() {
+    _target.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.files_moveCopy, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s4),
+        Text(
+          widget.sourcePath,
+          style: AppTextStyles.caption.copyWith(
+            color: context.scheme.onSurfaceVariant,
+            fontFamily: 'monospace',
+          ),
+        ),
+        const SizedBox(height: AppTokens.s16),
+        AppTextField(
+          controller: _target,
+          label: l10n.files_targetDirectory,
+          hint: '/opt',
+          autofocus: true,
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.files_copyMode),
+          value: _copy,
+          onChanged: (value) => setState(() => _copy = value),
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.files_overwrite),
+          value: _cover,
+          onChanged: (value) => setState(() => _cover = value),
+        ),
+        const SizedBox(height: AppTokens.s16),
+        PrimaryButton(
+          label: _copy ? l10n.files_copy : l10n.files_move,
+          onPressed: () {
+            final target = _target.text.trim();
+            if (target.isEmpty) return;
+            Navigator.of(
+              context,
+            ).pop(_MoveRequest(target: target, copy: _copy, cover: _cover));
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _BatchRoleRequest {
+  const _BatchRoleRequest({
+    required this.mode,
+    required this.user,
+    required this.group,
+    required this.sub,
+  });
+
+  final int mode;
+  final String user;
+  final String group;
+  final bool sub;
+}
+
+class _BatchRoleSheet extends StatefulWidget {
+  const _BatchRoleSheet();
+
+  @override
+  State<_BatchRoleSheet> createState() => _BatchRoleSheetState();
+}
+
+class _BatchRoleSheetState extends State<_BatchRoleSheet> {
+  final _mode = TextEditingController(text: '0644');
+  final _user = TextEditingController();
+  final _group = TextEditingController();
+  bool _sub = true;
+
+  @override
+  void dispose() {
+    _mode.dispose();
+    _user.dispose();
+    _group.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.files_batchPermission, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s16),
+        AppTextField(
+          controller: _mode,
+          label: l10n.files_permissionMode,
+          keyboardType: TextInputType.number,
+        ),
+        const SizedBox(height: AppTokens.s12),
+        AppTextField(controller: _user, label: l10n.files_permissionUser),
+        const SizedBox(height: AppTokens.s12),
+        AppTextField(controller: _group, label: l10n.files_permissionGroupName),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.files_recursive),
+          value: _sub,
+          onChanged: (value) => setState(() => _sub = value),
+        ),
+        const SizedBox(height: AppTokens.s16),
+        PrimaryButton(
+          label: l10n.action_save,
+          onPressed: () {
+            final text = _mode.text.trim();
+            if (!RegExp(r'^[0-7]{3,4}$').hasMatch(text)) return;
+            final mode = int.parse(text.padLeft(4, '0'), radix: 8);
+            Navigator.of(context).pop(
+              _BatchRoleRequest(
+                mode: mode,
+                user: _user.text.trim(),
+                group: _group.text.trim(),
+                sub: _sub,
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
@@ -826,7 +1205,7 @@ class _Breadcrumb extends StatelessWidget {
     final segments = path.split('/').where((e) => e.isNotEmpty).toList();
     final scheme = context.scheme;
     return SizedBox(
-      height: 36,
+      height: AppTokens.minTapTarget,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
@@ -834,7 +1213,7 @@ class _Breadcrumb extends StatelessWidget {
           InkWell(
             onTap: () => onTap('/'),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppTokens.s4),
+              padding: const EdgeInsets.symmetric(horizontal: AppTokens.s8),
               child: Center(
                 child: Text(
                   l10n.files_rootDirectory,
@@ -849,7 +1228,7 @@ class _Breadcrumb extends StatelessWidget {
             InkWell(
               onTap: () => onTap('/${segments.take(i + 1).join('/')}'),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppTokens.s4),
+                padding: const EdgeInsets.symmetric(horizontal: AppTokens.s8),
                 child: Center(
                   child: Text(
                     segments[i],
@@ -877,6 +1256,7 @@ class _FileTile extends StatelessWidget {
     required this.onTap,
     required this.onLongPress,
     required this.onMore,
+    this.showMore = true,
     this.selected = false,
     this.dirSize,
     this.calculating = false,
@@ -887,6 +1267,7 @@ class _FileTile extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onLongPress;
   final VoidCallback onMore;
+  final bool showMore;
   final bool selected;
   final int? dirSize;
   final bool calculating;
@@ -941,7 +1322,9 @@ class _FileTile extends StatelessWidget {
                   ),
                   Text(
                     item.isDir
-                        ? l10n.files_itemCount(item.itemTotal)
+                        ? (item.itemTotal > 0
+                              ? l10n.files_itemCount(item.itemTotal)
+                              : l10n.files_folder)
                         : '${formatBytes(item.size)} · ${item.modTime}',
                     style: AppTextStyles.caption.copyWith(
                       color: scheme.onSurfaceVariant,
@@ -954,11 +1337,11 @@ class _FileTile extends StatelessWidget {
             ),
             if (item.isDir)
               const Icon(TablerIcons.chevron_right, size: AppTokens.iconList)
-            else
+            else if (showMore)
               IconButton(
                 tooltip: l10n.action_more,
                 icon: const Icon(TablerIcons.dots, size: AppTokens.iconList),
-                onPressed: onLongPress,
+                onPressed: onMore,
               ),
           ],
         ),

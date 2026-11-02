@@ -32,6 +32,13 @@ class HostRepositoryImpl implements HostRepository {
   Future<SshInfoDto> getSshInfo() => _api.getSshInfo();
 
   @override
+  Future<String> loadSshFile(String name) => _api.loadSshFile(name);
+
+  @override
+  Future<void> updateSshFile(String key, String path, String value) =>
+      _api.updateSshFile(key, path, value);
+
+  @override
   Future<void> updateSsh(String key, String newValue) =>
       _api.updateSsh(key, newValue);
 
@@ -55,7 +62,13 @@ class HostRepositoryImpl implements HostRepository {
   Future<void> createSshCert(SshCertOperateReq req) => _api.createCert(req);
 
   @override
+  Future<void> editSshCert(SshCertOperateReq req) => _api.editCert(req);
+
+  @override
   Future<void> deleteSshCert(int id) => _api.deleteCert([id]);
+
+  @override
+  Future<void> syncSshCerts() => _api.syncCert();
 
   @override
   Future<List<Map<String, dynamic>>> searchTerminalSessions() =>

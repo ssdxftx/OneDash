@@ -15,7 +15,11 @@ class TaskWaiter {
   final Duration interval;
   final int maxAttempts;
 
-  Future<void> waitFor(String taskID, {String subject = '任务'}) async {
+  Future<void> waitFor(
+    String taskID, {
+    String subject = '任务',
+    void Function(TaskLogDto log)? onUpdate,
+  }) async {
     if (taskID.isEmpty) return;
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
       final response = await _client.post<Map<String, dynamic>>(
@@ -23,6 +27,7 @@ class TaskWaiter {
         data: {'taskID': taskID, 'page': 1, 'pageSize': 200, 'latest': true},
       );
       final log = ApiResponseParser.object(response, TaskLogDto.fromJson);
+      onUpdate?.call(log);
       final status = log.taskStatus.toLowerCase();
       if (status == 'success') return;
       if (status == 'failed' || status == 'error' || status == 'canceled') {

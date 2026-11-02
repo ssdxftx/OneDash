@@ -34,7 +34,9 @@ class WebsitesController
   }
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
+    state = const AsyncLoading<PageResult<WebsiteDto>>().copyWithPrevious(
+      state,
+    );
     state = await AsyncValue.guard(() => _fetch(page: 1));
     _page = 1;
   }
@@ -42,14 +44,18 @@ class WebsitesController
   Future<void> search(String value) async {
     _name = value.trim();
     _page = 1;
-    state = const AsyncLoading();
+    state = const AsyncLoading<PageResult<WebsiteDto>>().copyWithPrevious(
+      state,
+    );
     state = await AsyncValue.guard(() => _fetch(page: 1));
   }
 
   Future<void> setType(String type) async {
     _type = type;
     _page = 1;
-    state = const AsyncLoading();
+    state = const AsyncLoading<PageResult<WebsiteDto>>().copyWithPrevious(
+      state,
+    );
     state = await AsyncValue.guard(() => _fetch(page: 1));
   }
 

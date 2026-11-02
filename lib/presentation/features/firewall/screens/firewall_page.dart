@@ -258,6 +258,11 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
                     onReorder: _reorderRule,
                     onAdd: () => _showRuleSheet(data),
                     onRefresh: _refresh,
+                    onClearFilters: () => setState(() {
+                      _filter = 'all';
+                      _searching = false;
+                      _searchController.clear();
+                    }),
                   ),
                   1 => _ForwardTab(
                     data: data,
@@ -771,6 +776,7 @@ class _RulesTab extends StatelessWidget {
     required this.onReorder,
     required this.onAdd,
     required this.onRefresh,
+    required this.onClearFilters,
   });
 
   final _FirewallData data;
@@ -782,6 +788,7 @@ class _RulesTab extends StatelessWidget {
   final void Function(FirewallRuleItem item, int delta) onReorder;
   final VoidCallback onAdd;
   final Future<void> Function() onRefresh;
+  final VoidCallback onClearFilters;
 
   @override
   Widget build(BuildContext context) {
@@ -803,19 +810,11 @@ class _RulesTab extends StatelessWidget {
       ].any((value) => value.toLowerCase().contains(query));
     }).toList();
 
-    if (items.isEmpty) {
-      return EmptyState(
-        icon: TablerIcons.shield,
-        title: l10n.firewall_tabRules,
-        message: l10n.firewall_add_rule,
-        actionLabel: l10n.firewall_add_rule,
-        onAction: onAdd,
-      );
-    }
-
+    final filtered = query.isNotEmpty || filter != 'all';
     return RefreshIndicator(
       onRefresh: onRefresh,
       child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(
           AppTokens.s16,
           AppTokens.s8,
@@ -836,23 +835,43 @@ class _RulesTab extends StatelessWidget {
               IconButton(
                 tooltip: l10n.action_search,
                 onPressed: onSearchToggle,
-                icon: const Icon(TablerIcons.search),
+                icon: Icon(
+                  query.isNotEmpty ? TablerIcons.x : TablerIcons.search,
+                ),
               ),
             ],
           ),
           const SizedBox(height: AppTokens.s8),
-          SplitListGroup(
-            children: [
-              for (final item in items)
-                _RuleTile(
-                  item: item,
-                  onEdit: () => onEdit(item),
-                  onDelete: () => onDelete(item),
-                  onMoveUp: () => onReorder(item, -1),
-                  onMoveDown: () => onReorder(item, 1),
-                ),
-            ],
-          ),
+          if (items.isEmpty)
+            SizedBox(
+              height: 280,
+              child: EmptyState(
+                icon: TablerIcons.shield,
+                title: filtered
+                    ? l10n.firewall_noMatchingRules
+                    : l10n.firewall_tabRules,
+                message: filtered
+                    ? l10n.firewall_clearFiltersHint
+                    : l10n.firewall_add_rule,
+                actionLabel: filtered
+                    ? l10n.action_clear
+                    : l10n.firewall_add_rule,
+                onAction: filtered ? onClearFilters : onAdd,
+              ),
+            )
+          else
+            SplitListGroup(
+              children: [
+                for (final item in items)
+                  _RuleTile(
+                    item: item,
+                    onEdit: () => onEdit(item),
+                    onDelete: () => onDelete(item),
+                    onMoveUp: () => onReorder(item, -1),
+                    onMoveDown: () => onReorder(item, 1),
+                  ),
+              ],
+            ),
         ],
       ),
     );

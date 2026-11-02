@@ -16,7 +16,6 @@ import '../../../common/components/log_view.dart';
 import '../../../common/components/metric_card.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/split_list_group.dart';
-import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 
@@ -53,13 +52,13 @@ class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage> {
   final LogBuffer _logBuffer = LogBuffer();
   Timer? _timer;
   bool _paused = false;
+  int _tabIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _fetchLogs();
     _timer = Timer.periodic(const Duration(seconds: 3), (_) {
-      if (!_paused) _fetchLogs();
+      if (_tabIndex == 1 && !_paused) _fetchLogs();
     });
   }
 
@@ -113,6 +112,14 @@ class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage> {
           l10n.containers_logs,
           l10n.containers_config,
         ],
+        onChanged: (index) {
+          if (index == 1 && _tabIndex != 1) {
+            _tabIndex = index;
+            _fetchLogs();
+            return;
+          }
+          _tabIndex = index;
+        },
         children: [
           _OverviewTab(containerName: widget.containerName),
           LogView(
@@ -147,10 +154,28 @@ class _OverviewTab extends ConsumerWidget {
           TonalCard(
             child: Row(
               children: [
-                const StatusDot(status: 'running'),
+                const Icon(TablerIcons.box, size: AppTokens.iconList),
                 const SizedBox(width: AppTokens.s8),
-                Expanded(child: Text(data.name, style: AppTextStyles.titleM)),
-                Text(data.image, style: AppTextStyles.bodyS),
+                Expanded(
+                  child: Text(
+                    data.name,
+                    style: AppTextStyles.titleM,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: AppTokens.s8),
+                Flexible(
+                  child: Text(
+                    data.image,
+                    style: AppTextStyles.bodyS.copyWith(
+                      color: context.scheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
+                  ),
+                ),
               ],
             ),
           ),

@@ -10,11 +10,15 @@ import '../../../../data/dto/log/ssh_log_dto.dart';
 import '../../../../data/dto/log/task_log_dto.dart';
 import '../../../../data/repositories_impl/log_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_toast.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/states/async_state_view.dart';
+import '../../../common/states/error_toast.dart';
 import '../../../common/states/empty_state.dart';
 
 class _LogEntry {
@@ -126,7 +130,16 @@ class LogHubPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBarLarge(title: l10n.logs_title),
+      appBar: AppBarLarge(
+        title: l10n.logs_title,
+        actions: [
+          AppIconButton(
+            icon: TablerIcons.eraser,
+            tooltip: l10n.logs_clean,
+            onPressed: () => _openActions(context, ref),
+          ),
+        ],
+      ),
       body: SegmentedTabsView(
         labels: [
           l10n.logs_operation,
@@ -142,6 +155,83 @@ class LogHubPage extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+extension on LogHubPage {
+  Future<void> _openActions(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    await showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.logs_clean, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          SplitListGroup(
+            children: [
+              SplitListTile(
+                leading: const Icon(TablerIcons.list),
+                title: l10n.logs_cleanOperation,
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await _clean(context, ref, 'operation');
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.login),
+                title: l10n.logs_cleanLogin,
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await _clean(context, ref, 'login');
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.download),
+                title: l10n.logs_exportSsh,
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  try {
+                    final repository = await ref.read(
+                      logRepositoryProvider.future,
+                    );
+                    final path = await repository.exportSshLogs();
+                    if (!context.mounted) return;
+                    AppToast.success(context, l10n.logs_exported(path));
+                  } catch (error) {
+                    if (!context.mounted) return;
+                    showErrorToast(context, error);
+                  }
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _clean(BuildContext context, WidgetRef ref, String type) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.logs_clean,
+      message: l10n.logs_cleanConfirm,
+      confirmLabel: l10n.action_clear,
+    );
+    if (!confirmed || !context.mounted) return;
+    try {
+      final repository = await ref.read(logRepositoryProvider.future);
+      await repository.cleanLogs(type);
+      ref.invalidate(_logsProvider(0));
+      ref.invalidate(_logsProvider(1));
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 }
 
@@ -177,6 +267,36 @@ class _LogTab extends ConsumerWidget {
                   leading: StatusDot(status: item.status.toLowerCase()),
                   title: item.title,
                   subtitle: '${item.time}  ${item.detail}',
+                  onTap: () => showAppSheet<void>(
+                    context: context,
+                    builder: (sheetContext) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.title, style: AppTextStyles.titleL),
+                        const SizedBox(height: AppTokens.s4),
+                        Text(
+                          '${item.time} · ${item.status}',
+                          style: AppTextStyles.bodyS.copyWith(
+                            color: sheetContext.scheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: AppTokens.s16),
+                        SelectableText(
+                          item.detail,
+                          style: AppTextStyles.bodyM.copyWith(
+                            fontFamily: 'monospace',
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: AppTokens.s16),
+                        SecondaryButton(
+                          label: AppLocalizations.of(sheetContext).action_close,
+                          onPressed: () => Navigator.of(sheetContext).pop(),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),

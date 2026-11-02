@@ -102,7 +102,7 @@ class _LogViewState extends State<LogView> {
     final scheme = context.scheme;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0B0F0C),
+        color: AppTokens.consoleBackground,
         borderRadius: BorderRadius.circular(AppTokens.rMd),
         border: Border.all(color: scheme.outlineVariant),
       ),
@@ -123,7 +123,7 @@ class _LogViewState extends State<LogView> {
                     child: Text(
                       widget.emptyLabel ?? l10n.log_empty,
                       style: AppTextStyles.bodyS.copyWith(
-                        color: const Color(0xFF8A9A90),
+                        color: AppTokens.consoleMuted,
                       ),
                     ),
                   )
@@ -140,7 +140,7 @@ class _LogViewState extends State<LogView> {
                           widget.showLineNumbers ? '${index + 1}  $line' : line,
                           style: AppTextStyles.bodyS.copyWith(
                             fontFamily: 'monospace',
-                            color: const Color(0xFFD7E4DA),
+                            color: AppTokens.consoleForeground,
                             height: 1.5,
                           ),
                         );
@@ -151,10 +151,10 @@ class _LogViewState extends State<LogView> {
                   Positioned(
                     right: AppTokens.s16,
                     bottom: AppTokens.s16,
-                    child: FloatingActionButton.small(
+                    child: IconButton.filled(
                       tooltip: l10n.log_jumpLatest,
                       onPressed: _scrollToBottom,
-                      child: const Icon(TablerIcons.arrow_down),
+                      icon: const Icon(TablerIcons.arrow_down),
                     ),
                   ),
               ],

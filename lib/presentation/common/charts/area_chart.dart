@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens.dart';
@@ -197,12 +198,16 @@ class _AreaChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _AreaChartPainter oldDelegate) {
-    return oldDelegate.seriesA != seriesA ||
-        oldDelegate.seriesB != seriesB ||
+    return !listEquals(oldDelegate.seriesA, seriesA) ||
+        !listEquals(oldDelegate.seriesB, seriesB) ||
         oldDelegate.colorA != colorA ||
         oldDelegate.colorB != colorB ||
         oldDelegate.maxY != maxY ||
-        oldDelegate.showGrid != showGrid;
+        oldDelegate.minY != minY ||
+        oldDelegate.gridColor != gridColor ||
+        oldDelegate.showGrid != showGrid ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.fill != fill;
   }
 }
 
@@ -340,9 +345,10 @@ class _SparklinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _SparklinePainter oldDelegate) {
-    return oldDelegate.values != values ||
+    return !listEquals(oldDelegate.values, values) ||
         oldDelegate.color != color ||
         oldDelegate.minValue != minValue ||
-        oldDelegate.maxValue != maxValue;
+        oldDelegate.maxValue != maxValue ||
+        oldDelegate.strokeWidth != strokeWidth;
   }
 }

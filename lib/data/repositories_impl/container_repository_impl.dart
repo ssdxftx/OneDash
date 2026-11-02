@@ -89,6 +89,10 @@ class ContainerRepositoryImpl implements ContainerRepository {
   Future<ContainerItemStatsDto> getItemStats() => _containerApi.getItemStats();
 
   @override
+  Future<List<String>> loadContainerUsers(String containerName) =>
+      _containerApi.loadContainerUsers(containerName);
+
+  @override
   Future<ContainerDaemonConfigDto> getDaemonConfig() =>
       _containerApi.getDaemonConfig();
 
@@ -200,7 +204,10 @@ class ContainerRepositoryImpl implements ContainerRepository {
       _containerApi.createContainer(data);
 
   @override
-  Future<void> waitForTask(String taskID) => _containerApi.waitForTask(taskID);
+  Future<void> waitForTask(
+    String taskID, {
+    void Function(TaskLogDto log)? onUpdate,
+  }) => _containerApi.waitForTask(taskID, onUpdate: onUpdate);
 
   @override
   Future<void> updateContainer(Map<String, dynamic> data) =>

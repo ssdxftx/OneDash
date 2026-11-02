@@ -5,6 +5,14 @@ import '../../data/dto/database/slow_log_file_dto.dart';
 /// 数据库数据仓库接口。
 abstract interface class DatabaseRepository {
   Future<List<DatabaseInstanceDto>> listInstances(String types);
+  Future<PageResult<DatabaseInstanceDto>> searchRemoteDatabases({
+    required String type,
+    int page,
+    int pageSize,
+    String info,
+    String orderBy,
+    String? order,
+  });
   Future<DatabaseCheckDto> checkInstalled({
     required String key,
     required String name,

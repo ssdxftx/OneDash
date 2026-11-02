@@ -78,6 +78,18 @@ class _DatabaseCreateSheetState extends ConsumerState<DatabaseCreateSheet> {
       _instance = candidates.first;
       if (_isMysql) _loadFormats();
     }
+    if (_isRedis) _loadRedisPort();
+  }
+
+  Future<void> _loadRedisPort() async {
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      final port = await repository.getInstalledAppPort(type: 'redis');
+      if (!mounted || port <= 0) return;
+      _port.text = '$port';
+    } catch (_) {
+      // 未安装 Redis 时沿用默认端口，由提交阶段给出真实错误。
+    }
   }
 
   @override
@@ -210,7 +222,7 @@ class _DatabaseCreateSheetState extends ConsumerState<DatabaseCreateSheet> {
               PrimaryButton(
                 label: l10n.action_save,
                 loading: _saving,
-                onPressed: _submit,
+                onPressed: (!_isRedis && _instance == null) ? null : _submit,
               ),
             ],
           ),

@@ -116,10 +116,16 @@ class _ButtonContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const SizedBox(
-        height: 18,
-        width: 18,
-        child: CircularProgressIndicator(strokeWidth: 2),
+      return Semantics(
+        label: label,
+        enabled: false,
+        child: const SizedBox(
+          height: AppTokens.spinner,
+          width: AppTokens.spinner,
+          child: CircularProgressIndicator(
+            strokeWidth: AppTokens.spinnerStroke,
+          ),
+        ),
       );
     }
     if (icon == null) return Text(label);

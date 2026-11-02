@@ -12,12 +12,19 @@ abstract interface class HostRepository {
     required DateTime endTime,
   });
   Future<SshInfoDto> getSshInfo();
+  Future<String> loadSshFile(String name);
+  Future<void> updateSshFile(String key, String path, String value);
   Future<void> updateSsh(String key, String newValue);
   Future<bool> checkLocalSshConnection();
   Future<void> operateSsh(String operation);
   Future<bool> testHostConnection(Map<String, dynamic> body);
   Future<List<SshCertDto>> searchSshCerts();
   Future<void> createSshCert(SshCertOperateReq req);
+
+  /// 同步面板中的 SSH 密钥。
+  Future<void> syncSshCerts();
+  Future<void> editSshCert(SshCertOperateReq req);
+
   Future<void> deleteSshCert(int id);
   Future<List<Map<String, dynamic>>> searchTerminalSessions();
   Future<void> closeTerminalSession(String id);

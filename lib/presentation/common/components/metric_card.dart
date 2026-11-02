@@ -166,21 +166,18 @@ class MetricRing extends StatelessWidget {
               child: SizedBox(
                 width: math.max(0, size - strokeWidth * 2 - 6),
                 height: math.max(0, size - strokeWidth * 2 - 6),
-                child: MediaQuery.withClampedTextScaling(
-                  maxScaleFactor: 1.2,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child:
-                        center ??
-                        Text(
-                          '${value.toStringAsFixed(0)}%',
-                          style: AppTextStyles.bodyS.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: scheme.onSurface,
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                          ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child:
+                      center ??
+                      Text(
+                        '${value.toStringAsFixed(0)}%',
+                        style: AppTextStyles.bodyS.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: scheme.onSurface,
+                          fontFeatures: const [FontFeature.tabularFigures()],
                         ),
-                  ),
+                      ),
                 ),
               ),
             ),

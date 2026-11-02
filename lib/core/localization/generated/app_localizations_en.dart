@@ -3246,8 +3246,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get task_timeoutTitle => 'Task timed out';
 
   @override
-  String get task_failedNoDetail =>
-      'The task failed. Check the panel logs for details.';
+  String get task_failedNoDetail => 'Check the panel logs for details.';
 
   @override
   String get task_timeoutMessage =>
@@ -3258,4 +3257,1803 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get containers_continueInBackground => 'Continue in background';
+
+  @override
+  String get files_folder => 'Folder';
+
+  @override
+  String get task_runningHint => 'Running…';
+
+  @override
+  String get containers_groupMaintenance => 'Maintenance';
+
+  @override
+  String get containers_viewLogs => 'View logs';
+
+  @override
+  String get containers_liveMonitor => 'Live monitor';
+
+  @override
+  String get containers_groupLifecycle => 'Lifecycle';
+
+  @override
+  String get containers_resume => 'Resume';
+
+  @override
+  String get containers_kill => 'Force stop';
+
+  @override
+  String get containers_groupConfig => 'Configuration';
+
+  @override
+  String get containers_edit => 'Edit container';
+
+  @override
+  String get containers_editSubtitle =>
+      'Change image, ports, volumes and limits';
+
+  @override
+  String get containers_upgrade => 'Upgrade container';
+
+  @override
+  String get containers_upgradeSubtitle => 'Recreate with a newer image';
+
+  @override
+  String get containers_commit => 'Commit as image';
+
+  @override
+  String get containers_commitSubtitle =>
+      'Save the current container as an image';
+
+  @override
+  String get containers_groupDanger => 'Danger zone';
+
+  @override
+  String get containers_remove => 'Delete container';
+
+  @override
+  String get containers_removeSubtitle => 'Stop and remove this container';
+
+  @override
+  String get containers_forcePull => 'Always pull the latest image';
+
+  @override
+  String get containers_newImageName => 'New image name';
+
+  @override
+  String get containers_commitComment => 'Comment';
+
+  @override
+  String get containers_commitAuthor => 'Author';
+
+  @override
+  String get containers_pauseDuringCommit =>
+      'Pause the container while committing';
+
+  @override
+  String get containers_logsEmpty => 'No log output in the last hour';
+
+  @override
+  String get containers_cache => 'Cache';
+
+  @override
+  String get containers_diskRead => 'Disk read';
+
+  @override
+  String get containers_diskWrite => 'Disk write';
+
+  @override
+  String get containers_networkRX => 'Network received';
+
+  @override
+  String get containers_networkTX => 'Network sent';
+
+  @override
+  String get containers_updated => 'Container updated';
+
+  @override
+  String get containers_saving => 'Saving…';
+
+  @override
+  String get containers_prune => 'Prune unused containers';
+
+  @override
+  String get containers_pruneConfirm =>
+      'Unused stopped containers and build cache will be removed. Running containers stay intact.';
+
+  @override
+  String get containers_removeTitle => 'Delete container';
+
+  @override
+  String containers_removeMessage(String name) {
+    return 'This permanently deletes $name and its writable layer. Mounted data remains on disk.';
+  }
+
+  @override
+  String get cronjobs_create => 'Create scheduled task';
+
+  @override
+  String get cronjobs_edit => 'Edit scheduled task';
+
+  @override
+  String get cronjobs_updated => 'Scheduled task updated';
+
+  @override
+  String get cronjobs_created => 'Scheduled task created';
+
+  @override
+  String get cronjobs_saving => 'Saving…';
+
+  @override
+  String get cronjobs_name => 'Task name';
+
+  @override
+  String get cronjobs_type => 'Task type';
+
+  @override
+  String get cronjobs_spec => 'Cron expression';
+
+  @override
+  String get cronjobs_specHint => 'Five-field cron, or @every 10m';
+
+  @override
+  String get cronjobs_basic => 'Basic information';
+
+  @override
+  String get cronjobs_taskConfig => 'Task configuration';
+
+  @override
+  String get cronjobs_execution => 'Execution policy';
+
+  @override
+  String get cronjobs_script => 'Shell script';
+
+  @override
+  String get cronjobs_logFiles => 'Log files';
+
+  @override
+  String get cronjobs_logFilesHint => 'Comma-separated absolute paths';
+
+  @override
+  String get cronjobs_url => 'Request URL';
+
+  @override
+  String get cronjobs_website => 'Website';
+
+  @override
+  String get cronjobs_databaseType => 'Database type';
+
+  @override
+  String get cronjobs_databaseName => 'Database name';
+
+  @override
+  String get cronjobs_directory => 'Directory';
+
+  @override
+  String get cronjobs_files => 'Files';
+
+  @override
+  String get cronjobs_backupDirectory => 'Back up a directory';
+
+  @override
+  String get cronjobs_app => 'App install ID';
+
+  @override
+  String get cronjobs_withImage => 'Include container images';
+
+  @override
+  String get cronjobs_scopes => 'Log scopes';
+
+  @override
+  String get cronjobs_scopesHint => 'Comma-separated, for example system,ssh';
+
+  @override
+  String get cronjobs_ntpHint =>
+      'Synchronize the system clock with the configured time source.';
+
+  @override
+  String get cronjobs_cleanHint =>
+      'Clean temporary files and caches created by the panel.';
+
+  @override
+  String get cronjobs_retainCopies => 'Retained copies';
+
+  @override
+  String get cronjobs_retryTimes => 'Retry times';
+
+  @override
+  String get cronjobs_timeout => 'Timeout (seconds)';
+
+  @override
+  String get cronjobs_timeoutHint => '0 means no timeout';
+
+  @override
+  String get cronjobs_nameRequired => 'Enter a task name';
+
+  @override
+  String get cronjobs_specRequired => 'Enter a cron expression';
+
+  @override
+  String get cronjobs_scriptRequired => 'Enter a shell script';
+
+  @override
+  String get cronjobs_urlRequired => 'Enter a request URL';
+
+  @override
+  String get cronjobs_enabled => 'Enabled';
+
+  @override
+  String get cronjobs_disabled => 'Disabled';
+
+  @override
+  String get cronjobs_actions => 'Task actions';
+
+  @override
+  String get cronjobs_stopRunning => 'Stop running task';
+
+  @override
+  String get cronjobs_records => 'Execution records';
+
+  @override
+  String get cronjobs_cleanRecords => 'Clean records';
+
+  @override
+  String cronjobs_cleanRecordsConfirm(String name) {
+    return 'Delete every execution record of $name?';
+  }
+
+  @override
+  String get cronjobs_noRecords => 'No execution records';
+
+  @override
+  String get cronjobs_noRecordsHint => 'Records appear after the task runs.';
+
+  @override
+  String get cronjobs_recordLog => 'Execution log';
+
+  @override
+  String get cronjobs_recordLogEmpty => 'This record has no log output.';
+
+  @override
+  String cronjobs_deleteTitle(String name) {
+    return 'Delete $name';
+  }
+
+  @override
+  String get cronjobs_deleteMessage =>
+      'The scheduled task and its records will be removed.';
+
+  @override
+  String get cronjobs_typeShell => 'Shell script';
+
+  @override
+  String get cronjobs_typeLog => 'Split logs';
+
+  @override
+  String get cronjobs_typeCurl => 'Access URL';
+
+  @override
+  String get cronjobs_typeWebsite => 'Back up website';
+
+  @override
+  String get cronjobs_typeDatabase => 'Back up database';
+
+  @override
+  String get cronjobs_typeDirectory => 'Back up directory';
+
+  @override
+  String get cronjobs_typeApp => 'Back up app';
+
+  @override
+  String get cronjobs_typeSnapshot => 'Snapshot';
+
+  @override
+  String get cronjobs_typeCleanLog => 'Clean panel logs';
+
+  @override
+  String get cronjobs_typeClean => 'Clean garbage';
+
+  @override
+  String get cronjobs_typeNtp => 'Sync time';
+
+  @override
+  String get alerts_create => 'Create alert rule';
+
+  @override
+  String get alerts_edit => 'Edit alert rule';
+
+  @override
+  String get alerts_updated => 'Alert rule updated';
+
+  @override
+  String get alerts_created => 'Alert rule created';
+
+  @override
+  String get alerts_saving => 'Saving…';
+
+  @override
+  String get alerts_rule => 'Rule';
+
+  @override
+  String get alerts_type => 'Alert type';
+
+  @override
+  String get alerts_title => 'Title';
+
+  @override
+  String get alerts_titleHint => 'Leave empty to use the type name';
+
+  @override
+  String get alerts_project => 'Target';
+
+  @override
+  String get alerts_projectHint => 'Website ID, disk path, or all';
+
+  @override
+  String get alerts_threshold => 'Threshold';
+
+  @override
+  String get alerts_count => 'Trigger value';
+
+  @override
+  String get alerts_countHint => 'CPU, memory or load percentage';
+
+  @override
+  String get alerts_cycle => 'Cycle (days)';
+
+  @override
+  String get alerts_sendCount => 'Send limit per day';
+
+  @override
+  String get alerts_sendCountHint => 'Range 1-30';
+
+  @override
+  String get alerts_advancedParams => 'Advanced parameters';
+
+  @override
+  String get alerts_advancedParamsHint => 'Optional JSON or trigger mode';
+
+  @override
+  String get alerts_notification => 'Notification method';
+
+  @override
+  String get alerts_noConfigs =>
+      'No enabled notification config. Add one on the panel first.';
+
+  @override
+  String get alerts_method => 'Notification config IDs';
+
+  @override
+  String get alerts_methodHint => 'Comma-separated config IDs';
+
+  @override
+  String get alerts_methodRequired => 'Select at least one notification method';
+
+  @override
+  String get alerts_typeCpu => 'CPU usage';
+
+  @override
+  String get alerts_typeMemory => 'Memory usage';
+
+  @override
+  String get alerts_typeDisk => 'Disk usage';
+
+  @override
+  String get alerts_typeLoad => 'Load average';
+
+  @override
+  String get alerts_typeSshLogin => 'SSH login';
+
+  @override
+  String get alerts_typePanelLogin => 'Panel login';
+
+  @override
+  String get alerts_typeSsl => 'Certificate expiry';
+
+  @override
+  String get alerts_typeSiteEndTime => 'Website expiry';
+
+  @override
+  String get alerts_typePanelUpdate => 'Panel update';
+
+  @override
+  String get containers_resources => 'Images and networks';
+
+  @override
+  String get containers_pullImage => 'Pull image';
+
+  @override
+  String get containers_createNetwork => 'Create network';
+
+  @override
+  String get containers_tagImage => 'Tag image';
+
+  @override
+  String get containers_inUse => 'In use';
+
+  @override
+  String get containers_unused => 'Unused';
+
+  @override
+  String get containers_imageInUseHint =>
+      'Delete containers using this image first';
+
+  @override
+  String get containers_removeImage => 'Delete image';
+
+  @override
+  String containers_removeImageConfirm(String name) {
+    return 'Delete image $name?';
+  }
+
+  @override
+  String get containers_pullImageHint =>
+      'Pull an image by name, or create a container to pull one.';
+
+  @override
+  String get containers_noNetworks => 'No networks';
+
+  @override
+  String get containers_createNetworkHint =>
+      'Create a bridge network for your containers.';
+
+  @override
+  String get containers_removeNetwork => 'Delete network';
+
+  @override
+  String containers_removeNetworkConfirm(String name) {
+    return 'Delete network $name?';
+  }
+
+  @override
+  String get containers_system => 'System';
+
+  @override
+  String get containers_driver => 'Driver';
+
+  @override
+  String get containers_subnet => 'Subnet';
+
+  @override
+  String get containers_gateway => 'Gateway';
+
+  @override
+  String get containers_up => 'Start';
+
+  @override
+  String get containers_down => 'Take down';
+
+  @override
+  String get containers_rebuild => 'Rebuild';
+
+  @override
+  String get containers_createCompose => 'Create compose';
+
+  @override
+  String get containers_updateCompose => 'Edit compose';
+
+  @override
+  String get containers_composeLogs => 'Compose logs';
+
+  @override
+  String get containers_cleanComposeLogs => 'Clear compose logs';
+
+  @override
+  String get containers_deleteCompose => 'Delete compose';
+
+  @override
+  String containers_deleteComposeConfirm(String name) {
+    return 'Delete compose project $name?';
+  }
+
+  @override
+  String get containers_testCompose => 'Validate compose file';
+
+  @override
+  String get containers_composeValid => 'Compose file is valid';
+
+  @override
+  String get containers_composeInvalid => 'Compose file is invalid';
+
+  @override
+  String get containers_composeContentRequired =>
+      'Enter the compose file content';
+
+  @override
+  String get containers_dockerSettings => 'Docker settings';
+
+  @override
+  String get containers_dockerService => 'Docker service';
+
+  @override
+  String get containers_dockerRunning => 'Docker is running';
+
+  @override
+  String get containers_dockerStopped => 'Docker is stopped';
+
+  @override
+  String get containers_logSettings => 'Log rotation';
+
+  @override
+  String get containers_logMaxSize => 'Max size';
+
+  @override
+  String get containers_logMaxFile => 'Max files';
+
+  @override
+  String get containers_ipv6 => 'IPv6';
+
+  @override
+  String get containers_fixedCidrV6 => 'Fixed CIDR';
+
+  @override
+  String get containers_ip6Tables => 'Manage ip6tables';
+
+  @override
+  String get containers_experimental => 'Experimental';
+
+  @override
+  String get cronjobs_notFound => 'Scheduled task not found';
+
+  @override
+  String get files_tools => 'File tools';
+
+  @override
+  String get files_favorites => 'Favorites';
+
+  @override
+  String get files_recycleBin => 'Recycle bin';
+
+  @override
+  String get files_shares => 'Shared links';
+
+  @override
+  String get files_remoteDownload => 'Remote download';
+
+  @override
+  String get files_noFavorites => 'No favorites';
+
+  @override
+  String get files_noFavoritesHint =>
+      'Star a file or folder from its action sheet.';
+
+  @override
+  String get files_removeFavorite => 'Remove favorite';
+
+  @override
+  String get files_addFavorite => 'Add to favorites';
+
+  @override
+  String get files_favoriteAdded => 'Added to favorites';
+
+  @override
+  String get files_clearRecycleBin => 'Empty recycle bin';
+
+  @override
+  String get files_clearRecycleBinConfirm =>
+      'All recycled files will be permanently deleted.';
+
+  @override
+  String get files_recycleEmpty => 'Recycle bin is empty';
+
+  @override
+  String get files_recycleEmptyHint => 'Deleted files will appear here.';
+
+  @override
+  String get files_restore => 'Restore';
+
+  @override
+  String get files_noShares => 'No shared links';
+
+  @override
+  String get files_noSharesHint => 'Create a share from a file action sheet.';
+
+  @override
+  String get files_permanentShare => 'Permanent';
+
+  @override
+  String files_shareCode(String code) {
+    return 'Code $code';
+  }
+
+  @override
+  String get files_cancelShare => 'Cancel share';
+
+  @override
+  String files_cancelShareConfirm(String name) {
+    return 'Cancel the share for $name?';
+  }
+
+  @override
+  String get files_shareDetail => 'Share details';
+
+  @override
+  String get files_name => 'Name';
+
+  @override
+  String get files_path => 'Path';
+
+  @override
+  String get files_shareCodeLabel => 'Share code';
+
+  @override
+  String get files_sharePassword => 'Password';
+
+  @override
+  String get files_shareExpire => 'Expires';
+
+  @override
+  String get files_copyShareCode => 'Copy share code';
+
+  @override
+  String get files_remoteDownloadStarted => 'Remote download started';
+
+  @override
+  String get files_noRemoteDownloads => 'No active downloads';
+
+  @override
+  String get files_noRemoteDownloadsHint =>
+      'Active remote downloads appear here.';
+
+  @override
+  String get files_url => 'URL';
+
+  @override
+  String get files_targetDirectory => 'Target directory';
+
+  @override
+  String get files_ignoreCertificate => 'Ignore certificate errors';
+
+  @override
+  String get files_startDownload => 'Start download';
+
+  @override
+  String get files_moveCopy => 'Move or copy';
+
+  @override
+  String get files_batchPermission => 'Batch permissions';
+
+  @override
+  String get files_copyMode => 'Copy instead of move';
+
+  @override
+  String get files_overwrite => 'Overwrite existing files';
+
+  @override
+  String get files_copy => 'Copy';
+
+  @override
+  String get files_move => 'Move';
+
+  @override
+  String get files_recursive => 'Apply to subdirectories';
+
+  @override
+  String get action_stop => 'Stop';
+
+  @override
+  String get websites_advanced => 'Advanced settings';
+
+  @override
+  String get websites_security => 'Security';
+
+  @override
+  String get websites_rewrite => 'Rewrite';
+
+  @override
+  String get websites_redirect => 'Redirects';
+
+  @override
+  String get websites_editInfo => 'Edit website info';
+
+  @override
+  String get websites_favorite => 'Add to favorites';
+
+  @override
+  String get websites_indexConfig => 'Default documents';
+
+  @override
+  String get websites_indexConfigHint =>
+      'Set the files served for directory requests';
+
+  @override
+  String get websites_limitConfig => 'Traffic limits';
+
+  @override
+  String get websites_limitConfigHint =>
+      'Limit concurrent connections and rate';
+
+  @override
+  String get websites_dirPermission => 'Directory owner';
+
+  @override
+  String get websites_dirPermissionHint => 'Change the runtime user and group';
+
+  @override
+  String get websites_enabled => 'Enabled';
+
+  @override
+  String get websites_disabled => 'Disabled';
+
+  @override
+  String get websites_indexFiles => 'Index files';
+
+  @override
+  String get websites_perServer => 'Per-server connections';
+
+  @override
+  String get websites_perIp => 'Per-IP connections';
+
+  @override
+  String get websites_rateKb => 'Rate limit (KB/s)';
+
+  @override
+  String get websites_owner => 'User';
+
+  @override
+  String get websites_group => 'Group';
+
+  @override
+  String get websites_accessAuth => 'Access authentication';
+
+  @override
+  String get websites_username => 'Username';
+
+  @override
+  String get websites_password => 'Password';
+
+  @override
+  String get websites_allowOrigins => 'Allowed origins';
+
+  @override
+  String get websites_allowMethods => 'Allowed methods';
+
+  @override
+  String get websites_allowHeaders => 'Allowed headers';
+
+  @override
+  String get websites_allowCredentials => 'Allow credentials';
+
+  @override
+  String get websites_preflight => 'Preflight cache';
+
+  @override
+  String get websites_leech => 'Hotlink protection';
+
+  @override
+  String get websites_allowedExtensions => 'Allowed extensions';
+
+  @override
+  String get websites_returnCode => 'Blocked response code';
+
+  @override
+  String get websites_blocked => 'Block hotlinking';
+
+  @override
+  String get websites_logEnabled => 'Log blocked requests';
+
+  @override
+  String get websites_realIp => 'Real IP';
+
+  @override
+  String get websites_ipFrom => 'Trusted proxy';
+
+  @override
+  String get websites_ipHeader => 'IP header';
+
+  @override
+  String get websites_ipOther => 'Other proxy';
+
+  @override
+  String get websites_rewriteTemplates => 'Templates';
+
+  @override
+  String get websites_rewriteName => 'Rule name';
+
+  @override
+  String get websites_rewriteContent => 'Rewrite rules';
+
+  @override
+  String get websites_addRedirect => 'Add redirect';
+
+  @override
+  String get websites_editRedirect => 'Edit redirect';
+
+  @override
+  String get websites_redirectType => 'Type';
+
+  @override
+  String get websites_redirectDomain => 'Domain';
+
+  @override
+  String get websites_redirectPath => 'Path';
+
+  @override
+  String get websites_redirectTarget => 'Target URL';
+
+  @override
+  String get websites_redirectCode => 'Status code';
+
+  @override
+  String get websites_keepPath => 'Keep path';
+
+  @override
+  String get websites_redirectRoot => 'Redirect root';
+
+  @override
+  String get websites_noRedirects => 'No redirects';
+
+  @override
+  String get websites_noRedirectsHint =>
+      'Add a redirect rule for this website.';
+
+  @override
+  String get websites_addProxy => 'Add reverse proxy';
+
+  @override
+  String get websites_editProxy => 'Edit reverse proxy';
+
+  @override
+  String get websites_proxyName => 'Proxy name';
+
+  @override
+  String get websites_proxyMatch => 'Match path';
+
+  @override
+  String get websites_proxyPass => 'Upstream URL';
+
+  @override
+  String get websites_proxyHost => 'Proxy host header';
+
+  @override
+  String get websites_sni => 'SNI';
+
+  @override
+  String get websites_sslVerify => 'Verify upstream certificate';
+
+  @override
+  String get action_saved => 'Saved';
+
+  @override
+  String get action_loading => 'Loading…';
+
+  @override
+  String get websites_sslManage => 'Certificate management';
+
+  @override
+  String get websites_sslManageHint =>
+      'Apply, upload and delete certificates here. Bind one from the SSL tab.';
+
+  @override
+  String get websites_uploadSsl => 'Upload certificate';
+
+  @override
+  String get websites_applySsl => 'Apply certificate';
+
+  @override
+  String get websites_certificatePem => 'Certificate PEM';
+
+  @override
+  String get websites_privateKeyPem => 'Private key PEM';
+
+  @override
+  String get websites_sslUploaded => 'Certificate uploaded';
+
+  @override
+  String get websites_sslRequested => 'Certificate request submitted';
+
+  @override
+  String get websites_noAcmeAccount =>
+      'Create an ACME account on the panel first';
+
+  @override
+  String get websites_acmeAccount => 'ACME account';
+
+  @override
+  String get websites_autoRenew => 'Auto renew';
+
+  @override
+  String get websites_deleteSsl => 'Delete certificate';
+
+  @override
+  String websites_deleteSslConfirm(String name) {
+    return 'Delete certificate for $name?';
+  }
+
+  @override
+  String get action_upload => 'Upload';
+
+  @override
+  String get websites_changeDatabase => 'Change database';
+
+  @override
+  String websites_currentDatabase(String names) {
+    return 'Current: $names';
+  }
+
+  @override
+  String get websites_database => 'Database';
+
+  @override
+  String get websites_unbindDatabase => 'Unbind database';
+
+  @override
+  String get apps_upgrade => 'Upgrade';
+
+  @override
+  String get apps_editParams => 'Edit parameters';
+
+  @override
+  String get apps_changePort => 'Change port';
+
+  @override
+  String get apps_connInfo => 'Connection info';
+
+  @override
+  String get apps_ignoreUpdate => 'Ignore update';
+
+  @override
+  String get apps_uninstall => 'Uninstall';
+
+  @override
+  String apps_uninstallHint(String name) {
+    return 'Uninstall $name? This stops and removes the app containers.';
+  }
+
+  @override
+  String get apps_deleteDatabase => 'Delete database';
+
+  @override
+  String get apps_deleteBackup => 'Delete backups';
+
+  @override
+  String get apps_deleteImage => 'Delete images';
+
+  @override
+  String get apps_forceDelete => 'Force delete';
+
+  @override
+  String get apps_latestVersion => 'Already on the latest version';
+
+  @override
+  String get apps_backupBeforeUpgrade => 'Back up before upgrading';
+
+  @override
+  String get apps_pullImage => 'Pull latest image';
+
+  @override
+  String get apps_advancedParams => 'Advanced parameters';
+
+  @override
+  String get apps_containerName => 'Container name';
+
+  @override
+  String get apps_port => 'Port';
+
+  @override
+  String get databases_advanced => 'Advanced';
+
+  @override
+  String get databases_configFile => 'Configuration file';
+
+  @override
+  String get databases_configFileHint =>
+      'Read and edit the database configuration';
+
+  @override
+  String get databases_slowLog => 'Slow query log';
+
+  @override
+  String get databases_slowLogHint => 'Read the latest slow query log lines';
+
+  @override
+  String get databases_slowLogEmpty => 'No slow query log entries';
+
+  @override
+  String get databases_redis => 'Redis';
+
+  @override
+  String get databases_redisConfig => 'Redis configuration';
+
+  @override
+  String get databases_redisPassword => 'Redis password';
+
+  @override
+  String get databases_redisPersistence => 'Redis persistence';
+
+  @override
+  String get backups_create => 'Create backup';
+
+  @override
+  String get backups_type => 'Backup type';
+
+  @override
+  String get backups_dbPassword => 'Database password';
+
+  @override
+  String get backups_description => 'Description';
+
+  @override
+  String get backups_stopBefore => 'Stop container before backup';
+
+  @override
+  String get backups_startBackup => 'Start backup';
+
+  @override
+  String get backups_accounts => 'Backup accounts';
+
+  @override
+  String get backups_addAccount => 'Add backup account';
+
+  @override
+  String get backups_editAccount => 'Edit backup account';
+
+  @override
+  String get backups_noAccounts => 'No backup accounts';
+
+  @override
+  String get backups_noAccountsHint =>
+      'Add an account to store backups remotely.';
+
+  @override
+  String get backups_testConnection => 'Test connection';
+
+  @override
+  String get backups_accountName => 'Account name';
+
+  @override
+  String get backups_accountType => 'Account type';
+
+  @override
+  String get backups_accessKey => 'Access key';
+
+  @override
+  String get backups_credential => 'Secret key';
+
+  @override
+  String get backups_bucket => 'Bucket';
+
+  @override
+  String get backups_backupPath => 'Backup path';
+
+  @override
+  String get backups_vars => 'Account variables';
+
+  @override
+  String get backups_rememberAuth => 'Remember credentials';
+
+  @override
+  String get backups_connectionOk => 'Connection succeeded';
+
+  @override
+  String get backups_connectionFailed => 'Connection failed';
+
+  @override
+  String backups_deleteAccountConfirm(String name) {
+    return 'Delete backup account $name?';
+  }
+
+  @override
+  String get runtimes_sync => 'Sync runtimes';
+
+  @override
+  String get runtimes_delete => 'Delete runtime';
+
+  @override
+  String runtimes_deleteConfirm(String name) {
+    return 'Delete runtime $name?';
+  }
+
+  @override
+  String get host_syncKeys => 'Sync SSH keys';
+
+  @override
+  String get panelSettings_oldPassword => 'Current password';
+
+  @override
+  String get panelSettings_newPassword => 'New password';
+
+  @override
+  String get panelSettings_confirmPassword => 'Confirm password';
+
+  @override
+  String get panelSettings_passwordMismatch => 'Passwords do not match';
+
+  @override
+  String get panelSettings_portChangeWarning =>
+      'Changing the panel port disconnects the current session. Make sure the new port is open in the firewall.';
+
+  @override
+  String panelSettings_portChanged(int port) {
+    return 'Panel port changed to $port';
+  }
+
+  @override
+  String get panelSettings_apiKeyCopied => 'API key generated and copied';
+
+  @override
+  String get panelSettings_snapshots => 'Snapshots';
+
+  @override
+  String get panelSettings_snapshotsHint =>
+      'Create, recreate and delete panel snapshots';
+
+  @override
+  String get panelSettings_createSnapshot => 'Create snapshot';
+
+  @override
+  String get panelSettings_noSnapshots => 'No snapshots';
+
+  @override
+  String get panelSettings_noSnapshotsHint =>
+      'Create a snapshot to back up panel data.';
+
+  @override
+  String get panelSettings_snapshotName => 'Snapshot name';
+
+  @override
+  String get panelSettings_snapshotDescription => 'Description';
+
+  @override
+  String get panelSettings_recreateSnapshot => 'Recreate snapshot';
+
+  @override
+  String get panelSettings_recreateSnapshotHint =>
+      'Recreate this snapshot with current panel data?';
+
+  @override
+  String get panelSettings_deleteSnapshotHint =>
+      'Delete this snapshot and its files?';
+
+  @override
+  String get panelSettings_snapshotCreated => 'Snapshot task submitted';
+
+  @override
+  String get panelSettings_withDockerConf => 'Include Docker config';
+
+  @override
+  String get panelSettings_withMonitorData => 'Include monitoring data';
+
+  @override
+  String get panelSettings_withLoginLog => 'Include login logs';
+
+  @override
+  String get panelSettings_withOperationLog => 'Include operation logs';
+
+  @override
+  String get panelSettings_withSystemLog => 'Include system logs';
+
+  @override
+  String get panelSettings_withTaskLog => 'Include task logs';
+
+  @override
+  String get websites_openRestyPerformance => 'OpenResty performance';
+
+  @override
+  String get websites_openRestyConfig => 'OpenResty main config';
+
+  @override
+  String get websites_loadConfig => 'Load config';
+
+  @override
+  String get apps_syncRemote => 'Sync remote apps';
+
+  @override
+  String get apps_syncLocal => 'Sync local apps';
+
+  @override
+  String get websites_pathAuth => 'Path authentication';
+
+  @override
+  String get websites_noPathAuth => 'No path authentication';
+
+  @override
+  String get websites_addPathAuth => 'Add path authentication';
+
+  @override
+  String get websites_editPathAuth => 'Edit path authentication';
+
+  @override
+  String websites_deletePathAuth(String path) {
+    return 'Delete authentication for $path?';
+  }
+
+  @override
+  String get containers_imageRepos => 'Registries';
+
+  @override
+  String get containers_addRepo => 'Add registry';
+
+  @override
+  String get containers_editRepo => 'Edit registry';
+
+  @override
+  String get containers_noRepos => 'No registries';
+
+  @override
+  String get containers_noReposHint =>
+      'Add a registry to pull and push images.';
+
+  @override
+  String get containers_repoUrl => 'Registry URL';
+
+  @override
+  String get containers_protocol => 'Protocol';
+
+  @override
+  String get containers_repoAuth => 'Requires authentication';
+
+  @override
+  String get containers_repoId => 'Registry ID';
+
+  @override
+  String get containers_buildImage => 'Build image';
+
+  @override
+  String get containers_exportImage => 'Export image';
+
+  @override
+  String get containers_importImage => 'Import image';
+
+  @override
+  String get containers_pushImage => 'Push image';
+
+  @override
+  String get containers_baseImage => 'Base image';
+
+  @override
+  String get containers_imageArchive => 'Image archive paths';
+
+  @override
+  String get databases_variables => 'Performance variables';
+
+  @override
+  String get databases_variablesHint =>
+      'Read and update MySQL runtime variables';
+
+  @override
+  String get databases_redisStatus => 'Redis status';
+
+  @override
+  String get databases_installRedisCli => 'Install Redis CLI';
+
+  @override
+  String get host_terminalSessions => 'Terminal sessions';
+
+  @override
+  String get host_terminalSessionsHint =>
+      'Review and close active SSH sessions';
+
+  @override
+  String get host_closeAllSessions => 'Close all';
+
+  @override
+  String get websites_certificateAccounts => 'Certificate accounts';
+
+  @override
+  String get websites_addAcme => 'Add ACME account';
+
+  @override
+  String get websites_email => 'Email';
+
+  @override
+  String get websites_acmeType => 'ACME type';
+
+  @override
+  String get websites_caDirUrl => 'CA directory URL';
+
+  @override
+  String get websites_useProxy => 'Use proxy';
+
+  @override
+  String get websites_useEab => 'Use EAB';
+
+  @override
+  String get websites_noAcme => 'No ACME accounts';
+
+  @override
+  String get websites_noAcmeHint =>
+      'Add an ACME account to request certificates.';
+
+  @override
+  String get websites_addDns => 'Add DNS account';
+
+  @override
+  String get websites_dnsType => 'DNS provider';
+
+  @override
+  String get websites_authorization => 'Authorization JSON';
+
+  @override
+  String get websites_noDns => 'No DNS accounts';
+
+  @override
+  String get websites_noDnsHint => 'Add a DNS account for DNS-01 validation.';
+
+  @override
+  String get websites_addCa => 'Add CA';
+
+  @override
+  String get websites_commonName => 'Common name';
+
+  @override
+  String get websites_country => 'Country';
+
+  @override
+  String get websites_organization => 'Organization';
+
+  @override
+  String get websites_noCa => 'No CA certificates';
+
+  @override
+  String get websites_noCaHint =>
+      'Create a self-signed CA and issue certificates from it.';
+
+  @override
+  String get websites_obtainCa => 'Issue certificate';
+
+  @override
+  String get websites_renewCa => 'Renew';
+
+  @override
+  String get apps_cancelIgnore => 'Cancel ignored update';
+
+  @override
+  String get apps_notIgnored => 'This app is not ignored';
+
+  @override
+  String get files_exactSize => 'Calculate exact size';
+
+  @override
+  String get containers_cleanLogs => 'Clear container logs';
+
+  @override
+  String containers_cleanLogsConfirm(String name) {
+    return 'Clear logs for $name?';
+  }
+
+  @override
+  String get backups_listBuckets => 'List buckets';
+
+  @override
+  String get backups_refreshToken => 'Refresh token';
+
+  @override
+  String get backups_buckets => 'Buckets';
+
+  @override
+  String get websites_switchPhp => 'Switch PHP version';
+
+  @override
+  String get websites_switchPhpHint =>
+      'Change the PHP runtime or serve as a static site';
+
+  @override
+  String get websites_staticSite => 'Static site';
+
+  @override
+  String get websites_editSsl => 'Edit certificate';
+
+  @override
+  String get logs_clean => 'Clean logs';
+
+  @override
+  String get logs_cleanOperation => 'Clean operation logs';
+
+  @override
+  String get logs_cleanLogin => 'Clean login logs';
+
+  @override
+  String get logs_cleanConfirm => 'This permanently clears the selected logs.';
+
+  @override
+  String get logs_exportSsh => 'Export SSH logs';
+
+  @override
+  String get panelSettings_memo => 'Panel memo';
+
+  @override
+  String get panelSettings_memoHint => 'No memo yet';
+
+  @override
+  String get panelSettings_memoContentHint => 'Write a memo for this panel';
+
+  @override
+  String logs_exported(String path) {
+    return 'Exported to $path';
+  }
+
+  @override
+  String get websites_saveAsCustomRewrite => 'Save as custom template';
+
+  @override
+  String get websites_checkDns => 'Check DNS';
+
+  @override
+  String get alerts_addNotification => 'Add notification method';
+
+  @override
+  String get alerts_editNotification => 'Edit notification method';
+
+  @override
+  String get alerts_testNotification => 'Send test notification';
+
+  @override
+  String get alerts_configContent => 'Configuration (JSON)';
+
+  @override
+  String get alerts_configInvalid => 'Configuration is not valid JSON';
+
+  @override
+  String get alerts_testSent => 'Test notification sent';
+
+  @override
+  String get alerts_testFailed => 'Test notification failed';
+
+  @override
+  String get backups_calculateSizes => 'Calculate backup sizes';
+
+  @override
+  String get backups_recordCount => 'Records';
+
+  @override
+  String get backups_totalSize => 'Total size';
+
+  @override
+  String get backups_containerHint => 'Container name';
+
+  @override
+  String get files_websiteRoot => 'Website root directory';
+
+  @override
+  String get files_pickOwner => 'Pick user or group';
+
+  @override
+  String get panelSettings_apiInterfaceToggleHint =>
+      'Allow API access for this panel';
+
+  @override
+  String get panelSettings_restoreSnapshot => 'Restore snapshot';
+
+  @override
+  String get panelSettings_rollbackSnapshot => 'Rollback snapshot';
+
+  @override
+  String get panelSettings_snapshotSecret => 'Backup password (optional)';
+
+  @override
+  String get panelSettings_snapshotRestoreSubmitted => 'Restore task submitted';
+
+  @override
+  String get action_continue => 'Continue';
+
+  @override
+  String get panelSettings_importSnapshot => 'Import snapshot';
+
+  @override
+  String get panelSettings_snapshotJson => 'Snapshot JSON';
+
+  @override
+  String get panelSettings_snapshotJsonInvalid => 'Snapshot JSON is invalid';
+
+  @override
+  String get action_import => 'Import';
+
+  @override
+  String get databases_status => 'Runtime status';
+
+  @override
+  String files_alreadyExists(String name) {
+    return '$name already exists';
+  }
+
+  @override
+  String get runtime_extensionPresets => 'Extension presets';
+
+  @override
+  String get containers_containersUsingImage => 'Containers using this image';
+
+  @override
+  String get containers_diskUsage => 'Docker disk usage';
+
+  @override
+  String get containers_usageContainers => 'Containers';
+
+  @override
+  String get containers_usageImages => 'Images';
+
+  @override
+  String get containers_usageVolumes => 'Volumes';
+
+  @override
+  String get containers_usageBuildCache => 'Build cache';
+
+  @override
+  String get databases_remoteInstances => 'Remote instances';
+
+  @override
+  String get databases_addRemote => 'Add remote instance';
+
+  @override
+  String get databases_editRemote => 'Edit remote instance';
+
+  @override
+  String get databases_loadDatabases => 'Load databases';
+
+  @override
+  String get databases_testConnection => 'Test connection';
+
+  @override
+  String get databases_connectionOk => 'Connection succeeded';
+
+  @override
+  String get databases_connectionFailed => 'Connection failed';
+
+  @override
+  String get databases_ssl => 'Use SSL';
+
+  @override
+  String get files_checkExistence => 'Verify existence';
+
+  @override
+  String get panelSettings_mfa => 'Two-factor authentication';
+
+  @override
+  String get panelSettings_mfaHint => 'Bind an authenticator app';
+
+  @override
+  String get panelSettings_mfaCode => 'Verification code';
+
+  @override
+  String get panelSettings_bindMfa => 'Bind';
+
+  @override
+  String get panelSettings_passkeys => 'Passkeys';
+
+  @override
+  String get panelSettings_passkeysHint => 'Manage registered passkeys';
+
+  @override
+  String get panelSettings_noPasskeys => 'No passkeys registered';
+
+  @override
+  String get websites_downloadSsl => 'Download certificate';
+
+  @override
+  String get websites_downloadCa => 'Download CA';
+
+  @override
+  String websites_downloaded(String path) {
+    return 'Saved to $path';
+  }
+
+  @override
+  String get apps_storeSettings => 'App store settings';
+
+  @override
+  String get apps_uninstallDeleteImage => 'Delete image when uninstalling';
+
+  @override
+  String get apps_upgradeBackup => 'Back up before upgrade';
+
+  @override
+  String get apps_uninstallDeleteBackup => 'Delete backup when uninstalling';
+
+  @override
+  String get apps_installAllowPort => 'Check port availability on install';
+
+  @override
+  String get containers_users => 'Container users';
+
+  @override
+  String get runtime_scripts => 'package.json scripts';
+
+  @override
+  String get runtime_codeDir => 'Code directory';
+
+  @override
+  String get supervisor_configFile => 'Supervisor configuration';
+
+  @override
+  String get containers_composeTemplates => 'Compose templates';
+
+  @override
+  String get containers_importTemplates => 'Import templates';
+
+  @override
+  String get containers_templateJsonInvalid => 'Template JSON must be a list';
+
+  @override
+  String get containers_daemonKeyValue => 'Daemon key-value';
+
+  @override
+  String get containers_daemonKey => 'Key';
+
+  @override
+  String get containers_daemonValue => 'Value';
+
+  @override
+  String get runtime_name => 'Runtime name';
+
+  @override
+  String get runtime_port => 'Port';
+
+  @override
+  String get runtime_remark => 'Remark';
+
+  @override
+  String get host_sshConfigFile => 'SSH configuration file';
+
+  @override
+  String get host_sshConfigFileHint => 'Edit sshd_config directly';
+
+  @override
+  String get host_sshConfigNotFound => 'No SSH configuration file found';
+
+  @override
+  String get host_sshConfigWarning =>
+      'Saving an invalid configuration may break SSH access.';
+
+  @override
+  String get host_sshConfigSaved => 'SSH configuration saved';
+
+  @override
+  String get host_testSsh => 'Test SSH connection';
+
+  @override
+  String get host_testSshHint => 'Verify address, port and credentials';
+
+  @override
+  String get websites_viewAccessLog => 'View access log';
+
+  @override
+  String get websites_viewErrorLog => 'View error log';
+
+  @override
+  String get websites_liveLogHint => 'Read the latest lines in-app';
+
+  @override
+  String get websites_descriptionPin => 'Description and pin';
+
+  @override
+  String get websites_descriptionPinHint =>
+      'Set the panel description and pin state';
+
+  @override
+  String get websites_description => 'Description';
+
+  @override
+  String get websites_pin => 'Pin to top';
+
+  @override
+  String get websites_copyFromExisting => 'Copy from existing site';
+
+  @override
+  String get panelSettings_panelSsl => 'Panel HTTPS';
+
+  @override
+  String get panelSettings_panelSslHint =>
+      'Configure HTTPS for the panel entry';
+
+  @override
+  String get panelSettings_panelSslWarning =>
+      'Changing panel HTTPS may interrupt the current session.';
+
+  @override
+  String get panelSettings_panelSslMode => 'SSL mode';
+
+  @override
+  String get panelSettings_panelSslType => 'Certificate source';
+
+  @override
+  String get supervisor_editConfig => 'Edit process config';
+
+  @override
+  String get supervisor_viewOutLog => 'View stdout log';
+
+  @override
+  String get supervisor_viewErrLog => 'View error log';
+
+  @override
+  String get backups_restoreFromFile => 'Restore from server file';
+
+  @override
+  String get backups_restoreFromFileHint =>
+      'Upload a backup file already present on the server, then restore it.';
+
+  @override
+  String get backups_serverFilePath => 'Server file path';
+
+  @override
+  String get websites_editSource => 'Edit source';
+
+  @override
+  String get runtime_create => 'Create runtime';
+
+  @override
+  String get runtime_typeLabel => 'Type';
+
+  @override
+  String get runtime_image => 'Image';
+
+  @override
+  String get runtime_appDetailId => 'App detail ID';
+
+  @override
+  String get runtime_resource => 'Resource';
+
+  @override
+  String get runtime_version => 'Version';
+
+  @override
+  String get runtime_paramsJson => 'Parameters (JSON)';
+
+  @override
+  String get runtime_paramsInvalid => 'Parameters must be a JSON object';
+
+  @override
+  String get apps_alreadyInstalled =>
+      'This app is already installed. Manage it from the installed list.';
+
+  @override
+  String common_errorLine(String title, String message) {
+    return '$title: $message';
+  }
+
+  @override
+  String get websites_ssl => 'SSL';
+
+  @override
+  String get websites_proxyDeleted => 'Reverse proxy deleted';
+
+  @override
+  String get websites_proxyRequired =>
+      'Proxy name and upstream address are required.';
+
+  @override
+  String get websites_requiredFields => 'Complete all required fields.';
+
+  @override
+  String get websites_usernameRequired =>
+      'Username is required when authentication is enabled.';
+
+  @override
+  String get apps_cancelIgnoreUpdate => 'Resume update reminders';
+
+  @override
+  String get more_runtimesSubtitle => 'PHP / Node / Python';
+
+  @override
+  String get more_composeSubtitle => 'docker compose';
+
+  @override
+  String get firewall_noMatchingRules => 'No matching rules';
+
+  @override
+  String get firewall_clearFiltersHint =>
+      'Adjust the keyword or clear the filters.';
+
+  @override
+  String get panelSettings_apiKeyRow => 'API key';
+
+  @override
+  String get panelSettings_sslModeEnable => 'Enable';
+
+  @override
+  String get panelSettings_sslModeDisable => 'Disable';
+
+  @override
+  String get panelSettings_sslModeMux => 'Mux';
+
+  @override
+  String get panelSettings_sslPaste => 'Paste certificate';
+
+  @override
+  String get panelSettings_sslSelectExisting => 'Select existing';
+
+  @override
+  String get panelSettings_sslSelfSigned => 'Self-signed';
+
+  @override
+  String get panelSettings_languageEn => 'English';
 }

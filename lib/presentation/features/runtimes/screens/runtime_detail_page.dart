@@ -139,6 +139,11 @@ class _PhpExtensionsTabState extends ConsumerState<_PhpExtensionsTab> {
                     ),
                   ),
                   IconButton(
+                    tooltip: l10n.runtime_extensionPresets,
+                    onPressed: _showPresets,
+                    icon: const Icon(TablerIcons.list),
+                  ),
+                  IconButton(
                     tooltip: l10n.action_refresh,
                     onPressed: _refresh,
                     icon: const Icon(TablerIcons.refresh),
@@ -191,6 +196,43 @@ class _PhpExtensionsTabState extends ConsumerState<_PhpExtensionsTab> {
         );
       },
     );
+  }
+
+  Future<void> _showPresets() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(runtimeRepositoryProvider.future);
+      final result = await repository.searchPhpExtensions();
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.85,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.runtime_extensionPresets, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s16),
+            if (result.isEmpty)
+              Text(l10n.state_empty)
+            else
+              SplitListGroup(
+                children: [
+                  for (final group in result)
+                    SplitListTile(
+                      leading: const Icon(TablerIcons.puzzle),
+                      title: group.name,
+                      subtitle: group.extensions,
+                    ),
+                ],
+              ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _operate(String name, bool installed) async {
@@ -545,6 +587,69 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
     }
   }
 
+  Future<void> _showScripts() async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController();
+    final dir = await showAppSheet<String>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.runtime_scripts, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          AppTextField(
+            controller: controller,
+            label: l10n.runtime_codeDir,
+            hint: '/opt/1panel/apps/node/project',
+            autofocus: true,
+          ),
+          const SizedBox(height: AppTokens.s16),
+          PrimaryButton(
+            label: l10n.action_continue,
+            onPressed: () =>
+                Navigator.of(sheetContext).pop(controller.text.trim()),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (dir == null || dir.isEmpty || !mounted) return;
+    try {
+      final repository = await ref.read(runtimeRepositoryProvider.future);
+      final scripts = await repository.getNodeScripts(dir);
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.85,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.runtime_scripts, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s16),
+            if (scripts.isEmpty)
+              Text(l10n.state_empty)
+            else
+              SplitListGroup(
+                children: [
+                  for (final script in scripts)
+                    SplitListTile(
+                      leading: const Icon(TablerIcons.terminal_2),
+                      title: script.name,
+                      subtitle: script.script,
+                    ),
+                ],
+              ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _install() async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
@@ -599,6 +704,12 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
                 ),
               ),
               const SizedBox(width: AppTokens.s12),
+              IconButton(
+                tooltip: l10n.runtime_scripts,
+                onPressed: _showScripts,
+                icon: const Icon(TablerIcons.file_code),
+              ),
+              const SizedBox(width: AppTokens.s8),
               PrimaryButton(
                 label: l10n.runtime_install,
                 expanded: false,

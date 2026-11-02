@@ -29,7 +29,10 @@ class TonalCard extends StatelessWidget {
     final scheme = context.scheme;
     final content = Material(
       color: color ?? scheme.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(borderRadius),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(borderRadius),
+        side: BorderSide(color: scheme.outlineVariant),
+      ),
       clipBehavior: clipBehavior,
       child: InkWell(
         onTap: onTap,

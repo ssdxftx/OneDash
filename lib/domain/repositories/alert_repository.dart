@@ -10,6 +10,7 @@ abstract interface class AlertRepository {
   Future<PageResult<AlertLogInfo>> searchAlertLogs(AlertLogSearchReq req);
   Future<void> cleanAlertLogs();
   Future<AlertConfigInfo> getAlertConfig();
+  Future<List<AlertConfigInfo>> getAlertConfigs();
   Future<void> updateAlertConfig(AlertConfigUpdateReq req);
   Future<bool> testAlertConfig(AlertConfigTestReq req);
   Future<void> deleteAlertConfig(int id);

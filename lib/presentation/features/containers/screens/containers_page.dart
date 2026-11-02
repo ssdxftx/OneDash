@@ -6,24 +6,27 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/debouncer.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/container/container_search_dto.dart';
 import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/buttons.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/search_field.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/skeleton.dart';
-import '../../../common/components/split_list_group.dart';
 import '../../../common/components/status_dot.dart';
+import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/refreshable_empty_state.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../providers/containers_provider.dart';
-import '../../../common/states/error_toast.dart';
+import '../widgets/container_actions.dart';
 
 class ContainersPage extends ConsumerStatefulWidget {
   const ContainersPage({super.key, required this.serverId});
@@ -36,13 +39,69 @@ class ContainersPage extends ConsumerStatefulWidget {
 
 class _ContainersPageState extends ConsumerState<ContainersPage> {
   final _searchController = TextEditingController();
+  final _searchDebouncer = Debouncer();
   bool _searching = false;
+  bool _selecting = false;
   String _filter = 'all';
+  final Set<String> _selected = {};
+
+  bool get _selectionMode => _selecting;
+
+  void _toggle(String name) {
+    setState(() {
+      _selecting = true;
+      if (!_selected.remove(name)) _selected.add(name);
+    });
+  }
+
+  void _clearSelection() => setState(() {
+    _selecting = false;
+    _selected.clear();
+  });
+
+  Future<void> _batchDelete() async {
+    final l10n = AppLocalizations.of(context);
+    final names = _selected.toList(growable: false);
+    if (names.isEmpty) return;
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.containers_remove,
+      message: l10n.files_selectCount(names.length),
+      confirmLabel: l10n.action_delete,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    final repository = await ref.read(containerRepositoryProvider.future);
+    if (!mounted) return;
+    final taskID = const Uuid().v4();
+    final success = await TaskProgressSheet.run(
+      context,
+      title: l10n.containers_remove,
+      task: (controller) async {
+        await repository.operateContainer(
+          names: names,
+          operation: 'remove',
+          taskID: taskID,
+        );
+        await repository.waitForTask(
+          taskID,
+          onUpdate: (log) {
+            if (log.lines.isNotEmpty) controller.log(log.lines.last);
+          },
+        );
+      },
+    );
+    if (!success || !mounted) return;
+    _clearSelection();
+    AppToast.success(context, l10n.action_done);
+    await ref.read(containersProvider.notifier).refresh();
+  }
 
   static const _filters = ['all', 'running', 'stopped', 'abnormal'];
 
   @override
   void dispose() {
+    _searchDebouncer.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -85,24 +144,78 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                   icon: _searching ? TablerIcons.x : TablerIcons.search,
                   tooltip: l10n.action_search,
                   onPressed: () {
-                    setState(() => _searching = !_searching);
-                    if (!_searching) {
-                      _searchController.clear();
-                      ref.read(containersProvider.notifier).search('');
-                    }
+                    setState(() {
+                      _searching = !_searching;
+                      if (!_searching) {
+                        _clearSelection();
+                        _searchController.clear();
+                        ref.read(containersProvider.notifier).search('');
+                      }
+                    });
                   },
                 ),
                 AppIconButton(
-                  icon: TablerIcons.refresh,
-                  tooltip: l10n.action_refresh,
-                  onPressed: () =>
-                      ref.read(containersProvider.notifier).refresh(),
+                  icon: _selectionMode ? TablerIcons.x : TablerIcons.checklist,
+                  tooltip: _selectionMode
+                      ? l10n.files_cancelSelection
+                      : l10n.files_selectAll,
+                  onPressed: () => setState(() {
+                    if (_selectionMode) {
+                      _clearSelection();
+                    } else {
+                      _selecting = true;
+                      final items = ref
+                          .read(containersProvider)
+                          .valueOrNull
+                          ?.items;
+                      _selected.addAll(
+                        (items ?? const [])
+                            .where((item) => !item.isFromCompose)
+                            .map((item) => item.name),
+                      );
+                    }
+                  }),
                 ),
                 AppIconButton(
                   icon: TablerIcons.plus,
                   tooltip: l10n.containers_create,
                   onPressed: () =>
                       context.push('/s/${widget.serverId}/containers/create'),
+                ),
+                PopupMenuButton<String>(
+                  tooltip: l10n.action_more,
+                  icon: const Icon(TablerIcons.dots),
+                  onSelected: (value) {
+                    if (value == 'refresh') {
+                      ref.read(containersProvider.notifier).refresh();
+                    } else if (value == 'docker') {
+                      context.push('/s/${widget.serverId}/containers/docker');
+                    } else if (value == 'resources') {
+                      context.push(
+                        '/s/${widget.serverId}/containers/resources',
+                      );
+                    } else if (value == 'prune') {
+                      _prune();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'refresh',
+                      child: Text(l10n.action_refresh),
+                    ),
+                    PopupMenuItem(
+                      value: 'docker',
+                      child: Text(l10n.containers_dockerSettings),
+                    ),
+                    PopupMenuItem(
+                      value: 'resources',
+                      child: Text(l10n.containers_resources),
+                    ),
+                    PopupMenuItem(
+                      value: 'prune',
+                      child: Text(l10n.containers_prune),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -115,8 +228,12 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                 child: SearchField(
                   controller: _searchController,
                   autofocus: true,
-                  onChanged: (value) =>
-                      ref.read(containersProvider.notifier).search(value),
+                  onChanged: (value) {
+                    _clearSelection();
+                    _searchDebouncer(() {
+                      ref.read(containersProvider.notifier).search(value);
+                    }, delay: const Duration(milliseconds: 300));
+                  },
                 ),
               ),
             if (docker.valueOrNull != null && !docker.value!.isAvailable)
@@ -153,7 +270,10 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
               selected: {_filter},
               onChanged: (selection) {
                 if (selection.isEmpty) return;
-                setState(() => _filter = selection.first);
+                setState(() {
+                  _filter = selection.first;
+                  _clearSelection();
+                });
                 ref.read(containersProvider.notifier).setFilter(_filter);
               },
             ),
@@ -163,10 +283,14 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                 onRetry: () => ref.read(containersProvider.notifier).refresh(),
                 loading: const SkeletonList(itemCount: 8, itemHeight: 60),
                 isEmpty: (state) => state.items.isEmpty,
-                empty: EmptyState(
-                  icon: TablerIcons.box,
-                  title: l10n.containers_empty_title,
-                  message: l10n.containers_empty_message,
+                empty: RefreshableEmptyState(
+                  onRefresh: () =>
+                      ref.read(containersProvider.notifier).refresh(),
+                  child: EmptyState(
+                    icon: TablerIcons.box,
+                    title: l10n.containers_empty_title,
+                    message: l10n.containers_empty_message,
+                  ),
                 ),
                 builder: (state) => RefreshIndicator(
                   onRefresh: () =>
@@ -191,10 +315,20 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                           memory: stats == null
                               ? null
                               : formatBytes(stats.memoryUsage.toInt()),
-                          onTap: () => context.push(
-                            '/s/${widget.serverId}/containers/${Uri.encodeComponent(item.name)}',
-                          ),
-                          onLongPress: () => _showActions(item),
+                          selected: _selected.contains(item.name),
+                          selectable: !item.isFromCompose,
+                          selectionMode: _selectionMode,
+                          onTap: _selectionMode
+                              ? () {
+                                  if (!item.isFromCompose) _toggle(item.name);
+                                }
+                              : () => context.push(
+                                  '/s/${widget.serverId}/containers/${Uri.encodeComponent(item.name)}',
+                                ),
+                          onLongPress: () {
+                            if (!item.isFromCompose) _toggle(item.name);
+                          },
+                          onMore: () => _showActions(item),
                         ),
                       );
                     },
@@ -205,88 +339,71 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
           ],
         ),
       ),
+      bottomNavigationBar: _selectionMode
+          ? SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.all(AppTokens.s16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.files_selectCount(_selected.length),
+                        style: AppTextStyles.bodyM,
+                      ),
+                    ),
+                    DangerButton(
+                      expanded: false,
+                      icon: TablerIcons.trash,
+                      label: l10n.action_delete,
+                      onPressed: _batchDelete,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : null,
     );
   }
 
   Future<void> _showActions(ContainerItemDto item) async {
-    final l10n = AppLocalizations.of(context);
-    await showAppSheet<void>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(item.name, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s4),
-          Text(
-            item.imageName,
-            style: AppTextStyles.bodyS.copyWith(
-              color: context.scheme.onSurfaceVariant,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          SplitListGroup(
-            children: [
-              SplitListTile(
-                leading: const Icon(TablerIcons.player_play),
-                title: l10n.containers_start,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _operate(item, 'start');
-                },
-              ),
-              SplitListTile(
-                leading: const Icon(TablerIcons.player_stop),
-                title: l10n.containers_stop,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _operate(item, 'stop');
-                },
-              ),
-              SplitListTile(
-                leading: const Icon(TablerIcons.refresh),
-                title: l10n.containers_restart,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _operate(item, 'restart');
-                },
-              ),
-              SplitListTile(
-                leading: const Icon(TablerIcons.terminal_2),
-                title: l10n.containers_terminal,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  context.push(
-                    '/s/${widget.serverId}/terminal?container=${Uri.encodeComponent(item.name)}',
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: AppTokens.s8),
-        ],
-      ),
+    await showContainerActions(
+      context,
+      ref,
+      serverId: widget.serverId,
+      item: item,
+      onChanged: () => ref.read(containersProvider.notifier).refresh(),
     );
   }
 
-  Future<void> _operate(ContainerItemDto item, String operation) async {
+  Future<void> _prune() async {
     final l10n = AppLocalizations.of(context);
-    try {
-      final repository = await ref.read(containerRepositoryProvider.future);
-      await repository.operateContainer(
-        names: [item.name],
-        operation: operation,
-        taskID: const Uuid().v4(),
-      );
-      if (!mounted) return;
-      AppToast.success(context, l10n.action_done);
-      await ref.read(containersProvider.notifier).refresh();
-    } catch (error) {
-      if (!mounted) return;
-      showErrorToast(context, error);
-    }
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.containers_prune,
+      message: l10n.containers_pruneConfirm,
+      confirmLabel: l10n.containers_prune,
+    );
+    if (!confirmed || !mounted) return;
+    final repository = await ref.read(containerRepositoryProvider.future);
+    if (!mounted) return;
+    final taskID = const Uuid().v4();
+    final success = await TaskProgressSheet.run(
+      context,
+      title: l10n.containers_prune,
+      task: (controller) async {
+        await repository.pruneContainers(taskID: taskID);
+        await repository.waitForTask(
+          taskID,
+          onUpdate: (log) {
+            if (log.lines.isNotEmpty) controller.log(log.lines.last);
+          },
+        );
+      },
+    );
+    if (!success || !mounted) return;
+    AppToast.success(context, l10n.action_done);
+    await ref.read(containersProvider.notifier).refresh();
   }
 }
 
@@ -306,6 +423,10 @@ class _ContainerCard extends StatelessWidget {
     required this.memory,
     required this.onTap,
     required this.onLongPress,
+    required this.selected,
+    required this.selectable,
+    required this.selectionMode,
+    required this.onMore,
   });
 
   final ContainerItemDto item;
@@ -313,6 +434,10 @@ class _ContainerCard extends StatelessWidget {
   final String? memory;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final bool selected;
+  final bool selectable;
+  final bool selectionMode;
+  final VoidCallback onMore;
 
   @override
   Widget build(BuildContext context) {
@@ -321,11 +446,14 @@ class _ContainerCard extends StatelessWidget {
     return TonalCard(
       onTap: onTap,
       onLongPress: onLongPress,
+      color: selected ? scheme.primaryContainer.withValues(alpha: 0.35) : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
+              if (selectable && selectionMode)
+                Checkbox(value: selected, onChanged: (_) => onTap()),
               StatusDot(status: item.state.toLowerCase()),
               const SizedBox(width: AppTokens.s8),
               Expanded(
@@ -342,12 +470,15 @@ class _ContainerCard extends StatelessWidget {
                   color: scheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(width: AppTokens.s4),
-              Icon(
-                TablerIcons.chevron_right,
-                size: AppTokens.iconList,
-                color: scheme.onSurfaceVariant,
-              ),
+              if (!selectionMode) ...[
+                const SizedBox(width: AppTokens.s4),
+                IconButton(
+                  tooltip: l10n.action_more,
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(TablerIcons.dots, size: AppTokens.iconList),
+                  onPressed: onMore,
+                ),
+              ],
               if (item.isFromCompose)
                 Container(
                   padding: const EdgeInsets.symmetric(

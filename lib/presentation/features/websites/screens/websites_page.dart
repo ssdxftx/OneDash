@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
+import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../data/dto/website/website_dto.dart';
@@ -23,6 +24,7 @@ import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/refreshable_empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../providers/websites_provider.dart';
@@ -41,6 +43,50 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
   final _debouncer = Debouncer();
   bool _searching = false;
   String _selectedFilter = '';
+  bool _selecting = false;
+  final Set<int> _selected = {};
+
+  bool get _selectionMode => _selecting;
+
+  void _toggle(WebsiteDto site) {
+    setState(() {
+      _selecting = true;
+      if (!_selected.remove(site.id)) _selected.add(site.id);
+    });
+  }
+
+  void _clearSelection() => setState(() {
+    _selecting = false;
+    _selected.clear();
+  });
+
+  Future<void> _batchDelete() async {
+    final l10n = AppLocalizations.of(context);
+    final ids = _selected.toList(growable: false);
+    if (ids.isEmpty) return;
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.websites_delete,
+      message: l10n.files_selectCount(ids.length),
+      confirmLabel: l10n.action_delete,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      for (final id in ids) {
+        await repository.deleteWebsite(id);
+      }
+      if (!mounted) return;
+      _clearSelection();
+      AppToast.success(context, l10n.websites_deleted);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    } finally {
+      await ref.read(websitesProvider.notifier).refresh();
+    }
+  }
 
   static const _filters = ['', 'running', 'stopped', 'static', 'proxy', 'php'];
 
@@ -90,24 +136,62 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                   icon: _searching ? TablerIcons.x : TablerIcons.search,
                   tooltip: l10n.action_search,
                   onPressed: () {
-                    setState(() => _searching = !_searching);
-                    if (!_searching) {
-                      _searchController.clear();
-                      ref.read(websitesProvider.notifier).search('');
-                    }
+                    setState(() {
+                      _searching = !_searching;
+                      if (!_searching) {
+                        _clearSelection();
+                        _searchController.clear();
+                        ref.read(websitesProvider.notifier).search('');
+                      }
+                    });
                   },
                 ),
                 AppIconButton(
-                  icon: TablerIcons.layout,
-                  tooltip: l10n.websites_templates,
-                  onPressed: () =>
-                      context.push('/s/${widget.serverId}/websites/templates'),
+                  icon: _selectionMode ? TablerIcons.x : TablerIcons.checklist,
+                  tooltip: _selectionMode
+                      ? l10n.files_cancelSelection
+                      : l10n.files_selectAll,
+                  onPressed: () => setState(() {
+                    if (_selectionMode) {
+                      _clearSelection();
+                    } else {
+                      _selecting = true;
+                      final items = ref
+                          .read(websitesProvider)
+                          .valueOrNull
+                          ?.items;
+                      _selected.addAll(
+                        (items ?? const []).map((site) => site.id),
+                      );
+                    }
+                  }),
                 ),
                 AppIconButton(
                   icon: TablerIcons.plus,
                   tooltip: l10n.websites_create,
                   onPressed: () =>
                       context.push('/s/${widget.serverId}/websites/create'),
+                ),
+                PopupMenuButton<String>(
+                  tooltip: l10n.action_more,
+                  icon: const Icon(TablerIcons.dots),
+                  onSelected: (value) {
+                    if (value == 'templates') {
+                      context.push('/s/${widget.serverId}/websites/templates');
+                    } else if (value == 'refresh') {
+                      ref.read(websitesProvider.notifier).refresh();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'templates',
+                      child: Text(l10n.websites_templates),
+                    ),
+                    PopupMenuItem(
+                      value: 'refresh',
+                      child: Text(l10n.action_refresh),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -122,6 +206,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                   hint: l10n.action_search,
                   autofocus: true,
                   onChanged: (value) {
+                    _clearSelection();
                     _debouncer(() {
                       ref.read(websitesProvider.notifier).search(value);
                     }, delay: const Duration(milliseconds: 300));
@@ -134,7 +219,10 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
               selected: {_selectedFilter},
               onChanged: (selection) {
                 if (selection.isEmpty) return;
-                setState(() => _selectedFilter = selection.first);
+                setState(() {
+                  _selectedFilter = selection.first;
+                  _clearSelection();
+                });
                 ref.read(websitesProvider.notifier).setType(selection.first);
               },
             ),
@@ -144,13 +232,17 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 onRetry: () => ref.read(websitesProvider.notifier).refresh(),
                 loading: const SkeletonList(itemCount: 8),
                 isEmpty: (result) => result.items.isEmpty,
-                empty: EmptyState(
-                  icon: TablerIcons.world,
-                  title: l10n.websites_empty_title,
-                  message: l10n.websites_empty_message,
-                  actionLabel: l10n.websites_create,
-                  onAction: () =>
-                      context.push('/s/${widget.serverId}/websites/create'),
+                empty: RefreshableEmptyState(
+                  onRefresh: () =>
+                      ref.read(websitesProvider.notifier).refresh(),
+                  child: EmptyState(
+                    icon: TablerIcons.world,
+                    title: l10n.websites_empty_title,
+                    message: l10n.websites_empty_message,
+                    actionLabel: l10n.websites_create,
+                    onAction: () =>
+                        context.push('/s/${widget.serverId}/websites/create'),
+                  ),
                 ),
                 builder: (result) => RefreshIndicator(
                   onRefresh: () =>
@@ -177,10 +269,15 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                           padding: const EdgeInsets.only(bottom: AppTokens.s12),
                           child: _WebsiteCard(
                             site: site,
-                            onTap: () => context.push(
-                              '/s/${widget.serverId}/websites/${site.id}',
-                            ),
-                            onLongPress: () => _showSiteActions(site),
+                            selected: _selected.contains(site.id),
+                            selectionMode: _selectionMode,
+                            onTap: _selectionMode
+                                ? () => _toggle(site)
+                                : () => context.push(
+                                    '/s/${widget.serverId}/websites/${site.id}',
+                                  ),
+                            onLongPress: () => _toggle(site),
+                            onMore: () => _showSiteActions(site),
                           ),
                         );
                       },
@@ -192,6 +289,30 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
           ],
         ),
       ),
+      bottomNavigationBar: _selectionMode
+          ? SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.all(AppTokens.s16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.files_selectCount(_selected.length),
+                        style: AppTextStyles.bodyM,
+                      ),
+                    ),
+                    DangerButton(
+                      expanded: false,
+                      icon: TablerIcons.trash,
+                      label: l10n.action_delete,
+                      onPressed: _batchDelete,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : null,
     );
   }
 
@@ -289,7 +410,10 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
     if (uri == null) return;
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (!mounted) return;
-      showErrorToast(context, StateError(l10n.websites_openFailed));
+      showErrorToast(
+        context,
+        ApiBusinessException(400, l10n.websites_openFailed),
+      );
     }
   }
 
@@ -442,11 +566,17 @@ class _WebsiteCard extends StatelessWidget {
     required this.site,
     required this.onTap,
     required this.onLongPress,
+    required this.selected,
+    required this.selectionMode,
+    required this.onMore,
   });
 
   final WebsiteDto site;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final bool selected;
+  final bool selectionMode;
+  final VoidCallback onMore;
 
   @override
   Widget build(BuildContext context) {
@@ -473,11 +603,14 @@ class _WebsiteCard extends StatelessWidget {
     return TonalCard(
       onTap: onTap,
       onLongPress: onLongPress,
+      color: selected ? scheme.primaryContainer.withValues(alpha: 0.35) : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
+              if (selectionMode)
+                Checkbox(value: selected, onChanged: (_) => onTap()),
               StatusDot(status: site.status.toLowerCase()),
               const SizedBox(width: AppTokens.s8),
               Expanded(
@@ -499,26 +632,29 @@ class _WebsiteCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppTokens.s8,
-                    vertical: 2,
+                    vertical: AppTokens.chipPaddingY,
                   ),
                   decoration: BoxDecoration(
-                    color: scheme.primaryContainer,
+                    color: expiryColor.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(AppTokens.rXs),
                   ),
                   child: Text(
-                    'SSL',
+                    l10n.websites_ssl,
                     style: AppTextStyles.caption.copyWith(
-                      color: scheme.onPrimaryContainer,
+                      color: expiryColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-              const SizedBox(width: AppTokens.s4),
-              Icon(
-                TablerIcons.chevron_right,
-                size: AppTokens.iconList,
-                color: scheme.onSurfaceVariant,
-              ),
+              if (!selectionMode) ...[
+                const SizedBox(width: AppTokens.s4),
+                IconButton(
+                  tooltip: l10n.action_more,
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(TablerIcons.dots, size: AppTokens.iconList),
+                  onPressed: onMore,
+                ),
+              ],
             ],
           ),
           const SizedBox(height: AppTokens.s8),

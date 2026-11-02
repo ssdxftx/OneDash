@@ -10,7 +10,7 @@ String describeError(Object error, AppLocalizations l10n) {
   final data = mapError(error, l10n);
   final message = data.message.trim();
   if (message.isEmpty) return data.title;
-  return '${data.title}：$message';
+  return l10n.common_errorLine(data.title, message);
 }
 
 void showErrorToast(BuildContext context, Object error, {String? prefix}) {

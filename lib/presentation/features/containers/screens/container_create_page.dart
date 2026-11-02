@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../data/dto/container/container_info_dto.dart';
 import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
@@ -19,9 +20,16 @@ import '../../../common/states/error_toast.dart';
 import '../providers/containers_provider.dart';
 
 class ContainerCreatePage extends ConsumerStatefulWidget {
-  const ContainerCreatePage({super.key, required this.serverId});
+  const ContainerCreatePage({
+    super.key,
+    required this.serverId,
+    this.containerName,
+  });
 
   final int serverId;
+  final String? containerName;
+
+  bool get isEditing => containerName != null;
 
   @override
   ConsumerState<ContainerCreatePage> createState() =>
@@ -47,6 +55,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
   bool _submitting = false;
   List<String> _images = const [];
   List<String> _networks = const ['1panel-network'];
+  ContainerInfoDto? _initial;
 
   @override
   void initState() {
@@ -59,6 +68,9 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
       final repository = await ref.read(containerRepositoryProvider.future);
       final images = await repository.getImages();
       final networks = await repository.getNetworks();
+      final initial = widget.containerName == null
+          ? null
+          : await repository.getContainerInfo(widget.containerName!);
       if (!mounted) return;
       setState(() {
         _images = images
@@ -71,10 +83,57 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
               .map((network) => network.option)
               .where((network) => network.isNotEmpty),
         }.toList();
+        if (initial != null) _applyInitial(initial);
       });
-    } catch (_) {
-      // The form still supports manual input when options fail to load.
+    } catch (error) {
+      if (!mounted) return;
+      if (widget.isEditing) showErrorToast(context, error);
     }
+  }
+
+  void _applyInitial(ContainerInfoDto initial) {
+    _initial = initial;
+    _image.text = initial.image;
+    _name.text = initial.name;
+    _workingDir.text = initial.workingDir;
+    _command.text = initial.cmd?.join(' ') ?? '';
+    _entrypoint.text = initial.entrypoint?.join(' ') ?? '';
+    _cpu.text = initial.nanoCPUs <= 0
+        ? ''
+        : (initial.nanoCPUs / 1000000000).toStringAsFixed(2);
+    _memory.text = initial.memory <= 0
+        ? ''
+        : '${(initial.memory / 1024 / 1024).round()}';
+    _restartPolicy = initial.restartPolicy.isEmpty
+        ? 'unless-stopped'
+        : initial.restartPolicy;
+    _privileged = initial.privileged;
+    _autoRemove = initial.autoRemove;
+    if (initial.networks.isNotEmpty) {
+      _network = initial.networks.first.network;
+      _networks = {_network, ..._networks}.toList();
+    }
+    for (final port in _ports) {
+      port.dispose();
+    }
+    _ports
+      ..clear()
+      ..addAll(initial.exposedPorts.map((port) => _PortFields()..fill(port)));
+    if (_ports.isEmpty) _ports.add(_PortFields());
+    for (final volume in _volumes) {
+      volume.dispose();
+    }
+    _volumes
+      ..clear()
+      ..addAll(initial.volumes.map((volume) => _VolumeFields()..fill(volume)));
+    if (_volumes.isEmpty) _volumes.add(_VolumeFields());
+    for (final env in _envs) {
+      env.dispose();
+    }
+    _envs
+      ..clear()
+      ..addAll(initial.env.map((value) => _EnvFields()..fill(value)));
+    if (_envs.isEmpty) _envs.add(_EnvFields());
   }
 
   @override
@@ -112,6 +171,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
 
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context);
+    final providerContainer = ProviderScope.containerOf(context, listen: false);
     final name = _name.text.trim();
     final image = _image.text.trim();
     if (!RegExp(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]*$').hasMatch(name)) {
@@ -125,11 +185,19 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
     setState(() => _submitting = true);
     try {
       final repository = await ref.read(containerRepositoryProvider.future);
-      final taskID = await repository.createContainer(_payload(name, image));
-      await repository.waitForTask(taskID);
+      final payload = _payload(name, image);
+      if (widget.isEditing) {
+        await repository.updateContainer(payload);
+      } else {
+        final taskID = await repository.createContainer(payload);
+        await repository.waitForTask(taskID);
+      }
+      providerContainer.invalidate(containersProvider);
       if (!mounted) return;
-      AppToast.success(context, l10n.containers_created);
-      ref.invalidate(containersProvider);
+      AppToast.success(
+        context,
+        widget.isEditing ? l10n.containers_updated : l10n.containers_created,
+      );
       context.pop();
     } catch (error) {
       if (!mounted) return;
@@ -176,43 +244,74 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
         .toList();
     final cpu = double.tryParse(_cpu.text.trim()) ?? 0;
     final memory = int.tryParse(_memory.text.trim()) ?? 0;
+    final initial = _initial;
+    final networks = initial == null
+        ? [
+            {
+              'network': _network,
+              'ipv4': '',
+              'ipv6': '',
+              'macAddr': '',
+              'links': <String>[],
+              'aliases': <String>[],
+              'driverOpts': <String, String>{},
+              'gwPriority': 0,
+              'linkLocalIPs': <String>[],
+            },
+          ]
+        : initial.networks
+              .map(
+                (network) => {
+                  ...network.toJson(),
+                  'links': <String>[],
+                  'aliases': <String>[],
+                  'driverOpts': <String, String>{},
+                  'gwPriority': 0,
+                  'linkLocalIPs': <String>[],
+                },
+              )
+              .toList();
+    if (networks.isEmpty) {
+      networks.add({
+        'network': _network,
+        'ipv4': '',
+        'ipv6': '',
+        'macAddr': '',
+        'links': <String>[],
+        'aliases': <String>[],
+        'driverOpts': <String, String>{},
+        'gwPriority': 0,
+        'linkLocalIPs': <String>[],
+      });
+    } else {
+      networks.first['network'] = _network;
+    }
 
     return {
-      'taskID': const Uuid().v4(),
+      'taskID': initial?.taskID ?? const Uuid().v4(),
+      'forcePull': initial?.forcePull ?? false,
       'name': name,
       'image': image,
-      'hostname': '',
-      'domainName': '',
-      'dns': <String>[],
-      'networks': [
-        {
-          'network': _network,
-          'ipv4': '',
-          'ipv6': '',
-          'macAddr': '',
-          'links': <String>[],
-          'aliases': <String>[],
-          'driverOpts': <String, String>{},
-          'gwPriority': 0,
-          'linkLocalIPs': <String>[],
-        },
-      ],
-      'publishAllPorts': false,
+      'hostname': initial?.hostname ?? '',
+      'domainName': initial?.domainName ?? '',
+      'dns': initial?.dns ?? <String>[],
+      'networks': networks,
+      'publishAllPorts': initial?.publishAllPorts ?? false,
       'exposedPorts': ports,
-      'tty': false,
-      'openStdin': false,
+      'tty': initial?.tty ?? false,
+      'openStdin': initial?.openStdin ?? false,
       'workingDir': _workingDir.text.trim(),
-      'user': '',
+      'user': initial?.user ?? '',
       'cmd': _split(_command.text),
       'entrypoint': _split(_entrypoint.text),
-      'cpuShares': 0,
+      'cpuShares': initial?.cpuShares ?? 0,
       'nanoCPUs': cpu <= 0 ? 0 : cpu * 1000000000,
       'memory': memory <= 0 ? 0 : memory * 1024 * 1024,
       'volumes': volumes,
-      'extraHosts': <Map<String, String>>[],
+      'extraHosts': initial?.extraHosts ?? <String>[],
       'privileged': _privileged,
       'autoRemove': _autoRemove,
-      'labels': <String>[],
+      'labels': initial?.labels ?? <String>[],
       'env': env,
       'restartPolicy': _restartPolicy,
     };
@@ -248,7 +347,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBarLarge(
-        title: l10n.containers_create,
+        title: widget.isEditing ? l10n.containers_edit : l10n.containers_create,
         leading: IconButton(
           tooltip: l10n.action_close,
           onPressed: () => context.pop(),
@@ -323,6 +422,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
               fields: _ports[index],
               onRemove: () => _removePort(index),
               onChanged: () => setState(() {}),
+              canRemove: _ports.length > 1,
             ),
             const SizedBox(height: AppTokens.s8),
           ],
@@ -338,6 +438,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
             _VolumeRow(
               fields: _volumes[index],
               onRemove: () => _removeVolume(index),
+              canRemove: _volumes.length > 1,
             ),
             const SizedBox(height: AppTokens.s8),
           ],
@@ -360,11 +461,12 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
                       hint: l10n.containers_envHint,
                     ),
                   ),
-                  IconButton(
-                    tooltip: l10n.containers_removeRow,
-                    onPressed: () => _removeEnv(index),
-                    icon: const Icon(TablerIcons.trash),
-                  ),
+                  if (_envs.length > 1)
+                    IconButton(
+                      tooltip: l10n.containers_removeRow,
+                      onPressed: () => _removeEnv(index),
+                      icon: const Icon(TablerIcons.trash),
+                    ),
                 ],
               ),
             ),
@@ -471,17 +573,30 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
           children: [
             PrimaryButton(
               label: _submitting
-                  ? l10n.containers_creating
+                  ? l10n.containers_saving
+                  : widget.isEditing
+                  ? l10n.action_save
                   : l10n.containers_createSubmit,
               loading: _submitting,
-              onPressed: _canSubmit && !_submitting ? _submit : null,
+              onPressed:
+                  _canSubmit &&
+                      !_submitting &&
+                      (!widget.isEditing || _initial != null)
+                  ? _submit
+                  : null,
             ),
             if (_submitting) ...[
               const SizedBox(height: AppTokens.s8),
               SecondaryButton(
                 label: l10n.containers_continueInBackground,
                 icon: TablerIcons.arrow_back,
-                onPressed: () => context.pop(),
+                onPressed: () {
+                  ProviderScope.containerOf(
+                    context,
+                    listen: false,
+                  ).invalidate(containersProvider);
+                  context.pop();
+                },
               ),
             ],
           ],
@@ -496,6 +611,12 @@ class _PortFields {
   final container = TextEditingController();
   String protocol = 'tcp';
 
+  void fill(ContainerPortDto port) {
+    host.text = port.hostPort;
+    container.text = port.containerPort;
+    protocol = port.protocol.isEmpty ? 'tcp' : port.protocol;
+  }
+
   void dispose() {
     host.dispose();
     container.dispose();
@@ -506,6 +627,11 @@ class _VolumeFields {
   final source = TextEditingController();
   final target = TextEditingController();
 
+  void fill(ContainerVolumeDto volume) {
+    source.text = volume.sourceDir;
+    target.text = volume.containerDir;
+  }
+
   void dispose() {
     source.dispose();
     target.dispose();
@@ -514,6 +640,10 @@ class _VolumeFields {
 
 class _EnvFields {
   final value = TextEditingController();
+
+  void fill(String env) {
+    value.text = env;
+  }
 
   void dispose() {
     value.dispose();
@@ -525,11 +655,13 @@ class _PortRow extends StatelessWidget {
     required this.fields,
     required this.onRemove,
     required this.onChanged,
+    required this.canRemove,
   });
 
   final _PortFields fields;
   final VoidCallback onRemove;
   final VoidCallback onChanged;
+  final bool canRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -577,11 +709,12 @@ class _PortRow extends StatelessWidget {
                   },
                 ),
               ),
-              IconButton(
-                tooltip: l10n.containers_removeRow,
-                onPressed: onRemove,
-                icon: const Icon(TablerIcons.trash),
-              ),
+              if (canRemove)
+                IconButton(
+                  tooltip: l10n.containers_removeRow,
+                  onPressed: onRemove,
+                  icon: const Icon(TablerIcons.trash),
+                ),
             ],
           ),
         ],
@@ -591,10 +724,15 @@ class _PortRow extends StatelessWidget {
 }
 
 class _VolumeRow extends StatelessWidget {
-  const _VolumeRow({required this.fields, required this.onRemove});
+  const _VolumeRow({
+    required this.fields,
+    required this.onRemove,
+    required this.canRemove,
+  });
 
   final _VolumeFields fields;
   final VoidCallback onRemove;
+  final bool canRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -618,11 +756,12 @@ class _VolumeRow extends StatelessWidget {
                   hint: '/usr/share/nginx/html',
                 ),
               ),
-              IconButton(
-                tooltip: l10n.containers_removeRow,
-                onPressed: onRemove,
-                icon: const Icon(TablerIcons.trash),
-              ),
+              if (canRemove)
+                IconButton(
+                  tooltip: l10n.containers_removeRow,
+                  onPressed: onRemove,
+                  icon: const Icon(TablerIcons.trash),
+                ),
             ],
           ),
         ],

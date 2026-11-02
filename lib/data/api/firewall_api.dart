@@ -1,5 +1,6 @@
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/network/network_exceptions.dart';
 import '../dto/firewall/firewall_base_info_dto.dart';
 import '../dto/firewall/firewall_v2_dto.dart';
 import 'task_waiter.dart';
@@ -335,7 +336,7 @@ class FirewallApi {
             },
         ];
       default:
-        throw StateError('不支持的防火墙后端 $provider');
+        throw ApiBusinessException(400, '不支持的防火墙后端 $provider');
     }
   }
 
@@ -365,6 +366,6 @@ class FirewallApi {
         'direction': 'input',
       };
     }
-    throw StateError('不支持的防火墙后端 $provider');
+    throw ApiBusinessException(400, '不支持的防火墙后端 $provider');
   }
 }

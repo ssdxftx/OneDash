@@ -145,11 +145,11 @@ abstract final class AppTheme {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppTokens.rSm),
-          borderSide: BorderSide(color: scheme.outlineVariant),
+          borderSide: BorderSide(color: scheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppTokens.rSm),
-          borderSide: BorderSide(color: scheme.outlineVariant),
+          borderSide: BorderSide(color: scheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppTokens.rSm),
@@ -234,9 +234,23 @@ abstract final class AppTheme {
 
     return TextTheme(
       displayLarge: colored(AppTextStyles.display, scheme.onSurface),
-      displayMedium: colored(AppTextStyles.headline, scheme.onSurface),
+      displayMedium: colored(
+        AppTextStyles.display.copyWith(fontSize: 30, height: 1.2),
+        scheme.onSurface,
+      ),
+      displaySmall: colored(
+        AppTextStyles.display.copyWith(fontSize: 28, height: 1.22),
+        scheme.onSurface,
+      ),
+      headlineLarge: colored(
+        AppTextStyles.headline.copyWith(fontSize: 26),
+        scheme.onSurface,
+      ),
       headlineMedium: colored(AppTextStyles.headline, scheme.onSurface),
-      headlineSmall: colored(AppTextStyles.titleL, scheme.onSurface),
+      headlineSmall: colored(
+        AppTextStyles.titleL.copyWith(fontSize: 22),
+        scheme.onSurface,
+      ),
       titleLarge: colored(AppTextStyles.titleL, scheme.onSurface),
       titleMedium: colored(AppTextStyles.titleM, scheme.onSurface),
       titleSmall: colored(AppTextStyles.titleS, scheme.onSurface),

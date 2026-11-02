@@ -39,212 +39,234 @@ class MorePage extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: AppTokens.s32),
-          children: [
-            AppBarLarge(
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBarLarge(
               title: l10n.more_title,
               subtitle: server?.displayName,
               onTitleLongPress: () =>
                   showServerSwitcher(context, ref, currentServerId: serverId),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SectionHeader(title: l10n.more_group_apps),
-                  SplitListGroup(
-                    children: [
-                      _tile(
-                        context,
-                        icon: TablerIcons.apps,
-                        title: l10n.more_app_store,
-                        subtitle: l10n.more_appStoreSubtitle,
-                        onTap: () => context.push('/s/$serverId/more/apps'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.package,
-                        title: l10n.more_installed_apps,
-                        subtitle: '${counts?.appInstalledNumber ?? '-'}',
-                        onTap: () => context.push(
-                          '/s/$serverId/more/apps?tab=installed',
-                        ),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.database,
-                        title: l10n.more_databases,
-                        subtitle: '${counts?.databaseNumber ?? '-'}',
-                        onTap: () =>
-                            context.push('/s/$serverId/more/databases'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.clock,
-                        title: l10n.more_cronjobs,
-                        subtitle: '${counts?.cronjobNumber ?? '-'}',
-                        onTap: () => context.push('/s/$serverId/more/cronjobs'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.brand_docker,
-                        title: l10n.more_runtimes,
-                        subtitle: 'PHP / Node / Python',
-                        onTap: () => context.push('/s/$serverId/more/runtimes'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppTokens.s24),
-                  SectionHeader(title: l10n.more_group_web),
-                  SplitListGroup(
-                    children: [
-                      _tile(
-                        context,
-                        icon: TablerIcons.world,
-                        title: l10n.nav_websites,
-                        subtitle: '${counts?.websiteNumber ?? '-'}',
-                        onTap: () => context.go('/s/$serverId/websites'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.stack_2,
-                        title: l10n.containers_compose,
-                        subtitle: 'docker compose',
-                        onTap: () => context.push('/s/$serverId/more/compose'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.shield,
-                        title: l10n.more_firewall,
-                        onTap: () => context.push('/s/$serverId/more/firewall'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.folder,
-                        title: l10n.websites_groupManagement,
-                        onTap: () => context.push('/s/$serverId/more/groups'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppTokens.s24),
-                  SectionHeader(title: l10n.more_group_ops),
-                  SplitListGroup(
-                    children: [
-                      _tile(
-                        context,
-                        icon: TablerIcons.file_text,
-                        title: l10n.more_logs,
-                        onTap: () => context.push('/s/$serverId/more/logs'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.terminal_2,
-                        title: l10n.more_terminal,
-                        subtitle: 'SSH',
-                        onTap: () => context.push('/s/$serverId/terminal'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.list_details,
-                        title: l10n.more_process,
-                        onTap: () => context.push('/s/$serverId/more/process'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.server,
-                        title: l10n.host_title,
-                        subtitle: l10n.host_monitor,
-                        onTap: () => context.push('/s/$serverId/more/host'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.cloud_upload,
-                        title: l10n.more_backups,
-                        onTap: () => context.push('/s/$serverId/more/backups'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.bell,
-                        title: l10n.panelSettings_alerts,
-                        subtitle: l10n.panelSettings_alertList,
-                        onTap: () => context.push('/s/$serverId/more/alerts'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.settings_cog,
-                        title: l10n.supervisor_title,
-                        onTap: () =>
-                            context.push('/s/$serverId/more/host-tools'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.tool,
-                        title: l10n.toolbox_title,
-                        onTap: () => context.push('/s/$serverId/more/toolbox'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppTokens.s24),
-                  SectionHeader(title: l10n.more_group_system),
-                  SplitListGroup(
-                    children: [
-                      _tile(
-                        context,
-                        icon: TablerIcons.refresh,
-                        title: l10n.system_restartPanel,
-                        subtitle: l10n.system_restartPanelSubtitle,
-                        onTap: () => _restart(
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(
+                AppTokens.s16,
+                0,
+                AppTokens.s16,
+                AppTokens.s32,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SectionHeader(title: l10n.more_group_apps),
+                    SplitListGroup(
+                      children: [
+                        _tile(
                           context,
-                          ref,
-                          operation: '1panel',
-                          title: l10n.system_restartPanel,
-                          message: l10n.system_restartPanelMessage,
+                          icon: TablerIcons.apps,
+                          title: l10n.more_app_store,
+                          subtitle: l10n.more_appStoreSubtitle,
+                          onTap: () => context.push('/s/$serverId/more/apps'),
                         ),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.server,
-                        title: l10n.system_restartServer,
-                        subtitle: l10n.system_restartServerSubtitle,
-                        onTap: server == null
-                            ? null
-                            : () => _restart(
-                                context,
-                                ref,
-                                operation: 'system',
-                                title: l10n.system_restartServer,
-                                message: l10n.system_restartServerMessage,
-                                requireText: server.displayName,
-                              ),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.settings,
-                        title: l10n.more_panel_settings,
-                        subtitle: l10n.panel_settings_base,
-                        onTap: () => context.push('/s/$serverId/more/settings'),
-                      ),
-                      _tile(
-                        context,
-                        icon: TablerIcons.adjustments,
-                        title: l10n.more_app_settings,
-                        subtitle: l10n.settings_appearance,
-                        onTap: () => context.push('/settings'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppTokens.s24),
-                  Center(
-                    child: Text(
-                      'OneDash · GPL-3.0',
-                      style: AppTextStyles.caption.copyWith(
-                        color: scheme.onSurfaceVariant,
+                        _tile(
+                          context,
+                          icon: TablerIcons.package,
+                          title: l10n.more_installed_apps,
+                          subtitle: counts == null
+                              ? null
+                              : '${counts.appInstalledNumber}',
+                          onTap: () => context.push(
+                            '/s/$serverId/more/apps?tab=installed',
+                          ),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.database,
+                          title: l10n.more_databases,
+                          subtitle: counts == null
+                              ? null
+                              : '${counts.databaseNumber}',
+                          onTap: () =>
+                              context.push('/s/$serverId/more/databases'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.clock,
+                          title: l10n.more_cronjobs,
+                          subtitle: counts == null
+                              ? null
+                              : '${counts.cronjobNumber}',
+                          onTap: () =>
+                              context.push('/s/$serverId/more/cronjobs'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.brand_docker,
+                          title: l10n.more_runtimes,
+                          subtitle: l10n.more_runtimesSubtitle,
+                          onTap: () =>
+                              context.push('/s/$serverId/more/runtimes'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTokens.s24),
+                    SectionHeader(title: l10n.more_group_web),
+                    SplitListGroup(
+                      children: [
+                        _tile(
+                          context,
+                          icon: TablerIcons.world,
+                          title: l10n.nav_websites,
+                          subtitle: counts == null
+                              ? null
+                              : '${counts.websiteNumber}',
+                          onTap: () => context.go('/s/$serverId/websites'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.stack_2,
+                          title: l10n.containers_compose,
+                          subtitle: l10n.more_composeSubtitle,
+                          onTap: () =>
+                              context.push('/s/$serverId/more/compose'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.shield,
+                          title: l10n.more_firewall,
+                          onTap: () =>
+                              context.push('/s/$serverId/more/firewall'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.folder,
+                          title: l10n.websites_groupManagement,
+                          onTap: () => context.push('/s/$serverId/more/groups'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTokens.s24),
+                    SectionHeader(title: l10n.more_group_ops),
+                    SplitListGroup(
+                      children: [
+                        _tile(
+                          context,
+                          icon: TablerIcons.file_text,
+                          title: l10n.more_logs,
+                          onTap: () => context.push('/s/$serverId/more/logs'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.terminal_2,
+                          title: l10n.more_terminal,
+                          subtitle: 'SSH',
+                          onTap: () => context.push('/s/$serverId/terminal'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.list_details,
+                          title: l10n.more_process,
+                          onTap: () =>
+                              context.push('/s/$serverId/more/process'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.server,
+                          title: l10n.host_title,
+                          subtitle: l10n.host_monitor,
+                          onTap: () => context.push('/s/$serverId/more/host'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.cloud_upload,
+                          title: l10n.more_backups,
+                          onTap: () =>
+                              context.push('/s/$serverId/more/backups'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.bell,
+                          title: l10n.panelSettings_alerts,
+                          subtitle: l10n.panelSettings_alertList,
+                          onTap: () => context.push('/s/$serverId/more/alerts'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.settings_cog,
+                          title: l10n.supervisor_title,
+                          onTap: () =>
+                              context.push('/s/$serverId/more/host-tools'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.tool,
+                          title: l10n.toolbox_title,
+                          onTap: () =>
+                              context.push('/s/$serverId/more/toolbox'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTokens.s24),
+                    SectionHeader(title: l10n.more_group_system),
+                    SplitListGroup(
+                      children: [
+                        _tile(
+                          context,
+                          icon: TablerIcons.refresh,
+                          title: l10n.system_restartPanel,
+                          subtitle: l10n.system_restartPanelSubtitle,
+                          onTap: () => _restart(
+                            context,
+                            ref,
+                            operation: '1panel',
+                            title: l10n.system_restartPanel,
+                            message: l10n.system_restartPanelMessage,
+                          ),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.server,
+                          title: l10n.system_restartServer,
+                          subtitle: l10n.system_restartServerSubtitle,
+                          onTap: server == null
+                              ? null
+                              : () => _restart(
+                                  context,
+                                  ref,
+                                  operation: 'system',
+                                  title: l10n.system_restartServer,
+                                  message: l10n.system_restartServerMessage,
+                                  requireText: server.displayName,
+                                ),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.settings,
+                          title: l10n.more_panel_settings,
+                          subtitle: l10n.panel_settings_base,
+                          onTap: () =>
+                              context.push('/s/$serverId/more/settings'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.adjustments,
+                          title: l10n.more_app_settings,
+                          subtitle: l10n.settings_appearance,
+                          onTap: () => context.push('/settings'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTokens.s24),
+                    Center(
+                      child: Text(
+                        'OneDash · GPL-3.0',
+                        style: AppTextStyles.caption.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

@@ -1,0 +1,30 @@
+# Format: api_file.dart:method
+# Only methods already reachable through a differently named repository/API wrapper
+# or an internal helper flow.
+backup_api.dart:searchBackupAccounts
+backup_api.dart:createBackupAccount
+backup_api.dart:updateBackupAccount
+backup_api.dart:deleteBackupAccount
+backup_api.dart:checkBackupConnection
+host_api.dart:searchCerts
+host_api.dart:createCert
+host_api.dart:deleteCert
+host_api.dart:syncCert
+group_api.dart:searchGroups
+group_api.dart:createGroup
+group_api.dart:updateGroup
+group_api.dart:deleteGroup
+app_api.dart:getInstalledConnInfo
+database_api.dart:changeAccess
+process_api.dart:getListeningProcesses
+host_api.dart:editCert
+host_tool_api.dart:operateSupervisorConfig
+host_tool_api.dart:operateSupervisorProcessFile
+app_api.dart:_postInstalledOp
+app_api.dart:checkInstalledByKey
+firewall_api.dart:createRules
+firewall_api.dart:deleteRules
+
+# Reviewed exceptions for the mobile client.
+# These endpoints are web-only flows, helper/internal calls, or require device
+# file pickers / app-detail context that OneDash does not expose yet.

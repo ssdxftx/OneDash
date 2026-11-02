@@ -5,11 +5,15 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
+import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/website/website_detail_dto.dart';
 import '../../../../data/dto/website/website_dto.dart';
 import '../../../../data/dto/website/website_proxy_dto.dart';
 import '../../../../data/dto/website/website_domain_req.dart';
+import '../../../../data/dto/website/website_log_dto.dart';
+import '../../../../data/dto/website/website_resource_dto.dart';
+import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
@@ -30,6 +34,22 @@ import '../../../common/states/error_state.dart';
 import '../providers/websites_provider.dart';
 import '../../../common/states/error_toast.dart';
 import 'websites_page.dart';
+
+final _websiteLogFuture = FutureProvider.autoDispose
+    .family<List<String>, String>((ref, key) async {
+      final parts = key.split('|');
+      final id = int.tryParse(parts.first) ?? 0;
+      final name = parts.length > 1 ? parts[1] : '';
+      final repository = await ref.watch(fileRepositoryProvider.future);
+      final log = await repository.readRuntimeLog(
+        id: id,
+        type: 'website',
+        name: name,
+        pageSize: 300,
+        latest: true,
+      );
+      return log.lines;
+    }, name: 'websiteLogFuture');
 
 class WebsiteDetailPage extends ConsumerWidget {
   const WebsiteDetailPage({
@@ -66,6 +86,12 @@ class WebsiteDetailPage extends ConsumerWidget {
                   );
                 }
                 if (value == 'open') _open(context, site);
+                if (value == 'advanced') {
+                  context.push('/s/$serverId/websites/${site.id}/advanced');
+                }
+                if (value == 'accounts') {
+                  context.push('/s/$serverId/websites/accounts');
+                }
                 if (value == 'delete') _delete(context, ref, site);
               },
               itemBuilder: (context) => [
@@ -78,6 +104,14 @@ class WebsiteDetailPage extends ConsumerWidget {
                   ),
                 ),
                 PopupMenuItem(value: 'open', child: Text(l10n.websites_open)),
+                PopupMenuItem(
+                  value: 'advanced',
+                  child: Text(l10n.websites_advanced),
+                ),
+                PopupMenuItem(
+                  value: 'accounts',
+                  child: Text(l10n.websites_certificateAccounts),
+                ),
                 PopupMenuItem(
                   value: 'delete',
                   child: Text(l10n.websites_delete),
@@ -104,7 +138,7 @@ class WebsiteDetailPage extends ConsumerWidget {
           children: [
             _ConfigTab(detail: data),
             _DomainsTab(detail: data),
-            _SslTab(detail: data),
+            _SslTab(serverId: serverId, detail: data),
             _ProxyTab(detail: data),
             WebsiteLoadBalanceTab(websiteId: data.website.id),
             _LogsTab(serverId: serverId, detail: data),
@@ -182,7 +216,10 @@ class WebsiteDetailPage extends ConsumerWidget {
     if (uri == null) return;
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (!context.mounted) return;
-      showErrorToast(context, StateError(l10n.websites_openFailed));
+      showErrorToast(
+        context,
+        ApiBusinessException(400, l10n.websites_openFailed),
+      );
     }
   }
 }
@@ -223,6 +260,12 @@ class _ConfigTab extends ConsumerWidget {
           icon: const Icon(TablerIcons.file_code),
           label: Text(l10n.websites_configFile),
         ),
+        const SizedBox(height: AppTokens.s8),
+        OutlinedButton.icon(
+          onPressed: () => _changeDatabase(context, ref, site),
+          icon: const Icon(TablerIcons.database),
+          label: Text(l10n.websites_changeDatabase),
+        ),
         const SizedBox(height: AppTokens.s24),
         SplitListGroup(
           children: [
@@ -236,6 +279,91 @@ class _ConfigTab extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _changeDatabase(
+    BuildContext context,
+    WidgetRef ref,
+    WebsiteDto site,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final resources = await repository.getWebsiteResources(site.id);
+      final databases = await repository.getWebsiteDatabases();
+      if (!context.mounted) return;
+      int selected = 0;
+      final saved = await showAppSheet<bool>(
+        context: context,
+        builder: (sheetContext) => StatefulBuilder(
+          builder: (context, setState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.websites_changeDatabase, style: AppTextStyles.titleL),
+              const SizedBox(height: AppTokens.s8),
+              if (resources.isNotEmpty)
+                Text(
+                  l10n.websites_currentDatabase(
+                    resources
+                        .map((item) => item.name)
+                        .where((name) => name.isNotEmpty)
+                        .join(', '),
+                  ),
+                  style: AppTextStyles.bodyS.copyWith(
+                    color: context.scheme.onSurfaceVariant,
+                  ),
+                ),
+              const SizedBox(height: AppTokens.s16),
+              DropdownButtonFormField<int>(
+                initialValue: selected,
+                decoration: InputDecoration(labelText: l10n.websites_database),
+                items: [
+                  DropdownMenuItem(
+                    value: 0,
+                    child: Text(l10n.websites_unbindDatabase),
+                  ),
+                  for (final db in databases)
+                    DropdownMenuItem(
+                      value: db.id,
+                      child: Text('${db.name} · ${db.type}'),
+                    ),
+                ],
+                onChanged: (value) {
+                  if (value != null) setState(() => selected = value);
+                },
+              ),
+              const SizedBox(height: AppTokens.s16),
+              PrimaryButton(
+                label: l10n.action_save,
+                onPressed: () => Navigator.of(sheetContext).pop(true),
+              ),
+            ],
+          ),
+        ),
+      );
+      if (saved != true || !context.mounted) return;
+      WebsiteDatabaseDto? db;
+      for (final item in databases) {
+        if (item.id == selected) {
+          db = item;
+          break;
+        }
+      }
+      await repository.changeWebsiteDatabase(
+        WebsiteChangeDatabaseReq(
+          websiteID: site.id,
+          databaseID: selected == 0 ? 0 : selected,
+          databaseType: selected == 0 ? '' : db?.type,
+        ),
+      );
+      ref.invalidate(websiteDetailProvider(site.id));
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _editConfig(
@@ -375,13 +503,11 @@ class _DomainsTab extends ConsumerWidget {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (domain.ssl)
-                        Text(
-                          'SSL',
-                          style: AppTextStyles.caption.copyWith(
-                            color: context.scheme.primary,
-                          ),
-                        ),
+                      Switch(
+                        value: domain.ssl,
+                        onChanged: (value) =>
+                            _toggleSsl(context, ref, domain, value),
+                      ),
                       IconButton(
                         tooltip: l10n.websites_removeDomain,
                         onPressed: () => _deleteDomain(context, ref, domain.id),
@@ -447,6 +573,23 @@ class _DomainsTab extends ConsumerWidget {
     }
   }
 
+  Future<void> _toggleSsl(
+    BuildContext context,
+    WidgetRef ref,
+    WebsiteDomainDto domain,
+    bool value,
+  ) async {
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.updateDomainSsl(domain.id, value);
+      ref.invalidate(websiteDetailProvider(detail.website.id));
+    } catch (error) {
+      ref.invalidate(websiteDetailProvider(detail.website.id));
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _deleteDomain(
     BuildContext context,
     WidgetRef ref,
@@ -464,7 +607,7 @@ class _DomainsTab extends ConsumerWidget {
       final repository = await ref.read(websiteRepositoryProvider.future);
       await repository.deleteDomain(id);
       if (!context.mounted) return;
-      AppToast.success(context, l10n.websites_domainDeleted);
+      AppToast.success(context, l10n.websites_proxyDeleted);
       ref.invalidate(websiteDetailProvider(detail.website.id));
     } catch (error) {
       if (!context.mounted) return;
@@ -474,8 +617,9 @@ class _DomainsTab extends ConsumerWidget {
 }
 
 class _SslTab extends StatelessWidget {
-  const _SslTab({required this.detail});
+  const _SslTab({required this.serverId, required this.detail});
 
+  final int serverId;
   final WebsiteDetailDto detail;
 
   @override
@@ -505,6 +649,15 @@ class _SslTab extends StatelessWidget {
               ),
               icon: const Icon(TablerIcons.shield_check),
               label: Text(l10n.websites_bindExistingCertificate),
+            ),
+            const SizedBox(height: AppTokens.s8),
+            OutlinedButton.icon(
+              onPressed: () => context.push(
+                '/s/$serverId/websites/${detail.website.id}/ssl'
+                '?domain=${Uri.encodeComponent(detail.website.primaryDomain)}',
+              ),
+              icon: const Icon(TablerIcons.shield),
+              label: Text(l10n.websites_sslManage),
             ),
           ],
         ),
@@ -550,6 +703,15 @@ class _SslTab extends StatelessWidget {
           icon: const Icon(TablerIcons.shield_check),
           label: Text(l10n.websites_changeCertificate),
         ),
+        const SizedBox(height: AppTokens.s8),
+        OutlinedButton.icon(
+          onPressed: () => context.push(
+            '/s/$serverId/websites/${detail.website.id}/ssl'
+            '?domain=${Uri.encodeComponent(detail.website.primaryDomain)}',
+          ),
+          icon: const Icon(TablerIcons.shield),
+          label: Text(l10n.websites_sslManage),
+        ),
       ],
     );
   }
@@ -564,73 +726,288 @@ class _ProxyTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final proxies = ref.watch(websiteProxiesProvider(detail.website.id));
-    return AsyncStateView(
-      value: proxies,
-      onRetry: () => ref.invalidate(websiteProxiesProvider(detail.website.id)),
-      loading: const SkeletonList(itemCount: 5),
-      isEmpty: (items) => items.isEmpty,
-      empty: EmptyState(
-        icon: TablerIcons.arrows_exchange,
-        title: l10n.websites_noReverseProxy,
-        message: l10n.websites_noReverseProxyHint,
-      ),
-      builder: (items) => ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
-        children: [
-          for (final proxy in items)
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppTokens.s12),
-              child: TonalCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        StatusDot(status: proxy.enable ? 'running' : 'stopped'),
-                        const SizedBox(width: AppTokens.s8),
-                        Expanded(
-                          child: Text(
-                            proxy.name,
-                            style: AppTextStyles.titleS,
-                            maxLines: 1,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppTokens.s16,
+            AppTokens.s16,
+            AppTokens.s16,
+            0,
+          ),
+          child: PrimaryButton(
+            label: l10n.websites_addProxy,
+            icon: TablerIcons.plus,
+            onPressed: () => _edit(context, ref),
+          ),
+        ),
+        Expanded(
+          child: AsyncStateView(
+            value: proxies,
+            onRetry: () =>
+                ref.invalidate(websiteProxiesProvider(detail.website.id)),
+            loading: const SkeletonList(itemCount: 5),
+            isEmpty: (items) => items.isEmpty,
+            empty: EmptyState(
+              icon: TablerIcons.arrows_exchange,
+              title: l10n.websites_noReverseProxy,
+              message: l10n.websites_noReverseProxyHint,
+            ),
+            builder: (items) => ListView(
+              padding: const EdgeInsets.all(AppTokens.s16),
+              children: [
+                for (final proxy in items)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                    child: TonalCard(
+                      onTap: () => _edit(context, ref, proxy),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              StatusDot(
+                                status: proxy.enable ? 'running' : 'stopped',
+                              ),
+                              const SizedBox(width: AppTokens.s8),
+                              Expanded(
+                                child: Text(
+                                  proxy.name,
+                                  style: AppTextStyles.titleS,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Switch(
+                                value: proxy.enable,
+                                onChanged: (value) =>
+                                    _toggle(context, ref, proxy, value),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            '${proxy.match} -> ${proxy.proxyPass}',
+                            style: AppTextStyles.caption.copyWith(
+                              color: context.scheme.onSurfaceVariant,
+                              fontFamily: 'monospace',
+                            ),
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        Switch(
-                          value: proxy.enable,
-                          onChanged: (value) =>
-                              _toggle(context, ref, proxy, value),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '${proxy.match} -> ${proxy.proxyPass}',
-                      style: AppTextStyles.caption.copyWith(
-                        color: context.scheme.onSurfaceVariant,
-                        fontFamily: 'monospace',
+                          const SizedBox(height: AppTokens.s8),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton.icon(
+                                  onPressed: () =>
+                                      _editSource(context, ref, proxy),
+                                  icon: const Icon(
+                                    TablerIcons.file_code,
+                                    size: 16,
+                                  ),
+                                  label: Text(l10n.websites_editSource),
+                                ),
+                                TextButton.icon(
+                                  onPressed: () => _delete(context, ref, proxy),
+                                  icon: const Icon(TablerIcons.trash, size: 16),
+                                  label: Text(l10n.action_delete),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: context.appColors.danger,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: AppTokens.s8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: () => _delete(context, ref, proxy),
-                        icon: const Icon(TablerIcons.trash, size: 16),
-                        label: Text(l10n.action_delete),
-                        style: TextButton.styleFrom(
-                          foregroundColor: context.appColors.danger,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _edit(
+    BuildContext context,
+    WidgetRef ref, [
+    WebsiteProxyDto? current,
+  ]) async {
+    final l10n = AppLocalizations.of(context);
+    final name = TextEditingController(text: current?.name ?? '');
+    final match = TextEditingController(text: current?.match ?? '/');
+    final pass = TextEditingController(text: current?.proxyPass ?? '');
+    final host = TextEditingController(text: current?.proxyHost ?? r'$host');
+    bool enable = current?.enable ?? true;
+    bool sni = current?.sni ?? false;
+    bool sslVerify = current?.sslVerify ?? false;
+    String? formError;
+    final saved = await showAppSheet<bool>(
+      context: context,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setState) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              current == null
+                  ? l10n.websites_addProxy
+                  : l10n.websites_editProxy,
+              style: AppTextStyles.titleL,
+            ),
+            const SizedBox(height: AppTokens.s16),
+            AppTextField(controller: name, label: l10n.websites_proxyName),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: match,
+              label: l10n.websites_proxyMatch,
+              hint: '/',
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: pass,
+              label: l10n.websites_proxyPass,
+              hint: 'http://127.0.0.1:8080',
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: host,
+              label: l10n.websites_proxyHost,
+              hint: r'$host',
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.websites_enabled),
+              value: enable,
+              onChanged: (value) => setState(() => enable = value),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.websites_sni),
+              value: sni,
+              onChanged: (value) => setState(() => sni = value),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.websites_sslVerify),
+              value: sslVerify,
+              onChanged: (value) => setState(() => sslVerify = value),
+            ),
+            if (formError != null) ...[
+              const SizedBox(height: AppTokens.s8),
+              Text(
+                formError!,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: sheetContext.appColors.danger,
                 ),
               ),
+            ],
+            const SizedBox(height: AppTokens.s16),
+            PrimaryButton(
+              label: l10n.action_save,
+              onPressed: () {
+                final proxyName = name.text.trim();
+                final proxyPass = pass.text.trim();
+                if (proxyName.isEmpty || proxyPass.isEmpty) {
+                  setState(() => formError = l10n.websites_proxyRequired);
+                  return;
+                }
+                Navigator.of(sheetContext).pop(true);
+              },
             ),
+          ],
+        ),
+      ),
+    );
+    final payload = {
+      'id': current?.id ?? 0,
+      'operate': current == null ? 'create' : 'update',
+      'name': name.text.trim(),
+      'match': match.text.trim(),
+      'proxyPass': pass.text.trim(),
+      'proxyHost': host.text.trim(),
+      'enable': enable,
+      'cache': current?.cache ?? false,
+      'sni': sni,
+      'sslVerify': sslVerify,
+      'proxySSLName': current?.proxySSLName ?? '',
+      'cors': current?.cors ?? false,
+      'allowOrigins': current?.allowOrigins ?? '',
+      'allowMethods': current?.allowMethods ?? '',
+      'allowHeaders': current?.allowHeaders ?? '',
+      'allowCredentials': current?.allowCredentials ?? false,
+      'preflight': current?.preflight ?? false,
+    };
+    name.dispose();
+    match.dispose();
+    pass.dispose();
+    host.dispose();
+    if (saved != true || !context.mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.updateWebsiteProxy(payload);
+      ref.invalidate(websiteProxiesProvider(detail.website.id));
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _editSource(
+    BuildContext context,
+    WidgetRef ref,
+    WebsiteProxyDto proxy,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController(text: proxy.content);
+    final saved = await showAppSheet<bool>(
+      context: context,
+      maxHeightFactor: 0.92,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.websites_editSource, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s4),
+          Text(
+            proxy.name,
+            style: AppTextStyles.caption.copyWith(
+              color: sheetContext.scheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AppTokens.s16),
+          AppTextField(controller: controller, maxLines: 18),
+          const SizedBox(height: AppTokens.s16),
+          PrimaryButton(
+            label: l10n.action_save,
+            onPressed: () => Navigator.of(sheetContext).pop(true),
+          ),
         ],
       ),
     );
+    final content = controller.text;
+    controller.dispose();
+    if (saved != true || !context.mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.updateWebsiteProxyFile(
+        detail.website.id,
+        proxy.name,
+        content,
+      );
+      ref.invalidate(websiteProxiesProvider(detail.website.id));
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _toggle(
@@ -672,7 +1049,7 @@ class _ProxyTab extends ConsumerWidget {
       await repository.deleteWebsiteProxy(detail.website.id, proxy.name);
       ref.invalidate(websiteProxiesProvider(detail.website.id));
       if (!context.mounted) return;
-      AppToast.success(context, l10n.websites_domainDeleted);
+      AppToast.success(context, l10n.websites_proxyDeleted);
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);
@@ -685,6 +1062,81 @@ class _LogsTab extends ConsumerWidget {
 
   final int serverId;
   final WebsiteDetailDto detail;
+
+  Future<void> _showLog(
+    BuildContext context,
+    WidgetRef ref,
+    String name,
+    String title,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final key = '${detail.website.id}|$name';
+    await showAppSheet<void>(
+      context: context,
+      maxHeightFactor: 0.9,
+      builder: (sheetContext) {
+        final log = ref.watch(_websiteLogFuture(key));
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(child: Text(title, style: AppTextStyles.titleL)),
+                IconButton(
+                  tooltip: l10n.action_refresh,
+                  icon: const Icon(TablerIcons.refresh),
+                  onPressed: () => ref.invalidate(_websiteLogFuture(key)),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTokens.s8),
+            if (log.isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (log.hasError)
+              Text(describeError(log.error!, l10n))
+            else if ((log.valueOrNull ?? const []).isEmpty)
+              Text(l10n.state_empty)
+            else
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    for (final line in log.valueOrNull ?? const [])
+                      Text(
+                        line,
+                        style: AppTextStyles.caption.copyWith(
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _toggleLog(
+    BuildContext context,
+    WidgetRef ref,
+    WebsiteLogType type,
+    bool value,
+  ) async {
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.operateWebsiteLog(
+        detail.website.id,
+        type: type,
+        operate: value ? 'enable' : 'disable',
+      );
+      ref.invalidate(websiteDetailProvider(detail.website.id));
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -713,7 +1165,44 @@ class _LogsTab extends ConsumerWidget {
                 '/s/$serverId/files?path=${Uri.encodeComponent(detail.errorLogPath)}',
               ),
             ),
+            SplitListTile(
+              leading: const Icon(TablerIcons.file_text),
+              title: l10n.websites_viewAccessLog,
+              subtitle: l10n.websites_liveLogHint,
+              trailing: const Icon(TablerIcons.eye),
+              onTap: () =>
+                  _showLog(context, ref, 'access.log', l10n.websites_accessLog),
+            ),
+            SplitListTile(
+              leading: const Icon(TablerIcons.file_alert),
+              title: l10n.websites_viewErrorLog,
+              subtitle: l10n.websites_liveLogHint,
+              trailing: const Icon(TablerIcons.eye),
+              onTap: () =>
+                  _showLog(context, ref, 'error.log', l10n.websites_errorLog),
+            ),
           ],
+        ),
+        const SizedBox(height: AppTokens.s16),
+        TonalCard(
+          child: Column(
+            children: [
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.websites_accessLog),
+                value: detail.accessLog,
+                onChanged: (value) =>
+                    _toggleLog(context, ref, WebsiteLogType.access, value),
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.websites_errorLog),
+                value: detail.errorLog,
+                onChanged: (value) =>
+                    _toggleLog(context, ref, WebsiteLogType.error, value),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: AppTokens.s16),
         Text(

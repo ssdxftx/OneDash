@@ -16,6 +16,7 @@ import '../dto/common/page_result.dart';
 import '../dto/file/file_ai_search_dto.dart';
 import '../dto/file/file_favorite_dto.dart';
 import '../dto/file/file_item_dto.dart';
+import '../dto/file/file_log_dto.dart';
 import '../dto/file/user_group_dto.dart';
 import '../dto/file/file_share_dto.dart';
 
@@ -89,6 +90,23 @@ class FileRepositoryImpl implements FileRepository {
 
   @override
   Future<int> getFileSize(String path) => _fileApi.getFileSize(path);
+
+  @override
+  Future<FileLogDto> readRuntimeLog({
+    required int id,
+    required String type,
+    String name = '',
+    int page = 1,
+    int pageSize = 200,
+    bool latest = false,
+  }) => _fileApi.readRuntimeLog(
+    id: id,
+    type: type,
+    name: name,
+    page: page,
+    pageSize: pageSize,
+    latest: latest,
+  );
 
   @override
   Future<bool> getRecycleStatus() => _fileApi.getRecycleStatus();

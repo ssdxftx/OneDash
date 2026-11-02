@@ -50,6 +50,9 @@ class _ServerShellScaffold extends ConsumerWidget {
         ),
         child: NavigationBar(
           selectedIndex: navigationShell.currentIndex,
+          labelBehavior: MediaQuery.textScalerOf(context).scale(1) > 1.2
+              ? NavigationDestinationLabelBehavior.onlyShowSelected
+              : NavigationDestinationLabelBehavior.alwaysShow,
           onDestinationSelected: (index) {
             HapticFeedback.selectionClick();
             navigationShell.goBranch(

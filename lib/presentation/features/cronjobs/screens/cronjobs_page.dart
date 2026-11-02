@@ -1,32 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/dto/cronjob/cronjob_dto.dart';
 import '../../../../data/repositories_impl/cronjob_repository_impl.dart';
+import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/skeleton.dart';
-import '../../../common/components/split_list_group.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
-
-final _cronjobsProvider = FutureProvider.autoDispose<PageResult<CronjobDto>>((
-  ref,
-) {
-  return ref
-      .watch(cronjobRepositoryProvider.future)
-      .then(
-        (repository) => repository.searchCronjobs({'page': 1, 'pageSize': 100}),
-      );
-}, name: 'cronjobsProvider');
+import '../providers/cronjobs_provider.dart';
+import '../widgets/cronjob_records_sheet.dart';
 
 class CronjobsPage extends ConsumerWidget {
   const CronjobsPage({super.key, required this.serverId});
@@ -36,7 +28,7 @@ class CronjobsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final cronjobs = ref.watch(_cronjobsProvider);
+    final cronjobs = ref.watch(cronjobsProvider);
     return Scaffold(
       appBar: AppBarLarge(
         title: l10n.cronjobs_title,
@@ -44,13 +36,18 @@ class CronjobsPage extends ConsumerWidget {
           AppIconButton(
             icon: TablerIcons.refresh,
             tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_cronjobsProvider),
+            onPressed: () => ref.invalidate(cronjobsProvider),
+          ),
+          AppIconButton(
+            icon: TablerIcons.plus,
+            tooltip: l10n.cronjobs_create,
+            onPressed: () => context.push('/s/$serverId/more/cronjobs/form'),
           ),
         ],
       ),
       body: AsyncStateView(
         value: cronjobs,
-        onRetry: () => ref.invalidate(_cronjobsProvider),
+        onRetry: () => ref.invalidate(cronjobsProvider),
         loading: const SkeletonList(itemCount: 8),
         isEmpty: (data) => data.items.isEmpty,
         empty: EmptyState(
@@ -67,6 +64,7 @@ class CronjobsPage extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: AppTokens.s12),
               child: _CronjobCard(
                 item: item,
+                onTap: () => _showActions(context, ref, item),
                 onLongPress: () => _showActions(context, ref, item),
               ),
             );
@@ -83,80 +81,151 @@ class CronjobsPage extends ConsumerWidget {
   ) async {
     final l10n = AppLocalizations.of(context);
     final enabled = item.status.toLowerCase() == 'enable';
+    final colors = context.appColors;
     await showAppSheet<void>(
       context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(item.name, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s4),
-          Text(
-            item.spec,
-            style: AppTextStyles.bodyS.copyWith(
-              color: context.scheme.onSurfaceVariant,
+      maxHeightFactor: 0.85,
+      builder: (sheetContext) => ActionSheetScaffold(
+        infoCard: ActionSheetInfoCard(
+          leading: Container(
+            decoration: BoxDecoration(
+              color: (enabled ? colors.success : colors.info).withValues(
+                alpha: 0.1,
+              ),
+              borderRadius: BorderRadius.circular(AppTokens.rMd),
+            ),
+            child: Icon(
+              TablerIcons.clock,
+              color: enabled ? colors.success : colors.info,
+              size: AppTokens.iconNav,
             ),
           ),
-          const SizedBox(height: AppTokens.s16),
-          SplitListGroup(
-            children: [
-              SplitListTile(
-                leading: const Icon(TablerIcons.player_play),
-                title: l10n.cronjobs_runOnce,
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  await _run(context, ref, item, () async {
-                    final repository = await ref.read(
-                      cronjobRepositoryProvider.future,
-                    );
-                    await repository.handleOnce(item.id);
-                  });
-                },
-              ),
-              SplitListTile(
-                leading: Icon(
-                  enabled ? TablerIcons.player_pause : TablerIcons.player_play,
-                ),
-                title: enabled ? l10n.cronjobs_disable : l10n.cronjobs_enable,
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  await _run(context, ref, item, () async {
-                    final repository = await ref.read(
-                      cronjobRepositoryProvider.future,
-                    );
-                    await repository.updateStatus(
-                      item.id,
-                      enabled ? 'disable' : 'enable',
-                    );
-                  });
-                },
-              ),
-              SplitListTile(
-                leading: const Icon(TablerIcons.trash),
-                title: l10n.action_delete,
-                danger: true,
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  final confirmed = await showConfirmSheet(
-                    context,
-                    title: l10n.action_delete,
-                    message: item.name,
-                    confirmLabel: l10n.action_delete,
-                  );
-                  if (!confirmed) return;
-                  if (!context.mounted) return;
-                  await _run(context, ref, item, () async {
-                    final repository = await ref.read(
-                      cronjobRepositoryProvider.future,
-                    );
-                    await repository.deleteCronjob([item.id]);
-                  });
-                },
-              ),
-            ],
+          title: item.name,
+          subtitle: item.spec,
+          trailing: ActionSheetStatusPill(
+            label: enabled ? l10n.cronjobs_enabled : l10n.cronjobs_disabled,
+            color: enabled ? colors.success : colors.info,
           ),
-          const SizedBox(height: AppTokens.s8),
-        ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ActionSheetSection(
+              title: l10n.cronjobs_actions,
+              icon: TablerIcons.player_play,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.player_play,
+                  iconColor: colors.success,
+                  title: l10n.cronjobs_runOnce,
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await _run(context, ref, item, () async {
+                      final repository = await ref.read(
+                        cronjobRepositoryProvider.future,
+                      );
+                      await repository.handleOnce(item.id);
+                    });
+                  },
+                ),
+                ActionSheetRow(
+                  icon: enabled
+                      ? TablerIcons.player_pause
+                      : TablerIcons.player_play,
+                  iconColor: colors.warning,
+                  title: enabled ? l10n.cronjobs_disable : l10n.cronjobs_enable,
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await _run(context, ref, item, () async {
+                      final repository = await ref.read(
+                        cronjobRepositoryProvider.future,
+                      );
+                      await repository.updateStatus(
+                        item.id,
+                        enabled ? 'disable' : 'enable',
+                      );
+                    });
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.clock_stop,
+                  iconColor: colors.warning,
+                  title: l10n.cronjobs_stopRunning,
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await _run(context, ref, item, () async {
+                      final repository = await ref.read(
+                        cronjobRepositoryProvider.future,
+                      );
+                      await repository.stopCronjob(item.id);
+                    });
+                  },
+                ),
+              ],
+            ),
+            ActionSheetSection(
+              title: l10n.cronjobs_records,
+              icon: TablerIcons.history,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.edit,
+                  iconColor: colors.chart2,
+                  title: l10n.cronjobs_edit,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/$serverId/more/cronjobs/form?id=${item.id}',
+                    );
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.history,
+                  iconColor: colors.info,
+                  title: l10n.cronjobs_records,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    showAppSheet<void>(
+                      context: context,
+                      maxHeightFactor: 0.85,
+                      builder: (sheetContext) =>
+                          CronjobRecordsSheet(cronjob: item),
+                    );
+                  },
+                ),
+              ],
+            ),
+            ActionSheetSection(
+              title: l10n.containers_groupDanger,
+              icon: TablerIcons.alert_triangle,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.trash,
+                  iconColor: colors.danger,
+                  title: l10n.action_delete,
+                  danger: true,
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    final confirmed = await showConfirmSheet(
+                      context,
+                      title: l10n.cronjobs_deleteTitle(item.name),
+                      message: l10n.cronjobs_deleteMessage,
+                      confirmLabel: l10n.action_delete,
+                      requireText: item.name,
+                    );
+                    if (!confirmed || !context.mounted) return;
+                    await _run(context, ref, item, () async {
+                      final repository = await ref.read(
+                        cronjobRepositoryProvider.future,
+                      );
+                      await repository.deleteCronjob([item.id]);
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -172,7 +241,7 @@ class CronjobsPage extends ConsumerWidget {
       await action();
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);
-      ref.invalidate(_cronjobsProvider);
+      ref.invalidate(cronjobsProvider);
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);
@@ -181,9 +250,14 @@ class CronjobsPage extends ConsumerWidget {
 }
 
 class _CronjobCard extends StatelessWidget {
-  const _CronjobCard({required this.item, required this.onLongPress});
+  const _CronjobCard({
+    required this.item,
+    required this.onTap,
+    required this.onLongPress,
+  });
 
   final CronjobDto item;
+  final VoidCallback onTap;
   final VoidCallback onLongPress;
 
   @override
@@ -192,6 +266,7 @@ class _CronjobCard extends StatelessWidget {
     final scheme = context.scheme;
     final enabled = item.status.toLowerCase() == 'enable';
     return TonalCard(
+      onTap: onTap,
       onLongPress: onLongPress,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

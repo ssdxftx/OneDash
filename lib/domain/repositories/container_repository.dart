@@ -56,6 +56,7 @@ abstract interface class ContainerRepository {
 
   /// 获取容器磁盘占用统计。
   Future<ContainerItemStatsDto> getItemStats();
+  Future<List<String>> loadContainerUsers(String containerName);
 
   /// 获取 Docker daemon 配置。
   Future<ContainerDaemonConfigDto> getDaemonConfig();
@@ -132,7 +133,10 @@ abstract interface class ContainerRepository {
   Future<String> createContainer(Map<String, dynamic> data);
 
   /// 等待容器创建任务结束。
-  Future<void> waitForTask(String taskID);
+  Future<void> waitForTask(
+    String taskID, {
+    void Function(TaskLogDto log)? onUpdate,
+  });
 
   /// 更新容器。
   Future<void> updateContainer(Map<String, dynamic> data);

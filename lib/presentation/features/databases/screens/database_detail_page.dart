@@ -19,6 +19,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../providers/database_detail_provider.dart';
+import '../widgets/database_advanced_tab.dart';
 import '../widgets/database_users_tab.dart';
 import '../../../common/states/error_toast.dart';
 
@@ -92,7 +93,11 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
         onRetry: () => ref.invalidate(databaseDetailProvider(_key)),
         loading: const SkeletonList(itemCount: 6),
         builder: (state) => SegmentedTabsView(
-          labels: [l10n.databases_title, l10n.databases_usersGrants],
+          labels: [
+            l10n.databases_title,
+            l10n.databases_usersGrants,
+            l10n.databases_advanced,
+          ],
           children: [
             ListView(
               padding: const EdgeInsets.all(AppTokens.s16),
@@ -164,23 +169,29 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => _changePassword(state.item.id),
-                        icon: const Icon(TablerIcons.key),
-                        label: Text(l10n.databases_changePassword),
+                        onPressed: () => _showStatus(state),
+                        icon: const Icon(TablerIcons.activity),
+                        label: Text(l10n.databases_status),
                       ),
                     ),
                     const SizedBox(width: AppTokens.s12),
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: _delete,
-                        icon: const Icon(TablerIcons.trash),
-                        label: Text(l10n.databases_deleteDatabase),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: context.appColors.danger,
-                        ),
+                        onPressed: () => _changePassword(state.item.id),
+                        icon: const Icon(TablerIcons.key),
+                        label: Text(l10n.databases_changePassword),
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: AppTokens.s12),
+                OutlinedButton.icon(
+                  onPressed: _delete,
+                  icon: const Icon(TablerIcons.trash),
+                  label: Text(l10n.databases_deleteDatabase),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: context.appColors.danger,
+                  ),
                 ),
               ],
             ),
@@ -188,6 +199,11 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
               item: state.item,
               type: widget.type,
               instance: widget.instance,
+            ),
+            DatabaseAdvancedTab(
+              type: widget.type,
+              instance: widget.instance,
+              databaseName: widget.databaseName,
             ),
           ],
         ),
@@ -205,6 +221,44 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
     final value = state.connection[key];
     if (value != null && '$value'.isNotEmpty) return '$value';
     return '-';
+  }
+
+  Future<void> _showStatus(DatabaseDetailState state) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      final status = await repository.getStatus(
+        type: widget.type,
+        name: state.item.name,
+      );
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.databases_status, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s16),
+            if (status.isEmpty)
+              Text(l10n.state_empty)
+            else
+              SplitListGroup(
+                children: [
+                  for (final entry in status.entries)
+                    SplitListTile(
+                      title: entry.key,
+                      trailing: Text(entry.value),
+                    ),
+                ],
+              ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _setRemoteAccess(bool value) async {
@@ -301,13 +355,26 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
         requireText: widget.databaseName,
       );
       if (!confirmed) return;
-      await repository.deleteDatabase(
-        id: state.item.id,
-        type: widget.type,
-        database: widget.instance,
-        forceDelete: false,
-        deleteBackup: false,
-      );
+      if (widget.type.startsWith('postgresql')) {
+        await repository.deletePgDatabase(
+          id: state.item.id,
+          type: widget.type,
+          database: widget.instance,
+        );
+      } else if (widget.type == 'mongodb') {
+        await repository.deleteMongoDatabase(
+          id: state.item.id,
+          database: widget.instance,
+        );
+      } else {
+        await repository.deleteDatabase(
+          id: state.item.id,
+          type: widget.type,
+          database: widget.instance,
+          forceDelete: false,
+          deleteBackup: false,
+        );
+      }
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
       Navigator.of(context).pop();

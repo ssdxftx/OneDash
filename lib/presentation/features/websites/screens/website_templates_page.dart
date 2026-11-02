@@ -57,6 +57,17 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
   }
 
   Future<void> _openEditor([WebsiteTemplateDto? template]) async {
+    if (template != null) {
+      try {
+        final repository = await ref.read(websiteRepositoryProvider.future);
+        template = await repository.getTemplate(template.id);
+      } catch (error) {
+        if (!mounted) return;
+        showErrorToast(context, error);
+        return;
+      }
+      if (!mounted) return;
+    }
     await showAppSheet<bool>(
       context: context,
       maxHeightFactor: 0.95,

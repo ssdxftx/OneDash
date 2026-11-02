@@ -1,3 +1,4 @@
+import '../../data/dto/cronjob/cronjob_form_data_dto.dart';
 import 'package:dio/dio.dart';
 
 import '../../data/dto/common/page_result.dart';
@@ -38,6 +39,7 @@ abstract interface class WebsiteRepository {
 
   /// 查询网站详情
   Future<WebsiteDetailDto> getWebsite(int id);
+  Future<List<WebsiteOptionDto>> getWebsiteOptions();
 
   /// 查询 OpenResty 运行状态。
   Future<OpenRestyStatusDto> getOpenRestyStatus();

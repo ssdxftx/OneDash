@@ -14,9 +14,11 @@ Page<void> fadePage(GoRouterState state, Widget child) {
     transitionDuration: AppTokens.dBase,
     reverseTransitionDuration: AppTokens.dBase,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (context.reduceMotion) return child;
       final curved = CurvedAnimation(
         parent: animation,
         curve: AppTokens.curveBase,
+        reverseCurve: AppTokens.curveBase,
       );
       return FadeTransition(opacity: curved, child: child);
     },
@@ -33,8 +35,8 @@ Page<void> slidePage(GoRouterState state, Widget child) {
       if (context.reduceMotion) return child;
       final curved = CurvedAnimation(
         parent: animation,
-        curve: Curves.easeOutCubic,
-        reverseCurve: Curves.easeInCubic,
+        curve: AppTokens.curveBase,
+        reverseCurve: AppTokens.curveBase,
       );
       return SlideTransition(
         position: Tween<Offset>(

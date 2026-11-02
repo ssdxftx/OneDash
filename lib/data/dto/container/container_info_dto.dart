@@ -55,6 +55,35 @@ class ContainerInfoDto {
   final List<String> env;
   final String restartPolicy;
 
+  Map<String, dynamic> toJson() => {
+    'taskID': taskID,
+    'forcePull': forcePull,
+    'name': name,
+    'image': image,
+    'hostname': hostname,
+    'domainName': domainName,
+    'dns': dns ?? const [],
+    'networks': networks.map((item) => item.toJson()).toList(),
+    'publishAllPorts': publishAllPorts,
+    'exposedPorts': exposedPorts.map((item) => item.toJson()).toList(),
+    'tty': tty,
+    'openStdin': openStdin,
+    'workingDir': workingDir,
+    'user': user,
+    'cmd': cmd ?? const [],
+    'entrypoint': entrypoint ?? const [],
+    'cpuShares': cpuShares,
+    'nanoCPUs': nanoCPUs,
+    'memory': memory,
+    'privileged': privileged,
+    'autoRemove': autoRemove,
+    'volumes': volumes.map((item) => item.toJson()).toList(),
+    'extraHosts': extraHosts ?? const [],
+    'labels': labels,
+    'env': env,
+    'restartPolicy': restartPolicy,
+  };
+
   factory ContainerInfoDto.fromJson(Map<String, dynamic> json) {
     return ContainerInfoDto(
       taskID: json['taskID'] as String? ?? '',

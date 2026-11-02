@@ -4,12 +4,17 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../data/dto/app/app_detail_dto.dart';
+import '../../../../data/dto/app/app_installed_check_req.dart';
+import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../../common/components/app_toast.dart';
 import '../../../common/states/async_state_view.dart';
+import '../../../common/states/error_toast.dart';
 import '../providers/app_store_provider.dart';
 import '../widgets/app_install_sheet.dart';
 
@@ -80,18 +85,47 @@ class AppDetailPage extends ConsumerWidget {
             ],
             const SizedBox(height: AppTokens.s24),
             PrimaryButton(
-              label: l10n.apps_install,
-              icon: TablerIcons.download,
-              onPressed: () => showAppSheet<bool>(
-                context: context,
-                maxHeightFactor: 0.95,
-                builder: (_) => AppInstallSheet(app: app),
-              ),
+              label: app.installed ? l10n.apps_installed : l10n.apps_install,
+              icon: app.installed
+                  ? TablerIcons.circle_check
+                  : TablerIcons.download,
+              onPressed: app.installed
+                  ? null
+                  : () => _install(context, ref, app),
             ),
             const SizedBox(height: AppTokens.s32),
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _install(
+    BuildContext context,
+    WidgetRef ref,
+    AppDetailDto app,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      final check = await repository.checkAppInstalled(
+        AppInstalledCheckReq(key: app.key, name: app.name),
+      );
+      if (!context.mounted) return;
+      if (check.isExist) {
+        AppToast.warning(context, l10n.apps_alreadyInstalled);
+        return;
+      }
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+      return;
+    }
+    if (!context.mounted) return;
+    await showAppSheet<bool>(
+      context: context,
+      maxHeightFactor: 0.95,
+      builder: (_) => AppInstallSheet(app: app),
     );
   }
 }

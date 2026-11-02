@@ -25,52 +25,14 @@ class AppBarLarge extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = context.scheme;
     return AppBar(
       toolbarHeight: preferredSize.height,
       leading: leading,
       actions: actions,
-      title: GestureDetector(
-        onLongPress: onTitleLongPress,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Text(
-                    title,
-                    style: AppTextStyles.headline.copyWith(
-                      color: scheme.onSurface,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (onTitleLongPress != null) ...[
-                  const SizedBox(width: AppTokens.s4),
-                  Icon(
-                    TablerIcons.chevron_down,
-                    size: 18,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ],
-              ],
-            ),
-            if (subtitle != null)
-              Text(
-                subtitle!,
-                style: AppTextStyles.bodyS.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-          ],
-        ),
+      title: _TitleBlock(
+        title: title,
+        subtitle: subtitle,
+        onTap: onTitleLongPress,
       ),
     );
   }
@@ -108,49 +70,75 @@ class SliverAppBarLarge extends StatelessWidget {
       actions: actions,
       leading: leading,
       flexibleSpace: flexibleSpace,
-      title: GestureDetector(
-        onLongPress: onTitleLongPress,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Text(
-                    title,
-                    style: AppTextStyles.headline.copyWith(
-                      color: scheme.onSurface,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (onTitleLongPress != null) ...[
-                  const SizedBox(width: AppTokens.s4),
-                  Icon(
-                    TablerIcons.chevron_down,
-                    size: 18,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ],
-              ],
-            ),
-            if (subtitle != null)
-              Text(
-                subtitle!,
-                style: AppTextStyles.bodyS.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-          ],
-        ),
+      title: _TitleBlock(
+        title: title,
+        subtitle: subtitle,
+        onTap: onTitleLongPress,
       ),
+    );
+  }
+}
+
+class _TitleBlock extends StatelessWidget {
+  const _TitleBlock({required this.title, this.subtitle, this.onTap});
+
+  final String title;
+  final String? subtitle;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.scheme;
+    final interactive = onTap != null;
+    final block = GestureDetector(
+      onTap: onTap,
+      onLongPress: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Text(
+                  title,
+                  style: AppTextStyles.headline.copyWith(
+                    color: scheme.onSurface,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (interactive) ...[
+                const SizedBox(width: AppTokens.s4),
+                Icon(
+                  TablerIcons.chevron_down,
+                  size: 18,
+                  color: scheme.onSurfaceVariant,
+                  semanticLabel: null,
+                ),
+              ],
+            ],
+          ),
+          if (subtitle != null)
+            Text(
+              subtitle!,
+              style: AppTextStyles.bodyS.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+        ],
+      ),
+    );
+    return Semantics(
+      button: interactive,
+      label: title,
+      child: ExcludeSemantics(child: block),
     );
   }
 }

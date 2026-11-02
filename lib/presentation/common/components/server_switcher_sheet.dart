@@ -4,12 +4,14 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/localization/generated/app_localizations.dart';
+import '../states/error_mapper.dart';
 import '../states/error_toast.dart';
 import '../../../core/theme/tokens.dart';
 import '../../features/servers/providers/servers_provider.dart';
 import 'bottom_sheet_surface.dart';
 import 'split_list_group.dart';
-import 'status_dot.dart';
+import 'skeleton.dart';
+import '../states/error_state.dart';
 
 Future<void> showServerSwitcher(
   BuildContext context,
@@ -38,11 +40,20 @@ class _ServerSwitcherBody extends ConsumerWidget {
         Text(l10n.servers_title, style: AppTextStyles.titleL),
         const SizedBox(height: AppTokens.s16),
         servers.when(
-          loading: () => const Padding(
-            padding: EdgeInsets.symmetric(vertical: AppTokens.s24),
-            child: Center(child: CircularProgressIndicator()),
+          loading: () => const SkeletonShimmer(
+            child: Column(
+              children: [
+                SkeletonCard(height: 64),
+                SkeletonCard(height: 64),
+                SkeletonCard(height: 64),
+              ],
+            ),
           ),
-          error: (error, _) => Text(describeError(error, l10n)),
+          error: (error, _) => ErrorState(
+            compact: true,
+            data: mapError(error, l10n),
+            onRetry: () => ref.invalidate(serversProvider),
+          ),
           data: (items) => Column(
             children: [
               SplitListGroup(
@@ -58,13 +69,22 @@ class _ServerSwitcherBody extends ConsumerWidget {
                               color: Theme.of(context).colorScheme.primary,
                               size: AppTokens.iconList,
                             )
-                          : const StatusDot(status: 'running'),
+                          : const Icon(
+                              TablerIcons.chevron_right,
+                              size: AppTokens.iconList,
+                            ),
                       onTap: () async {
                         final navigator = Navigator.of(context);
                         final router = GoRouter.of(context);
-                        await ref
-                            .read(serversProvider.notifier)
-                            .touch(server.id);
+                        try {
+                          await ref
+                              .read(serversProvider.notifier)
+                              .touch(server.id);
+                        } catch (error) {
+                          if (!context.mounted) return;
+                          showErrorToast(context, error);
+                          return;
+                        }
                         navigator.pop();
                         if (server.id != currentServerId) {
                           router.go('/s/${server.id}/overview');

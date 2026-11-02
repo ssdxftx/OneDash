@@ -45,6 +45,24 @@ class SettingRepositoryImpl implements SettingRepository {
   }) => _settingApi.updateCoreSetting(key: key, value: value);
 
   @override
+  Future<void> saveDescription({
+    required String id,
+    required String type,
+    String detailType = '',
+    required bool isPinned,
+    required String description,
+  }) => _settingApi.saveDescription(
+    id: id,
+    type: type,
+    detailType: detailType,
+    isPinned: isPinned,
+    description: description,
+  );
+
+  @override
+  Future<void> saveMemo(String content) => _settingApi.saveMemo(content);
+
+  @override
   Future<void> updatePassword({
     required String oldPassword,
     required String newPassword,

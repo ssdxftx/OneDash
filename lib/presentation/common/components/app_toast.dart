@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../../core/theme/tokens.dart';
+
 enum AppToastType { success, error, warning, info }
 
 abstract final class AppToast {
@@ -24,12 +26,15 @@ abstract final class AppToast {
       autoCloseDuration: duration,
       showProgressBar: false,
       margin: EdgeInsets.only(
-        top: MediaQuery.paddingOf(context).top + 12,
-        left: 16,
-        right: 16,
+        top: MediaQuery.paddingOf(context).top + AppTokens.toastMargin,
+        left: AppTokens.s16,
+        right: AppTokens.s16,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      borderRadius: BorderRadius.circular(14),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTokens.s16,
+        vertical: AppTokens.s12,
+      ),
+      borderRadius: BorderRadius.circular(AppTokens.rMd),
       title: Text(message),
     );
   }

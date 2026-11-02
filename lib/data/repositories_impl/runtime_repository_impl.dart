@@ -3,11 +3,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/network/dio_client_provider.dart';
 import '../../domain/repositories/runtime_repository.dart';
+import '../dto/file/file_log_dto.dart';
 import '../../presentation/features/server_detail/providers/active_server_provider.dart';
 import '../api/file_api.dart';
 import '../api/runtime_api.dart';
 import '../dto/common/page_result.dart';
-import '../dto/common/task_log_dto.dart';
 import '../dto/runtime/node_script_dto.dart';
 import '../dto/runtime/runtime_dto.dart';
 
@@ -55,7 +55,7 @@ class RuntimeRepositoryImpl implements RuntimeRepository {
       _api.getNodeScripts(codeDir);
 
   @override
-  Future<TaskLogDto> readRuntimeLog({required int id, required String type}) =>
+  Future<FileLogDto> readRuntimeLog({required int id, required String type}) =>
       _fileApi.readRuntimeLog(id: id, type: type);
 
   @override

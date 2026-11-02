@@ -3172,7 +3172,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get task_timeoutTitle => '任务超时';
 
   @override
-  String get task_failedNoDetail => '任务执行失败，请查看面板日志。';
+  String get task_failedNoDetail => '请查看面板日志。';
 
   @override
   String get task_timeoutMessage => '任务仍在执行，请稍后刷新列表。';
@@ -3182,4 +3182,1760 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get containers_continueInBackground => '转到后台继续';
+
+  @override
+  String get files_folder => '文件夹';
+
+  @override
+  String get task_runningHint => '正在执行…';
+
+  @override
+  String get containers_groupMaintenance => '运维维护';
+
+  @override
+  String get containers_viewLogs => '查看日志';
+
+  @override
+  String get containers_liveMonitor => '实时监控';
+
+  @override
+  String get containers_groupLifecycle => '生命周期';
+
+  @override
+  String get containers_resume => '恢复';
+
+  @override
+  String get containers_kill => '强制停止';
+
+  @override
+  String get containers_groupConfig => '配置';
+
+  @override
+  String get containers_edit => '编辑容器';
+
+  @override
+  String get containers_editSubtitle => '修改镜像、端口、挂载与资源限制';
+
+  @override
+  String get containers_upgrade => '升级容器';
+
+  @override
+  String get containers_upgradeSubtitle => '使用新镜像重建容器';
+
+  @override
+  String get containers_commit => '制作镜像';
+
+  @override
+  String get containers_commitSubtitle => '把当前容器保存为镜像';
+
+  @override
+  String get containers_groupDanger => '危险区域';
+
+  @override
+  String get containers_remove => '删除容器';
+
+  @override
+  String get containers_removeSubtitle => '停止并移除该容器';
+
+  @override
+  String get containers_forcePull => '始终拉取最新镜像';
+
+  @override
+  String get containers_newImageName => '新镜像名称';
+
+  @override
+  String get containers_commitComment => '备注';
+
+  @override
+  String get containers_commitAuthor => '作者';
+
+  @override
+  String get containers_pauseDuringCommit => '制作镜像时暂停容器';
+
+  @override
+  String get containers_logsEmpty => '最近一小时没有日志';
+
+  @override
+  String get containers_cache => '缓存';
+
+  @override
+  String get containers_diskRead => '磁盘读取';
+
+  @override
+  String get containers_diskWrite => '磁盘写入';
+
+  @override
+  String get containers_networkRX => '网络接收';
+
+  @override
+  String get containers_networkTX => '网络发送';
+
+  @override
+  String get containers_updated => '容器已更新';
+
+  @override
+  String get containers_saving => '正在保存…';
+
+  @override
+  String get containers_prune => '清理未使用容器';
+
+  @override
+  String get containers_pruneConfirm => '将清理未使用的已停止容器与构建缓存，运行中的容器不受影响。';
+
+  @override
+  String get containers_removeTitle => '删除容器';
+
+  @override
+  String containers_removeMessage(String name) {
+    return '将永久删除 $name 及其可写层，挂载的数据仍保留在磁盘上。';
+  }
+
+  @override
+  String get cronjobs_create => '新建计划任务';
+
+  @override
+  String get cronjobs_edit => '编辑计划任务';
+
+  @override
+  String get cronjobs_updated => '计划任务已更新';
+
+  @override
+  String get cronjobs_created => '计划任务已创建';
+
+  @override
+  String get cronjobs_saving => '正在保存…';
+
+  @override
+  String get cronjobs_name => '任务名称';
+
+  @override
+  String get cronjobs_type => '任务类型';
+
+  @override
+  String get cronjobs_spec => '执行周期';
+
+  @override
+  String get cronjobs_specHint => '五段 cron 表达式，或 @every 10m';
+
+  @override
+  String get cronjobs_basic => '基础信息';
+
+  @override
+  String get cronjobs_taskConfig => '任务配置';
+
+  @override
+  String get cronjobs_execution => '执行策略';
+
+  @override
+  String get cronjobs_script => 'Shell 脚本';
+
+  @override
+  String get cronjobs_logFiles => '日志文件';
+
+  @override
+  String get cronjobs_logFilesHint => '多个绝对路径用逗号分隔';
+
+  @override
+  String get cronjobs_url => '请求地址';
+
+  @override
+  String get cronjobs_website => '网站';
+
+  @override
+  String get cronjobs_databaseType => '数据库类型';
+
+  @override
+  String get cronjobs_databaseName => '数据库名称';
+
+  @override
+  String get cronjobs_directory => '目录';
+
+  @override
+  String get cronjobs_files => '文件';
+
+  @override
+  String get cronjobs_backupDirectory => '备份整个目录';
+
+  @override
+  String get cronjobs_app => '应用安装 ID';
+
+  @override
+  String get cronjobs_withImage => '包含容器镜像';
+
+  @override
+  String get cronjobs_scopes => '日志范围';
+
+  @override
+  String get cronjobs_scopesHint => '逗号分隔，例如 system,ssh';
+
+  @override
+  String get cronjobs_ntpHint => '按面板配置的时间源同步系统时钟。';
+
+  @override
+  String get cronjobs_cleanHint => '清理面板产生的临时文件与缓存。';
+
+  @override
+  String get cronjobs_retainCopies => '保留份数';
+
+  @override
+  String get cronjobs_retryTimes => '重试次数';
+
+  @override
+  String get cronjobs_timeout => '超时时间（秒）';
+
+  @override
+  String get cronjobs_timeoutHint => '0 表示不限制';
+
+  @override
+  String get cronjobs_nameRequired => '请输入任务名称';
+
+  @override
+  String get cronjobs_specRequired => '请输入执行周期';
+
+  @override
+  String get cronjobs_scriptRequired => '请输入 Shell 脚本';
+
+  @override
+  String get cronjobs_urlRequired => '请输入请求地址';
+
+  @override
+  String get cronjobs_enabled => '已启用';
+
+  @override
+  String get cronjobs_disabled => '已停用';
+
+  @override
+  String get cronjobs_actions => '任务操作';
+
+  @override
+  String get cronjobs_stopRunning => '停止正在执行';
+
+  @override
+  String get cronjobs_records => '执行记录';
+
+  @override
+  String get cronjobs_cleanRecords => '清理记录';
+
+  @override
+  String cronjobs_cleanRecordsConfirm(String name) {
+    return '确定清理 $name 的全部执行记录吗？';
+  }
+
+  @override
+  String get cronjobs_noRecords => '暂无执行记录';
+
+  @override
+  String get cronjobs_noRecordsHint => '任务执行后会在这里显示记录。';
+
+  @override
+  String get cronjobs_recordLog => '执行日志';
+
+  @override
+  String get cronjobs_recordLogEmpty => '该记录没有日志输出。';
+
+  @override
+  String cronjobs_deleteTitle(String name) {
+    return '删除 $name';
+  }
+
+  @override
+  String get cronjobs_deleteMessage => '计划任务及其执行记录将被删除。';
+
+  @override
+  String get cronjobs_typeShell => 'Shell 脚本';
+
+  @override
+  String get cronjobs_typeLog => '日志切割';
+
+  @override
+  String get cronjobs_typeCurl => '访问 URL';
+
+  @override
+  String get cronjobs_typeWebsite => '备份网站';
+
+  @override
+  String get cronjobs_typeDatabase => '备份数据库';
+
+  @override
+  String get cronjobs_typeDirectory => '备份目录';
+
+  @override
+  String get cronjobs_typeApp => '备份应用';
+
+  @override
+  String get cronjobs_typeSnapshot => '快照';
+
+  @override
+  String get cronjobs_typeCleanLog => '清理面板日志';
+
+  @override
+  String get cronjobs_typeClean => '清理垃圾';
+
+  @override
+  String get cronjobs_typeNtp => '同步时间';
+
+  @override
+  String get alerts_create => '新建告警规则';
+
+  @override
+  String get alerts_edit => '编辑告警规则';
+
+  @override
+  String get alerts_updated => '告警规则已更新';
+
+  @override
+  String get alerts_created => '告警规则已创建';
+
+  @override
+  String get alerts_saving => '正在保存…';
+
+  @override
+  String get alerts_rule => '规则';
+
+  @override
+  String get alerts_type => '告警类型';
+
+  @override
+  String get alerts_title => '标题';
+
+  @override
+  String get alerts_titleHint => '留空时使用类型名称';
+
+  @override
+  String get alerts_project => '目标';
+
+  @override
+  String get alerts_projectHint => '网站 ID、磁盘路径或 all';
+
+  @override
+  String get alerts_threshold => '阈值';
+
+  @override
+  String get alerts_count => '触发值';
+
+  @override
+  String get alerts_countHint => 'CPU、内存或负载百分比';
+
+  @override
+  String get alerts_cycle => '周期（天）';
+
+  @override
+  String get alerts_sendCount => '每日发送上限';
+
+  @override
+  String get alerts_sendCountHint => '范围 1-30';
+
+  @override
+  String get alerts_advancedParams => '高级参数';
+
+  @override
+  String get alerts_advancedParamsHint => '可选 JSON 或触发模式';
+
+  @override
+  String get alerts_notification => '通知方式';
+
+  @override
+  String get alerts_noConfigs => '没有已启用的通知配置，请先在面板添加。';
+
+  @override
+  String get alerts_method => '通知配置 ID';
+
+  @override
+  String get alerts_methodHint => '多个配置 ID 用逗号分隔';
+
+  @override
+  String get alerts_methodRequired => '请至少选择一种通知方式';
+
+  @override
+  String get alerts_typeCpu => 'CPU 使用率';
+
+  @override
+  String get alerts_typeMemory => '内存使用率';
+
+  @override
+  String get alerts_typeDisk => '磁盘使用率';
+
+  @override
+  String get alerts_typeLoad => '负载';
+
+  @override
+  String get alerts_typeSshLogin => 'SSH 登录';
+
+  @override
+  String get alerts_typePanelLogin => '面板登录';
+
+  @override
+  String get alerts_typeSsl => '证书到期';
+
+  @override
+  String get alerts_typeSiteEndTime => '网站到期';
+
+  @override
+  String get alerts_typePanelUpdate => '面板更新';
+
+  @override
+  String get containers_resources => '镜像与网络';
+
+  @override
+  String get containers_pullImage => '拉取镜像';
+
+  @override
+  String get containers_createNetwork => '新建网络';
+
+  @override
+  String get containers_tagImage => '重设标签';
+
+  @override
+  String get containers_inUse => '使用中';
+
+  @override
+  String get containers_unused => '未使用';
+
+  @override
+  String get containers_imageInUseHint => '请先删除使用该镜像的容器';
+
+  @override
+  String get containers_removeImage => '删除镜像';
+
+  @override
+  String containers_removeImageConfirm(String name) {
+    return '确定删除镜像 $name 吗？';
+  }
+
+  @override
+  String get containers_pullImageHint => '按名称拉取镜像，或创建容器时自动拉取。';
+
+  @override
+  String get containers_noNetworks => '暂无网络';
+
+  @override
+  String get containers_createNetworkHint => '为容器创建桥接网络。';
+
+  @override
+  String get containers_removeNetwork => '删除网络';
+
+  @override
+  String containers_removeNetworkConfirm(String name) {
+    return '确定删除网络 $name 吗？';
+  }
+
+  @override
+  String get containers_system => '系统';
+
+  @override
+  String get containers_driver => '驱动';
+
+  @override
+  String get containers_subnet => '子网';
+
+  @override
+  String get containers_gateway => '网关';
+
+  @override
+  String get containers_up => '启动';
+
+  @override
+  String get containers_down => '停止并移除';
+
+  @override
+  String get containers_rebuild => '重新构建';
+
+  @override
+  String get containers_createCompose => '新建编排';
+
+  @override
+  String get containers_updateCompose => '编辑编排';
+
+  @override
+  String get containers_composeLogs => '编排日志';
+
+  @override
+  String get containers_cleanComposeLogs => '清空编排日志';
+
+  @override
+  String get containers_deleteCompose => '删除编排';
+
+  @override
+  String containers_deleteComposeConfirm(String name) {
+    return '确定删除编排项目 $name 吗？';
+  }
+
+  @override
+  String get containers_testCompose => '校验编排文件';
+
+  @override
+  String get containers_composeValid => '编排文件校验通过';
+
+  @override
+  String get containers_composeInvalid => '编排文件校验未通过';
+
+  @override
+  String get containers_composeContentRequired => '请输入编排文件内容';
+
+  @override
+  String get containers_dockerSettings => 'Docker 设置';
+
+  @override
+  String get containers_dockerService => 'Docker 服务';
+
+  @override
+  String get containers_dockerRunning => 'Docker 正在运行';
+
+  @override
+  String get containers_dockerStopped => 'Docker 已停止';
+
+  @override
+  String get containers_logSettings => '日志切割';
+
+  @override
+  String get containers_logMaxSize => '单个日志大小';
+
+  @override
+  String get containers_logMaxFile => '保留文件数';
+
+  @override
+  String get containers_ipv6 => 'IPv6';
+
+  @override
+  String get containers_fixedCidrV6 => '固定 CIDR';
+
+  @override
+  String get containers_ip6Tables => '管理 ip6tables';
+
+  @override
+  String get containers_experimental => '实验特性';
+
+  @override
+  String get cronjobs_notFound => '计划任务不存在';
+
+  @override
+  String get files_tools => '文件工具';
+
+  @override
+  String get files_favorites => '收藏';
+
+  @override
+  String get files_recycleBin => '回收站';
+
+  @override
+  String get files_shares => '分享管理';
+
+  @override
+  String get files_remoteDownload => '远程下载';
+
+  @override
+  String get files_noFavorites => '暂无收藏';
+
+  @override
+  String get files_noFavoritesHint => '在文件操作面板中收藏文件或目录。';
+
+  @override
+  String get files_removeFavorite => '取消收藏';
+
+  @override
+  String get files_addFavorite => '添加到收藏';
+
+  @override
+  String get files_favoriteAdded => '已添加到收藏';
+
+  @override
+  String get files_clearRecycleBin => '清空回收站';
+
+  @override
+  String get files_clearRecycleBinConfirm => '回收站中的全部文件将被永久删除。';
+
+  @override
+  String get files_recycleEmpty => '回收站为空';
+
+  @override
+  String get files_recycleEmptyHint => '删除的文件会显示在这里。';
+
+  @override
+  String get files_restore => '还原';
+
+  @override
+  String get files_noShares => '暂无分享';
+
+  @override
+  String get files_noSharesHint => '在文件操作面板中创建分享。';
+
+  @override
+  String get files_permanentShare => '永久';
+
+  @override
+  String files_shareCode(String code) {
+    return '分享码 $code';
+  }
+
+  @override
+  String get files_cancelShare => '取消分享';
+
+  @override
+  String files_cancelShareConfirm(String name) {
+    return '确定取消 $name 的分享吗？';
+  }
+
+  @override
+  String get files_shareDetail => '分享详情';
+
+  @override
+  String get files_name => '名称';
+
+  @override
+  String get files_path => '路径';
+
+  @override
+  String get files_shareCodeLabel => '分享码';
+
+  @override
+  String get files_sharePassword => '密码';
+
+  @override
+  String get files_shareExpire => '有效期';
+
+  @override
+  String get files_copyShareCode => '复制分享码';
+
+  @override
+  String get files_remoteDownloadStarted => '远程下载已开始';
+
+  @override
+  String get files_noRemoteDownloads => '暂无下载任务';
+
+  @override
+  String get files_noRemoteDownloadsHint => '正在进行的远程下载会显示在这里。';
+
+  @override
+  String get files_url => '链接';
+
+  @override
+  String get files_targetDirectory => '目标目录';
+
+  @override
+  String get files_ignoreCertificate => '忽略证书错误';
+
+  @override
+  String get files_startDownload => '开始下载';
+
+  @override
+  String get files_moveCopy => '移动或复制';
+
+  @override
+  String get files_batchPermission => '批量权限';
+
+  @override
+  String get files_copyMode => '复制而非移动';
+
+  @override
+  String get files_overwrite => '覆盖同名文件';
+
+  @override
+  String get files_copy => '复制';
+
+  @override
+  String get files_move => '移动';
+
+  @override
+  String get files_recursive => '应用到子目录';
+
+  @override
+  String get action_stop => '停止';
+
+  @override
+  String get websites_advanced => '高级设置';
+
+  @override
+  String get websites_security => '安全';
+
+  @override
+  String get websites_rewrite => '伪静态';
+
+  @override
+  String get websites_redirect => '重定向';
+
+  @override
+  String get websites_editInfo => '编辑网站信息';
+
+  @override
+  String get websites_favorite => '添加到收藏';
+
+  @override
+  String get websites_indexConfig => '默认文档';
+
+  @override
+  String get websites_indexConfigHint => '设置目录请求的默认文件';
+
+  @override
+  String get websites_limitConfig => '流量限制';
+
+  @override
+  String get websites_limitConfigHint => '限制并发连接与速率';
+
+  @override
+  String get websites_dirPermission => '目录权限';
+
+  @override
+  String get websites_dirPermissionHint => '修改运行用户与用户组';
+
+  @override
+  String get websites_enabled => '已启用';
+
+  @override
+  String get websites_disabled => '已停用';
+
+  @override
+  String get websites_indexFiles => '默认文档列表';
+
+  @override
+  String get websites_perServer => '全站并发';
+
+  @override
+  String get websites_perIp => '单 IP 并发';
+
+  @override
+  String get websites_rateKb => '限速（KB/s）';
+
+  @override
+  String get websites_owner => '用户';
+
+  @override
+  String get websites_group => '用户组';
+
+  @override
+  String get websites_accessAuth => '访问认证';
+
+  @override
+  String get websites_username => '用户名';
+
+  @override
+  String get websites_password => '密码';
+
+  @override
+  String get websites_allowOrigins => '允许来源';
+
+  @override
+  String get websites_allowMethods => '允许方法';
+
+  @override
+  String get websites_allowHeaders => '允许请求头';
+
+  @override
+  String get websites_allowCredentials => '允许携带凭据';
+
+  @override
+  String get websites_preflight => '预检缓存';
+
+  @override
+  String get websites_leech => '防盗链';
+
+  @override
+  String get websites_allowedExtensions => '允许的扩展名';
+
+  @override
+  String get websites_returnCode => '拦截响应码';
+
+  @override
+  String get websites_blocked => '拦截盗链';
+
+  @override
+  String get websites_logEnabled => '记录拦截日志';
+
+  @override
+  String get websites_realIp => '真实 IP';
+
+  @override
+  String get websites_ipFrom => '可信代理';
+
+  @override
+  String get websites_ipHeader => 'IP 请求头';
+
+  @override
+  String get websites_ipOther => '其他代理';
+
+  @override
+  String get websites_rewriteTemplates => '模板';
+
+  @override
+  String get websites_rewriteName => '规则名称';
+
+  @override
+  String get websites_rewriteContent => '伪静态规则';
+
+  @override
+  String get websites_addRedirect => '新增重定向';
+
+  @override
+  String get websites_editRedirect => '编辑重定向';
+
+  @override
+  String get websites_redirectType => '类型';
+
+  @override
+  String get websites_redirectDomain => '域名';
+
+  @override
+  String get websites_redirectPath => '路径';
+
+  @override
+  String get websites_redirectTarget => '目标地址';
+
+  @override
+  String get websites_redirectCode => '状态码';
+
+  @override
+  String get websites_keepPath => '保留路径';
+
+  @override
+  String get websites_redirectRoot => '重定向根路径';
+
+  @override
+  String get websites_noRedirects => '暂无重定向';
+
+  @override
+  String get websites_noRedirectsHint => '为该网站添加重定向规则。';
+
+  @override
+  String get websites_addProxy => '新增反向代理';
+
+  @override
+  String get websites_editProxy => '编辑反向代理';
+
+  @override
+  String get websites_proxyName => '代理名称';
+
+  @override
+  String get websites_proxyMatch => '匹配路径';
+
+  @override
+  String get websites_proxyPass => '上游地址';
+
+  @override
+  String get websites_proxyHost => '代理 Host';
+
+  @override
+  String get websites_sni => 'SNI';
+
+  @override
+  String get websites_sslVerify => '校验上游证书';
+
+  @override
+  String get action_saved => '已保存';
+
+  @override
+  String get action_loading => '加载中…';
+
+  @override
+  String get websites_sslManage => '证书管理';
+
+  @override
+  String get websites_sslManageHint => '在这里申请、上传和删除证书，在 SSL 页签绑定。';
+
+  @override
+  String get websites_uploadSsl => '上传证书';
+
+  @override
+  String get websites_applySsl => '申请证书';
+
+  @override
+  String get websites_certificatePem => '证书 PEM';
+
+  @override
+  String get websites_privateKeyPem => '私钥 PEM';
+
+  @override
+  String get websites_sslUploaded => '证书已上传';
+
+  @override
+  String get websites_sslRequested => '证书申请已提交';
+
+  @override
+  String get websites_noAcmeAccount => '请先在面板创建 ACME 账号';
+
+  @override
+  String get websites_acmeAccount => 'ACME 账号';
+
+  @override
+  String get websites_autoRenew => '自动续签';
+
+  @override
+  String get websites_deleteSsl => '删除证书';
+
+  @override
+  String websites_deleteSslConfirm(String name) {
+    return '确定删除 $name 的证书吗？';
+  }
+
+  @override
+  String get action_upload => '上传';
+
+  @override
+  String get websites_changeDatabase => '更换数据库';
+
+  @override
+  String websites_currentDatabase(String names) {
+    return '当前：$names';
+  }
+
+  @override
+  String get websites_database => '数据库';
+
+  @override
+  String get websites_unbindDatabase => '解除数据库关联';
+
+  @override
+  String get apps_upgrade => '升级';
+
+  @override
+  String get apps_editParams => '修改参数';
+
+  @override
+  String get apps_changePort => '修改端口';
+
+  @override
+  String get apps_connInfo => '连接信息';
+
+  @override
+  String get apps_ignoreUpdate => '忽略更新';
+
+  @override
+  String get apps_uninstall => '卸载';
+
+  @override
+  String apps_uninstallHint(String name) {
+    return '确定卸载 $name 吗？将停止并移除应用容器。';
+  }
+
+  @override
+  String get apps_deleteDatabase => '删除数据库';
+
+  @override
+  String get apps_deleteBackup => '删除备份';
+
+  @override
+  String get apps_deleteImage => '删除镜像';
+
+  @override
+  String get apps_forceDelete => '强制删除';
+
+  @override
+  String get apps_latestVersion => '已是最新版本';
+
+  @override
+  String get apps_backupBeforeUpgrade => '升级前备份';
+
+  @override
+  String get apps_pullImage => '拉取最新镜像';
+
+  @override
+  String get apps_advancedParams => '高级参数';
+
+  @override
+  String get apps_containerName => '容器名称';
+
+  @override
+  String get apps_port => '端口';
+
+  @override
+  String get databases_advanced => '高级';
+
+  @override
+  String get databases_configFile => '配置文件';
+
+  @override
+  String get databases_configFileHint => '读取并修改数据库配置';
+
+  @override
+  String get databases_slowLog => '慢查询日志';
+
+  @override
+  String get databases_slowLogHint => '查看最近的慢查询日志';
+
+  @override
+  String get databases_slowLogEmpty => '暂无慢查询日志';
+
+  @override
+  String get databases_redis => 'Redis';
+
+  @override
+  String get databases_redisConfig => 'Redis 配置';
+
+  @override
+  String get databases_redisPassword => 'Redis 密码';
+
+  @override
+  String get databases_redisPersistence => 'Redis 持久化';
+
+  @override
+  String get backups_create => '新建备份';
+
+  @override
+  String get backups_type => '备份类型';
+
+  @override
+  String get backups_dbPassword => '数据库密码';
+
+  @override
+  String get backups_description => '备注';
+
+  @override
+  String get backups_stopBefore => '备份前停止容器';
+
+  @override
+  String get backups_startBackup => '开始备份';
+
+  @override
+  String get backups_accounts => '备份账号';
+
+  @override
+  String get backups_addAccount => '新建备份账号';
+
+  @override
+  String get backups_editAccount => '编辑备份账号';
+
+  @override
+  String get backups_noAccounts => '暂无备份账号';
+
+  @override
+  String get backups_noAccountsHint => '添加账号以远程保存备份。';
+
+  @override
+  String get backups_testConnection => '测试连接';
+
+  @override
+  String get backups_accountName => '账号名称';
+
+  @override
+  String get backups_accountType => '账号类型';
+
+  @override
+  String get backups_accessKey => 'Access Key';
+
+  @override
+  String get backups_credential => 'Secret Key';
+
+  @override
+  String get backups_bucket => 'Bucket';
+
+  @override
+  String get backups_backupPath => '备份路径';
+
+  @override
+  String get backups_vars => '账号变量';
+
+  @override
+  String get backups_rememberAuth => '记住凭据';
+
+  @override
+  String get backups_connectionOk => '连接成功';
+
+  @override
+  String get backups_connectionFailed => '连接失败';
+
+  @override
+  String backups_deleteAccountConfirm(String name) {
+    return '确定删除备份账号 $name 吗？';
+  }
+
+  @override
+  String get runtimes_sync => '同步运行环境';
+
+  @override
+  String get runtimes_delete => '删除运行环境';
+
+  @override
+  String runtimes_deleteConfirm(String name) {
+    return '确定删除运行环境 $name 吗？';
+  }
+
+  @override
+  String get host_syncKeys => '同步 SSH 密钥';
+
+  @override
+  String get panelSettings_oldPassword => '当前密码';
+
+  @override
+  String get panelSettings_newPassword => '新密码';
+
+  @override
+  String get panelSettings_confirmPassword => '确认密码';
+
+  @override
+  String get panelSettings_passwordMismatch => '两次输入的密码不一致';
+
+  @override
+  String get panelSettings_portChangeWarning => '修改面板端口会断开当前会话，请确保新端口已在防火墙放行。';
+
+  @override
+  String panelSettings_portChanged(int port) {
+    return '面板端口已改为 $port';
+  }
+
+  @override
+  String get panelSettings_apiKeyCopied => 'API Key 已生成并复制';
+
+  @override
+  String get panelSettings_snapshots => '快照';
+
+  @override
+  String get panelSettings_snapshotsHint => '创建、重建和删除面板快照';
+
+  @override
+  String get panelSettings_createSnapshot => '创建快照';
+
+  @override
+  String get panelSettings_noSnapshots => '暂无快照';
+
+  @override
+  String get panelSettings_noSnapshotsHint => '创建快照以备份面板数据。';
+
+  @override
+  String get panelSettings_snapshotName => '快照名称';
+
+  @override
+  String get panelSettings_snapshotDescription => '描述';
+
+  @override
+  String get panelSettings_recreateSnapshot => '重建快照';
+
+  @override
+  String get panelSettings_recreateSnapshotHint => '确定使用当前面板数据重建该快照吗？';
+
+  @override
+  String get panelSettings_deleteSnapshotHint => '确定删除该快照及其文件吗？';
+
+  @override
+  String get panelSettings_snapshotCreated => '快照任务已提交';
+
+  @override
+  String get panelSettings_withDockerConf => '包含 Docker 配置';
+
+  @override
+  String get panelSettings_withMonitorData => '包含监控数据';
+
+  @override
+  String get panelSettings_withLoginLog => '包含登录日志';
+
+  @override
+  String get panelSettings_withOperationLog => '包含操作日志';
+
+  @override
+  String get panelSettings_withSystemLog => '包含系统日志';
+
+  @override
+  String get panelSettings_withTaskLog => '包含任务日志';
+
+  @override
+  String get websites_openRestyPerformance => 'OpenResty 性能';
+
+  @override
+  String get websites_openRestyConfig => 'OpenResty 主配置';
+
+  @override
+  String get websites_loadConfig => '读取配置';
+
+  @override
+  String get apps_syncRemote => '同步远程应用';
+
+  @override
+  String get apps_syncLocal => '同步本地应用';
+
+  @override
+  String get websites_pathAuth => '路径认证';
+
+  @override
+  String get websites_noPathAuth => '暂无路径认证';
+
+  @override
+  String get websites_addPathAuth => '新增路径认证';
+
+  @override
+  String get websites_editPathAuth => '编辑路径认证';
+
+  @override
+  String websites_deletePathAuth(String path) {
+    return '确定删除 $path 的认证吗？';
+  }
+
+  @override
+  String get containers_imageRepos => '镜像仓库';
+
+  @override
+  String get containers_addRepo => '新建仓库';
+
+  @override
+  String get containers_editRepo => '编辑仓库';
+
+  @override
+  String get containers_noRepos => '暂无镜像仓库';
+
+  @override
+  String get containers_noReposHint => '添加镜像仓库以拉取和推送镜像。';
+
+  @override
+  String get containers_repoUrl => '仓库地址';
+
+  @override
+  String get containers_protocol => '协议';
+
+  @override
+  String get containers_repoAuth => '需要认证';
+
+  @override
+  String get containers_repoId => '仓库 ID';
+
+  @override
+  String get containers_buildImage => '构建镜像';
+
+  @override
+  String get containers_exportImage => '导出镜像';
+
+  @override
+  String get containers_importImage => '导入镜像';
+
+  @override
+  String get containers_pushImage => '推送镜像';
+
+  @override
+  String get containers_baseImage => '基础镜像';
+
+  @override
+  String get containers_imageArchive => '镜像归档路径';
+
+  @override
+  String get databases_variables => '性能变量';
+
+  @override
+  String get databases_variablesHint => '读取并修改 MySQL 运行变量';
+
+  @override
+  String get databases_redisStatus => 'Redis 状态';
+
+  @override
+  String get databases_installRedisCli => '安装 Redis CLI';
+
+  @override
+  String get host_terminalSessions => '终端会话';
+
+  @override
+  String get host_terminalSessionsHint => '查看并关闭活动 SSH 会话';
+
+  @override
+  String get host_closeAllSessions => '全部关闭';
+
+  @override
+  String get websites_certificateAccounts => '证书账号';
+
+  @override
+  String get websites_addAcme => '新增 ACME 账号';
+
+  @override
+  String get websites_email => '邮箱';
+
+  @override
+  String get websites_acmeType => 'ACME 类型';
+
+  @override
+  String get websites_caDirUrl => 'CA 目录地址';
+
+  @override
+  String get websites_useProxy => '使用代理';
+
+  @override
+  String get websites_useEab => '使用 EAB';
+
+  @override
+  String get websites_noAcme => '暂无 ACME 账号';
+
+  @override
+  String get websites_noAcmeHint => '添加 ACME 账号以申请证书。';
+
+  @override
+  String get websites_addDns => '新增 DNS 账号';
+
+  @override
+  String get websites_dnsType => 'DNS 服务商';
+
+  @override
+  String get websites_authorization => '授权 JSON';
+
+  @override
+  String get websites_noDns => '暂无 DNS 账号';
+
+  @override
+  String get websites_noDnsHint => '添加 DNS 账号用于 DNS 验证。';
+
+  @override
+  String get websites_addCa => '新建 CA';
+
+  @override
+  String get websites_commonName => '通用名称';
+
+  @override
+  String get websites_country => '国家';
+
+  @override
+  String get websites_organization => '组织';
+
+  @override
+  String get websites_noCa => '暂无 CA';
+
+  @override
+  String get websites_noCaHint => '创建自签 CA 并从中签发证书。';
+
+  @override
+  String get websites_obtainCa => '签发证书';
+
+  @override
+  String get websites_renewCa => '续签';
+
+  @override
+  String get apps_cancelIgnore => '取消忽略更新';
+
+  @override
+  String get apps_notIgnored => '该应用未被忽略';
+
+  @override
+  String get files_exactSize => '计算精确大小';
+
+  @override
+  String get containers_cleanLogs => '清空容器日志';
+
+  @override
+  String containers_cleanLogsConfirm(String name) {
+    return '确定清空 $name 的日志吗？';
+  }
+
+  @override
+  String get backups_listBuckets => '列出存储桶';
+
+  @override
+  String get backups_refreshToken => '刷新 Token';
+
+  @override
+  String get backups_buckets => '存储桶';
+
+  @override
+  String get websites_switchPhp => '切换 PHP 版本';
+
+  @override
+  String get websites_switchPhpHint => '切换 PHP 运行环境，或改为静态网站';
+
+  @override
+  String get websites_staticSite => '静态网站';
+
+  @override
+  String get websites_editSsl => '编辑证书';
+
+  @override
+  String get logs_clean => '清理日志';
+
+  @override
+  String get logs_cleanOperation => '清理操作日志';
+
+  @override
+  String get logs_cleanLogin => '清理登录日志';
+
+  @override
+  String get logs_cleanConfirm => '选中的日志将被永久清空。';
+
+  @override
+  String get logs_exportSsh => '导出 SSH 日志';
+
+  @override
+  String get panelSettings_memo => '面板备忘录';
+
+  @override
+  String get panelSettings_memoHint => '暂无备忘录';
+
+  @override
+  String get panelSettings_memoContentHint => '填写面板备忘录';
+
+  @override
+  String logs_exported(String path) {
+    return '已导出到 $path';
+  }
+
+  @override
+  String get websites_saveAsCustomRewrite => '保存为自定义模板';
+
+  @override
+  String get websites_checkDns => '检查 DNS';
+
+  @override
+  String get alerts_addNotification => '添加通知方式';
+
+  @override
+  String get alerts_editNotification => '编辑通知方式';
+
+  @override
+  String get alerts_testNotification => '发送测试通知';
+
+  @override
+  String get alerts_configContent => '配置内容（JSON）';
+
+  @override
+  String get alerts_configInvalid => '配置内容不是合法的 JSON';
+
+  @override
+  String get alerts_testSent => '测试通知已发送';
+
+  @override
+  String get alerts_testFailed => '测试通知发送失败';
+
+  @override
+  String get backups_calculateSizes => '统计备份大小';
+
+  @override
+  String get backups_recordCount => '记录数';
+
+  @override
+  String get backups_totalSize => '总大小';
+
+  @override
+  String get backups_containerHint => '容器名称';
+
+  @override
+  String get files_websiteRoot => '网站根目录';
+
+  @override
+  String get files_pickOwner => '选择用户或用户组';
+
+  @override
+  String get panelSettings_apiInterfaceToggleHint => '允许通过 API 访问面板';
+
+  @override
+  String get panelSettings_restoreSnapshot => '恢复快照';
+
+  @override
+  String get panelSettings_rollbackSnapshot => '回滚快照';
+
+  @override
+  String get panelSettings_snapshotSecret => '备份密码（可选）';
+
+  @override
+  String get panelSettings_snapshotRestoreSubmitted => '恢复任务已提交';
+
+  @override
+  String get action_continue => '继续';
+
+  @override
+  String get panelSettings_importSnapshot => '导入快照';
+
+  @override
+  String get panelSettings_snapshotJson => '快照 JSON';
+
+  @override
+  String get panelSettings_snapshotJsonInvalid => '快照 JSON 格式无效';
+
+  @override
+  String get action_import => '导入';
+
+  @override
+  String get databases_status => '运行状态';
+
+  @override
+  String files_alreadyExists(String name) {
+    return '$name 已存在';
+  }
+
+  @override
+  String get runtime_extensionPresets => '扩展预设';
+
+  @override
+  String get containers_containersUsingImage => '使用此镜像的容器';
+
+  @override
+  String get containers_diskUsage => 'Docker 磁盘占用';
+
+  @override
+  String get containers_usageContainers => '容器';
+
+  @override
+  String get containers_usageImages => '镜像';
+
+  @override
+  String get containers_usageVolumes => '数据卷';
+
+  @override
+  String get containers_usageBuildCache => '构建缓存';
+
+  @override
+  String get databases_remoteInstances => '远程实例';
+
+  @override
+  String get databases_addRemote => '添加远程实例';
+
+  @override
+  String get databases_editRemote => '编辑远程实例';
+
+  @override
+  String get databases_loadDatabases => '加载数据库';
+
+  @override
+  String get databases_testConnection => '测试连接';
+
+  @override
+  String get databases_connectionOk => '连接成功';
+
+  @override
+  String get databases_connectionFailed => '连接失败';
+
+  @override
+  String get databases_ssl => '使用 SSL';
+
+  @override
+  String get files_checkExistence => '检查是否存在';
+
+  @override
+  String get panelSettings_mfa => '双因素认证';
+
+  @override
+  String get panelSettings_mfaHint => '绑定认证器应用';
+
+  @override
+  String get panelSettings_mfaCode => '验证码';
+
+  @override
+  String get panelSettings_bindMfa => '绑定';
+
+  @override
+  String get panelSettings_passkeys => '通行密钥';
+
+  @override
+  String get panelSettings_passkeysHint => '管理已注册的通行密钥';
+
+  @override
+  String get panelSettings_noPasskeys => '尚未注册通行密钥';
+
+  @override
+  String get websites_downloadSsl => '下载证书';
+
+  @override
+  String get websites_downloadCa => '下载 CA';
+
+  @override
+  String websites_downloaded(String path) {
+    return '已保存到 $path';
+  }
+
+  @override
+  String get apps_storeSettings => '应用商店设置';
+
+  @override
+  String get apps_uninstallDeleteImage => '卸载时删除镜像';
+
+  @override
+  String get apps_upgradeBackup => '升级前备份';
+
+  @override
+  String get apps_uninstallDeleteBackup => '卸载时删除备份';
+
+  @override
+  String get apps_installAllowPort => '安装时检查端口';
+
+  @override
+  String get containers_users => '容器用户';
+
+  @override
+  String get runtime_scripts => 'package.json 脚本';
+
+  @override
+  String get runtime_codeDir => '代码目录';
+
+  @override
+  String get supervisor_configFile => 'Supervisor 配置';
+
+  @override
+  String get containers_composeTemplates => '编排模板';
+
+  @override
+  String get containers_importTemplates => '导入模板';
+
+  @override
+  String get containers_templateJsonInvalid => '模板 JSON 必须是数组';
+
+  @override
+  String get containers_daemonKeyValue => 'Daemon 键值';
+
+  @override
+  String get containers_daemonKey => '键';
+
+  @override
+  String get containers_daemonValue => '值';
+
+  @override
+  String get runtime_name => '运行环境名称';
+
+  @override
+  String get runtime_port => '端口';
+
+  @override
+  String get runtime_remark => '备注';
+
+  @override
+  String get host_sshConfigFile => 'SSH 配置文件';
+
+  @override
+  String get host_sshConfigFileHint => '直接编辑 sshd_config';
+
+  @override
+  String get host_sshConfigNotFound => '未找到 SSH 配置文件';
+
+  @override
+  String get host_sshConfigWarning => '保存无效配置可能导致 SSH 无法连接。';
+
+  @override
+  String get host_sshConfigSaved => 'SSH 配置已保存';
+
+  @override
+  String get host_testSsh => '测试 SSH 连接';
+
+  @override
+  String get host_testSshHint => '验证地址、端口与凭据';
+
+  @override
+  String get websites_viewAccessLog => '查看访问日志';
+
+  @override
+  String get websites_viewErrorLog => '查看错误日志';
+
+  @override
+  String get websites_liveLogHint => '在应用内查看最新日志';
+
+  @override
+  String get websites_descriptionPin => '描述与置顶';
+
+  @override
+  String get websites_descriptionPinHint => '设置面板描述与置顶状态';
+
+  @override
+  String get websites_description => '描述';
+
+  @override
+  String get websites_pin => '置顶';
+
+  @override
+  String get websites_copyFromExisting => '从现有网站复制';
+
+  @override
+  String get panelSettings_panelSsl => '面板 HTTPS';
+
+  @override
+  String get panelSettings_panelSslHint => '配置面板入口的 HTTPS';
+
+  @override
+  String get panelSettings_panelSslWarning => '修改面板 HTTPS 可能中断当前会话。';
+
+  @override
+  String get panelSettings_panelSslMode => 'SSL 模式';
+
+  @override
+  String get panelSettings_panelSslType => '证书来源';
+
+  @override
+  String get supervisor_editConfig => '编辑进程配置';
+
+  @override
+  String get supervisor_viewOutLog => '查看标准输出日志';
+
+  @override
+  String get supervisor_viewErrLog => '查看错误日志';
+
+  @override
+  String get backups_restoreFromFile => '从服务器文件恢复';
+
+  @override
+  String get backups_restoreFromFileHint => '上传服务器上已有的备份文件后执行恢复。';
+
+  @override
+  String get backups_serverFilePath => '服务器文件路径';
+
+  @override
+  String get websites_editSource => '编辑源文件';
+
+  @override
+  String get runtime_create => '新建运行环境';
+
+  @override
+  String get runtime_typeLabel => '类型';
+
+  @override
+  String get runtime_image => '镜像';
+
+  @override
+  String get runtime_appDetailId => '应用详情 ID';
+
+  @override
+  String get runtime_resource => '资源规格';
+
+  @override
+  String get runtime_version => '版本';
+
+  @override
+  String get runtime_paramsJson => '参数（JSON）';
+
+  @override
+  String get runtime_paramsInvalid => '参数必须是 JSON 对象';
+
+  @override
+  String get apps_alreadyInstalled => '该应用已安装，请到已安装列表操作。';
+
+  @override
+  String common_errorLine(String title, String message) {
+    return '$title：$message';
+  }
+
+  @override
+  String get websites_ssl => 'SSL';
+
+  @override
+  String get websites_proxyDeleted => '反向代理已删除';
+
+  @override
+  String get websites_proxyRequired => '请填写代理名称和上游地址。';
+
+  @override
+  String get websites_requiredFields => '请填写所有必填项。';
+
+  @override
+  String get websites_usernameRequired => '启用访问认证时必须填写用户名。';
+
+  @override
+  String get apps_cancelIgnoreUpdate => '恢复更新提醒';
+
+  @override
+  String get more_runtimesSubtitle => 'PHP / Node / Python';
+
+  @override
+  String get more_composeSubtitle => 'docker compose';
+
+  @override
+  String get firewall_noMatchingRules => '没有匹配的规则';
+
+  @override
+  String get firewall_clearFiltersHint => '调整关键字或清除筛选条件。';
+
+  @override
+  String get panelSettings_apiKeyRow => 'API 密钥';
+
+  @override
+  String get panelSettings_sslModeEnable => '启用';
+
+  @override
+  String get panelSettings_sslModeDisable => '停用';
+
+  @override
+  String get panelSettings_sslModeMux => 'Mux';
+
+  @override
+  String get panelSettings_sslPaste => '粘贴证书';
+
+  @override
+  String get panelSettings_sslSelectExisting => '选择已有证书';
+
+  @override
+  String get panelSettings_sslSelfSigned => '自签名';
+
+  @override
+  String get panelSettings_languageEn => 'English';
 }

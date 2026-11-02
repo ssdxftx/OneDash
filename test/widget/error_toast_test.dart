@@ -32,6 +32,15 @@ void main() {
     expect(text, contains('Task failed'));
   });
 
+  test('task failure fallback does not repeat the title', () {
+    final text = describeError(
+      const TaskFailedException(subject: '容器任务'),
+      l10n,
+    );
+
+    expect('Task failed'.allMatches(text).length, 1);
+  });
+
   test('task timeout uses the timeout message', () {
     final text = describeError(
       const TaskFailedException(subject: '容器任务', timedOut: true),

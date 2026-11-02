@@ -63,19 +63,19 @@ class ContainersController extends AutoDisposeAsyncNotifier<ContainersState> {
   }
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
+    state = const AsyncLoading<ContainersState>().copyWithPrevious(state);
     state = await AsyncValue.guard(_fetch);
   }
 
   Future<void> setFilter(String value) async {
     _state = value;
-    state = const AsyncLoading();
+    state = const AsyncLoading<ContainersState>().copyWithPrevious(state);
     state = await AsyncValue.guard(_fetch);
   }
 
   Future<void> search(String value) async {
     _name = value.trim();
-    state = const AsyncLoading();
+    state = const AsyncLoading<ContainersState>().copyWithPrevious(state);
     state = await AsyncValue.guard(_fetch);
   }
 }

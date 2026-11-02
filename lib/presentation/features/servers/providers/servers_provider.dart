@@ -17,7 +17,7 @@ class ServersController extends AsyncNotifier<List<Server>> {
   }
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
+    state = const AsyncLoading<List<Server>>().copyWithPrevious(state);
     state = await AsyncValue.guard(
       () => ref.read(serverRepositoryProvider).list(),
     );

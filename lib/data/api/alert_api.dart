@@ -65,6 +65,15 @@ class AlertApi {
     await _client.post('/api/v2/alert/logs/clean');
   }
 
+  /// 获取已启用的告警通知配置。
+  Future<List<AlertConfigInfo>> getAlertConfigs() async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/alert/config/info',
+      data: const <String, dynamic>{},
+    );
+    return ApiResponseParser.list(resp, AlertConfigInfo.fromJson);
+  }
+
   /// 获取告警配置。
   Future<AlertConfigInfo> getAlertConfig() async {
     final resp = await _client.post<Map<String, dynamic>>(

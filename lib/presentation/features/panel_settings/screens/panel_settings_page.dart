@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/setting_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -202,12 +204,41 @@ class _PanelSettingsBody extends ConsumerWidget {
                     leading: const Icon(TablerIcons.lock),
                     title: l10n.panelSettings_panelLoginPassword,
                     subtitle: l10n.panelSettings_changePanelLoginPassword,
-                    trailing: Text(
-                      l10n.panelSettings_webOnlyTag,
-                      style: AppTextStyles.caption.copyWith(
-                        color: context.scheme.onSurfaceVariant,
-                      ),
-                    ),
+                    trailing: const Icon(TablerIcons.pencil),
+                    onTap: () => _changePassword(context, ref, l10n),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.notes),
+                    title: l10n.panelSettings_memo,
+                    subtitle: data.value('memo').isEmpty
+                        ? l10n.panelSettings_memoHint
+                        : data.value('memo'),
+                    trailing: const Icon(TablerIcons.pencil),
+                    onTap: () async {
+                      final value = await _editValue(
+                        context,
+                        title: l10n.panelSettings_memo,
+                        initial: data.value('memo'),
+                        hint: l10n.panelSettings_memoContentHint,
+                        maxLines: 6,
+                      );
+                      if (value == null || !context.mounted) return;
+                      try {
+                        final repository = await ref.read(
+                          settingRepositoryProvider.future,
+                        );
+                        await repository.saveMemo(value);
+                        ref.invalidate(_panelSettingsProvider);
+                        if (!context.mounted) return;
+                        AppToast.success(
+                          context,
+                          l10n.panelSettings_settingUpdated,
+                        );
+                      } catch (error) {
+                        if (!context.mounted) return;
+                        showErrorToast(context, error);
+                      }
+                    },
                   ),
                 ],
               ),
@@ -298,6 +329,29 @@ class _PanelSettingsBody extends ConsumerWidget {
                       'serverPort',
                       fallback: l10n.panelSettings_notSet,
                     ),
+                    trailing: const Icon(TablerIcons.pencil),
+                    onTap: () => _changePort(context, ref, l10n, data),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.lock_square),
+                    title: l10n.panelSettings_panelSsl,
+                    subtitle: l10n.panelSettings_panelSslHint,
+                    trailing: const Icon(TablerIcons.chevron_right),
+                    onTap: () => _editPanelSsl(context, ref, l10n),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.shield_lock),
+                    title: l10n.panelSettings_mfa,
+                    subtitle: l10n.panelSettings_mfaHint,
+                    trailing: const Icon(TablerIcons.chevron_right),
+                    onTap: () => _bindMfa(context, ref, l10n),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.fingerprint),
+                    title: l10n.panelSettings_passkeys,
+                    subtitle: l10n.panelSettings_passkeysHint,
+                    trailing: const Icon(TablerIcons.chevron_right),
+                    onTap: () => _managePasskeys(context, ref, l10n),
                   ),
                   SplitListTile(
                     leading: const Icon(TablerIcons.door),
@@ -314,6 +368,8 @@ class _PanelSettingsBody extends ConsumerWidget {
                       'bindDomain',
                       fallback: l10n.panelSettings_notSet,
                     ),
+                    trailing: const Icon(TablerIcons.pencil),
+                    onTap: () => _changeBind(context, ref, l10n, data),
                   ),
                 ],
               ),
@@ -331,15 +387,70 @@ class _PanelSettingsBody extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: AppTokens.s16),
+              SectionHeader(title: l10n.panelSettings_snapshots),
+              SplitListGroup(
+                children: [
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.camera),
+                    title: l10n.panelSettings_snapshots,
+                    subtitle: l10n.panelSettings_snapshotsHint,
+                    trailing: const Icon(TablerIcons.chevron_right),
+                    onTap: () =>
+                        context.push('/s/$serverId/more/settings/snapshots'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTokens.s24),
               SectionHeader(title: l10n.panelSettings_advancedSettings),
               SplitListGroup(
                 children: [
                   SplitListTile(
                     leading: const Icon(TablerIcons.api_app),
-                    title: l10n.panelSettings_apiInterface,
+                    title: l10n.panelSettings_apiKeyRow,
                     subtitle: data.enabled('apiInterfaceStatus')
                         ? l10n.panelSettings_enabled
                         : l10n.panelSettings_disabled,
+                    trailing: const Icon(TablerIcons.pencil),
+                    onTap: () => _generateApiKey(context, ref, l10n),
+                  ),
+                  SwitchListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: AppTokens.s16,
+                    ),
+                    secondary: const Icon(TablerIcons.api),
+                    title: Text(
+                      l10n.panelSettings_apiInterface,
+                      style: AppTextStyles.bodyL.copyWith(
+                        color: scheme.onSurface,
+                      ),
+                    ),
+                    subtitle: Text(
+                      l10n.panelSettings_apiInterfaceToggleHint,
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                    value: data.enabled('apiInterfaceStatus'),
+                    onChanged: (value) async {
+                      try {
+                        final repository = await ref.read(
+                          settingRepositoryProvider.future,
+                        );
+                        await repository.updateApiConfig({
+                          'apiInterfaceStatus': value ? 'Enable' : 'Disable',
+                          'apiKey': data.value('apiKey'),
+                        });
+                        ref.invalidate(_panelSettingsProvider);
+                        if (!context.mounted) return;
+                        AppToast.success(
+                          context,
+                          l10n.panelSettings_settingUpdated,
+                        );
+                      } catch (error) {
+                        if (!context.mounted) return;
+                        showErrorToast(context, error);
+                      }
+                    },
                   ),
                   SplitListTile(
                     leading: const Icon(TablerIcons.key),
@@ -347,6 +458,8 @@ class _PanelSettingsBody extends ConsumerWidget {
                     subtitle: data.value('apiKey').isEmpty
                         ? l10n.panelSettings_localApiKey
                         : '••••••••',
+                    trailing: const Icon(TablerIcons.refresh),
+                    onTap: () => _generateApiKey(context, ref, l10n),
                   ),
                 ],
               ),
@@ -357,6 +470,405 @@ class _PanelSettingsBody extends ConsumerWidget {
     );
   }
 
+  Future<void> _editPanelSsl(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    final cert = TextEditingController();
+    final key = TextEditingController();
+    String ssl = 'Enable';
+    String sslType = 'import-paste';
+    final saved = await showAppSheet<bool>(
+      context: context,
+      maxHeightFactor: 0.92,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setState) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.panelSettings_panelSsl, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s8),
+            Text(
+              l10n.panelSettings_panelSslWarning,
+              style: AppTextStyles.bodyS.copyWith(
+                color: sheetContext.appColors.warning,
+              ),
+            ),
+            const SizedBox(height: AppTokens.s16),
+            DropdownButtonFormField<String>(
+              initialValue: ssl,
+              decoration: InputDecoration(
+                labelText: l10n.panelSettings_panelSslMode,
+              ),
+              items: [
+                DropdownMenuItem(
+                  value: 'Enable',
+                  child: Text(l10n.panelSettings_sslModeEnable),
+                ),
+                DropdownMenuItem(
+                  value: 'Disable',
+                  child: Text(l10n.panelSettings_sslModeDisable),
+                ),
+                DropdownMenuItem(
+                  value: 'Mux',
+                  child: Text(l10n.panelSettings_sslModeMux),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => ssl = value);
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: sslType,
+              decoration: InputDecoration(
+                labelText: l10n.panelSettings_panelSslType,
+              ),
+              items: [
+                DropdownMenuItem(
+                  value: 'import-paste',
+                  child: Text(l10n.panelSettings_sslPaste),
+                ),
+                DropdownMenuItem(
+                  value: 'select',
+                  child: Text(l10n.panelSettings_sslSelectExisting),
+                ),
+                DropdownMenuItem(
+                  value: 'self',
+                  child: Text(l10n.panelSettings_sslSelfSigned),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => sslType = value);
+              },
+            ),
+            if (sslType == 'import-paste') ...[
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: cert,
+                label: l10n.websites_certificatePem,
+                maxLines: 6,
+              ),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: key,
+                label: l10n.websites_privateKeyPem,
+                maxLines: 6,
+              ),
+            ],
+            const SizedBox(height: AppTokens.s16),
+            PrimaryButton(
+              label: l10n.action_save,
+              onPressed: () => Navigator.of(sheetContext).pop(true),
+            ),
+          ],
+        ),
+      ),
+    );
+    final certValue = cert.text.trim();
+    final keyValue = key.text.trim();
+    cert.dispose();
+    key.dispose();
+    if (saved != true || !context.mounted) return;
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      await repository.updateSSL({
+        'ssl': ssl,
+        'sslType': sslType,
+        if (sslType == 'import-paste') 'cert': certValue,
+        if (sslType == 'import-paste') 'key': keyValue,
+      });
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.panelSettings_settingUpdated);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _bindMfa(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      final data = await repository.loadMFA(title: 'OneDash', interval: 30);
+      final secret = '${data['secret'] ?? ''}';
+      if (!context.mounted) return;
+      final controller = TextEditingController();
+      final saved = await showAppSheet<bool>(
+        context: context,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.panelSettings_mfa, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s12),
+            SelectableText(
+              secret.isEmpty ? l10n.state_empty : secret,
+              style: AppTextStyles.bodyM.copyWith(fontFamily: 'monospace'),
+            ),
+            const SizedBox(height: AppTokens.s16),
+            AppTextField(
+              controller: controller,
+              label: l10n.panelSettings_mfaCode,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: AppTokens.s16),
+            PrimaryButton(
+              label: l10n.panelSettings_bindMfa,
+              onPressed: () => Navigator.of(sheetContext).pop(true),
+            ),
+          ],
+        ),
+      );
+      final code = controller.text.trim();
+      controller.dispose();
+      if (saved != true || code.isEmpty || !context.mounted) return;
+      await repository.bindMFA(secret: secret, code: code, interval: '30');
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _managePasskeys(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      final items = await repository.listPasskeys();
+      if (!context.mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.panelSettings_passkeys, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s16),
+            if (items.isEmpty)
+              Text(l10n.panelSettings_noPasskeys)
+            else
+              SplitListGroup(
+                children: [
+                  for (final item in items)
+                    SplitListTile(
+                      leading: const Icon(TablerIcons.fingerprint),
+                      title:
+                          '${item['name'] ?? item['credentialName'] ?? item['id'] ?? ''}',
+                      trailing: IconButton(
+                        tooltip: l10n.action_delete,
+                        icon: const Icon(TablerIcons.trash),
+                        onPressed: () async {
+                          final id = item['id'];
+                          if (id is! num) return;
+                          await repository.deletePasskey(id.toInt());
+                          if (!sheetContext.mounted) return;
+                          Navigator.of(sheetContext).pop();
+                          AppToast.success(context, l10n.action_done);
+                        },
+                      ),
+                    ),
+                ],
+              ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _changePassword(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    final oldPassword = TextEditingController();
+    final newPassword = TextEditingController();
+    final confirm = TextEditingController();
+    final saved = await showAppSheet<bool>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.panelSettings_panelLoginPassword,
+            style: AppTextStyles.titleL,
+          ),
+          const SizedBox(height: AppTokens.s16),
+          AppTextField(
+            controller: oldPassword,
+            label: l10n.panelSettings_oldPassword,
+            obscure: true,
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: newPassword,
+            label: l10n.panelSettings_newPassword,
+            obscure: true,
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: confirm,
+            label: l10n.panelSettings_confirmPassword,
+            obscure: true,
+          ),
+          const SizedBox(height: AppTokens.s16),
+          PrimaryButton(
+            label: l10n.action_save,
+            onPressed: () => Navigator.of(sheetContext).pop(true),
+          ),
+        ],
+      ),
+    );
+    final oldValue = oldPassword.text;
+    final newValue = newPassword.text;
+    final confirmValue = confirm.text;
+    oldPassword.dispose();
+    newPassword.dispose();
+    confirm.dispose();
+    if (saved != true || !context.mounted) return;
+    if (newValue.isEmpty || newValue != confirmValue) {
+      AppToast.warning(context, l10n.panelSettings_passwordMismatch);
+      return;
+    }
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      await repository.updatePassword(
+        oldPassword: oldValue,
+        newPassword: newValue,
+      );
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.panelSettings_settingUpdated);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _changePort(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    _PanelSettingsData data,
+  ) async {
+    final controller = TextEditingController(text: data.value('serverPort'));
+    final value = await showAppSheet<int>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.panelSettings_panelPort, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s8),
+          Text(
+            l10n.panelSettings_portChangeWarning,
+            style: AppTextStyles.bodyS.copyWith(
+              color: context.scheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AppTokens.s16),
+          AppTextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: AppTokens.s16),
+          PrimaryButton(
+            label: l10n.action_save,
+            onPressed: () {
+              final port = int.tryParse(controller.text.trim());
+              if (port == null) return;
+              Navigator.of(sheetContext).pop(port);
+            },
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (value == null || !context.mounted) return;
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      await repository.updatePort(value);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.panelSettings_portChanged(value));
+      ref.invalidate(_panelSettingsProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _changeBind(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    _PanelSettingsData data,
+  ) async {
+    final controller = TextEditingController(text: data.value('bindDomain'));
+    final value = await showAppSheet<String>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.panelSettings_bindDomain, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          AppTextField(controller: controller, hint: 'panel.example.com'),
+          const SizedBox(height: AppTokens.s16),
+          PrimaryButton(
+            label: l10n.action_save,
+            onPressed: () =>
+                Navigator.of(sheetContext).pop(controller.text.trim()),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (value == null || !context.mounted) return;
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      await repository.updateBindInfo(
+        ipv6: data.value('ipv6'),
+        bindAddress: value,
+      );
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.panelSettings_settingUpdated);
+      ref.invalidate(_panelSettingsProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _generateApiKey(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      final key = await repository.generateApiKey();
+      if (!context.mounted) return;
+      await Clipboard.setData(ClipboardData(text: key));
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.panelSettings_apiKeyCopied);
+      ref.invalidate(_panelSettingsProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   String _languageLabel(AppLocalizations l10n, String code) {
     return switch (code) {
       'zh' => l10n.panelSettings_languageZh,
@@ -364,7 +876,7 @@ class _PanelSettingsBody extends ConsumerWidget {
       'ja' => l10n.panelSettings_languageJa,
       'ms' => l10n.panelSettings_languageMs,
       'pt-BR' => l10n.panelSettings_languagePtBr,
-      _ => 'English',
+      _ => l10n.panelSettings_languageEn,
     };
   }
 
@@ -397,7 +909,7 @@ class _PanelSettingsBody extends ConsumerWidget {
       title: l10n.panelSettings_language,
       options: [
         (value: 'zh', label: l10n.panelSettings_languageZh),
-        (value: 'en', label: 'English'),
+        (value: 'en', label: l10n.panelSettings_languageEn),
         (value: 'ja', label: l10n.panelSettings_languageJa),
         (value: 'ms', label: l10n.panelSettings_languageMs),
         (value: 'pt-BR', label: l10n.panelSettings_languagePtBr),
@@ -452,6 +964,7 @@ Future<String?> _editValue(
   String? description,
   TextInputType? keyboardType,
   List<TextInputFormatter>? inputFormatters,
+  int maxLines = 1,
 }) {
   return showAppSheet<String>(
     context: context,
@@ -462,6 +975,7 @@ Future<String?> _editValue(
       description: description,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
+      maxLines: maxLines,
     ),
   );
 }
@@ -474,6 +988,7 @@ class _ValueEditorSheet extends StatefulWidget {
     this.description,
     this.keyboardType,
     this.inputFormatters,
+    this.maxLines = 1,
   });
 
   final String title;
@@ -482,6 +997,7 @@ class _ValueEditorSheet extends StatefulWidget {
   final String? description;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
+  final int maxLines;
 
   @override
   State<_ValueEditorSheet> createState() => _ValueEditorSheetState();
@@ -520,6 +1036,7 @@ class _ValueEditorSheetState extends State<_ValueEditorSheet> {
           autofocus: true,
           keyboardType: widget.keyboardType,
           inputFormatters: widget.inputFormatters,
+          maxLines: widget.maxLines,
           decoration: InputDecoration(hintText: widget.hint),
         ),
         const SizedBox(height: AppTokens.s24),

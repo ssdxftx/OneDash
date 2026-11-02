@@ -1,3 +1,4 @@
+import '../../data/dto/file/file_log_dto.dart';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -49,6 +50,14 @@ abstract class FileRepository {
 
   /// 获取文件/目录大小。
   Future<int> getFileSize(String path);
+  Future<FileLogDto> readRuntimeLog({
+    required int id,
+    required String type,
+    String name,
+    int page,
+    int pageSize,
+    bool latest,
+  });
 
   /// 获取回收站状态。
   Future<bool> getRecycleStatus();

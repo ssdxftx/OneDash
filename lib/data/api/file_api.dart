@@ -6,11 +6,11 @@ import 'package:dio/dio.dart';
 import '../../core/network/api_compatibility.dart';
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
-import '../dto/common/task_log_dto.dart';
 import '../dto/common/page_result.dart';
 import '../dto/file/file_ai_search_dto.dart';
 import '../dto/file/file_favorite_dto.dart';
 import '../dto/file/file_item_dto.dart';
+import '../dto/file/file_log_dto.dart';
 import '../dto/file/user_group_dto.dart';
 import '../dto/file/file_share_dto.dart';
 
@@ -185,9 +185,10 @@ class FileApi {
   }
 
   /// 读取运行环境构建日志。
-  Future<TaskLogDto> readRuntimeLog({
+  Future<FileLogDto> readRuntimeLog({
     required int id,
     required String type,
+    String name = '',
     int page = 1,
     int pageSize = 500,
     bool latest = false,
@@ -195,6 +196,7 @@ class FileApi {
     final data = _readFilePayload(
       id: id,
       type: type,
+      name: name,
       page: page,
       pageSize: pageSize,
       latest: latest,
@@ -219,7 +221,7 @@ class FileApi {
       cacheScope: _client,
       cacheKey: 'files.readRuntimeLog',
     );
-    return ApiResponseParser.object(resp, TaskLogDto.fromJson);
+    return FileLogDto.fromJson(ApiResponseParser.map(resp));
   }
 
   Map<String, dynamic> _readFilePayload({

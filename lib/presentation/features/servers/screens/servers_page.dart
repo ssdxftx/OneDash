@@ -66,7 +66,12 @@ class ServersPage extends ConsumerWidget {
                 isEmpty: (items) => items.isEmpty,
                 empty: _EmptyServers(onAdd: () => context.push('/servers/add')),
                 builder: (items) => RefreshIndicator(
-                  onRefresh: () => ref.read(serversProvider.notifier).refresh(),
+                  onRefresh: () async {
+                    await ref.read(serversProvider.notifier).refresh();
+                    for (final server in items) {
+                      ref.invalidate(serverHealthProvider(server.id));
+                    }
+                  },
                   child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
@@ -303,7 +308,7 @@ class _ServerCard extends ConsumerWidget {
           Row(
             children: [
               StatusDot(
-                status: online ? 'running' : 'unknown',
+                status: online ? 'running' : 'offline',
                 semanticLabel: online
                     ? l10n.servers_online
                     : l10n.servers_offline,

@@ -16,6 +16,25 @@ class HostToolRepositoryImpl implements HostToolRepository {
       _api.getSupervisorStatus();
 
   @override
+  Future<String> supervisorConfig({
+    required String operate,
+    String content = '',
+  }) => _api.operateSupervisorConfig(operate: operate, content: content);
+
+  @override
+  Future<String> supervisorProcessFile({
+    required String name,
+    required String file,
+    required String operate,
+    String content = '',
+  }) => _api.operateSupervisorProcessFile(
+    name: name,
+    file: file,
+    operate: operate,
+    content: content,
+  );
+
+  @override
   Future<void> operateSupervisor(String operate) =>
       _api.operateSupervisor(operate);
 

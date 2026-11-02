@@ -21,6 +21,18 @@ abstract interface class SettingRepository {
   /// 更新 Core 侧面板配置。
   Future<void> updateCoreSetting({required String key, required String value});
 
+  /// 保存资源描述与置顶状态。
+  Future<void> saveDescription({
+    required String id,
+    required String type,
+    String detailType,
+    required bool isPinned,
+    required String description,
+  });
+
+  /// 保存面板备忘录。
+  Future<void> saveMemo(String content);
+
   /// 更新面板登录密码。
   Future<void> updatePassword({
     required String oldPassword,

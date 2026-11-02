@@ -146,23 +146,31 @@ class SkeletonList extends StatelessWidget {
     return ListView.builder(
       padding: padding,
       itemCount: itemCount,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.only(bottom: AppTokens.s12),
-        child: Row(
-          children: [
-            const SkeletonBox(width: 40, height: 40, borderRadius: 20),
-            const SizedBox(width: AppTokens.s12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SkeletonBox(width: 160, height: 14),
-                  const SizedBox(height: AppTokens.s8),
-                  SkeletonBox(width: 120 + (index % 3) * 40, height: 11),
-                ],
+      itemBuilder: (context, index) => SizedBox(
+        height: itemHeight,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: AppTokens.s12),
+          child: Row(
+            children: [
+              SkeletonBox(
+                width: itemHeight - AppTokens.s12,
+                height: itemHeight - AppTokens.s12,
+                borderRadius: (itemHeight - AppTokens.s12) / 2,
               ),
-            ),
-          ],
+              const SizedBox(width: AppTokens.s12),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SkeletonBox(width: 160, height: 14),
+                    const SizedBox(height: AppTokens.s8),
+                    SkeletonBox(width: 120 + (index % 3) * 40, height: 11),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

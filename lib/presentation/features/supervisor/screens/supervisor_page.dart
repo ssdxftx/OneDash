@@ -54,6 +54,12 @@ class SupervisorPage extends ConsumerWidget {
         actions: [
           if (ready)
             AppIconButton(
+              icon: TablerIcons.file_settings,
+              tooltip: l10n.supervisor_configFile,
+              onPressed: () => _editConfig(context, ref),
+            ),
+          if (ready)
+            AppIconButton(
               icon: TablerIcons.plus,
               tooltip: l10n.supervisor_createProcess,
               onPressed: () => _openForm(context, ref),
@@ -304,6 +310,122 @@ class SupervisorPage extends ConsumerWidget {
     }
   }
 
+  Future<void> _editConfig(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(hostToolRepositoryProvider.future);
+      final content = await repository.supervisorConfig(operate: 'get');
+      if (!context.mounted) return;
+      final controller = TextEditingController(text: content);
+      final saved = await showAppSheet<bool>(
+        context: context,
+        maxHeightFactor: 0.92,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.supervisor_configFile, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s16),
+            AppTextField(controller: controller, maxLines: 16),
+            const SizedBox(height: AppTokens.s16),
+            PrimaryButton(
+              label: l10n.action_save,
+              onPressed: () => Navigator.of(sheetContext).pop(true),
+            ),
+          ],
+        ),
+      );
+      final value = controller.text;
+      controller.dispose();
+      if (saved != true || !context.mounted) return;
+      await repository.supervisorConfig(operate: 'update', content: value);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_saved);
+      ref.invalidate(_supervisorProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showProcessFile(
+    BuildContext context,
+    WidgetRef ref,
+    SupervisorProcessConfig process,
+    String file,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final isConfig = file == 'config';
+    try {
+      final repository = await ref.read(hostToolRepositoryProvider.future);
+      final content = await repository.supervisorProcessFile(
+        name: process.name,
+        file: file,
+        operate: 'get',
+      );
+      if (!context.mounted) return;
+      final controller = TextEditingController(text: content);
+      final saved = await showAppSheet<bool>(
+        context: context,
+        maxHeightFactor: 0.92,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isConfig ? l10n.supervisor_editConfig : file,
+              style: AppTextStyles.titleL,
+            ),
+            const SizedBox(height: AppTokens.s4),
+            Text(
+              process.name,
+              style: AppTextStyles.caption.copyWith(
+                color: sheetContext.scheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: AppTokens.s16),
+            if (isConfig)
+              AppTextField(controller: controller, maxLines: 16)
+            else
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 320),
+                child: SingleChildScrollView(
+                  child: SelectableText(
+                    content.isEmpty ? l10n.state_empty : content,
+                    style: AppTextStyles.caption.copyWith(
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
+              ),
+            if (isConfig) ...[
+              const SizedBox(height: AppTokens.s16),
+              PrimaryButton(
+                label: l10n.action_save,
+                onPressed: () => Navigator.of(sheetContext).pop(true),
+              ),
+            ],
+          ],
+        ),
+      );
+      final value = controller.text;
+      controller.dispose();
+      if (!isConfig || saved != true || !context.mounted) return;
+      await repository.supervisorProcessFile(
+        name: process.name,
+        file: 'config',
+        operate: 'update',
+        content: value,
+      );
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_saved);
+      ref.invalidate(_supervisorProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _openForm(
     BuildContext context,
     WidgetRef ref, {
@@ -384,6 +506,21 @@ class SupervisorPage extends ConsumerWidget {
                 onTap: () => Navigator.of(sheetContext).pop('edit'),
               ),
               SplitListTile(
+                leading: const Icon(TablerIcons.file_settings),
+                title: l10n.supervisor_editConfig,
+                onTap: () => Navigator.of(sheetContext).pop('config'),
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.file_text),
+                title: l10n.supervisor_viewOutLog,
+                onTap: () => Navigator.of(sheetContext).pop('out.log'),
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.file_alert),
+                title: l10n.supervisor_viewErrLog,
+                onTap: () => Navigator.of(sheetContext).pop('err.log'),
+              ),
+              SplitListTile(
                 leading: const Icon(TablerIcons.trash),
                 title: l10n.common_delete,
                 subtitle: l10n.supervisor_deleteSubtitle,
@@ -398,6 +535,8 @@ class SupervisorPage extends ConsumerWidget {
     if (action == null || !context.mounted) return;
     if (action == 'edit') {
       await _openForm(context, ref, process: process);
+    } else if (action == 'config' || action.endsWith('.log')) {
+      await _showProcessFile(context, ref, process, action);
     } else {
       await _operateProcess(context, ref, l10n, process, action);
     }

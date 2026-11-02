@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -9,7 +11,9 @@ import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/dto/runtime/runtime_dto.dart';
 import '../../../../data/repositories_impl/runtime_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
+import '../../../common/components/buttons.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
@@ -43,6 +47,27 @@ class RuntimesPage extends ConsumerWidget {
             icon: TablerIcons.refresh,
             tooltip: l10n.action_refresh,
             onPressed: () => ref.invalidate(_runtimesProvider),
+          ),
+          AppIconButton(
+            icon: TablerIcons.plus,
+            tooltip: l10n.runtime_create,
+            onPressed: () => _create(context, ref),
+          ),
+          AppIconButton(
+            icon: TablerIcons.refresh,
+            tooltip: l10n.runtimes_sync,
+            onPressed: () async {
+              try {
+                final repository = await ref.read(
+                  runtimeRepositoryProvider.future,
+                );
+                await repository.syncRuntimes();
+                ref.invalidate(_runtimesProvider);
+              } catch (error) {
+                if (!context.mounted) return;
+                showErrorToast(context, error);
+              }
+            },
           ),
         ],
       ),
@@ -96,6 +121,15 @@ class RuntimesPage extends ConsumerWidget {
                             runtime.type,
                             style: AppTextStyles.caption,
                           ),
+                        ),
+                        IconButton(
+                          tooltip: l10n.action_more,
+                          visualDensity: VisualDensity.compact,
+                          icon: const Icon(
+                            TablerIcons.dots,
+                            size: AppTokens.iconList,
+                          ),
+                          onPressed: () => _showActions(context, ref, runtime),
                         ),
                       ],
                     ),
@@ -166,11 +200,29 @@ class RuntimesPage extends ConsumerWidget {
                 },
               ),
               SplitListTile(
+                leading: const Icon(TablerIcons.edit),
+                title: l10n.action_edit,
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await _edit(context, ref, runtime);
+                },
+              ),
+              SplitListTile(
                 leading: const Icon(TablerIcons.refresh),
                 title: l10n.containers_restart,
                 onTap: () async {
                   Navigator.of(sheetContext).pop();
                   await _operate(context, ref, runtime, 'restart');
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.trash),
+                title: l10n.action_delete,
+                danger: true,
+                enabled: !running,
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await _delete(context, ref, runtime);
                 },
               ),
             ],
@@ -179,6 +231,221 @@ class RuntimesPage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _create(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final name = TextEditingController();
+    final type = TextEditingController(text: 'php');
+    final image = TextEditingController();
+    final appDetailId = TextEditingController();
+    final resource = TextEditingController();
+    final version = TextEditingController();
+    final codeDir = TextEditingController();
+    final port = TextEditingController();
+    final remark = TextEditingController();
+    final params = TextEditingController(text: '{}');
+    final saved = await showAppSheet<bool>(
+      context: context,
+      maxHeightFactor: 0.92,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.runtime_create, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          AppTextField(controller: name, label: l10n.runtime_name),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: type, label: l10n.runtime_typeLabel),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: image, label: l10n.runtime_image),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: appDetailId,
+            label: l10n.runtime_appDetailId,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: resource, label: l10n.runtime_resource),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: version, label: l10n.runtime_version),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: codeDir, label: l10n.runtime_codeDir),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: port,
+            label: l10n.runtime_port,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: remark, label: l10n.runtime_remark),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: params,
+            label: l10n.runtime_paramsJson,
+            maxLines: 5,
+          ),
+          const SizedBox(height: AppTokens.s16),
+          PrimaryButton(
+            label: l10n.action_create,
+            onPressed: () => Navigator.of(sheetContext).pop(true),
+          ),
+        ],
+      ),
+    );
+    final nameValue = name.text.trim();
+    final typeValue = type.text.trim();
+    final imageValue = image.text.trim();
+    final detailId = int.tryParse(appDetailId.text.trim()) ?? 0;
+    final resourceValue = resource.text.trim();
+    final versionValue = version.text.trim();
+    final codeDirValue = codeDir.text.trim();
+    final portValue = int.tryParse(port.text.trim()) ?? 0;
+    final remarkValue = remark.text.trim();
+    final paramsRaw = params.text.trim();
+    name.dispose();
+    type.dispose();
+    image.dispose();
+    appDetailId.dispose();
+    resource.dispose();
+    version.dispose();
+    codeDir.dispose();
+    port.dispose();
+    remark.dispose();
+    params.dispose();
+    if (saved != true || !context.mounted || nameValue.isEmpty) return;
+    Map<String, dynamic> parsed;
+    try {
+      final decoded = jsonDecode(paramsRaw.isEmpty ? '{}' : paramsRaw);
+      if (decoded is! Map<String, dynamic>) {
+        AppToast.warning(context, l10n.runtime_paramsInvalid);
+        return;
+      }
+      parsed = decoded;
+    } catch (_) {
+      AppToast.warning(context, l10n.runtime_paramsInvalid);
+      return;
+    }
+    try {
+      final repository = await ref.read(runtimeRepositoryProvider.future);
+      await repository.createRuntime(
+        RuntimeCreateReq(
+          name: nameValue,
+          appDetailID: detailId,
+          image: imageValue,
+          params: parsed,
+          type: typeValue,
+          resource: resourceValue,
+          version: versionValue,
+          codeDir: codeDirValue,
+          port: portValue,
+          remark: remarkValue,
+        ),
+      );
+      ref.invalidate(_runtimesProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _edit(
+    BuildContext context,
+    WidgetRef ref,
+    RuntimeDto runtime,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(runtimeRepositoryProvider.future);
+      final detail = await repository.getRuntime(runtime.id);
+      if (!context.mounted) return;
+      final name = TextEditingController(text: detail.name);
+      final remark = TextEditingController(text: detail.remark);
+      final port = TextEditingController(text: detail.port);
+      final saved = await showAppSheet<bool>(
+        context: context,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.action_edit, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s16),
+            AppTextField(controller: name, label: l10n.runtime_name),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: port, label: l10n.runtime_port),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: remark, label: l10n.runtime_remark),
+            const SizedBox(height: AppTokens.s16),
+            PrimaryButton(
+              label: l10n.action_save,
+              onPressed: () => Navigator.of(sheetContext).pop(true),
+            ),
+          ],
+        ),
+      );
+      final nameValue = name.text.trim();
+      final remarkValue = remark.text.trim();
+      final portValue = int.tryParse(port.text.trim().split(':').last) ?? 0;
+      name.dispose();
+      remark.dispose();
+      port.dispose();
+      if (saved != true || !context.mounted || nameValue.isEmpty) return;
+      await repository.updateRuntime(
+        RuntimeCreateReq(
+          id: detail.id,
+          name: nameValue,
+          appDetailID: detail.appDetailID,
+          image: detail.image,
+          params: detail.params ?? const {},
+          type: detail.type,
+          resource: detail.resource,
+          appID: detail.appID,
+          version: detail.version,
+          source: detail.source,
+          codeDir: detail.codeDir,
+          port: portValue,
+          exposedPorts: detail.exposedPorts,
+          environments: detail.environments,
+          volumes: detail.volumes,
+          extraHosts: detail.extraHosts,
+          remark: remarkValue,
+        ),
+      );
+      ref.invalidate(_runtimesProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _delete(
+    BuildContext context,
+    WidgetRef ref,
+    RuntimeDto runtime,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.runtimes_delete,
+      message: l10n.runtimes_deleteConfirm(runtime.name),
+      confirmLabel: l10n.action_delete,
+      requireText: runtime.name,
+    );
+    if (!confirmed || !context.mounted) return;
+    try {
+      final repository = await ref.read(runtimeRepositoryProvider.future);
+      await repository.deleteRuntime(runtime.id, forceDelete: true);
+      ref.invalidate(_runtimesProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _operate(

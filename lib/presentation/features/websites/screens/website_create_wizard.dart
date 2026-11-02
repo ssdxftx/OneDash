@@ -5,9 +5,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../data/dto/cronjob/cronjob_form_data_dto.dart';
 import '../../../../data/dto/website/website_create_req.dart';
 import '../../../../data/dto/website/website_domain_req.dart';
+import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
@@ -61,6 +64,57 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
     });
   }
 
+  Future<void> _copyFromExisting() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final options = await repository.getWebsiteOptions();
+      if (!mounted) return;
+      if (options.isEmpty) {
+        AppToast.warning(context, l10n.state_empty);
+        return;
+      }
+      final picked = await showAppSheet<WebsiteOptionDto>(
+        context: context,
+        maxHeightFactor: 0.85,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.websites_copyFromExisting, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s16),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final option in options)
+                    ListTile(
+                      leading: const Icon(TablerIcons.world),
+                      title: Text(option.primaryDomain),
+                      subtitle: Text(option.alias),
+                      onTap: () => Navigator.of(sheetContext).pop(option),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+      if (picked == null || !mounted) return;
+      setState(() {
+        _aliasController.text = picked.alias;
+        if (picked.primaryDomain.isNotEmpty) {
+          _domains
+            ..clear()
+            ..add(picked.primaryDomain);
+        }
+      });
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _create() async {
     final l10n = AppLocalizations.of(context);
     if (_domains.isEmpty) {
@@ -101,13 +155,23 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
     final scheme = context.scheme;
     final metadata = ref.watch(websiteCreateMetadataProvider);
 
+    final typeLabel = switch (_type) {
+      'proxy' => l10n.websites_proxy,
+      'php' => l10n.websites_php,
+      _ => l10n.websites_static,
+    };
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.websites_create)),
+      appBar: AppBarLarge(
+        title: l10n.websites_create,
+        leading: IconButton(
+          tooltip: l10n.action_close,
+          onPressed: () => context.pop(),
+          icon: const Icon(TablerIcons.x),
+        ),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(AppTokens.s16),
         children: [
-          const _StepIndicator(index: 2),
-          const SizedBox(height: AppTokens.s24),
           SectionHeader(title: l10n.websites_domains),
           TonalCard(
             child: Column(
@@ -150,6 +214,13 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                   controller: _aliasController,
                   label: l10n.websites_alias,
                   hint: l10n.websites_optional,
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _copyFromExisting,
+                    child: Text(l10n.websites_copyFromExisting),
+                  ),
                 ),
               ],
             ),
@@ -197,7 +268,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                 ),
                 const SizedBox(height: AppTokens.s8),
                 Text(
-                  '${l10n.websites_type}: $_type',
+                  '${l10n.websites_type}: $typeLabel',
                   style: AppTextStyles.bodyM,
                 ),
                 const SizedBox(height: AppTokens.s8),
@@ -220,50 +291,6 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
           const SizedBox(height: AppTokens.s32),
         ],
       ),
-    );
-  }
-}
-
-class _StepIndicator extends StatelessWidget {
-  const _StepIndicator({required this.index});
-
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        for (var i = 0; i < 3; i++) ...[
-          Container(
-            width: 24,
-            height: 24,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: i <= index
-                  ? context.scheme.primary
-                  : context.scheme.surfaceContainerHigh,
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              '${i + 1}',
-              style: AppTextStyles.caption.copyWith(
-                color: i <= index
-                    ? context.scheme.onPrimary
-                    : context.scheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          if (i < 2)
-            Expanded(
-              child: Container(
-                height: 2,
-                color: i < index
-                    ? context.scheme.primary
-                    : context.scheme.outlineVariant,
-              ),
-            ),
-        ],
-      ],
     );
   }
 }

@@ -9,6 +9,7 @@ import '../api/file_api.dart';
 import '../api/group_api.dart';
 import '../api/website_api.dart';
 import '../dto/common/page_result.dart';
+import '../dto/cronjob/cronjob_form_data_dto.dart';
 import '../dto/website/website_acme_account_dto.dart';
 import '../dto/website/website_create_metadata.dart';
 import '../dto/website/website_create_req.dart';
@@ -55,6 +56,10 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
 
   @override
   Future<WebsiteDetailDto> getWebsite(int id) => _websiteApi.getWebsite(id);
+
+  @override
+  Future<List<WebsiteOptionDto>> getWebsiteOptions() =>
+      _websiteApi.getWebsiteOptions();
 
   @override
   Future<OpenRestyStatusDto> getOpenRestyStatus() =>

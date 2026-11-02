@@ -40,4 +40,6 @@ abstract interface class LogRepository {
     String info,
     String status,
   });
+
+  Future<String> exportSshLogs({String info, String status});
 }

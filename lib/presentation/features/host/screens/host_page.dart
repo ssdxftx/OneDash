@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +17,7 @@ import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/filter_chips.dart';
+import '../../../common/components/section_header.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
@@ -49,6 +51,10 @@ class _HostPageState extends ConsumerState<HostPage> {
   int _hours = 1;
   Map<String, dynamic> _setting = const {};
   List<SshCertDto> _certs = const [];
+  bool _certSelecting = false;
+  final Set<int> _selectedCerts = {};
+
+  bool get _certSelectionMode => _certSelecting;
   late Future<_MonitorSeries> _monitor;
   late Future<SshInfoDto> _ssh;
 
@@ -303,6 +309,12 @@ class _HostPageState extends ConsumerState<HostPage> {
                   subtitle: info.isActive
                       ? l10n.databases_enabled
                       : l10n.databases_disabled,
+                  trailing: Icon(
+                    info.isActive
+                        ? TablerIcons.player_pause
+                        : TablerIcons.player_play,
+                  ),
+                  onTap: () => _toggleSsh(info.isActive),
                 ),
                 SplitListTile(
                   title: l10n.host_sshPort,
@@ -345,47 +357,467 @@ class _HostPageState extends ConsumerState<HostPage> {
                 ),
               ],
             ),
-            const SizedBox(height: AppTokens.s24),
-            Row(
+            const SizedBox(height: AppTokens.s16),
+            SplitListGroup(
               children: [
-                Expanded(
-                  child: Text(l10n.host_sshKeys, style: AppTextStyles.titleM),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.plug_connected),
+                  title: l10n.host_testSsh,
+                  subtitle: l10n.host_testSshHint,
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: _testSshConnection,
                 ),
-                TextButton.icon(
-                  onPressed: _generateKey,
-                  icon: const Icon(TablerIcons.plus, size: AppTokens.iconList),
-                  label: Text(l10n.host_generateKey),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.file_settings),
+                  title: l10n.host_sshConfigFile,
+                  subtitle: l10n.host_sshConfigFileHint,
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: _editSshConfig,
+                ),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.terminal_2),
+                  title: l10n.host_terminalSessions,
+                  subtitle: l10n.host_terminalSessionsHint,
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: _showSessions,
                 ),
               ],
             ),
+            const SizedBox(height: AppTokens.s24),
+            SectionHeader(
+              title: l10n.host_sshKeys,
+              trailing: PopupMenuButton<String>(
+                tooltip: l10n.action_more,
+                icon: const Icon(TablerIcons.dots),
+                onSelected: (value) {
+                  if (value == 'sync') {
+                    _syncKeys();
+                  } else if (value == 'generate') {
+                    _generateKey();
+                  } else if (value == 'select') {
+                    setState(() {
+                      _certSelecting = true;
+                      _selectedCerts
+                        ..clear()
+                        ..addAll(_certs.map((cert) => cert.id));
+                    });
+                  } else if (value == 'cancel') {
+                    setState(() {
+                      _certSelecting = false;
+                      _selectedCerts.clear();
+                    });
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(value: 'sync', child: Text(l10n.host_syncKeys)),
+                  PopupMenuItem(
+                    value: 'generate',
+                    child: Text(l10n.host_generateKey),
+                  ),
+                  if (_certs.isNotEmpty)
+                    PopupMenuItem(
+                      value: _certSelectionMode ? 'cancel' : 'select',
+                      child: Text(
+                        _certSelectionMode
+                            ? l10n.files_cancelSelection
+                            : l10n.files_selectAll,
+                      ),
+                    ),
+                ],
+              ),
+            ),
             const SizedBox(height: AppTokens.s8),
             if (_certs.isEmpty)
-              Text(
-                l10n.state_empty,
-                style: AppTextStyles.bodyS.copyWith(
-                  color: context.scheme.onSurfaceVariant,
-                ),
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.key,
+                title: l10n.state_empty,
               )
             else
               SplitListGroup(
                 children: [
                   for (final cert in _certs)
                     SplitListTile(
-                      leading: const Icon(TablerIcons.key),
+                      leading: _certSelectionMode
+                          ? Checkbox(
+                              value: _selectedCerts.contains(cert.id),
+                              onChanged: (_) => setState(() {
+                                if (!_selectedCerts.remove(cert.id)) {
+                                  _selectedCerts.add(cert.id);
+                                }
+                              }),
+                            )
+                          : const Icon(TablerIcons.key),
                       title: cert.name,
                       subtitle: cert.encryptionMode,
-                      trailing: IconButton(
-                        tooltip: l10n.host_deleteKey,
-                        icon: const Icon(TablerIcons.trash),
-                        onPressed: () => _deleteKey(cert),
-                      ),
+                      trailing: _certSelectionMode
+                          ? null
+                          : Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  tooltip: l10n.action_edit,
+                                  icon: const Icon(TablerIcons.edit),
+                                  onPressed: () => _editKey(cert),
+                                ),
+                                IconButton(
+                                  tooltip: l10n.host_deleteKey,
+                                  icon: const Icon(TablerIcons.trash),
+                                  onPressed: () => _deleteKey(cert),
+                                ),
+                              ],
+                            ),
+                      onTap: _certSelectionMode
+                          ? () => setState(() {
+                              if (!_selectedCerts.remove(cert.id)) {
+                                _selectedCerts.add(cert.id);
+                              }
+                            })
+                          : null,
                     ),
                 ],
+              ),
+            if (_certSelectionMode)
+              Padding(
+                padding: const EdgeInsets.only(top: AppTokens.s12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.files_selectCount(_selectedCerts.length),
+                        style: AppTextStyles.bodyM,
+                      ),
+                    ),
+                    DangerButton(
+                      expanded: false,
+                      icon: TablerIcons.trash,
+                      label: l10n.action_delete,
+                      onPressed: _deleteSelectedKeys,
+                    ),
+                  ],
+                ),
               ),
           ],
         );
       },
     );
+  }
+
+  Future<void> _deleteSelectedKeys() async {
+    final l10n = AppLocalizations.of(context);
+    final ids = _selectedCerts.toList(growable: false);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.files_batchDelete,
+      message: l10n.files_selectCount(ids.length),
+      confirmLabel: l10n.action_delete,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      for (final id in ids) {
+        await repository.deleteSshCert(id);
+      }
+      if (!mounted) return;
+      setState(() {
+        _certSelecting = false;
+        _selectedCerts.clear();
+      });
+      await _loadCerts();
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _testSshConnection() async {
+    final l10n = AppLocalizations.of(context);
+    final addr = TextEditingController();
+    final port = TextEditingController(text: '22');
+    final user = TextEditingController(text: 'root');
+    final password = TextEditingController();
+    final saved = await showAppSheet<bool>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.host_testSsh, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          AppTextField(
+            controller: addr,
+            label: l10n.databases_address,
+            hint: '192.168.1.10',
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: port,
+            label: l10n.databases_port,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: user, label: l10n.databases_username),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: password,
+            label: l10n.databases_password,
+            obscure: true,
+          ),
+          const SizedBox(height: AppTokens.s16),
+          PrimaryButton(
+            label: l10n.host_testSsh,
+            onPressed: () => Navigator.of(sheetContext).pop(true),
+          ),
+        ],
+      ),
+    );
+    final addrValue = addr.text.trim();
+    final portValue = int.tryParse(port.text.trim()) ?? 0;
+    final userValue = user.text.trim();
+    final passwordValue = password.text;
+    addr.dispose();
+    port.dispose();
+    user.dispose();
+    password.dispose();
+    if (saved != true || !mounted || addrValue.isEmpty || portValue == 0) {
+      return;
+    }
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      final ok = await repository.testHostConnection({
+        'addr': addrValue,
+        'port': portValue,
+        'user': userValue,
+        'authMode': 'password',
+        'password': passwordValue,
+      });
+      if (!mounted) return;
+      if (ok) {
+        AppToast.success(context, l10n.databases_connectionOk);
+      } else {
+        AppToast.warning(context, l10n.databases_connectionFailed);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _editSshConfig() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      final optionsRaw = await repository.loadSshFile('sshdConfOptions');
+      final options = <String>[];
+      try {
+        final decoded = jsonDecode(optionsRaw);
+        if (decoded is List) {
+          for (final item in decoded) {
+            if (item is Map && item['path'] != null) {
+              options.add('${item['path']}');
+            }
+          }
+        }
+      } catch (_) {
+        // Fall back to an empty list.
+      }
+      if (options.isEmpty || !mounted) {
+        if (mounted) AppToast.warning(context, l10n.host_sshConfigNotFound);
+        return;
+      }
+      String path = options.first;
+      if (options.length > 1) {
+        final picked = await showAppSheet<String>(
+          context: context,
+          builder: (sheetContext) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.host_sshConfigFile, style: AppTextStyles.titleL),
+              const SizedBox(height: AppTokens.s16),
+              SplitListGroup(
+                children: [
+                  for (final option in options)
+                    SplitListTile(
+                      leading: const Icon(TablerIcons.file),
+                      title: option,
+                      onTap: () => Navigator.of(sheetContext).pop(option),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        );
+        if (picked == null || !mounted) return;
+        path = picked;
+      }
+      final content = await repository.loadSshFile('sshdConfPath:$path');
+      if (!mounted) return;
+      final controller = TextEditingController(text: content);
+      final saved = await showAppSheet<bool>(
+        context: context,
+        maxHeightFactor: 0.92,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.host_sshConfigFile, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s4),
+            Text(
+              path,
+              style: AppTextStyles.caption.copyWith(
+                color: sheetContext.scheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: AppTokens.s16),
+            AppTextField(controller: controller, maxLines: 16),
+            const SizedBox(height: AppTokens.s8),
+            Text(
+              l10n.host_sshConfigWarning,
+              style: AppTextStyles.bodyS.copyWith(
+                color: sheetContext.appColors.warning,
+              ),
+            ),
+            const SizedBox(height: AppTokens.s16),
+            PrimaryButton(
+              label: l10n.action_save,
+              onPressed: () => Navigator.of(sheetContext).pop(true),
+            ),
+          ],
+        ),
+      );
+      final value = controller.text;
+      controller.dispose();
+      if (saved != true || !mounted) return;
+      await repository.updateSshFile('sshdConfPath', value, path);
+      if (!mounted) return;
+      AppToast.success(context, l10n.host_sshConfigSaved);
+      _refreshSsh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showSessions() async {
+    final l10n = AppLocalizations.of(context);
+    final repository = await ref.read(
+      hostRepositoryProvider(widget.serverId).future,
+    );
+    if (!mounted) return;
+    await showAppSheet<void>(
+      context: context,
+      maxHeightFactor: 0.85,
+      builder: (sheetContext) => FutureBuilder<List<Map<String, dynamic>>>(
+        future: repository.searchTerminalSessions(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Text(describeError(snapshot.error!, l10n));
+          }
+          final items = snapshot.data ?? const [];
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.host_terminalSessions,
+                      style: AppTextStyles.titleL,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: items.isEmpty
+                        ? null
+                        : () async {
+                            await repository.closeAllTerminalSessions();
+                            if (!context.mounted) return;
+                            Navigator.of(context).pop();
+                            AppToast.success(context, l10n.action_done);
+                          },
+                    child: Text(l10n.host_closeAllSessions),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTokens.s8),
+              if (items.isEmpty)
+                Text(
+                  l10n.state_empty,
+                  style: AppTextStyles.bodyS.copyWith(
+                    color: context.scheme.onSurfaceVariant,
+                  ),
+                )
+              else
+                for (final item in items)
+                  ListTile(
+                    dense: true,
+                    title: Text('${item['username'] ?? item['user'] ?? '-'}'),
+                    subtitle: Text(
+                      '${item['clientIP'] ?? item['ip'] ?? ''} '
+                      '${item['connectTime'] ?? ''}',
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(TablerIcons.x),
+                      onPressed: () async {
+                        final id = '${item['id'] ?? item['sessionID'] ?? ''}';
+                        if (id.isEmpty) return;
+                        await repository.closeTerminalSession(id);
+                        if (!context.mounted) return;
+                        Navigator.of(context).pop();
+                        AppToast.success(context, l10n.action_done);
+                      },
+                    ),
+                  ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _toggleSsh(bool active) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      await repository.operateSsh(active ? 'disable' : 'enable');
+      if (!mounted) return;
+      AppToast.success(context, l10n.host_sshUpdated);
+      _refreshSsh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _syncKeys() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      await repository.syncSshCerts();
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      unawaited(_loadCerts());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _generateKey() async {
@@ -453,6 +885,59 @@ class _HostPageState extends ConsumerState<HostPage> {
       );
       if (!mounted) return;
       AppToast.success(context, l10n.host_keyGenerated);
+      unawaited(_loadCerts());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _editKey(SshCertDto cert) async {
+    final l10n = AppLocalizations.of(context);
+    final name = TextEditingController(text: cert.name);
+    final description = TextEditingController();
+    final confirmed = await showAppSheet<bool>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.action_edit, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          AppTextField(
+            controller: name,
+            label: l10n.host_keyName,
+            autofocus: true,
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: description, label: l10n.websites_remark),
+          const SizedBox(height: AppTokens.s24),
+          PrimaryButton(
+            label: l10n.action_save,
+            onPressed: () => Navigator.of(sheetContext).pop(true),
+          ),
+        ],
+      ),
+    );
+    final keyName = name.text.trim();
+    final note = description.text.trim();
+    name.dispose();
+    description.dispose();
+    if (confirmed != true || keyName.isEmpty || !mounted) return;
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      await repository.editSshCert(
+        SshCertOperateReq(
+          id: cert.id,
+          name: keyName,
+          encryptionMode: cert.encryptionMode,
+          description: note,
+        ),
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_saved);
       unawaited(_loadCerts());
     } catch (error) {
       if (!mounted) return;

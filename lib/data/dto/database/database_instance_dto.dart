@@ -7,6 +7,12 @@ class DatabaseInstanceDto {
     required this.database,
     required this.version,
     required this.address,
+    this.port = 0,
+    this.username = '',
+    this.password = '',
+    this.description = '',
+    this.ssl = false,
+    this.timeout = 0,
   });
 
   final int id;
@@ -15,6 +21,14 @@ class DatabaseInstanceDto {
   final String database;
   final String version;
   final String address;
+  final int port;
+  final String username;
+  final String password;
+  final String description;
+  final bool ssl;
+  final int timeout;
+
+  String get name => database;
 
   factory DatabaseInstanceDto.fromJson(Map<String, dynamic> json) {
     return DatabaseInstanceDto(
@@ -24,6 +38,12 @@ class DatabaseInstanceDto {
       database: json['database'] as String? ?? '',
       version: json['version'] as String? ?? '',
       address: json['address'] as String? ?? '',
+      port: json['port'] as int? ?? 0,
+      username: json['username'] as String? ?? '',
+      password: json['password'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      ssl: json['ssl'] as bool? ?? false,
+      timeout: json['timeout'] as int? ?? 0,
     );
   }
 }

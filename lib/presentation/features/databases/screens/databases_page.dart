@@ -9,7 +9,9 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/database/database_instance_dto.dart';
 import '../../../../data/repositories_impl/database_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
+import '../../../common/components/buttons.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/skeleton.dart';
@@ -47,6 +49,8 @@ final _databasesProvider = FutureProvider.autoDispose<_DatabasesState>((
   final types = instances.isEmpty
       ? ['mysql', 'postgresql', 'redis', 'mongodb']
       : instances.map((e) => e.type).toSet().toList();
+  var failures = 0;
+  Object? firstError;
   final results = await Future.wait<List<DatabaseSearchItemDto>>(
     types.map((type) async {
       try {
@@ -69,11 +73,16 @@ final _databasesProvider = FutureProvider.autoDispose<_DatabasesState>((
           ),
         };
         return page.items.map((item) => item.withType(type)).toList();
-      } catch (_) {
+      } catch (error) {
+        failures++;
+        firstError ??= error;
         return <DatabaseSearchItemDto>[];
       }
     }),
   );
+  if (types.isNotEmpty && failures == types.length && firstError != null) {
+    throw firstError!;
+  }
   return _DatabasesState(
     items: results.expand((e) => e).toList(),
     types: types,
@@ -109,6 +118,11 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
       appBar: AppBarLarge(
         title: l10n.databases_title,
         actions: [
+          AppIconButton(
+            icon: TablerIcons.server,
+            tooltip: l10n.databases_remoteInstances,
+            onPressed: _showRemote,
+          ),
           AppIconButton(
             icon: TablerIcons.plus,
             tooltip: l10n.databases_create,
@@ -179,6 +193,14 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
       'redis-cluster' => 'Redis Cluster',
       _ => type,
     };
+  }
+
+  Future<void> _showRemote() async {
+    await showAppSheet<void>(
+      context: context,
+      maxHeightFactor: 0.9,
+      builder: (sheetContext) => const _RemoteInstancesSheet(),
+    );
   }
 
   Future<void> _showCreateType(_DatabasesState? state) async {
@@ -356,6 +378,305 @@ class _DatabaseCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _RemoteInstancesSheet extends ConsumerStatefulWidget {
+  const _RemoteInstancesSheet();
+
+  @override
+  ConsumerState<_RemoteInstancesSheet> createState() =>
+      _RemoteInstancesSheetState();
+}
+
+class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
+  List<DatabaseInstanceDto> _items = const [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      final items = <DatabaseInstanceDto>[];
+      for (final type in const ['mysql', 'postgresql', 'mongodb', 'redis']) {
+        try {
+          final page = await repository.searchRemoteDatabases(type: type);
+          items.addAll(page.items);
+        } catch (_) {
+          // Skip types the panel does not support.
+        }
+      }
+      if (!mounted) return;
+      setState(() => _items = items);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _edit([DatabaseInstanceDto? current]) async {
+    final l10n = AppLocalizations.of(context);
+    final name = TextEditingController(text: current?.name ?? '');
+    final address = TextEditingController(text: current?.address ?? '');
+    final port = TextEditingController(
+      text: current == null || current.port == 0 ? '' : '${current.port}',
+    );
+    final username = TextEditingController(text: current?.username ?? '');
+    final password = TextEditingController(text: current?.password ?? '');
+    final description = TextEditingController(text: current?.description ?? '');
+    final type = current?.type ?? 'mysql';
+    bool ssl = current?.ssl ?? false;
+    final saved = await showAppSheet<bool>(
+      context: context,
+      maxHeightFactor: 0.92,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setState) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              current == null
+                  ? l10n.databases_addRemote
+                  : l10n.databases_editRemote,
+              style: AppTextStyles.titleL,
+            ),
+            const SizedBox(height: AppTokens.s16),
+            AppTextField(controller: name, label: l10n.files_name),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: address, label: l10n.databases_address),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: port,
+              label: l10n.databases_port,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: username, label: l10n.databases_username),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: password,
+              label: l10n.databases_password,
+              obscure: true,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: description,
+              label: l10n.databases_description,
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.databases_ssl),
+              value: ssl,
+              onChanged: (value) => setState(() => ssl = value),
+            ),
+            const SizedBox(height: AppTokens.s16),
+            PrimaryButton(
+              label: l10n.action_save,
+              onPressed: () => Navigator.of(sheetContext).pop(true),
+            ),
+          ],
+        ),
+      ),
+    );
+    final nameValue = name.text.trim();
+    final addressValue = address.text.trim();
+    final portValue = int.tryParse(port.text.trim()) ?? 0;
+    final usernameValue = username.text.trim();
+    final passwordValue = password.text;
+    final note = description.text.trim();
+    name.dispose();
+    address.dispose();
+    port.dispose();
+    username.dispose();
+    password.dispose();
+    description.dispose();
+    if (saved != true || !mounted || nameValue.isEmpty) return;
+    final body = <String, dynamic>{
+      if (current != null) 'id': current.id,
+      'name': nameValue,
+      'type': type,
+      'from': current?.from ?? 'remote',
+      'version': current?.version ?? '',
+      'database': current?.database ?? nameValue,
+      'address': addressValue,
+      'port': portValue,
+      'username': usernameValue,
+      'password': passwordValue,
+      'description': note,
+      'ssl': ssl,
+      'timeout': current?.timeout ?? 30,
+    };
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      if (await repository.checkRemoteConnection(body)) {
+        await repository.updateRemoteDatabase(body);
+        if (!mounted) return;
+        AppToast.success(context, l10n.action_saved);
+        await _load();
+      } else {
+        if (!mounted) return;
+        AppToast.warning(context, l10n.databases_connectionFailed);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _test(DatabaseInstanceDto item) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      final ok = await repository.checkRemoteConnection({
+        'name': item.name,
+        'type': item.type,
+        'from': item.from,
+        'address': item.address,
+        'port': item.port,
+        'username': item.username,
+        'password': item.password,
+        'ssl': item.ssl,
+        'timeout': item.timeout,
+      });
+      if (!mounted) return;
+      if (ok) {
+        AppToast.success(context, l10n.databases_connectionOk);
+      } else {
+        AppToast.warning(context, l10n.databases_connectionFailed);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _loadDatabases(DatabaseInstanceDto item) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      if (item.type.startsWith('postgresql')) {
+        await repository.loadPgFromRemote(database: item.name);
+      } else {
+        await repository.loadFromRemote(
+          from: item.from.isEmpty ? 'remote' : item.from,
+          type: item.type,
+          database: item.name,
+        );
+      }
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _delete(DatabaseInstanceDto item) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.action_delete,
+      message: item.name,
+      confirmLabel: l10n.action_delete,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      await repository.deleteRemoteDatabase(
+        id: item.id,
+        database: item.name,
+        forceDelete: true,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                l10n.databases_remoteInstances,
+                style: AppTextStyles.titleL,
+              ),
+            ),
+            TextButton.icon(
+              onPressed: _loading ? null : _edit,
+              icon: const Icon(TablerIcons.plus, size: 18),
+              label: Text(l10n.databases_addRemote),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppTokens.s8),
+        if (_loading)
+          const SkeletonList(itemCount: 3)
+        else if (_items.isEmpty)
+          Text(l10n.state_empty)
+        else
+          Flexible(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                for (final item in _items)
+                  ListTile(
+                    leading: const Icon(TablerIcons.database),
+                    title: Text(item.name),
+                    subtitle: Text(
+                      '${item.type} · ${item.address}${item.port == 0 ? '' : ':${item.port}'}',
+                    ),
+                    trailing: PopupMenuButton<String>(
+                      tooltip: l10n.action_more,
+                      icon: const Icon(TablerIcons.dots),
+                      onSelected: (value) {
+                        if (value == 'load') _loadDatabases(item);
+                        if (value == 'test') _test(item);
+                        if (value == 'edit') _edit(item);
+                        if (value == 'delete') _delete(item);
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'load',
+                          child: Text(l10n.databases_loadDatabases),
+                        ),
+                        PopupMenuItem(
+                          value: 'test',
+                          child: Text(l10n.databases_testConnection),
+                        ),
+                        PopupMenuItem(
+                          value: 'edit',
+                          child: Text(l10n.action_edit),
+                        ),
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Text(l10n.action_delete),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

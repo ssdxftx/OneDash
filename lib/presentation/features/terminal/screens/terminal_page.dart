@@ -11,6 +11,7 @@ import 'package:xterm/xterm.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../common/states/error_toast.dart';
 import '../../../../core/network/api_compatibility.dart';
+import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/network/one_panel_auth.dart';
 import '../../../../core/network/web_socket_connector.dart';
 import '../../../../core/storage/storage_service.dart';
@@ -59,7 +60,10 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
       final server = await storage.getServer(widget.serverId);
       if (server == null) {
         if (!mounted) return;
-        throw StateError(AppLocalizations.of(context).process_serverMissing);
+        throw ApiBusinessException(
+          400,
+          AppLocalizations.of(context).process_serverMissing,
+        );
       }
       final apiKey = await storage.getApiKey(widget.serverId) ?? '';
       final headers = await OnePanelAuth.signedHeaders(apiKey);
@@ -211,26 +215,13 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
     if (text == null || text.isEmpty) return;
     if (text.contains('password=') || text.contains('token=')) {
       if (!mounted) return;
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            AppLocalizations.of(context).terminal_sensitivePasteTitle,
-          ),
-          content: Text(
-            AppLocalizations.of(context).terminal_sensitivePasteMessage,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(AppLocalizations.of(context).action_cancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(AppLocalizations.of(context).terminal_paste),
-            ),
-          ],
-        ),
+      final l10n = AppLocalizations.of(context);
+      final confirmed = await showConfirmSheet(
+        context,
+        title: l10n.terminal_sensitivePasteTitle,
+        message: l10n.terminal_sensitivePasteMessage,
+        confirmLabel: l10n.terminal_paste,
+        danger: false,
       );
       if (confirmed != true) return;
     }
@@ -263,22 +254,12 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
       canPop: _status != _TerminalStatus.connected,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(l10n.terminal_title),
-            content: Text(l10n.terminal_disconnect_confirm),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(l10n.action_cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text(l10n.action_close),
-              ),
-            ],
-          ),
+        final confirmed = await showConfirmSheet(
+          context,
+          title: l10n.terminal_title,
+          message: l10n.terminal_disconnect_confirm,
+          confirmLabel: l10n.action_close,
+          danger: false,
         );
         if (confirmed == true) {
           await _disconnect();
@@ -287,10 +268,10 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0B0F0C),
+        backgroundColor: AppTokens.consoleBackground,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF0B0F0C),
-          foregroundColor: const Color(0xFFD7E4DA),
+          backgroundColor: AppTokens.consoleBackground,
+          foregroundColor: AppTokens.consoleForeground,
           title: Row(
             children: [
               Container(
@@ -413,7 +394,7 @@ class _TerminalToolbar extends StatelessWidget {
       top: false,
       child: Container(
         height: 48,
-        color: const Color(0xFF141A16),
+        color: AppTokens.consoleToolbar,
         child: ListView(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: AppTokens.s8),
@@ -475,8 +456,11 @@ class _KeyButton extends StatelessWidget {
         child: TextButton(
           onPressed: onTap,
           style: TextButton.styleFrom(
-            foregroundColor: const Color(0xFFD7E4DA),
-            minimumSize: const Size(44, 36),
+            foregroundColor: AppTokens.consoleForeground,
+            minimumSize: const Size(
+              AppTokens.minTapTarget,
+              AppTokens.minTapTarget,
+            ),
           ),
           child: Text(label, style: AppTextStyles.caption),
         ),

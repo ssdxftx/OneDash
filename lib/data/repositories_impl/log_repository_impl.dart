@@ -82,6 +82,10 @@ class LogRepositoryImpl implements LogRepository {
     info: info,
     status: status,
   );
+
+  @override
+  Future<String> exportSshLogs({String info = '', String status = 'All'}) =>
+      _api.exportSshLogs(info: info, status: status);
 }
 
 /// 基于当前激活服务器的日志仓库 Provider。

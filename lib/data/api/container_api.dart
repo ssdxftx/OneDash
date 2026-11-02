@@ -22,6 +22,7 @@ import '../dto/container/compose_template_dto.dart';
 import '../dto/container/image_dtos.dart';
 import '../dto/container/network_dtos.dart';
 import '../dto/common/page_result.dart';
+import '../dto/common/task_log_dto.dart';
 import 'task_waiter.dart';
 
 /// 容器 API。
@@ -361,12 +362,15 @@ class ContainerApi {
     return '${data['taskID'] ?? ''}';
   }
 
-  /// 等待容器创建任务结束。
-  Future<void> waitForTask(String taskID) async {
+  /// 等待容器任务结束。
+  Future<void> waitForTask(
+    String taskID, {
+    void Function(TaskLogDto log)? onUpdate,
+  }) async {
     await TaskWaiter(
       _client,
       maxAttempts: 240,
-    ).waitFor(taskID, subject: '容器任务');
+    ).waitFor(taskID, subject: '容器任务', onUpdate: onUpdate);
   }
 
   /// 更新容器。
