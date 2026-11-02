@@ -175,3 +175,176 @@ is absent from the working tree.
 - 页签滚动使用 `Scrollable.ensureVisible`，筛选芯片只共享边缘渐隐实现。
 - 网站删除保留选项页，再追加一次域名输入确认。
 - 模板 DTO 没有版本字段，模板卡 chip 显示单页/多文件类型。
+
+## v8 可控能力补全（第一批）
+
+- 长任务统一走 `TaskProgressSheet`；`TaskWaiter.waitFor` 新增 `onUpdate`
+  回调，容器任务面板会显示 `/logs/tasks/read` 返回的最后一行日志。
+- 容器编辑复用 `ContainerCreatePage`，路由为
+  `/s/:serverId/containers/:name/edit`。1Panel `/containers/update` 需要完整
+  `ContainerOperate`，因此未在表单暴露的 hostname、DNS、labels 等字段从
+  `/containers/info` 原值回填并保留。
+- 镜像、网络、Docker 设置和编排表单均使用现有数据层方法，没有新增依赖。
+- 编排创建使用 `from: edit` + `file` + `dirName`；编排更新使用
+  `name`、`path`、`detailPath`、`content`，两者都携带 taskID 并轮询。
+- `tool/check_action_reachability.py` 用方法体中的 `.post/.put/.delete`
+  识别写方法。阈值从报告基线 217 降到 189，后续批次只能继续下调。
+- 当前环境没有 Android 真机或模拟器；85 项测试全部通过，但未执行真实点击验收。
+
+## v9 网站与文件批次
+
+- 网站高级设置页复用现有 DTO 与 repository，没有新增数据层方法。默认文档、流量
+  限制、目录权限、认证、CORS、防盗链、真实 IP、伪静态和重定向均直接映射官方
+  请求体。
+- 重定向保存直接提交 `WebsiteRedirectDto.toJson()`。1Panel 的 `name` 是规则文件
+  名，客户端没有自动生成，需用户填写。
+- SSL 申请使用 `provider: http`、`keyType: P256` 与第一个或用户选择的 ACME
+  账号；创建后按主域名重新查询证书 id，再调用 `obtainSsl`。
+- 文件工具页只依赖现有 `FileRepository`。回收站列表是原始 Map，按
+  `name/rName/sourcePath/from/size/isDir` 读取。
+- 远程下载接口返回任务 key，不提供百分比进度；页面展示 key 并支持停止。
+
+## v10 应用、数据库与备份批次
+
+- 已安装应用任务（卸载、升级）通过 `AppRepository.readTaskLog(taskID)` 轮询，
+  与其他模块的 TaskWaiter 分离，因为应用任务接口按 taskID 查询。
+- 文件工具页复用 `FileFavoriteDto`、`FileShareDto`；回收站接口返回原始 Map，
+  按 1Panel `RecycleBinDTO` 字段解析。
+- 数据库高级页按类型只展示可用能力：MySQL/PostgreSQL 显示慢日志，Redis 显示
+  配置、密码与持久化。
+- 手动备份由 1Panel 固定写入本地账号 1，因此新建备份表单不选择账号；备份账号
+  管理页用于外部存储账号 CRUD。
+- 网站备份复用 `backupDatabase(type: 'website')`，没有新增 API 方法。
+
+## v11 主机、运行时与面板设置批次
+
+- SSH 服务启停使用 1Panel 的 `operation: enable|disable`。
+- 运行环境删除使用 `forceDelete: true`，只在非运行状态提供入口。
+- 面板端口修改属于高风险操作，客户端在提交前明确提示会断开当前会话。
+- 快照创建固定使用本地账号 1（`sourceAccountIDs: "1"`,
+  `downloadAccountID: 1`），并携带 taskID；未实现恢复/回滚，避免误操作。
+
+## v12 网站收尾与应用同步批次
+
+- 域名 SSL 开关直接绑定/解绑已有证书，证书本身仍在 SSL 证书管理页维护。
+- 路径级认证使用 `WebsitePathAuthUpdateReq`，删除时复用同一接口并传 `operate: delete`。
+- OpenResty 性能参数按返回的 `name` 动态生成输入框，保存时拼成 `Map<String,String>`。
+- 可达性 allowlist 只登记已经通过 repository 包装器接线的 API 方法，避免脚本按
+  API 方法名匹配时误判。
+
+## v13 容器镜像仓库批次
+
+- 镜像构建、导出、导入、推送都复用 `ContainerRepository.waitForTask`，与容器任务
+  使用同一套日志轮询和任务面板。
+- 镜像仓库内置账号 id=1 只读，删除入口按 `isBuiltIn` 隐藏。
+README 中不记录真实仓库凭据；表单仅在会话内使用。
+
+## v14 数据库变量、Redis 状态与 SSH 会话
+
+- MySQL 变量更新按 1Panel `MysqlVariablesUpdateHelper` 发送
+  `[{param, value}]`，只覆盖客户端表单中的常用项。
+- Redis 状态直接展示接口返回的键值对；安装 Redis CLI 使用现有仓库方法。
+- SSH 终端会话页读取原始 Map，兼容 `username/user`、`clientIP/ip`、
+  `id/sessionID` 字段命名。
+
+## v15 证书账号与取消忽略批次
+
+- 证书账号页直接复用 `WebsiteRepository` 的 ACME/DNS/CA 方法，不新增依赖。
+- DNS 授权以 JSON 文本录入，解析后作为 `authorization` Map 提交；解析失败不发请求。
+- CA 续签需要 `sslId`，客户端只在 CA 记录含有效 sslId 时提交。
+- 取消忽略更新通过 `getIgnoredApps` 匹配当前安装 ID，再按忽略记录 id 删除。
+
+## v16 文件、容器日志与备份账号收尾
+
+- `unwired_allowlist.txt` 已登记全部剩余未接方法，分类为 Web 专属、设备文件选择器
+  依赖、以及 repository 包装器已覆盖的辅助接口。阈值降为 0，但 allowlist 中的
+  能力仍需要后续单独设计，不能视为已实现。
+- 本批按用户要求没有重新构建 APK。
+
+## v17 网站、日志、备忘录与 SSH 密钥
+
+- 网站 PHP 切换使用运行时列表过滤 `php` 类型；静态站点以 runtimeID=0 提交。
+- 日志导出只提示服务端返回的临时 CSV 路径，客户端不下载文件。
+- SSH 密钥编辑通过新增的 `editSshCert` 包装器调用 `editCert`，因此该 API
+  方法继续留在 allowlist 的包装器豁免区。
+- 本批未构建 APK。
+
+## v18 通知配置、备份容器、快照与文件辅助
+
+- 通知配置按原始 JSON 编辑，测试时从中解析 SMTP 字段；配置非法 JSON 时只提示，
+  不发起请求。
+- 容器恢复使用 600 秒超时，与容器备份的耗时量级保持一致。
+- 快照恢复与回滚共用密码输入，密码允许为空。
+- 网站根目录入口在文件管理器 AppBar，跳转后走既有的 path 路由。
+
+## v19 数据库、证书账号、镜像与 Docker 用量
+
+- 数据库状态直接展示接口返回的键值，不做单位推断。
+- 新建文件前先查存在性，避免面板返回覆盖/已存在错误。
+- ACME 编辑只保留邮箱、类型、CA 地址与代理开关；EAB 字段按空值提交。
+- 镜像用量与容器列表分开请求，避免镜像页首屏变慢。
+
+## v20 远程数据库、批量文件检查、MFA 与证书下载
+
+- 远程数据库实例 DTO 补齐 port/username/password/description/ssl/timeout，
+  列表与编辑共用同一结构。
+- 远程实例保存前先调用连接测试，测试失败不写回。
+- 证书下载使用 `FilePicker.saveFile` 的 bytes 模式，交给系统保存面板。
+- MFA 绑定展示 secret 并要求输入 6 位验证码；通行密钥删除后关闭面板。
+
+## v21 商店设置、容器用户、Node 脚本与 Supervisor
+
+- 商店设置保存时逐项调用更新接口，任一项失败会中止并提示。
+- Node 脚本需要用户提供代码目录，避免猜测运行环境路径。
+- Supervisor 配置通过 operate=get/update 读写，保存后刷新总览。
+- 镜像仓库检索只读展示，不替代本地仓库列表。
+
+## v22 编排模板、daemon 键值与运行环境编辑
+
+- 编排模板 JSON 必须是数组，导入前做类型校验。
+- daemon 键值保存后重新读取整份配置，避免界面与文件不一致。
+- 运行时编辑复用详情里的 params/环境变量/卷/端口映射，避免更新时丢失配置。
+
+## v23 SSH 配置文件与连接测试
+
+- SSH 配置文件通过 `sshdConfOptions` 获取可编辑文件列表，内容读取使用
+  `sshdConfPath:<path>`。
+- 保存时按 1Panel 约定传 `key='sshdConfPath'`、`path=内容`、`value=文件路径`，
+  参数命名与直觉相反，已在此记录避免后续改错。
+- 连接测试固定 password 认证，成功后仅提示，不保存任何凭据。
+
+## v24 网站日志查看与描述置顶
+
+- `readRuntimeLog` 原返回 TaskLogDto 会丢掉 `lines`，已改为 FileLogDto 并补上
+  `name` 参数；网站日志必须传 `name=access.log` 或 `error.log`。
+- 网站描述保存使用 `type=website`，描述为空也会提交，用于清空。
+
+## v25 网站选项、面板 HTTPS 与 Supervisor 进程文件
+
+- 网站选项仅复制域名和别名，不复制类型或反代配置。
+- 面板 HTTPS 修改会立即生效，界面已标注可能中断当前会话。
+- Supervisor 进程文件接口的 file 仅接受 out.log / err.log / config；配置通过
+  operate=get/update 读写。
+
+## v26 收尾：服务器文件恢复、源文件编辑与运行时新增
+
+- 备份恢复上传使用服务器本地路径，targetDir 固定 `/opt/1panel/backup`。
+- 代理/重定向源文件直接使用列表接口返回的 content 字段，不再另取文件。
+- 运行时新增为高级表单，参数 JSON 必须是对象。
+- 真实 allowlist 缺口已清空，剩余 27 条均为包装器改名豁免。
+- 本轮已重新构建 APK，SHA-256 见 v26 回执。
+
+## v27 收尾：数据库专用删除、Redis 端口、安装前检查与批量选择
+
+- PG/Mongo 删除不再走通用删除分支，分别调用专用接口。
+- Redis 新建默认端口改为读取已安装应用的实际端口，读取失败时保留 6379。
+- 容器镜像、网络、容器列表、网站列表、SSH 密钥均加入多选批量删除。
+- 批量删除统一二次确认，容器/镜像批量操作走任务面板。
+
+## v28 UI 一致性与细节审查
+
+- 统一批量选择模型：独立 `_selecting` 状态，选择态才显示 Checkbox，长按进入选择。
+- 列表刷新/搜索保留旧 AsyncData，避免 RefreshIndicator 被骨架替换。
+- 主要列表空态统一 `RefreshableEmptyState`；危险批量入口统一 `DangerButton`。
+- 终端与日志控制台使用 `AppTokens.console*` 语义色，确认弹层统一 `showConfirmSheet`。
+- 修复两个无界 `Flexible` Sheet 崩溃点；新增标题栏点击与字号层级回归测试。
