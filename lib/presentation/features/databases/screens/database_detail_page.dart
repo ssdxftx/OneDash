@@ -100,7 +100,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
           ],
           children: [
             ListView(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               children: [
                 TonalCard(
                   child: Column(

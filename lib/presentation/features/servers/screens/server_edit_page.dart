@@ -393,12 +393,11 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
         title: widget.isEditing
             ? l10n.server_edit_edit_title
             : l10n.server_edit_add_title,
-        subtitle: l10n.server_edit_address,
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           children: [
             SectionHeader(title: l10n.server_edit_address),
             TonalCard(
@@ -439,7 +438,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
                         child: AppTextField(
                           controller: _portController,
                           label: l10n.server_edit_port,
-                          helper: l10n.server_edit_port_default,
+                          helper: l10n.server_edit_portHelper,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
@@ -520,19 +519,11 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (_steps.isEmpty)
-                    Text(
-                      l10n.server_edit_test,
-                      style: AppTextStyles.bodyS.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    )
-                  else
-                    for (final step in _steps) ...[
-                      _DiagnosisRow(step: step),
-                      if (step != _steps.last)
-                        const SizedBox(height: AppTokens.s12),
-                    ],
+                  for (final step in _steps) ...[
+                    _DiagnosisRow(step: step),
+                    if (step != _steps.last)
+                      const SizedBox(height: AppTokens.s12),
+                  ],
                   if (_clockDrift != null) ...[
                     const SizedBox(height: AppTokens.s12),
                     Row(

@@ -116,7 +116,7 @@ class InstalledAppPage extends ConsumerWidget {
         value: info,
         onRetry: () => ref.invalidate(installedInfoProvider(id)),
         builder: (app) => ListView(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           children: [
             TonalCard(
               child: Row(
@@ -171,19 +171,20 @@ class InstalledAppPage extends ConsumerWidget {
             const SizedBox(height: AppTokens.s24),
             SplitListGroup(
               children: [
-                SplitListTile(title: l10n.app_detail_key, subtitle: app.appKey),
+                SplitListTile(title: l10n.app_detail_key, value: app.appKey),
                 SplitListTile(
                   title: l10n.app_detail_container,
-                  subtitle: app.container,
+                  value: app.container,
                 ),
-                SplitListTile(
-                  title: l10n.app_detail_compose,
-                  subtitle: app.composePath,
-                ),
+                if (app.composePath.trim().isNotEmpty)
+                  SplitListTile(
+                    title: l10n.app_detail_compose,
+                    value: app.composePath,
+                  ),
                 if (app.message.isNotEmpty)
                   SplitListTile(
                     title: l10n.app_detail_message,
-                    subtitle: app.message,
+                    value: app.message,
                   ),
               ],
             ),

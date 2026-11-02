@@ -156,6 +156,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get files_sortModifiedTime => 'Modified Time';
 
   @override
+  String get files_homeDirectory => 'Home';
+
+  @override
   String get files_rootDirectory => 'Root';
 
   @override
@@ -353,8 +356,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get panelSettings_noAlertRules => 'No alert rules';
 
   @override
-  String panelSettings_alertCardMeta(String type, String method) {
-    return 'Type: $type  Method: $method';
+  String alerts_cardMeta(String type, String method) {
+    return 'Type: $type · Method: $method';
   }
 
   @override
@@ -838,7 +841,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard_system_info => 'System information';
 
   @override
-  String get dashboard_sites_containers => 'Sites and containers';
+  String get dashboard_sites_containers => 'Websites and containers';
 
   @override
   String get dashboard_quick_actions => 'Quick actions';
@@ -913,7 +916,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_empty_message =>
-      'Create a site to serve a static folder or reverse proxy.';
+      'Create a website to serve a static folder or reverse proxy.';
 
   @override
   String get websites_create => 'Create website';
@@ -925,7 +928,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_running => 'Running';
 
   @override
-  String get websites_stopped => 'Site stopped';
+  String get websites_stopped => 'Stopped';
 
   @override
   String get websites_static => 'Static';
@@ -1229,7 +1232,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_removeDomainMessage =>
-      'This domain will no longer point to this site.';
+      'This domain will no longer point to this website.';
 
   @override
   String get websites_domainDeleted => 'Domain deleted';
@@ -1245,7 +1248,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_noReverseProxyHint =>
-      'Reverse proxy rules added in the panel will appear here.';
+      'Add a reverse proxy rule to this website in the panel.';
 
   @override
   String websites_deleteProxyMessage(String name, String match) {
@@ -1554,7 +1557,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String websites_count(int count) {
-    return '$count sites';
+    return '$count websites';
   }
 
   @override
@@ -1823,7 +1826,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String websites_groupDeleteConfirm(String name) {
-    return 'Delete group \"$name\"? Sites in it will fall back to the default group.';
+    return 'Delete group \"$name\"? Websites in it will fall back to the default group.';
   }
 
   @override
@@ -2116,13 +2119,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Fill in port and at least one source';
 
   @override
-  String get websites_start => 'Start site';
+  String get websites_start => 'Start website';
 
   @override
-  String get websites_stop => 'Stop site';
+  String get websites_stop => 'Stop website';
 
   @override
-  String get websites_delete => 'Delete site';
+  String get websites_delete => 'Delete website';
 
   @override
   String get websites_copyDomain => 'Copy domain';
@@ -2137,7 +2140,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_deleteMessage =>
-      'Site files, Nginx configuration and SSL certificates will be deleted. This cannot be undone.';
+      'Website files, Nginx configuration and SSL certificates will be deleted. This cannot be undone.';
 
   @override
   String websites_deleteDatabaseCount(int count) {
@@ -2145,19 +2148,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get websites_deleteBackup => 'Also delete site backups';
+  String get websites_deleteBackup => 'Also delete website backups';
 
   @override
   String get websites_forceDelete => 'Force delete and ignore errors';
 
   @override
-  String get websites_deleted => 'Site deleted';
+  String get websites_deleted => 'Website deleted';
 
   @override
-  String get websites_started => 'Site started';
+  String get websites_started => 'Website started';
 
   @override
-  String get websites_actions => 'Site actions';
+  String get websites_actions => 'Website actions';
 
   @override
   String get containers_create => 'Create container';
@@ -3034,19 +3037,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_templateGenerate => 'Generate';
 
   @override
-  String get websites_templateOutputs => 'Generated sites';
+  String get websites_templateOutputs => 'Generated websites';
 
   @override
   String get websites_templateOutputName => 'Output name';
 
   @override
-  String get websites_templateOutputEmpty => 'No generated sites';
+  String get websites_templateOutputEmpty => 'No generated websites';
 
   @override
-  String get websites_templateOutputGenerated => 'Site generated';
+  String get websites_templateOutputGenerated => 'Website generated';
 
   @override
-  String get websites_templateOutputDelete => 'Delete generated site';
+  String get websites_templateOutputDelete => 'Delete generated website';
 
   @override
   String get websites_templateNoVariables => 'No variables';
@@ -4671,10 +4674,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_switchPhpHint =>
-      'Change the PHP runtime or serve as a static site';
+      'Change the PHP runtime or serve as a static website';
 
   @override
-  String get websites_staticSite => 'Static site';
+  String get websites_staticSite => 'Static website';
 
   @override
   String get websites_editSsl => 'Edit certificate';
@@ -4971,7 +4974,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_pin => 'Pin to top';
 
   @override
-  String get websites_copyFromExisting => 'Copy from existing site';
+  String get websites_copyFromExisting => 'Copy from existing website';
 
   @override
   String get panelSettings_panelSsl => 'Panel HTTPS';
@@ -5127,6 +5130,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backups_typeWebdav => 'WebDAV';
 
   @override
+  String get backups_typeKodo => 'Qiniu Kodo';
+
+  @override
+  String get backups_typeUpyun => 'UPYUN';
+
+  @override
+  String get backups_typeAliyun => 'Aliyun Drive';
+
+  @override
+  String get backups_typeGoogleDrive => 'Google Drive';
+
+  @override
   String get runtimes_emptyTitle => 'No runtimes installed';
 
   @override
@@ -5139,7 +5154,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_templatesEmptyTitle => 'No templates yet';
 
   @override
-  String get websites_templateOutputsEmptyTitle => 'No generated sites yet';
+  String get websites_templateOutputsEmptyTitle => 'No generated websites yet';
 
   @override
   String get host_sshUnavailableTitle => 'SSH service unavailable';
@@ -5180,4 +5195,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_loadBalanceEmptyTitle => 'No upstream nodes';
+
+  @override
+  String servers_count(Object count) {
+    return '$count panels';
+  }
+
+  @override
+  String get servers_sectionConnected => 'Connected panels';
+
+  @override
+  String get supervisor_sectionProcesses => 'Guarded processes';
+
+  @override
+  String get toolbox_timeSection => 'Time zone and time';
+
+  @override
+  String more_appsCount(Object count) {
+    return '$count apps';
+  }
+
+  @override
+  String more_databasesCount(Object count) {
+    return '$count databases';
+  }
+
+  @override
+  String more_cronjobsCount(Object count) {
+    return '$count scheduled tasks';
+  }
+
+  @override
+  String websites_templateVariableCount(Object count) {
+    return '$count variables';
+  }
+
+  @override
+  String get server_edit_portHelper => '1Panel listens on 9999 by default';
+
+  @override
+  String get log_emptyMessage => 'No log entries in this category yet.';
+
+  @override
+  String get process_emptyMessage =>
+      'No processes are available on this server.';
+
+  @override
+  String get runtimes_emptyMessage =>
+      'Runtimes installed from the app store will appear here.';
 }

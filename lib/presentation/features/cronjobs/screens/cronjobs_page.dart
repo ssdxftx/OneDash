@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/cronjob/cronjob_dto.dart';
 import '../../../../data/repositories_impl/cronjob_repository_impl.dart';
 import '../../../common/components/action_sheet.dart';
@@ -55,6 +56,8 @@ class CronjobsPage extends ConsumerWidget {
           icon: TablerIcons.clock,
           title: l10n.cronjobs_empty_title,
           message: l10n.cronjobs_empty_message,
+          actionLabel: l10n.cronjobs_create,
+          onAction: () => context.push('/s/$serverId/more/cronjobs/form'),
         ),
         builder: (data) => ListView.builder(
           padding: const EdgeInsets.all(AppTokens.s16),
@@ -265,7 +268,6 @@ class _CronjobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = context.scheme;
-    final enabled = item.status.toLowerCase() == 'enable';
     return TonalCard(
       onTap: onTap,
       onLongPress: onLongPress,
@@ -274,8 +276,6 @@ class _CronjobCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              StatusDot(status: enabled ? 'running' : 'stopped'),
-              const SizedBox(width: AppTokens.s8),
               Expanded(
                 child: Text(
                   item.name,
@@ -294,7 +294,7 @@ class _CronjobCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppTokens.rXs),
                 ),
                 child: Text(
-                  item.type,
+                  cronjobTypeLabel(item.type, l10n),
                   style: AppTextStyles.caption.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
@@ -325,7 +325,11 @@ class _CronjobCard extends StatelessWidget {
                 child: Text(
                   item.lastRecordTime.isEmpty
                       ? l10n.cronjobs_neverRun
-                      : item.lastRecordTime,
+                      : formatListTime(
+                          DateTime.tryParse(item.lastRecordTime),
+                          l10n,
+                          fallback: item.lastRecordTime,
+                        ),
                   style: AppTextStyles.caption.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),

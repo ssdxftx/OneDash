@@ -51,7 +51,7 @@ class ProcessPage extends ConsumerWidget {
         empty: EmptyState(
           icon: TablerIcons.cpu,
           title: l10n.process_emptyTitle,
-          message: l10n.state_empty,
+          message: l10n.process_emptyMessage,
         ),
         builder: (items) => ListView.builder(
           padding: const EdgeInsets.all(AppTokens.s16),
@@ -76,6 +76,7 @@ class ProcessPage extends ConsumerWidget {
                         '${item.pid}',
                         style: AppTextStyles.caption,
                         maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: AppTokens.s12),

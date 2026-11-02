@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -128,7 +127,6 @@ class FirewallPage extends ConsumerStatefulWidget {
 class _FirewallPageState extends ConsumerState<FirewallPage> {
   final _searchController = TextEditingController();
   int _tab = 0;
-  bool _fabVisible = true;
   bool _searching = false;
   bool _operating = false;
   String _filter = 'all';
@@ -160,25 +158,18 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
             tooltip: l10n.action_refresh,
             onPressed: _refresh,
           ),
-        ],
-      ),
-      floatingActionButton: (_tab == 0 || _tab == 1) && _fabVisible
-          ? FloatingActionButton.small(
+          if (_tab == 0 || _tab == 1)
+            AppIconButton(
+              icon: TablerIcons.plus,
               tooltip: _tab == 0
                   ? l10n.firewall_add_rule
                   : l10n.firewall_addForward,
               onPressed: _openAdd,
-              child: const Icon(TablerIcons.plus),
-            )
-          : null,
+            ),
+        ],
+      ),
       body: NotificationListener<UserScrollNotification>(
-        onNotification: (notification) {
-          final visible = notification.direction != ScrollDirection.reverse;
-          if (visible != _fabVisible && mounted) {
-            setState(() => _fabVisible = visible);
-          }
-          return false;
-        },
+        onNotification: (_) => false,
         child: AsyncStateView(
           value: firewall,
           onRetry: () => ref.invalidate(_firewallProvider),
@@ -206,10 +197,7 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
                   l10n.firewall_tabSettings,
                 ],
                 selectedIndex: _tab,
-                onChanged: (value) => setState(() {
-                  _tab = value;
-                  _fabVisible = true;
-                }),
+                onChanged: (value) => setState(() => _tab = value),
               ),
               if (_tab == 0) ...[
                 if (_searching)
@@ -1005,7 +993,7 @@ class _ForwardTab extends StatelessWidget {
         AppTokens.s16,
         AppTokens.s8,
         AppTokens.s16,
-        AppTokens.s32 + AppTokens.buttonHeight,
+        AppTokens.s32 + AppTokens.buttonHeight + AppTokens.s48,
       ),
       children: [
         TonalCard(

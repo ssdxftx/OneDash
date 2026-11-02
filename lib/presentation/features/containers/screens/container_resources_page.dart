@@ -689,7 +689,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '${formatBytes(image.size)} · ${image.createdAt}',
+                              '${formatBytes(image.size)} · ${formatLocalDateTime(image.createdAt)}',
                               style: AppTextStyles.caption.copyWith(
                                 color: context.scheme.onSurfaceVariant,
                               ),

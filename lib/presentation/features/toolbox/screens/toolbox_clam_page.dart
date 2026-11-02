@@ -265,19 +265,19 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
         title: l10n.toolbox_clam,
         actions: [
           AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.toolbox_scanRecords,
-            onPressed: _base['isExist'] == true ? _create : null,
-          ),
-          AppIconButton(
             icon: TablerIcons.refresh,
             tooltip: l10n.action_refresh,
             onPressed: _load,
           ),
+          AppIconButton(
+            icon: TablerIcons.plus,
+            tooltip: l10n.toolbox_scanRecords,
+            onPressed: _base['isExist'] == true ? _create : null,
+          ),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         children: [
           SplitListGroup(
             children: [

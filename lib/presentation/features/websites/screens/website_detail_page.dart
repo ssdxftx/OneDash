@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/website/website_detail_dto.dart';
 import '../../../../data/dto/website/website_dto.dart';
 import '../../../../data/dto/website/website_proxy_dto.dart';
@@ -234,7 +235,7 @@ class _ConfigTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final site = detail.website;
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         TonalCard(
           child: Row(
@@ -274,7 +275,13 @@ class _ConfigTab extends ConsumerWidget {
             _Row(label: l10n.websites_path, value: site.sitePath),
             _Row(label: l10n.websites_runtime, value: site.runtimeName),
             _Row(label: l10n.websites_remark, value: site.remark),
-            _Row(label: l10n.websites_createdAt, value: site.createdAt),
+            _Row(
+              label: l10n.websites_createdAt,
+              value: formatLocalDateTime(
+                site.createdAt,
+                locale: l10n.localeName,
+              ),
+            ),
           ],
         ),
       ],
@@ -483,7 +490,7 @@ class _DomainsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         if (detail.domains.isEmpty)
           Padding(
@@ -664,7 +671,7 @@ class _SslTab extends StatelessWidget {
       );
     }
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         TonalCard(
           child: Column(
@@ -754,7 +761,7 @@ class _ProxyTab extends ConsumerWidget {
               message: l10n.websites_noReverseProxyHint,
             ),
             builder: (items) => ListView(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               children: [
                 for (final proxy in items)
                   Padding(
@@ -1143,7 +1150,7 @@ class _LogsTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final scheme = context.scheme;
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         SplitListGroup(
           children: [

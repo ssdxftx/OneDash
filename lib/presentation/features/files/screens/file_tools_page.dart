@@ -440,7 +440,7 @@ class _SharesTab extends ConsumerWidget {
                 title: l10n.files_shareExpire,
                 subtitle: share.permanent
                     ? l10n.files_permanentShare
-                    : formatRelativeTime(
+                    : formatListTime(
                         DateTime.fromMillisecondsSinceEpoch(
                           share.expiresAt * 1000,
                         ),

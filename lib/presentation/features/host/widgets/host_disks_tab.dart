@@ -252,7 +252,7 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         children: [
           if (_disks.systemDisks.isNotEmpty) ...[
             SectionHeader(title: l10n.host_diskSystem),

@@ -81,7 +81,7 @@ class ToolboxPage extends ConsumerWidget {
         onRetry: () => ref.invalidate(_toolboxProvider),
         loading: const SkeletonList(itemCount: 8),
         builder: (value) => ListView(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           children: [
             SectionHeader(title: l10n.toolbox_group_system),
             SplitListGroup(

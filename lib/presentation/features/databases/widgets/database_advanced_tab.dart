@@ -33,7 +33,7 @@ class DatabaseAdvancedTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         TonalCard(
           child: Column(

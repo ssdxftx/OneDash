@@ -36,7 +36,10 @@ class SplitListGroup extends StatelessWidget {
       padding: padding,
       child: Material(
         color: scheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(AppTokens.rLg),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTokens.rLg),
+          side: BorderSide(color: scheme.outlineVariant),
+        ),
         clipBehavior: Clip.antiAlias,
         child: Column(mainAxisSize: MainAxisSize.min, children: rows),
       ),
@@ -51,6 +54,7 @@ class SplitListTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.subtitleStyle,
+    this.value,
     this.leading,
     this.trailing,
     this.onTap,
@@ -63,6 +67,7 @@ class SplitListTile extends StatelessWidget {
   final String title;
   final String? subtitle;
   final TextStyle? subtitleStyle;
+  final String? value;
   final Widget? leading;
   final Widget? trailing;
   final VoidCallback? onTap;
@@ -84,6 +89,23 @@ class SplitListTile extends StatelessWidget {
         ? scheme.onSurfaceVariant
         : scheme.onSurfaceVariant.withValues(alpha: 0.38);
 
+    final titleStyle = AppTextStyles.bodyL.copyWith(
+      color: titleColor,
+      fontWeight: FontWeight.w500,
+    );
+    final effectiveTrailing =
+        trailing ??
+        (value == null
+            ? null
+            : Text(
+                value!,
+                style: titleStyle.copyWith(
+                  color: enabled
+                      ? scheme.onSurface
+                      : scheme.onSurface.withValues(alpha: 0.38),
+                ),
+              ));
+
     return InkWell(
       onTap: enabled ? onTap : null,
       onLongPress: enabled ? onLongPress : null,
@@ -99,7 +121,19 @@ class SplitListTile extends StatelessWidget {
               final trailingLimit = constraints.maxWidth.isFinite
                   ? constraints.maxWidth * 0.6
                   : null;
+              final stackTrailing =
+                  effectiveTrailing != null &&
+                  _isText(effectiveTrailing) &&
+                  _overflows(
+                    context,
+                    constraints.maxWidth,
+                    titleStyle,
+                    effectiveTrailing,
+                  );
               return Row(
+                crossAxisAlignment: stackTrailing
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.center,
                 children: [
                   if (leading != null) ...[
                     IconTheme(
@@ -119,10 +153,7 @@ class SplitListTile extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: AppTextStyles.bodyL.copyWith(
-                            color: titleColor,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: titleStyle,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -136,12 +167,24 @@ class SplitListTile extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
+                        if (stackTrailing) ...[
+                          const SizedBox(height: 2),
+                          _buildTrailing(
+                            effectiveTrailing,
+                            null,
+                            alignStart: true,
+                            allowWrap: true,
+                          ),
+                        ],
                       ],
                     ),
                   ),
-                  if (trailing != null) ...[
+                  if (effectiveTrailing != null && !stackTrailing) ...[
                     const SizedBox(width: AppTokens.s12),
-                    _buildTrailing(trailing!, trailingLimit),
+                    _buildTrailing(
+                      effectiveTrailing,
+                      _isText(effectiveTrailing) ? null : trailingLimit,
+                    ),
                   ],
                 ],
               );
@@ -152,19 +195,61 @@ class SplitListTile extends StatelessWidget {
     );
   }
 
-  Widget _buildTrailing(Widget child, double? maxWidth) {
+  bool _isText(Widget widget) => widget is Text && widget.data != null;
+
+  bool _overflows(
+    BuildContext context,
+    double availableWidth,
+    TextStyle titleStyle,
+    Widget trailing,
+  ) {
+    if (!availableWidth.isFinite) return false;
+    final textScaler = MediaQuery.textScalerOf(context);
+    final direction = Directionality.of(context);
+    final titlePainter = TextPainter(
+      text: TextSpan(text: title, style: titleStyle),
+      textDirection: direction,
+      textScaler: textScaler,
+      maxLines: 1,
+    )..layout();
+    final trailingText = trailing as Text;
+    final trailingPainter = TextPainter(
+      text: TextSpan(
+        text: trailingText.data,
+        style: trailingText.style ?? DefaultTextStyle.of(context).style,
+      ),
+      textDirection: direction,
+      textScaler: textScaler,
+      maxLines: 1,
+    )..layout();
+    final leadingWidth = leading == null
+        ? 0.0
+        : AppTokens.iconLeading + AppTokens.s12;
+    final rowWidth = availableWidth - leadingWidth;
+    return titlePainter.width + AppTokens.s12 + trailingPainter.width >
+        rowWidth;
+  }
+
+  Widget _buildTrailing(
+    Widget child,
+    double? maxWidth, {
+    bool alignStart = false,
+    bool allowWrap = false,
+  }) {
     final text = child is Text && child.data != null
         ? Text(
             child.data!,
             style: child.style,
             strutStyle: child.strutStyle,
-            textAlign: child.textAlign ?? TextAlign.end,
+            textAlign: alignStart
+                ? TextAlign.start
+                : child.textAlign ?? TextAlign.end,
             textDirection: child.textDirection,
             locale: child.locale,
-            softWrap: false,
+            softWrap: allowWrap,
             overflow: TextOverflow.ellipsis,
             textScaler: child.textScaler,
-            maxLines: 1,
+            maxLines: allowWrap ? 2 : 1,
             semanticsLabel: child.semanticsLabel,
             textWidthBasis: child.textWidthBasis,
             textHeightBehavior: child.textHeightBehavior,

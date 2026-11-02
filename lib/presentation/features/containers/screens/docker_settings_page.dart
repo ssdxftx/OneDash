@@ -238,6 +238,11 @@ class _DockerSettingsPageState extends ConsumerState<DockerSettingsPage> {
         title: l10n.containers_dockerSettings,
         actions: [
           AppIconButton(
+            icon: TablerIcons.refresh,
+            tooltip: l10n.action_refresh,
+            onPressed: _load,
+          ),
+          AppIconButton(
             icon: TablerIcons.key,
             tooltip: l10n.containers_daemonKeyValue,
             onPressed: _editDaemonKey,
@@ -246,11 +251,6 @@ class _DockerSettingsPageState extends ConsumerState<DockerSettingsPage> {
             icon: TablerIcons.chart_pie,
             tooltip: l10n.containers_diskUsage,
             onPressed: _showStats,
-          ),
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: _load,
           ),
         ],
       ),

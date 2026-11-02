@@ -79,7 +79,7 @@ class RuntimesPage extends ConsumerWidget {
         empty: EmptyState(
           icon: TablerIcons.brand_docker,
           title: l10n.runtimes_emptyTitle,
-          message: l10n.state_empty,
+          message: l10n.runtimes_emptyMessage,
         ),
         builder: (data) => ListView.builder(
           padding: const EdgeInsets.all(AppTokens.s16),
@@ -184,7 +184,7 @@ class RuntimesPage extends ConsumerWidget {
           Text(runtime.name, style: AppTextStyles.titleL),
           const SizedBox(height: AppTokens.s4),
           Text(
-            '${runtime.type} · ${runtime.version}',
+            _joinNonEmpty([runtime.type, runtime.version]),
             style: AppTextStyles.bodyS.copyWith(
               color: context.scheme.onSurfaceVariant,
             ),

@@ -154,19 +154,19 @@ class _ToolboxFtpPageState extends ConsumerState<ToolboxFtpPage> {
         title: l10n.toolbox_ftp,
         actions: [
           AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.toolbox_ftpAdd,
-            onPressed: _create,
-          ),
-          AppIconButton(
             icon: TablerIcons.refresh,
             tooltip: l10n.action_refresh,
             onPressed: _load,
           ),
+          AppIconButton(
+            icon: TablerIcons.plus,
+            tooltip: l10n.toolbox_ftpAdd,
+            onPressed: _create,
+          ),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         children: [
           SplitListGroup(
             children: [

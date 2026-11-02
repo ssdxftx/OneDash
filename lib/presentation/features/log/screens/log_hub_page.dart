@@ -134,7 +134,7 @@ class LogHubPage extends ConsumerWidget {
         title: l10n.logs_title,
         actions: [
           AppIconButton(
-            icon: TablerIcons.eraser,
+            icon: TablerIcons.trash,
             tooltip: l10n.logs_clean,
             onPressed: () => _openActions(context, ref),
           ),
@@ -251,8 +251,8 @@ class _LogTab extends ConsumerWidget {
       isEmpty: (items) => items.isEmpty,
       empty: EmptyState(
         icon: TablerIcons.file_text,
-        title: l10n.state_empty,
-        message: l10n.logs_title,
+        title: l10n.log_empty,
+        message: l10n.log_emptyMessage,
       ),
       builder: (items) => ListView.builder(
         padding: const EdgeInsets.all(AppTokens.s16),

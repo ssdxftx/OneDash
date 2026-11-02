@@ -35,9 +35,18 @@ String formatRelativeTime(DateTime? time, AppLocalizations l10n) {
   }
 }
 
-String formatTimeAgo(DateTime? time, AppLocalizations l10n, {String? prefix}) {
-  final label = formatRelativeTime(time, l10n);
-  return '${prefix ?? l10n.format_timeAgoPrefixBackup}$label';
+/// 列表统一时间：7 天内用相对时间，更早用绝对日期。
+String formatListTime(
+  DateTime? time,
+  AppLocalizations l10n, {
+  String fallback = '-',
+}) {
+  if (time == null) return fallback;
+  final diff = DateTime.now().difference(time.toLocal());
+  if (!diff.isNegative && diff.inDays <= 7) {
+    return formatRelativeTime(time, l10n);
+  }
+  return formatLocalDateTime(time.toIso8601String(), locale: l10n.localeName);
 }
 
 /// 将数值权限（如 755）转换为符号权限（如 drwxr-xr-x）。
@@ -109,28 +118,6 @@ String formatLocalDateTime(
       ? DateFormat.yMd(locale).add_Hms()
       : DateFormat.yMd(locale).add_Hm();
   return formatter.format(parsed.toLocal());
-}
-
-/// 格式化文件修改时间，自动转换为本地时区
-String formatFileModTime(String modTimeStr) {
-  if (modTimeStr.isEmpty) return '-';
-  try {
-    // 1Panel 后端通常返回类似 2024-04-27T06:12:37Z 的 ISO 8601 字符串
-    final utcTime = DateTime.parse(modTimeStr);
-    final localTime = utcTime.toLocal();
-
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final y = localTime.year;
-    final m = twoDigits(localTime.month);
-    final d = twoDigits(localTime.day);
-    final h = twoDigits(localTime.hour);
-    final min = twoDigits(localTime.minute);
-    final s = twoDigits(localTime.second);
-
-    return '$y/$m/$d $h:$min:$s';
-  } catch (e) {
-    return modTimeStr; // 解析失败则返回原字符串
-  }
 }
 
 /// 中间省略文本。适用于长文件名，保留开头和结尾（后缀）。

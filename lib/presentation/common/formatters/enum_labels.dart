@@ -1,5 +1,32 @@
 import '../../../core/localization/generated/app_localizations.dart';
 
+/// 1Panel 备份账号类型常量，服务端按大写精确匹配。
+const backupAccountTypes = <String>[
+  'S3',
+  'OSS',
+  'SFTP',
+  'MINIO',
+  'COS',
+  'KODO',
+  'UPYUN',
+  'ALIYUN',
+  'OneDrive',
+  'WebDAV',
+  'GoogleDrive',
+];
+const backupAccountLocal = 'LOCAL';
+
+String canonicalBackupAccountType(String raw) {
+  final value = raw.trim();
+  if (value.toLowerCase() == backupAccountLocal.toLowerCase()) {
+    return backupAccountLocal;
+  }
+  for (final type in backupAccountTypes) {
+    if (type.toLowerCase() == value.toLowerCase()) return type;
+  }
+  return backupAccountTypes.first;
+}
+
 String alertTypeLabel(String raw, AppLocalizations l10n) =>
     switch (raw.toLowerCase()) {
       'cpu' => l10n.alert_type_cpu,
@@ -54,6 +81,22 @@ String taskStatusLabel(String raw, AppLocalizations l10n) =>
       _ => raw,
     };
 
+String cronjobTypeLabel(String raw, AppLocalizations l10n) =>
+    switch (raw.toLowerCase()) {
+      'shell' => l10n.cronjobs_typeShell,
+      'log' => l10n.cronjobs_typeLog,
+      'curl' => l10n.cronjobs_typeCurl,
+      'website' => l10n.cronjobs_typeWebsite,
+      'database' => l10n.cronjobs_typeDatabase,
+      'directory' => l10n.cronjobs_typeDirectory,
+      'app' => l10n.cronjobs_typeApp,
+      'snapshot' => l10n.cronjobs_typeSnapshot,
+      'cleanlog' => l10n.cronjobs_typeCleanLog,
+      'clean' => l10n.cronjobs_typeClean,
+      'ntp' => l10n.cronjobs_typeNtp,
+      _ => raw,
+    };
+
 String backupAccountTypeLabel(String raw, AppLocalizations l10n) =>
     switch (raw.toLowerCase()) {
       'local' => l10n.backups_typeLocal,
@@ -64,5 +107,9 @@ String backupAccountTypeLabel(String raw, AppLocalizations l10n) =>
       'minio' => l10n.backups_typeMinio,
       'onedrive' => l10n.backups_typeOneDrive,
       'webdav' => l10n.backups_typeWebdav,
+      'kodo' => l10n.backups_typeKodo,
+      'upyun' => l10n.backups_typeUpyun,
+      'aliyun' => l10n.backups_typeAliyun,
+      'googledrive' => l10n.backups_typeGoogleDrive,
       _ => raw,
     };

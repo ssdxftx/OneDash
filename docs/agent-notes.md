@@ -364,3 +364,19 @@ README 中不记录真实仓库凭据；表单仅在会话内使用。
 - 占位符透明度以输入框填充色为背景校验对比度，80% 才满足 4.5:1。
 - 列表空态标题描述“没有数据”，栏目名继续放在页面标题或分区标题。
 - 缺失记录使用 `RecordNotFoundException`，本地服务器缺失使用 `ServerNotFoundException`，不再用 `StateError` 承载业务文案。
+
+## v31 验收任务书 v11 修复
+
+- 备份账号类型必须以面板大写常量为准，编辑前做大小写归一；`LOCAL` 只用于编辑展示，新建下拉不提供。
+- 下拉/表单的值与展示文案分离：值用契约常量，文案走 `backupAccountTypeLabel`。
+- `SplitListTile` 的文本尾值先用 `TextPainter` 判断能否同排，放不下时移到标题下方的第二行，非文本尾值保持右侧。
+- 底部弹层内出现 `SwitchListTile` 时，需要在其与装饰容器之间提供透明 `Material`，否则触发 ListTile 背景断言。
+
+## v32 UI 审查报告（v12）修复
+
+- 页面级列表边距统一引用 `AppTokens.pagePadding`，宽屏内容由 `ServerShell` 按 `contentMaxWidth` 居中约束。
+- `SplitListGroup` 与 `TonalCard` 共用 `outlineVariant` 边框；详情主值使用 `SplitListTile.value`，长文本配置保留等宽 `subtitle`。
+- 新建入口统一收进 AppBar，禁止新增右下 FAB；动作超过 3 个时收进 `⋯`，刷新固定首位。
+- 列表时间统一 `formatListTime`（7 天内相对、之后绝对），详情时间统一 `formatLocalDateTime`；`formatTimeAgo` / `formatFileModTime` 已删除。
+- 空态：首屏列表必须提供 `actionLabel`，模块文案替代 `state_empty`。
+- 新增 `tool/check_ui_consistency.py`，校验刷新首位、无 FAB 与时间死代码。

@@ -356,6 +356,12 @@ abstract class AppLocalizations {
   /// **'Modified Time'**
   String get files_sortModifiedTime;
 
+  /// Breadcrumb label for the filesystem root.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get files_homeDirectory;
+
   /// Files breadcrumb root directory label.
   ///
   /// In en, this message translates to:
@@ -728,11 +734,11 @@ abstract class AppLocalizations {
   /// **'No alert rules'**
   String get panelSettings_noAlertRules;
 
-  /// Alert card metadata text.
+  /// Alert card metadata line.
   ///
   /// In en, this message translates to:
-  /// **'Type: {type}  Method: {method}'**
-  String panelSettings_alertCardMeta(String type, String method);
+  /// **'Type: {type} · Method: {method}'**
+  String alerts_cardMeta(String type, String method);
 
   /// Toast shown after deleting an item.
   ///
@@ -1631,7 +1637,7 @@ abstract class AppLocalizations {
   /// OneDash UI string
   ///
   /// In en, this message translates to:
-  /// **'Sites and containers'**
+  /// **'Websites and containers'**
   String get dashboard_sites_containers;
 
   /// OneDash UI string
@@ -1769,7 +1775,7 @@ abstract class AppLocalizations {
   /// OneDash UI string
   ///
   /// In en, this message translates to:
-  /// **'Create a site to serve a static folder or reverse proxy.'**
+  /// **'Create a website to serve a static folder or reverse proxy.'**
   String get websites_empty_message;
 
   /// OneDash UI string
@@ -1793,7 +1799,7 @@ abstract class AppLocalizations {
   /// Toast shown after a website stops.
   ///
   /// In en, this message translates to:
-  /// **'Site stopped'**
+  /// **'Stopped'**
   String get websites_stopped;
 
   /// OneDash UI string
@@ -2381,7 +2387,7 @@ abstract class AppLocalizations {
   /// Delete domain confirmation message.
   ///
   /// In en, this message translates to:
-  /// **'This domain will no longer point to this site.'**
+  /// **'This domain will no longer point to this website.'**
   String get websites_removeDomainMessage;
 
   /// Domain deleted.
@@ -2411,7 +2417,7 @@ abstract class AppLocalizations {
   /// Reverse proxy empty state.
   ///
   /// In en, this message translates to:
-  /// **'Reverse proxy rules added in the panel will appear here.'**
+  /// **'Add a reverse proxy rule to this website in the panel.'**
   String get websites_noReverseProxyHint;
 
   /// Delete reverse proxy confirmation.
@@ -2963,7 +2969,7 @@ abstract class AppLocalizations {
   /// Count shown in list header.
   ///
   /// In en, this message translates to:
-  /// **'{count} sites'**
+  /// **'{count} websites'**
   String websites_count(int count);
 
   /// Count shown in list header.
@@ -3455,7 +3461,7 @@ abstract class AppLocalizations {
   /// Text for websites_groupDeleteConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Delete group \"{name}\"? Sites in it will fall back to the default group.'**
+  /// **'Delete group \"{name}\"? Websites in it will fall back to the default group.'**
   String websites_groupDeleteConfirm(String name);
 
   /// Text for websites_groupEmpty.
@@ -4013,19 +4019,19 @@ abstract class AppLocalizations {
   /// Action to start a website.
   ///
   /// In en, this message translates to:
-  /// **'Start site'**
+  /// **'Start website'**
   String get websites_start;
 
   /// Action to stop a website.
   ///
   /// In en, this message translates to:
-  /// **'Stop site'**
+  /// **'Stop website'**
   String get websites_stop;
 
   /// Action to delete a website.
   ///
   /// In en, this message translates to:
-  /// **'Delete site'**
+  /// **'Delete website'**
   String get websites_delete;
 
   /// Action to copy a website domain.
@@ -4049,7 +4055,7 @@ abstract class AppLocalizations {
   /// Website deletion warning.
   ///
   /// In en, this message translates to:
-  /// **'Site files, Nginx configuration and SSL certificates will be deleted. This cannot be undone.'**
+  /// **'Website files, Nginx configuration and SSL certificates will be deleted. This cannot be undone.'**
   String get websites_deleteMessage;
 
   /// Checkbox label to delete linked databases.
@@ -4061,7 +4067,7 @@ abstract class AppLocalizations {
   /// Checkbox label to delete website backups.
   ///
   /// In en, this message translates to:
-  /// **'Also delete site backups'**
+  /// **'Also delete website backups'**
   String get websites_deleteBackup;
 
   /// Checkbox label for forced website deletion.
@@ -4073,19 +4079,19 @@ abstract class AppLocalizations {
   /// Toast shown after a website is deleted.
   ///
   /// In en, this message translates to:
-  /// **'Site deleted'**
+  /// **'Website deleted'**
   String get websites_deleted;
 
   /// Toast shown after a website starts.
   ///
   /// In en, this message translates to:
-  /// **'Site started'**
+  /// **'Website started'**
   String get websites_started;
 
   /// Title for the website actions sheet.
   ///
   /// In en, this message translates to:
-  /// **'Site actions'**
+  /// **'Website actions'**
   String get websites_actions;
 
   /// Title and action for creating a container.
@@ -5801,7 +5807,7 @@ abstract class AppLocalizations {
   /// Generated template site list.
   ///
   /// In en, this message translates to:
-  /// **'Generated sites'**
+  /// **'Generated websites'**
   String get websites_templateOutputs;
 
   /// Generated site name.
@@ -5813,19 +5819,19 @@ abstract class AppLocalizations {
   /// Empty generated site list.
   ///
   /// In en, this message translates to:
-  /// **'No generated sites'**
+  /// **'No generated websites'**
   String get websites_templateOutputEmpty;
 
   /// Generated site success toast.
   ///
   /// In en, this message translates to:
-  /// **'Site generated'**
+  /// **'Website generated'**
   String get websites_templateOutputGenerated;
 
   /// Delete generated template site.
   ///
   /// In en, this message translates to:
-  /// **'Delete generated site'**
+  /// **'Delete generated website'**
   String get websites_templateOutputDelete;
 
   /// Template has no variables.
@@ -8921,13 +8927,13 @@ abstract class AppLocalizations {
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
-  /// **'Change the PHP runtime or serve as a static site'**
+  /// **'Change the PHP runtime or serve as a static website'**
   String get websites_switchPhpHint;
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
-  /// **'Static site'**
+  /// **'Static website'**
   String get websites_staticSite;
 
   /// OneDash UI text.
@@ -9503,7 +9509,7 @@ abstract class AppLocalizations {
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
-  /// **'Copy from existing site'**
+  /// **'Copy from existing website'**
   String get websites_copyFromExisting;
 
   /// OneDash UI text.
@@ -9794,6 +9800,30 @@ abstract class AppLocalizations {
   /// **'WebDAV'**
   String get backups_typeWebdav;
 
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'Qiniu Kodo'**
+  String get backups_typeKodo;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'UPYUN'**
+  String get backups_typeUpyun;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'Aliyun Drive'**
+  String get backups_typeAliyun;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Drive'**
+  String get backups_typeGoogleDrive;
+
   /// Empty state title for runtimes.
   ///
   /// In en, this message translates to:
@@ -9821,7 +9851,7 @@ abstract class AppLocalizations {
   /// Empty state title for template outputs.
   ///
   /// In en, this message translates to:
-  /// **'No generated sites yet'**
+  /// **'No generated websites yet'**
   String get websites_templateOutputsEmptyTitle;
 
   /// Empty state title when SSH info is missing.
@@ -9901,6 +9931,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No upstream nodes'**
   String get websites_loadBalanceEmptyTitle;
+
+  /// Connected panel count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} panels'**
+  String servers_count(Object count);
+
+  /// Section title for connected panels.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected panels'**
+  String get servers_sectionConnected;
+
+  /// Section title for supervisor processes.
+  ///
+  /// In en, this message translates to:
+  /// **'Guarded processes'**
+  String get supervisor_sectionProcesses;
+
+  /// Section title for device time settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Time zone and time'**
+  String get toolbox_timeSection;
+
+  /// Installed app count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} apps'**
+  String more_appsCount(Object count);
+
+  /// Database count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} databases'**
+  String more_databasesCount(Object count);
+
+  /// Scheduled task count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} scheduled tasks'**
+  String more_cronjobsCount(Object count);
+
+  /// Template variable count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} variables'**
+  String websites_templateVariableCount(Object count);
+
+  /// Helper for the panel port field.
+  ///
+  /// In en, this message translates to:
+  /// **'1Panel listens on 9999 by default'**
+  String get server_edit_portHelper;
+
+  /// No log entries in this category yet.
+  ///
+  /// In en, this message translates to:
+  /// **'No log entries in this category yet.'**
+  String get log_emptyMessage;
+
+  /// No processes are available on this server.
+  ///
+  /// In en, this message translates to:
+  /// **'No processes are available on this server.'**
+  String get process_emptyMessage;
+
+  /// Runtimes installed from the app store will appear here.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtimes installed from the app store will appear here.'**
+  String get runtimes_emptyMessage;
 }
 
 class _AppLocalizationsDelegate

@@ -52,6 +52,11 @@ class SupervisorPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.supervisor_title,
         actions: [
+          AppIconButton(
+            icon: TablerIcons.refresh,
+            tooltip: l10n.action_refresh,
+            onPressed: () => ref.invalidate(_supervisorProvider),
+          ),
           if (ready)
             AppIconButton(
               icon: TablerIcons.file_settings,
@@ -64,11 +69,6 @@ class SupervisorPage extends ConsumerWidget {
               tooltip: l10n.supervisor_createProcess,
               onPressed: () => _openForm(context, ref),
             ),
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_supervisorProvider),
-          ),
         ],
       ),
       body: AsyncStateView(
@@ -117,7 +117,7 @@ class SupervisorPage extends ConsumerWidget {
       onRefresh: () async => ref.invalidate(_supervisorProvider),
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         children: [
           TonalCard(
             child: Column(
@@ -192,7 +192,7 @@ class SupervisorPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppTokens.s24),
-          SectionHeader(title: l10n.supervisor_title),
+          SectionHeader(title: l10n.supervisor_sectionProcesses),
           if (data.processes.isEmpty)
             EmptyState(
               icon: TablerIcons.cpu,

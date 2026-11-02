@@ -589,7 +589,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                 ? (item.itemTotal > 0
                       ? l10n.files_itemCount(item.itemTotal)
                       : l10n.files_folder)
-                : '${formatBytes(item.size)} · ${item.modTime}',
+                : '${formatBytes(item.size)} · ${formatListTime(DateTime.tryParse(item.modTime), l10n, fallback: item.modTime)}',
             style: AppTextStyles.bodyS.copyWith(
               color: context.scheme.onSurfaceVariant,
             ),
@@ -795,6 +795,11 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                     }
                   },
                 ),
+                AppIconButton(
+                  icon: TablerIcons.upload,
+                  tooltip: l10n.files_upload,
+                  onPressed: _uploading ? null : _upload,
+                ),
                 PopupMenuButton<String>(
                   tooltip: l10n.files_sort,
                   icon: const Icon(TablerIcons.arrows_sort),
@@ -884,19 +889,6 @@ class _FilesPageState extends ConsumerState<FilesPage> {
           ),
         ),
       ),
-      floatingActionButton: _selectionMode
-          ? null
-          : FloatingActionButton(
-              tooltip: l10n.files_upload,
-              onPressed: _uploading ? null : _upload,
-              child: _uploading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(TablerIcons.upload),
-            ),
       body: AsyncStateView(
         value: files,
         onRetry: () => ref.read(filesProvider(_path).notifier).refresh(),
@@ -1216,7 +1208,7 @@ class _Breadcrumb extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: AppTokens.s8),
               child: Center(
                 child: Text(
-                  l10n.files_rootDirectory,
+                  l10n.files_homeDirectory,
                   style: AppTextStyles.bodyS.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
@@ -1325,7 +1317,7 @@ class _FileTile extends StatelessWidget {
                         ? (item.itemTotal > 0
                               ? l10n.files_itemCount(item.itemTotal)
                               : l10n.files_folder)
-                        : '${formatBytes(item.size)} · ${item.modTime}',
+                        : '${formatBytes(item.size)} · ${formatListTime(DateTime.tryParse(item.modTime), l10n, fallback: item.modTime)}',
                     style: AppTextStyles.caption.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),

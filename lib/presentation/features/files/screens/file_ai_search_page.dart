@@ -75,7 +75,7 @@ class _FileAiSearchPageState extends ConsumerState<FileAiSearchPage> {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.files_aiSearch)),
       body: ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         children: [
           Text(
             widget.initialPath,

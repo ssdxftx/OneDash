@@ -60,7 +60,10 @@ class BottomSheetSurface extends StatelessWidget {
           Flexible(
             child: SingleChildScrollView(
               padding: padding,
-              child: SafeArea(top: false, child: child),
+              child: Material(
+                type: MaterialType.transparency,
+                child: SafeArea(top: false, child: child),
+              ),
             ),
           ),
         ],

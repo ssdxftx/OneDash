@@ -4,6 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/cronjob/cronjob_dto.dart';
 import '../../../../data/repositories_impl/cronjob_repository_impl.dart';
 import '../../../common/components/app_toast.dart';
@@ -129,7 +130,10 @@ class CronjobRecordsSheet extends ConsumerWidget {
                   for (final record in data.items)
                     SplitListTile(
                       leading: StatusDot(status: record.status.toLowerCase()),
-                      title: record.startTime,
+                      title: formatLocalDateTime(
+                        record.startTime,
+                        locale: AppLocalizations.of(context).localeName,
+                      ),
                       subtitle: record.message.isEmpty
                           ? record.status
                           : record.message,

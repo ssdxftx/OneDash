@@ -139,7 +139,8 @@ class SnapshotPage extends ConsumerWidget {
                   const SizedBox(height: AppTokens.s4),
                   Text(
                     '${taskStatusLabel(status, l10n)} · '
-                    '${item['createdAt'] ?? ''} · ${item['version'] ?? ''}',
+                    '${formatLocalDateTime('${item['createdAt'] ?? ''}', locale: l10n.localeName)} · '
+                    '${item['version'] ?? ''}',
                     style: AppTextStyles.caption.copyWith(
                       color: failed
                           ? context.appColors.danger

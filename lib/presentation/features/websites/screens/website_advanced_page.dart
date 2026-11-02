@@ -152,7 +152,7 @@ class _BasicTab extends ConsumerWidget {
       builder: (data) {
         final site = data.website;
         return ListView(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           children: [
             TonalCard(
               child: Row(
@@ -633,7 +633,7 @@ class _SecurityTab extends ConsumerWidget {
     final leech = ref.watch(_leechProvider(websiteId));
     final realIp = ref.watch(_realIpProvider(websiteId));
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         _StatusCard(
           title: l10n.websites_accessAuth,
@@ -1343,7 +1343,7 @@ class _RewriteTabState extends ConsumerState<_RewriteTab> {
     final l10n = AppLocalizations.of(context);
     if (_loading) return const SkeletonList(itemCount: 4);
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         if (_templates.isNotEmpty) ...[
           Text(l10n.websites_rewriteTemplates, style: AppTextStyles.bodyS),
@@ -1773,7 +1773,7 @@ class _OpenRestyTabState extends ConsumerState<_OpenRestyTab> {
     final l10n = AppLocalizations.of(context);
     if (_loading) return const SkeletonList(itemCount: 6);
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         Text(l10n.websites_openRestyPerformance, style: AppTextStyles.titleS),
         const SizedBox(height: AppTokens.s8),

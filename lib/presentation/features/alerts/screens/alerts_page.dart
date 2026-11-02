@@ -105,6 +105,8 @@ class _AlertListTab extends ConsumerWidget {
             icon: TablerIcons.bell_off,
             title: l10n.panelSettings_noAlertRules,
             message: l10n.panelSettings_webPanelRequired,
+            actionLabel: l10n.alerts_create,
+            onAction: () => context.push('/s/$serverId/more/alerts/form'),
           );
         }
         return ListView.separated(
@@ -229,7 +231,7 @@ class _AlertCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      l10n.panelSettings_alertCardMeta(
+                      l10n.alerts_cardMeta(
                         alertTypeLabel(alert.type, l10n),
                         alertMethodLabel(alert.method, l10n),
                       ),
@@ -247,34 +249,23 @@ class _AlertCard extends StatelessWidget {
                 onChanged: (_) => onToggle(),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              if (compact)
-                PopupMenuButton<String>(
-                  tooltip: l10n.action_more,
-                  icon: Icon(
-                    TablerIcons.dots,
-                    size: AppTokens.iconList,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  onSelected: (value) {
-                    if (value == 'delete') onDelete();
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Text(l10n.common_delete),
-                    ),
-                  ],
-                )
-              else
-                IconButton(
-                  tooltip: l10n.common_delete,
-                  onPressed: onDelete,
-                  icon: Icon(
-                    TablerIcons.trash,
-                    size: AppTokens.iconList,
-                    color: scheme.error,
-                  ),
+              PopupMenuButton<String>(
+                tooltip: l10n.action_more,
+                icon: Icon(
+                  TablerIcons.dots,
+                  size: AppTokens.iconList,
+                  color: scheme.onSurfaceVariant,
                 ),
+                onSelected: (value) {
+                  if (value == 'delete') onDelete();
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Text(l10n.common_delete),
+                  ),
+                ],
+              ),
             ],
           );
         },
@@ -435,7 +426,7 @@ class _AlertSettingsTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final configs = ref.watch(_alertConfigsProvider);
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         Text(
           l10n.panelSettings_webPanelRequired,

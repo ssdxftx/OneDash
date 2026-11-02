@@ -35,7 +35,37 @@ void main() {
     expect(backupAccountTypeLabel('LOCAL', l10n), 'Local');
     expect(backupAccountTypeLabel('oss', l10n), 'Alibaba Cloud OSS');
     expect(backupAccountTypeLabel('s3', l10n), 'S3');
+    expect(backupAccountTypeLabel('KODO', l10n), 'Qiniu Kodo');
+    expect(backupAccountTypeLabel('upyun', l10n), 'UPYUN');
+    expect(backupAccountTypeLabel('aliyun', l10n), 'Aliyun Drive');
+    expect(backupAccountTypeLabel('GoogleDrive', l10n), 'Google Drive');
     expect(backupAccountTypeLabel('custom', l10n), 'custom');
+  });
+
+  test('backup account types match the panel contract', () {
+    expect(backupAccountTypes, hasLength(11));
+    expect(backupAccountLocal, 'LOCAL');
+    for (final type in backupAccountTypes) {
+      expect(backupAccountTypes.where((item) => item == type), hasLength(1));
+      expect(type, isNot(equals(backupAccountLocal)));
+    }
+    expect(backupAccountTypes, contains('OneDrive'));
+    expect(backupAccountTypes, contains('GoogleDrive'));
+  });
+
+  test('backup account types normalize to canonical casing', () {
+    expect(canonicalBackupAccountType('local'), 'LOCAL');
+    expect(canonicalBackupAccountType('ONEDRIVE'), 'OneDrive');
+    expect(canonicalBackupAccountType('googledrive'), 'GoogleDrive');
+    expect(canonicalBackupAccountType('minio'), 'MINIO');
+    expect(canonicalBackupAccountType('unknown'), 'S3');
+  });
+
+  test('cronjob types are localized with raw fallback', () {
+    expect(cronjobTypeLabel('shell', l10n), 'Shell script');
+    expect(cronjobTypeLabel('Website', l10n), 'Back up website');
+    expect(cronjobTypeLabel('snapshot', l10n), 'Snapshot');
+    expect(cronjobTypeLabel('custom', l10n), 'custom');
   });
 
   test('task status labels cover snapshot and backup states', () {

@@ -147,26 +147,6 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                   },
                 ),
                 AppIconButton(
-                  icon: _selectionMode ? TablerIcons.x : TablerIcons.checklist,
-                  tooltip: _selectionMode
-                      ? l10n.files_cancelSelection
-                      : l10n.files_selectAll,
-                  onPressed: () => setState(() {
-                    if (_selectionMode) {
-                      _clearSelection();
-                    } else {
-                      _selecting = true;
-                      final items = ref
-                          .read(websitesProvider)
-                          .valueOrNull
-                          ?.items;
-                      _selected.addAll(
-                        (items ?? const []).map((site) => site.id),
-                      );
-                    }
-                  }),
-                ),
-                AppIconButton(
                   icon: TablerIcons.plus,
                   tooltip: l10n.websites_create,
                   onPressed: () =>
@@ -176,13 +156,36 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                   tooltip: l10n.action_more,
                   icon: const Icon(TablerIcons.dots),
                   onSelected: (value) {
-                    if (value == 'templates') {
+                    if (value == 'select') {
+                      setState(() {
+                        if (_selectionMode) {
+                          _clearSelection();
+                        } else {
+                          _selecting = true;
+                          final items = ref
+                              .read(websitesProvider)
+                              .valueOrNull
+                              ?.items;
+                          _selected.addAll(
+                            (items ?? const []).map((site) => site.id),
+                          );
+                        }
+                      });
+                    } else if (value == 'templates') {
                       context.push('/s/${widget.serverId}/websites/templates');
                     } else if (value == 'refresh') {
                       ref.read(websitesProvider.notifier).refresh();
                     }
                   },
                   itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'select',
+                      child: Text(
+                        _selectionMode
+                            ? l10n.files_cancelSelection
+                            : l10n.files_selectAll,
+                      ),
+                    ),
                     PopupMenuItem(
                       value: 'templates',
                       child: Text(l10n.websites_templates),
@@ -257,9 +260,9 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                     child: ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(
-                        AppTokens.s16,
+                        AppTokens.pagePadding,
                         AppTokens.s8,
-                        AppTokens.s16,
+                        AppTokens.pagePadding,
                         AppTokens.s32,
                       ),
                       itemCount: result.items.length,

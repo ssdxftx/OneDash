@@ -175,7 +175,7 @@ class _HostPageState extends ConsumerState<HostPage> {
 
   Widget _monitorTab(AppLocalizations l10n) {
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         AppFilterChips<int>(
           options: const [1, 6, 24],
@@ -300,7 +300,7 @@ class _HostPageState extends ConsumerState<HostPage> {
           );
         }
         return ListView(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           children: [
             SplitListGroup(
               children: [

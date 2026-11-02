@@ -34,7 +34,7 @@ class AppDetailPage extends ConsumerWidget {
         value: detail,
         onRetry: () => ref.invalidate(appDetailProvider(appId)),
         builder: (app) => ListView(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           children: [
             TonalCard(
               child: Column(
@@ -63,19 +63,13 @@ class AppDetailPage extends ConsumerWidget {
             const SizedBox(height: AppTokens.s24),
             SplitListGroup(
               children: [
-                SplitListTile(title: l10n.appStore_appKey, subtitle: app.key),
-                SplitListTile(
-                  title: l10n.panelSettings_type,
-                  subtitle: app.type,
-                ),
-                SplitListTile(
-                  title: l10n.websites_website,
-                  subtitle: app.website,
-                ),
-                SplitListTile(title: 'GitHub', subtitle: app.github),
+                SplitListTile(title: l10n.appStore_appKey, value: app.key),
+                SplitListTile(title: l10n.panelSettings_type, value: app.type),
+                SplitListTile(title: l10n.websites_website, value: app.website),
+                SplitListTile(title: 'GitHub', value: app.github),
                 SplitListTile(
                   title: l10n.appStore_installed,
-                  subtitle: app.installed ? l10n.common_yes : l10n.common_no,
+                  value: app.installed ? l10n.common_yes : l10n.common_no,
                 ),
               ],
             ),

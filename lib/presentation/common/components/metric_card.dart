@@ -100,6 +100,7 @@ class MetricCard extends StatelessWidget {
                     ),
                     maxLines: 1,
                     softWrap: false,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),

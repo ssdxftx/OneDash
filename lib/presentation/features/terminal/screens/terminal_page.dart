@@ -288,17 +288,17 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
           ),
           actions: [
             IconButton(
-              tooltip: l10n.terminal_sessions,
-              onPressed: _showSessions,
-              icon: const Icon(TablerIcons.list),
-            ),
-            IconButton(
               tooltip: l10n.action_refresh,
               onPressed: () async {
                 await _disconnect();
                 await _connect();
               },
               icon: const Icon(TablerIcons.refresh),
+            ),
+            IconButton(
+              tooltip: l10n.terminal_sessions,
+              onPressed: _showSessions,
+              icon: const Icon(TablerIcons.list),
             ),
             PopupMenuButton<double>(
               tooltip: l10n.terminal_fontSize,

@@ -149,7 +149,7 @@ class _OverviewTab extends ConsumerWidget {
       value: info,
       onRetry: () => ref.invalidate(_containerInfoProvider(containerName)),
       builder: (data) => ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         children: [
           TonalCard(
             child: Row(
@@ -232,22 +232,23 @@ class _OverviewTab extends ConsumerWidget {
           const SizedBox(height: AppTokens.s24),
           SplitListGroup(
             children: [
-              SplitListTile(
-                title: l10n.containers_images,
-                subtitle: data.image,
-              ),
-              SplitListTile(
-                title: l10n.containers_hostname,
-                subtitle: data.hostname,
-              ),
-              SplitListTile(
-                title: l10n.containers_restartPolicy,
-                subtitle: data.restartPolicy,
-              ),
-              SplitListTile(
-                title: l10n.containers_workingDir,
-                subtitle: data.workingDir,
-              ),
+              if (data.image.trim().isNotEmpty)
+                SplitListTile(title: l10n.containers_images, value: data.image),
+              if (data.hostname.trim().isNotEmpty)
+                SplitListTile(
+                  title: l10n.containers_hostname,
+                  value: data.hostname,
+                ),
+              if (data.restartPolicy.trim().isNotEmpty)
+                SplitListTile(
+                  title: l10n.containers_restartPolicy,
+                  value: data.restartPolicy,
+                ),
+              if (data.workingDir.trim().isNotEmpty)
+                SplitListTile(
+                  title: l10n.containers_workingDir,
+                  value: data.workingDir,
+                ),
               if (data.volumes.isNotEmpty)
                 SplitListTile(
                   title: l10n.containers_mountedVolumes,
@@ -274,26 +275,42 @@ class _ConfigTab extends ConsumerWidget {
       value: info,
       onRetry: () => ref.invalidate(_containerInfoProvider(containerName)),
       builder: (data) => ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         children: [
           SplitListGroup(
             children: [
-              SplitListTile(
-                title: l10n.containers_envVars,
-                subtitle: data.env.isEmpty ? '-' : data.env.join('\n'),
-              ),
-              SplitListTile(
-                title: l10n.containers_command,
-                subtitle: data.cmd?.join(' ') ?? '-',
-              ),
-              SplitListTile(
-                title: l10n.containers_entrypoint,
-                subtitle: data.entrypoint?.join(' ') ?? '-',
-              ),
-              SplitListTile(
-                title: l10n.nav_network,
-                subtitle: data.networks.map((n) => n.network).join(', '),
-              ),
+              if (data.env.isNotEmpty)
+                SplitListTile(
+                  title: l10n.containers_envVars,
+                  subtitle: data.env.join('\n'),
+                  subtitleStyle: AppTextStyles.bodyM.copyWith(
+                    fontFamily: 'monospace',
+                    color: context.scheme.onSurface,
+                  ),
+                ),
+              if (data.cmd != null && data.cmd!.isNotEmpty)
+                SplitListTile(
+                  title: l10n.containers_command,
+                  subtitle: data.cmd!.join(' '),
+                  subtitleStyle: AppTextStyles.bodyM.copyWith(
+                    fontFamily: 'monospace',
+                    color: context.scheme.onSurface,
+                  ),
+                ),
+              if (data.entrypoint != null && data.entrypoint!.isNotEmpty)
+                SplitListTile(
+                  title: l10n.containers_entrypoint,
+                  subtitle: data.entrypoint!.join(' '),
+                  subtitleStyle: AppTextStyles.bodyM.copyWith(
+                    fontFamily: 'monospace',
+                    color: context.scheme.onSurface,
+                  ),
+                ),
+              if (data.networks.isNotEmpty)
+                SplitListTile(
+                  title: l10n.nav_network,
+                  subtitle: data.networks.map((n) => n.network).join(', '),
+                ),
               SplitListTile(
                 title: l10n.containers_memory,
                 subtitle: data.memory == 0

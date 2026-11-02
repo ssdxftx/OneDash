@@ -49,9 +49,9 @@ class MorePage extends ConsumerWidget {
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(
-                AppTokens.s16,
+                AppTokens.pagePadding,
                 0,
-                AppTokens.s16,
+                AppTokens.pagePadding,
                 AppTokens.s32,
               ),
               sliver: SliverToBoxAdapter(
@@ -63,7 +63,7 @@ class MorePage extends ConsumerWidget {
                       children: [
                         _tile(
                           context,
-                          icon: TablerIcons.apps,
+                          icon: TablerIcons.layout_grid,
                           title: l10n.more_app_store,
                           subtitle: l10n.more_appStoreSubtitle,
                           onTap: () => context.push('/s/$serverId/more/apps'),
@@ -74,7 +74,7 @@ class MorePage extends ConsumerWidget {
                           title: l10n.more_installed_apps,
                           subtitle: counts == null
                               ? null
-                              : '${counts.appInstalledNumber}',
+                              : l10n.more_appsCount(counts.appInstalledNumber),
                           onTap: () => context.push(
                             '/s/$serverId/more/apps?tab=installed',
                           ),
@@ -85,7 +85,7 @@ class MorePage extends ConsumerWidget {
                           title: l10n.more_databases,
                           subtitle: counts == null
                               ? null
-                              : '${counts.databaseNumber}',
+                              : l10n.more_databasesCount(counts.databaseNumber),
                           onTap: () =>
                               context.push('/s/$serverId/more/databases'),
                         ),
@@ -95,7 +95,7 @@ class MorePage extends ConsumerWidget {
                           title: l10n.more_cronjobs,
                           subtitle: counts == null
                               ? null
-                              : '${counts.cronjobNumber}',
+                              : l10n.more_cronjobsCount(counts.cronjobNumber),
                           onTap: () =>
                               context.push('/s/$serverId/more/cronjobs'),
                         ),
@@ -119,7 +119,7 @@ class MorePage extends ConsumerWidget {
                           title: l10n.nav_websites,
                           subtitle: counts == null
                               ? null
-                              : '${counts.websiteNumber}',
+                              : l10n.websites_count(counts.websiteNumber),
                           onTap: () => context.go('/s/$serverId/websites'),
                         ),
                         _tile(

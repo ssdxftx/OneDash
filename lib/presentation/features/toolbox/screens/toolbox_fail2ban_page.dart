@@ -260,7 +260,7 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
               message: l10n.toolbox_notInstalledHint,
             )
           : ListView(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               children: [
                 SplitListGroup(
                   children: [

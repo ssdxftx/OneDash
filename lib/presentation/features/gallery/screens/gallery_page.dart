@@ -33,7 +33,7 @@ class _GalleryPageState extends State<GalleryPage> {
     return Scaffold(
       appBar: AppBarLarge(title: l10n.gallery_title),
       body: ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         children: [
           const SectionHeader(title: 'Cards'),
           TonalCard(

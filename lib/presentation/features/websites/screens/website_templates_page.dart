@@ -128,14 +128,14 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
         title: l10n.websites_templates,
         actions: [
           AppIconButton(
-            icon: TablerIcons.folder,
-            tooltip: l10n.websites_templateOutputs,
-            onPressed: _showOutputs,
-          ),
-          AppIconButton(
             icon: TablerIcons.refresh,
             tooltip: l10n.action_refresh,
             onPressed: _load,
+          ),
+          AppIconButton(
+            icon: TablerIcons.folder,
+            tooltip: l10n.websites_templateOutputs,
+            onPressed: _showOutputs,
           ),
           AppIconButton(
             icon: TablerIcons.plus,
@@ -174,7 +174,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                 : RefreshIndicator(
                     onRefresh: _load,
                     child: ListView(
-                      padding: const EdgeInsets.all(AppTokens.s16),
+                      padding: const EdgeInsets.all(AppTokens.pagePadding),
                       children: [
                         for (final template in _templates)
                           Padding(
@@ -259,8 +259,9 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          '${template.parsedVariables.length} '
-                                          '${l10n.websites_templateVariables}',
+                                          l10n.websites_templateVariableCount(
+                                            template.parsedVariables.length,
+                                          ),
                                           style: AppTextStyles.bodyS.copyWith(
                                             color:
                                                 context.scheme.onSurfaceVariant,
@@ -274,7 +275,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                                         ),
                                         onPressed: () => _generate(template),
                                         icon: const Icon(
-                                          TablerIcons.player_play,
+                                          TablerIcons.file_plus,
                                           size: AppTokens.iconList,
                                         ),
                                         label: Text(

@@ -58,7 +58,7 @@ class WebsiteGroupsPage extends ConsumerWidget {
             );
           }
           return ListView(
-            padding: const EdgeInsets.all(AppTokens.s16),
+            padding: const EdgeInsets.all(AppTokens.pagePadding),
             children: [
               SplitListGroup(
                 children: [

@@ -94,17 +94,17 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                 ),
                 actions: [
                   AppIconButton(
-                    icon: TablerIcons.terminal_2,
-                    tooltip: l10n.dashboard_terminal,
-                    onPressed: () =>
-                        context.push('/s/${widget.serverId}/terminal'),
-                  ),
-                  AppIconButton(
                     icon: TablerIcons.refresh,
                     tooltip: l10n.action_refresh,
                     onPressed: () => ref
                         .read(overviewProvider(widget.serverId).notifier)
                         .refresh(),
+                  ),
+                  AppIconButton(
+                    icon: TablerIcons.terminal_2,
+                    tooltip: l10n.dashboard_terminal,
+                    onPressed: () =>
+                        context.push('/s/${widget.serverId}/terminal'),
                   ),
                 ],
               ),

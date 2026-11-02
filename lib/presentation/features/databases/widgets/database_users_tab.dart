@@ -106,7 +106,7 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
       return const Center(child: CircularProgressIndicator());
     }
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.s16),
+      padding: const EdgeInsets.all(AppTokens.pagePadding),
       children: [
         Row(
           children: [

@@ -128,7 +128,7 @@ class _FilePermissionSheetState extends ConsumerState<_FilePermissionSheet> {
             shrinkWrap: true,
             children: [
               Padding(
-                padding: const EdgeInsets.all(AppTokens.s16),
+                padding: const EdgeInsets.all(AppTokens.pagePadding),
                 child: Text(l10n.files_pickOwner, style: AppTextStyles.titleL),
               ),
               for (final user in data.users)

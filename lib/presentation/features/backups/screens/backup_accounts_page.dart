@@ -70,10 +70,16 @@ class BackupAccountsPage extends ConsumerWidget {
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {
             final account = items[index];
+            final name = '${account['name'] ?? ''}';
             final type = '${account['type'] ?? ''}';
             final path = '${account['backupPath'] ?? ''}';
+            final typeLabel = backupAccountTypeLabel(type, l10n);
+            final nameLower = name.toLowerCase();
+            final nameHasType =
+                nameLower.contains(type.toLowerCase()) ||
+                nameLower.contains(typeLabel.toLowerCase());
             final subtitle = [
-              backupAccountTypeLabel(type, l10n),
+              if (!nameHasType) typeLabel,
               if (path.isNotEmpty) path,
             ].join(' · ');
             return TonalCard(
@@ -91,19 +97,18 @@ class BackupAccountsPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '${account['name'] ?? ''}',
-                          style: AppTextStyles.titleM,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          style: AppTextStyles.caption.copyWith(
-                            color: context.scheme.onSurfaceVariant,
+                        Text(name, style: AppTextStyles.titleM),
+                        if (subtitle.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle,
+                            style: AppTextStyles.caption.copyWith(
+                              color: context.scheme.onSurfaceVariant,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        ],
                       ],
                     ),
                   ),
@@ -162,7 +167,12 @@ class BackupAccountsPage extends ConsumerWidget {
       text: '${current?['backupPath'] ?? ''}',
     );
     final vars = TextEditingController(text: '${current?['vars'] ?? ''}');
-    String type = '${current?['type'] ?? 'local'}';
+    final rawType = '${current?['type'] ?? backupAccountTypes.first}'
+        .toUpperCase();
+    final isLocalAccount = rawType == backupAccountLocal;
+    String type = isLocalAccount || backupAccountTypes.contains(rawType)
+        ? rawType
+        : backupAccountTypes.first;
     bool rememberAuth = current?['rememberAuth'] == true;
     final saved = await showAppSheet<bool>(
       context: context,
@@ -181,36 +191,30 @@ class BackupAccountsPage extends ConsumerWidget {
             const SizedBox(height: AppTokens.s16),
             AppTextField(controller: name, label: l10n.backups_accountName),
             const SizedBox(height: AppTokens.s12),
-            DropdownButtonFormField<String>(
-              initialValue: type,
-              decoration: InputDecoration(labelText: l10n.backups_accountType),
-              items: [
-                DropdownMenuItem(
-                  value: 'local',
-                  child: Text(l10n.backups_typeLocal),
+            if (isLocalAccount)
+              InputDecorator(
+                decoration: InputDecoration(
+                  labelText: l10n.backups_accountType,
                 ),
-                DropdownMenuItem(
-                  value: 'sftp',
-                  child: Text(l10n.backups_typeSftp),
+                child: Text(l10n.backups_typeLocal),
+              )
+            else
+              DropdownButtonFormField<String>(
+                initialValue: type,
+                decoration: InputDecoration(
+                  labelText: l10n.backups_accountType,
                 ),
-                DropdownMenuItem(value: 's3', child: Text(l10n.backups_typeS3)),
-                DropdownMenuItem(
-                  value: 'oss',
-                  child: Text(l10n.backups_typeOss),
-                ),
-                DropdownMenuItem(
-                  value: 'cos',
-                  child: Text(l10n.backups_typeCos),
-                ),
-                DropdownMenuItem(
-                  value: 'minio',
-                  child: Text(l10n.backups_typeMinio),
-                ),
-              ],
-              onChanged: (value) {
-                if (value != null) setState(() => type = value);
-              },
-            ),
+                items: [
+                  for (final value in backupAccountTypes)
+                    DropdownMenuItem(
+                      value: value,
+                      child: Text(backupAccountTypeLabel(value, l10n)),
+                    ),
+                ],
+                onChanged: (value) {
+                  if (value != null) setState(() => type = value);
+                },
+              ),
             const SizedBox(height: AppTokens.s12),
             AppTextField(controller: accessKey, label: l10n.backups_accessKey),
             const SizedBox(height: AppTokens.s12),

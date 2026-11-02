@@ -184,7 +184,7 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         children: [
           SectionHeader(title: l10n.host_diagSummary),
           SplitListGroup(

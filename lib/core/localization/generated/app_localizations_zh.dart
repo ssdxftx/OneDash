@@ -156,6 +156,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get files_sortModifiedTime => '修改时间';
 
   @override
+  String get files_homeDirectory => '主目录';
+
+  @override
   String get files_rootDirectory => '根目录';
 
   @override
@@ -347,8 +350,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get panelSettings_noAlertRules => '暂无告警规则';
 
   @override
-  String panelSettings_alertCardMeta(String type, String method) {
-    return '类型: $type  方式: $method';
+  String alerts_cardMeta(String type, String method) {
+    return '类型：$type · 方式：$method';
   }
 
   @override
@@ -821,7 +824,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_system_info => '系统信息';
 
   @override
-  String get dashboard_sites_containers => '站点与容器';
+  String get dashboard_sites_containers => '网站与容器';
 
   @override
   String get dashboard_quick_actions => '快捷操作';
@@ -894,7 +897,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_empty_title => '还没有网站';
 
   @override
-  String get websites_empty_message => '创建一个静态站点或反向代理来开始。';
+  String get websites_empty_message => '创建一个静态网站或反向代理来开始。';
 
   @override
   String get websites_create => '创建网站';
@@ -906,7 +909,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_running => '运行中';
 
   @override
-  String get websites_stopped => '站点已停止';
+  String get websites_stopped => '已停止';
 
   @override
   String get websites_static => '静态';
@@ -1204,7 +1207,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_domainAdded => '已添加';
 
   @override
-  String get websites_removeDomainMessage => '删除后该域名将不再指向此站点。';
+  String get websites_removeDomainMessage => '删除后该域名将不再指向此网站。';
 
   @override
   String get websites_domainDeleted => '已删除';
@@ -1219,7 +1222,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_changeCertificate => '更换/绑定证书';
 
   @override
-  String get websites_noReverseProxyHint => '在面板中为站点添加反向代理规则后会显示在这里。';
+  String get websites_noReverseProxyHint => '在面板中为网站添加反向代理规则后会显示在这里。';
 
   @override
   String websites_deleteProxyMessage(String name, String match) {
@@ -2061,13 +2064,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get firewall_whitelistRequired => '请填写端口和至少一个来源';
 
   @override
-  String get websites_start => '启动站点';
+  String get websites_start => '启动网站';
 
   @override
-  String get websites_stop => '停止站点';
+  String get websites_stop => '停止网站';
 
   @override
-  String get websites_delete => '删除站点';
+  String get websites_delete => '删除网站';
 
   @override
   String get websites_copyDomain => '复制域名';
@@ -2081,7 +2084,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get websites_deleteMessage => '站点文件、Nginx 配置和 SSL 证书将一并删除，且不可恢复。';
+  String get websites_deleteMessage => '网站文件、Nginx 配置和 SSL 证书将一并删除，且不可恢复。';
 
   @override
   String websites_deleteDatabaseCount(int count) {
@@ -2089,19 +2092,19 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get websites_deleteBackup => '同时删除站点备份';
+  String get websites_deleteBackup => '同时删除网站备份';
 
   @override
   String get websites_forceDelete => '强制删除（忽略错误）';
 
   @override
-  String get websites_deleted => '站点已删除';
+  String get websites_deleted => '网站已删除';
 
   @override
-  String get websites_started => '站点已启动';
+  String get websites_started => '网站已启动';
 
   @override
-  String get websites_actions => '站点操作';
+  String get websites_actions => '网站操作';
 
   @override
   String get containers_create => '新建容器';
@@ -2966,19 +2969,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_templateGenerate => '生成';
 
   @override
-  String get websites_templateOutputs => '已生成站点';
+  String get websites_templateOutputs => '已生成网站';
 
   @override
   String get websites_templateOutputName => '输出名称';
 
   @override
-  String get websites_templateOutputEmpty => '暂无生成站点';
+  String get websites_templateOutputEmpty => '暂无生成网站';
 
   @override
-  String get websites_templateOutputGenerated => '站点已生成';
+  String get websites_templateOutputGenerated => '网站已生成';
 
   @override
-  String get websites_templateOutputDelete => '删除生成站点';
+  String get websites_templateOutputDelete => '删除生成网站';
 
   @override
   String get websites_templateNoVariables => '无变量';
@@ -5006,6 +5009,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get backups_typeWebdav => 'WebDAV';
 
   @override
+  String get backups_typeKodo => '七牛云 Kodo';
+
+  @override
+  String get backups_typeUpyun => '又拍云';
+
+  @override
+  String get backups_typeAliyun => '阿里云盘';
+
+  @override
+  String get backups_typeGoogleDrive => 'Google 云端硬盘';
+
+  @override
   String get runtimes_emptyTitle => '暂无已安装运行时';
 
   @override
@@ -5018,7 +5033,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_templatesEmptyTitle => '暂无模板';
 
   @override
-  String get websites_templateOutputsEmptyTitle => '暂无生成结果';
+  String get websites_templateOutputsEmptyTitle => '暂无生成网站';
 
   @override
   String get host_sshUnavailableTitle => 'SSH 服务不可用';
@@ -5058,4 +5073,50 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_loadBalanceEmptyTitle => '暂无上游节点';
+
+  @override
+  String servers_count(Object count) {
+    return '$count 个面板';
+  }
+
+  @override
+  String get servers_sectionConnected => '已连接面板';
+
+  @override
+  String get supervisor_sectionProcesses => '守护进程';
+
+  @override
+  String get toolbox_timeSection => '时区与时间';
+
+  @override
+  String more_appsCount(Object count) {
+    return '$count 个应用';
+  }
+
+  @override
+  String more_databasesCount(Object count) {
+    return '$count 个数据库';
+  }
+
+  @override
+  String more_cronjobsCount(Object count) {
+    return '$count 个计划任务';
+  }
+
+  @override
+  String websites_templateVariableCount(Object count) {
+    return '$count 个变量';
+  }
+
+  @override
+  String get server_edit_portHelper => '1Panel 默认端口为 9999';
+
+  @override
+  String get log_emptyMessage => '该分类暂时没有日志记录。';
+
+  @override
+  String get process_emptyMessage => '服务器当前没有可显示的进程。';
+
+  @override
+  String get runtimes_emptyMessage => '从应用商店安装运行时后会显示在这里。';
 }

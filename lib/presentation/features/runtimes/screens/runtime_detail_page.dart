@@ -473,7 +473,7 @@ class _FpmTabState extends ConsumerState<_FpmTab> {
         final data = snapshot.data;
         if (data == null) return const SizedBox.shrink();
         return ListView(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           children: [
             Text(l10n.runtime_fpmConfig, style: AppTextStyles.titleM),
             const SizedBox(height: AppTokens.s12),

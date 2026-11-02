@@ -43,7 +43,15 @@ class _ServerShellScaffold extends ConsumerWidget {
     final scheme = context.scheme;
     return Scaffold(
       backgroundColor: scheme.surface,
-      body: navigationShell,
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: AppTokens.contentMaxWidth,
+          ),
+          child: navigationShell,
+        ),
+      ),
       bottomNavigationBar: DecoratedBox(
         decoration: BoxDecoration(
           border: Border(top: BorderSide(color: scheme.outlineVariant)),

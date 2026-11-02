@@ -98,8 +98,8 @@ class ServersPage extends ConsumerWidget {
                               AppTokens.s8,
                             ),
                             child: SectionHeader(
-                              title: l10n.servers_title,
-                              subtitle: '${items.length}',
+                              title: l10n.servers_sectionConnected,
+                              subtitle: l10n.servers_count(items.length),
                             ),
                           ),
                         ),
@@ -396,7 +396,7 @@ class _ServerCard extends ConsumerWidget {
                   server.lastUsedAt == null
                       ? l10n.servers_offline
                       : l10n.servers_last_seen(
-                          formatRelativeTime(server.lastUsedAt, l10n),
+                          formatListTime(server.lastUsedAt, l10n),
                         ),
                   style: AppTextStyles.caption.copyWith(
                     color: scheme.onSurfaceVariant,

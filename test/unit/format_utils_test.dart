@@ -1,0 +1,27 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:onedash/core/localization/generated/app_localizations_en.dart';
+import 'package:onedash/core/utils/format_utils.dart';
+
+void main() {
+  setUpAll(() async => initializeDateFormatting('en'));
+  final l10n = AppLocalizationsEn();
+  final now = DateTime.now();
+
+  test('list time uses relative labels within seven days', () {
+    final time = now.subtract(const Duration(days: 2));
+    expect(formatListTime(time, l10n), l10n.format_relativeDaysAgo(2));
+  });
+
+  test('list time switches to an absolute date after seven days', () {
+    final time = now.subtract(const Duration(days: 8));
+    expect(
+      formatListTime(time, l10n),
+      formatLocalDateTime(time.toIso8601String(), locale: l10n.localeName),
+    );
+  });
+
+  test('list time preserves the fallback for unparseable values', () {
+    expect(formatListTime(null, l10n, fallback: 'raw'), 'raw');
+  });
+}

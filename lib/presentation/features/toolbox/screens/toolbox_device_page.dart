@@ -78,9 +78,9 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         children: [
-          SectionHeader(title: l10n.toolbox_time),
+          SectionHeader(title: l10n.toolbox_timeSection),
           SplitListGroup(
             children: [
               SplitListTile(

@@ -119,6 +119,11 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
         title: l10n.databases_title,
         actions: [
           AppIconButton(
+            icon: TablerIcons.refresh,
+            tooltip: l10n.action_refresh,
+            onPressed: () => ref.invalidate(_databasesProvider),
+          ),
+          AppIconButton(
             icon: TablerIcons.server,
             tooltip: l10n.databases_remoteInstances,
             onPressed: _showRemote,
@@ -127,11 +132,6 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
             icon: TablerIcons.plus,
             tooltip: l10n.databases_create,
             onPressed: () => _showCreateType(state),
-          ),
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_databasesProvider),
           ),
         ],
       ),

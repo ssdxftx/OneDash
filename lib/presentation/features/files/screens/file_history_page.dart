@@ -4,6 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
@@ -97,7 +98,8 @@ class _FileHistoryPageState extends ConsumerState<FileHistoryPage> {
                       title:
                           '${item['fileName'] ?? item['path'] ?? widget.path}',
                       subtitle:
-                          '${item['operation'] ?? ''} · ${item['createdAt'] ?? ''}',
+                          '${item['operation'] ?? ''} · '
+                          '${formatLocalDateTime('${item['createdAt'] ?? ''}', locale: AppLocalizations.of(context).localeName)}',
                       trailing: PopupMenuButton<String>(
                         icon: const Icon(TablerIcons.dots_vertical),
                         onSelected: (value) {

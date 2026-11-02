@@ -224,6 +224,10 @@
   "@files_sortModifiedTime": {
     "description": "Files sort by modified time option."
   },
+  "files_homeDirectory": "Home",
+  "@files_homeDirectory": {
+    "description": "Breadcrumb label for the filesystem root."
+  },
   "files_rootDirectory": "Root",
   "@files_rootDirectory": {
     "description": "Files breadcrumb root directory label."
@@ -482,9 +486,9 @@
   "@panelSettings_noAlertRules": {
     "description": "Empty state for alert rules."
   },
-  "panelSettings_alertCardMeta": "Type: {type}  Method: {method}",
-  "@panelSettings_alertCardMeta": {
-    "description": "Alert card metadata text.",
+  "alerts_cardMeta": "Type: {type} · Method: {method}",
+  "@alerts_cardMeta": {
+    "description": "Alert card metadata line.",
     "placeholders": {
       "type": {
         "type": "String"
@@ -1154,7 +1158,7 @@
   "@dashboard_system_info": {
     "description": "OneDash UI string"
   },
-  "dashboard_sites_containers": "Sites and containers",
+  "dashboard_sites_containers": "Websites and containers",
   "@dashboard_sites_containers": {
     "description": "OneDash UI string"
   },
@@ -1259,7 +1263,7 @@
   "@websites_empty_title": {
     "description": "OneDash UI string"
   },
-  "websites_empty_message": "Create a site to serve a static folder or reverse proxy.",
+  "websites_empty_message": "Create a website to serve a static folder or reverse proxy.",
   "@websites_empty_message": {
     "description": "OneDash UI string"
   },
@@ -1275,7 +1279,7 @@
   "@websites_running": {
     "description": "OneDash UI string"
   },
-  "websites_stopped": "Site stopped",
+  "websites_stopped": "Stopped",
   "@websites_stopped": {
     "description": "Toast shown after a website stops."
   },
@@ -1677,7 +1681,7 @@
   "@websites_domainAdded": {
     "description": "Domain add success."
   },
-  "websites_removeDomainMessage": "This domain will no longer point to this site.",
+  "websites_removeDomainMessage": "This domain will no longer point to this website.",
   "@websites_removeDomainMessage": {
     "description": "Delete domain confirmation message."
   },
@@ -1697,7 +1701,7 @@
   "@websites_changeCertificate": {
     "description": "Change certificate button."
   },
-  "websites_noReverseProxyHint": "Reverse proxy rules added in the panel will appear here.",
+  "websites_noReverseProxyHint": "Add a reverse proxy rule to this website in the panel.",
   "@websites_noReverseProxyHint": {
     "description": "Reverse proxy empty state."
   },
@@ -2113,7 +2117,7 @@
   "@server_edit_port_default": {
     "description": "Helper text showing the default panel port."
   },
-  "websites_count": "{count} sites",
+  "websites_count": "{count} websites",
   "containers_count": "{count} containers",
   "@websites_count": {
     "description": "Count shown in list header.",
@@ -2222,7 +2226,7 @@
   "websites_groupManagement": "Group Management",
   "websites_groupName": "Group Name",
   "websites_groupSetDefault": "Set as Default",
-  "websites_groupDeleteConfirm": "Delete group \"{name}\"? Sites in it will fall back to the default group.",
+  "websites_groupDeleteConfirm": "Delete group \"{name}\"? Websites in it will fall back to the default group.",
   "websites_groupEmpty": "No groups",
   "supervisor_deleteConfirm": "Delete guarded process \"{name}\"?",
   "@supervisor_title": {
@@ -2861,15 +2865,15 @@
   "@firewall_whitelistRequired": {
     "description": "Validation message for a firewall whitelist rule."
   },
-  "websites_start": "Start site",
+  "websites_start": "Start website",
   "@websites_start": {
     "description": "Action to start a website."
   },
-  "websites_stop": "Stop site",
+  "websites_stop": "Stop website",
   "@websites_stop": {
     "description": "Action to stop a website."
   },
-  "websites_delete": "Delete site",
+  "websites_delete": "Delete website",
   "@websites_delete": {
     "description": "Action to delete a website."
   },
@@ -2890,7 +2894,7 @@
       }
     }
   },
-  "websites_deleteMessage": "Site files, Nginx configuration and SSL certificates will be deleted. This cannot be undone.",
+  "websites_deleteMessage": "Website files, Nginx configuration and SSL certificates will be deleted. This cannot be undone.",
   "@websites_deleteMessage": {
     "description": "Website deletion warning."
   },
@@ -2903,7 +2907,7 @@
       }
     }
   },
-  "websites_deleteBackup": "Also delete site backups",
+  "websites_deleteBackup": "Also delete website backups",
   "@websites_deleteBackup": {
     "description": "Checkbox label to delete website backups."
   },
@@ -2911,15 +2915,15 @@
   "@websites_forceDelete": {
     "description": "Checkbox label for forced website deletion."
   },
-  "websites_deleted": "Site deleted",
+  "websites_deleted": "Website deleted",
   "@websites_deleted": {
     "description": "Toast shown after a website is deleted."
   },
-  "websites_started": "Site started",
+  "websites_started": "Website started",
   "@websites_started": {
     "description": "Toast shown after a website starts."
   },
-  "websites_actions": "Site actions",
+  "websites_actions": "Website actions",
   "@websites_actions": {
     "description": "Title for the website actions sheet."
   },
@@ -4078,7 +4082,7 @@
   "@websites_templateGenerate": {
     "description": "Generate a site from the template."
   },
-  "websites_templateOutputs": "Generated sites",
+  "websites_templateOutputs": "Generated websites",
   "@websites_templateOutputs": {
     "description": "Generated template site list."
   },
@@ -4086,15 +4090,15 @@
   "@websites_templateOutputName": {
     "description": "Generated site name."
   },
-  "websites_templateOutputEmpty": "No generated sites",
+  "websites_templateOutputEmpty": "No generated websites",
   "@websites_templateOutputEmpty": {
     "description": "Empty generated site list."
   },
-  "websites_templateOutputGenerated": "Site generated",
+  "websites_templateOutputGenerated": "Website generated",
   "@websites_templateOutputGenerated": {
     "description": "Generated site success toast."
   },
-  "websites_templateOutputDelete": "Delete generated site",
+  "websites_templateOutputDelete": "Delete generated website",
   "@websites_templateOutputDelete": {
     "description": "Delete generated template site."
   },
@@ -6243,11 +6247,11 @@
   "@websites_switchPhp": {
     "description": "OneDash UI text."
   },
-  "websites_switchPhpHint": "Change the PHP runtime or serve as a static site",
+  "websites_switchPhpHint": "Change the PHP runtime or serve as a static website",
   "@websites_switchPhpHint": {
     "description": "OneDash UI text."
   },
-  "websites_staticSite": "Static site",
+  "websites_staticSite": "Static website",
   "@websites_staticSite": {
     "description": "OneDash UI text."
   },
@@ -6646,7 +6650,7 @@
   "@websites_pin": {
     "description": "OneDash UI text."
   },
-  "websites_copyFromExisting": "Copy from existing site",
+  "websites_copyFromExisting": "Copy from existing website",
   "@websites_copyFromExisting": {
     "description": "OneDash UI text."
   },
@@ -6850,6 +6854,22 @@
   "@backups_typeWebdav": {
     "description": "Backup account type."
   },
+  "backups_typeKodo": "Qiniu Kodo",
+  "@backups_typeKodo": {
+    "description": "Backup account type."
+  },
+  "backups_typeUpyun": "UPYUN",
+  "@backups_typeUpyun": {
+    "description": "Backup account type."
+  },
+  "backups_typeAliyun": "Aliyun Drive",
+  "@backups_typeAliyun": {
+    "description": "Backup account type."
+  },
+  "backups_typeGoogleDrive": "Google Drive",
+  "@backups_typeGoogleDrive": {
+    "description": "Backup account type."
+  },
   "runtimes_emptyTitle": "No runtimes installed",
   "@runtimes_emptyTitle": {
     "description": "Empty state title for runtimes."
@@ -6866,7 +6886,7 @@
   "@websites_templatesEmptyTitle": {
     "description": "Empty state title for website templates."
   },
-  "websites_templateOutputsEmptyTitle": "No generated sites yet",
+  "websites_templateOutputsEmptyTitle": "No generated websites yet",
   "@websites_templateOutputsEmptyTitle": {
     "description": "Empty state title for template outputs."
   },
@@ -6921,5 +6941,53 @@
   "websites_loadBalanceEmptyTitle": "No upstream nodes",
   "@websites_loadBalanceEmptyTitle": {
     "description": "Empty state title for load balance upstreams."
+  },
+  "servers_count": "{count} panels",
+  "@servers_count": {
+    "description": "Connected panel count."
+  },
+  "servers_sectionConnected": "Connected panels",
+  "@servers_sectionConnected": {
+    "description": "Section title for connected panels."
+  },
+  "supervisor_sectionProcesses": "Guarded processes",
+  "@supervisor_sectionProcesses": {
+    "description": "Section title for supervisor processes."
+  },
+  "toolbox_timeSection": "Time zone and time",
+  "@toolbox_timeSection": {
+    "description": "Section title for device time settings."
+  },
+  "more_appsCount": "{count} apps",
+  "@more_appsCount": {
+    "description": "Installed app count."
+  },
+  "more_databasesCount": "{count} databases",
+  "@more_databasesCount": {
+    "description": "Database count."
+  },
+  "more_cronjobsCount": "{count} scheduled tasks",
+  "@more_cronjobsCount": {
+    "description": "Scheduled task count."
+  },
+  "websites_templateVariableCount": "{count} variables",
+  "@websites_templateVariableCount": {
+    "description": "Template variable count."
+  },
+  "server_edit_portHelper": "1Panel listens on 9999 by default",
+  "@server_edit_portHelper": {
+    "description": "Helper for the panel port field."
+  },
+  "log_emptyMessage": "No log entries in this category yet.",
+  "@log_emptyMessage": {
+    "description": "No log entries in this category yet."
+  },
+  "process_emptyMessage": "No processes are available on this server.",
+  "@process_emptyMessage": {
+    "description": "No processes are available on this server."
+  },
+  "runtimes_emptyMessage": "Runtimes installed from the app store will appear here.",
+  "@runtimes_emptyMessage": {
+    "description": "Runtimes installed from the app store will appear here."
   }
 }

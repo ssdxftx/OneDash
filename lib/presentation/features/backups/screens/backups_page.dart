@@ -55,20 +55,33 @@ class BackupsPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.backups_title,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.cloud_cog,
-            tooltip: l10n.backups_accounts,
-            onPressed: () => context.push('/s/$serverId/more/backups/accounts'),
-          ),
-          AppIconButton(
-            icon: TablerIcons.file_upload,
-            tooltip: l10n.backups_restoreFromFile,
-            onPressed: () => _restoreFromFile(context, ref),
-          ),
-          AppIconButton(
-            icon: TablerIcons.calculator,
-            tooltip: l10n.backups_calculateSizes,
-            onPressed: () => _showSizes(context, ref),
+          PopupMenuButton<String>(
+            tooltip: l10n.action_more,
+            icon: const Icon(TablerIcons.dots),
+            onSelected: (value) {
+              switch (value) {
+                case 'accounts':
+                  context.push('/s/$serverId/more/backups/accounts');
+                case 'restore':
+                  _restoreFromFile(context, ref);
+                case 'sizes':
+                  _showSizes(context, ref);
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'accounts',
+                child: Text(l10n.backups_accounts),
+              ),
+              PopupMenuItem(
+                value: 'restore',
+                child: Text(l10n.backups_restoreFromFile),
+              ),
+              PopupMenuItem(
+                value: 'sizes',
+                child: Text(l10n.backups_calculateSizes),
+              ),
+            ],
           ),
           AppIconButton(
             icon: TablerIcons.plus,
@@ -432,6 +445,8 @@ class _BackupTab extends ConsumerWidget {
         icon: TablerIcons.cloud_upload,
         title: l10n.backups_empty_title,
         message: l10n.backups_empty_message,
+        actionLabel: l10n.backups_create,
+        onAction: () => _create(context, ref),
       ),
       builder: (data) => ListView.builder(
         padding: const EdgeInsets.all(AppTokens.s16),
@@ -499,7 +514,7 @@ class _BackupTab extends ConsumerWidget {
                       Text(
                         record.createdAt == null
                             ? '-'
-                            : formatRelativeTime(record.createdAt, l10n),
+                            : formatListTime(record.createdAt, l10n),
                         style: AppTextStyles.caption.copyWith(
                           color: context.scheme.onSurfaceVariant,
                         ),

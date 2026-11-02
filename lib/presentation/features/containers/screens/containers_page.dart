@@ -155,28 +155,6 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                   },
                 ),
                 AppIconButton(
-                  icon: _selectionMode ? TablerIcons.x : TablerIcons.checklist,
-                  tooltip: _selectionMode
-                      ? l10n.files_cancelSelection
-                      : l10n.files_selectAll,
-                  onPressed: () => setState(() {
-                    if (_selectionMode) {
-                      _clearSelection();
-                    } else {
-                      _selecting = true;
-                      final items = ref
-                          .read(containersProvider)
-                          .valueOrNull
-                          ?.items;
-                      _selected.addAll(
-                        (items ?? const [])
-                            .where((item) => !item.isFromCompose)
-                            .map((item) => item.name),
-                      );
-                    }
-                  }),
-                ),
-                AppIconButton(
                   icon: TablerIcons.plus,
                   tooltip: l10n.containers_create,
                   onPressed: () =>
@@ -186,7 +164,24 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                   tooltip: l10n.action_more,
                   icon: const Icon(TablerIcons.dots),
                   onSelected: (value) {
-                    if (value == 'refresh') {
+                    if (value == 'select') {
+                      setState(() {
+                        if (_selectionMode) {
+                          _clearSelection();
+                        } else {
+                          _selecting = true;
+                          final items = ref
+                              .read(containersProvider)
+                              .valueOrNull
+                              ?.items;
+                          _selected.addAll(
+                            (items ?? const [])
+                                .where((item) => !item.isFromCompose)
+                                .map((item) => item.name),
+                          );
+                        }
+                      });
+                    } else if (value == 'refresh') {
                       ref.read(containersProvider.notifier).refresh();
                     } else if (value == 'docker') {
                       context.push('/s/${widget.serverId}/containers/docker');
@@ -199,6 +194,14 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                     }
                   },
                   itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'select',
+                      child: Text(
+                        _selectionMode
+                            ? l10n.files_cancelSelection
+                            : l10n.files_selectAll,
+                      ),
+                    ),
                     PopupMenuItem(
                       value: 'refresh',
                       child: Text(l10n.action_refresh),
@@ -290,6 +293,9 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                     icon: TablerIcons.box,
                     title: l10n.containers_empty_title,
                     message: l10n.containers_empty_message,
+                    actionLabel: l10n.containers_create,
+                    onAction: () =>
+                        context.push('/s/${widget.serverId}/containers/create'),
                   ),
                 ),
                 builder: (state) => RefreshIndicator(
@@ -298,9 +304,9 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(
-                      AppTokens.s16,
+                      AppTokens.pagePadding,
                       AppTokens.s8,
-                      AppTokens.s16,
+                      AppTokens.pagePadding,
                       AppTokens.s32,
                     ),
                     itemCount: state.items.length,
