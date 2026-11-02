@@ -14,6 +14,7 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -330,8 +331,16 @@ class _CronjobCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (item.lastRecordStatus.isNotEmpty)
+              if (item.lastRecordStatus.isNotEmpty) ...[
                 StatusDot(status: item.lastRecordStatus.toLowerCase()),
+                const SizedBox(width: 4),
+                Text(
+                  taskStatusLabel(item.lastRecordStatus, l10n),
+                  style: AppTextStyles.caption.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ],
           ),
         ],

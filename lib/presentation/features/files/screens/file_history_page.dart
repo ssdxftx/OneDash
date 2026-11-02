@@ -78,7 +78,7 @@ class _FileHistoryPageState extends ConsumerState<FileHistoryPage> {
           if (items.isEmpty) {
             return EmptyState(
               icon: TablerIcons.history,
-              title: l10n.files_history,
+              title: l10n.files_historyEmptyTitle,
               message: l10n.files_historyEmpty,
             );
           }

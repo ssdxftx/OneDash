@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/dto/database/database_instance_dto.dart';
+import '../../../../core/network/network_exceptions.dart';
 import '../../../../data/repositories_impl/database_repository_impl.dart';
 
 typedef DatabaseKey = ({String name, String type, String instance});
@@ -46,7 +47,7 @@ final databaseDetailProvider = FutureProvider.autoDispose
         }
       }
       if (item == null) {
-        throw StateError('数据库不存在: ${key.name}');
+        throw const RecordNotFoundException();
       }
       Map<String, dynamic> connection = const {};
       try {

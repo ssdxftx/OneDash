@@ -236,7 +236,7 @@ class _AlertCard extends StatelessWidget {
                       style: AppTextStyles.bodyS.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
-                      maxLines: 1,
+                      maxLines: compact ? 2 : 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -457,7 +457,7 @@ class _AlertSettingsTab extends ConsumerWidget {
           isEmpty: (items) => items.isEmpty,
           empty: EmptyState(
             icon: TablerIcons.bell_off,
-            title: l10n.panelSettings_notificationMethods,
+            title: l10n.panelSettings_notificationMethodsEmptyTitle,
             message: l10n.alerts_noConfigs,
           ),
           builder: (items) => Column(

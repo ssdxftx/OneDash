@@ -94,55 +94,86 @@ class SplitListTile extends StatelessWidget {
             horizontal: AppTokens.s16,
             vertical: AppTokens.s12,
           ),
-          child: Row(
-            children: [
-              if (leading != null) ...[
-                IconTheme(
-                  data: IconThemeData(
-                    size: AppTokens.iconLeading,
-                    color: danger ? colors.danger : scheme.onSurfaceVariant,
-                  ),
-                  child: leading!,
-                ),
-                const SizedBox(width: AppTokens.s12),
-              ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: AppTextStyles.bodyL.copyWith(
-                        color: titleColor,
-                        fontWeight: FontWeight.w500,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final trailingLimit = constraints.maxWidth.isFinite
+                  ? constraints.maxWidth * 0.6
+                  : null;
+              return Row(
+                children: [
+                  if (leading != null) ...[
+                    IconTheme(
+                      data: IconThemeData(
+                        size: AppTokens.iconLeading,
+                        color: danger ? colors.danger : scheme.onSurfaceVariant,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      child: leading!,
                     ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle!,
-                        style: (subtitleStyle ?? AppTextStyles.bodyS).copyWith(
-                          color: subtitleColor,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                    const SizedBox(width: AppTokens.s12),
                   ],
-                ),
-              ),
-              if (trailing != null) ...[
-                const SizedBox(width: AppTokens.s12),
-                trailing!,
-              ],
-            ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title,
+                          style: AppTextStyles.bodyL.copyWith(
+                            color: titleColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle!,
+                            style: (subtitleStyle ?? AppTextStyles.bodyS)
+                                .copyWith(color: subtitleColor),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (trailing != null) ...[
+                    const SizedBox(width: AppTokens.s12),
+                    _buildTrailing(trailing!, trailingLimit),
+                  ],
+                ],
+              );
+            },
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTrailing(Widget child, double? maxWidth) {
+    final text = child is Text && child.data != null
+        ? Text(
+            child.data!,
+            style: child.style,
+            strutStyle: child.strutStyle,
+            textAlign: child.textAlign ?? TextAlign.end,
+            textDirection: child.textDirection,
+            locale: child.locale,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            textScaler: child.textScaler,
+            maxLines: 1,
+            semanticsLabel: child.semanticsLabel,
+            textWidthBasis: child.textWidthBasis,
+            textHeightBehavior: child.textHeightBehavior,
+          )
+        : child;
+    if (maxWidth == null) return text;
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: text,
     );
   }
 }

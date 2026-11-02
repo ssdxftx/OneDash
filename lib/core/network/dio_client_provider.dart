@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../storage/storage_service.dart';
 import '../../presentation/features/settings/providers/app_settings_provider.dart';
 import 'dio_client.dart';
+import 'network_exceptions.dart';
 
 part 'dio_client_provider.g.dart';
 
@@ -15,7 +16,7 @@ Future<DioClient> dioClient(Ref ref, int serverId) async {
   final storage = ref.watch(storageServiceProvider);
   final server = await storage.getServer(serverId);
   if (server == null) {
-    throw StateError('服务器不存在: $serverId');
+    throw const ServerNotFoundException();
   }
   final apiKey = await storage.getApiKey(serverId) ?? '';
   final settings = await ref.watch(appSettingsControllerProvider.future);

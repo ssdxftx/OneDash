@@ -12,6 +12,7 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -69,12 +70,18 @@ class BackupAccountsPage extends ConsumerWidget {
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {
             final account = items[index];
+            final type = '${account['type'] ?? ''}';
+            final path = '${account['backupPath'] ?? ''}';
+            final subtitle = [
+              backupAccountTypeLabel(type, l10n),
+              if (path.isNotEmpty) path,
+            ].join(' · ');
             return TonalCard(
               onTap: () => _edit(context, ref, account),
               child: Row(
                 children: [
                   Icon(
-                    '${account['type'] ?? ''}'.toLowerCase() == 'local'
+                    type.toLowerCase() == 'local'
                         ? TablerIcons.folder
                         : TablerIcons.cloud,
                     color: context.scheme.onSurfaceVariant,
@@ -90,7 +97,7 @@ class BackupAccountsPage extends ConsumerWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${account['type'] ?? ''} · ${account['backupPath'] ?? ''}',
+                          subtitle,
                           style: AppTextStyles.caption.copyWith(
                             color: context.scheme.onSurfaceVariant,
                           ),
@@ -177,13 +184,28 @@ class BackupAccountsPage extends ConsumerWidget {
             DropdownButtonFormField<String>(
               initialValue: type,
               decoration: InputDecoration(labelText: l10n.backups_accountType),
-              items: const [
-                DropdownMenuItem(value: 'local', child: Text('Local')),
-                DropdownMenuItem(value: 'sftp', child: Text('SFTP')),
-                DropdownMenuItem(value: 's3', child: Text('S3')),
-                DropdownMenuItem(value: 'oss', child: Text('OSS')),
-                DropdownMenuItem(value: 'cos', child: Text('COS')),
-                DropdownMenuItem(value: 'minio', child: Text('MinIO')),
+              items: [
+                DropdownMenuItem(
+                  value: 'local',
+                  child: Text(l10n.backups_typeLocal),
+                ),
+                DropdownMenuItem(
+                  value: 'sftp',
+                  child: Text(l10n.backups_typeSftp),
+                ),
+                DropdownMenuItem(value: 's3', child: Text(l10n.backups_typeS3)),
+                DropdownMenuItem(
+                  value: 'oss',
+                  child: Text(l10n.backups_typeOss),
+                ),
+                DropdownMenuItem(
+                  value: 'cos',
+                  child: Text(l10n.backups_typeCos),
+                ),
+                DropdownMenuItem(
+                  value: 'minio',
+                  child: Text(l10n.backups_typeMinio),
+                ),
               ],
               onChanged: (value) {
                 if (value != null) setState(() => type = value);

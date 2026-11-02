@@ -355,7 +355,7 @@ class _WebsiteLoadBalanceTabState extends ConsumerState<WebsiteLoadBalanceTab> {
     if (_upstreams.isEmpty) {
       return EmptyState(
         icon: TablerIcons.arrows_exchange,
-        title: l10n.websites_loadBalance,
+        title: l10n.websites_loadBalanceEmptyTitle,
         message: l10n.websites_lbEmpty,
         actionLabel: l10n.websites_lbAdd,
         onAction: _showForm,

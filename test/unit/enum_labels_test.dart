@@ -31,6 +31,13 @@ void main() {
     expect(sslProviderLabel('custom', l10n), 'custom');
   });
 
+  test('backup account types are localized', () {
+    expect(backupAccountTypeLabel('LOCAL', l10n), 'Local');
+    expect(backupAccountTypeLabel('oss', l10n), 'Alibaba Cloud OSS');
+    expect(backupAccountTypeLabel('s3', l10n), 'S3');
+    expect(backupAccountTypeLabel('custom', l10n), 'custom');
+  });
+
   test('task status labels cover snapshot and backup states', () {
     expect(taskStatusLabel('Success', l10n), 'Success');
     expect(taskStatusLabel('failed', l10n), 'Failed');

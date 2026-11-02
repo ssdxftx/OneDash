@@ -5101,4 +5101,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get panelSettings_languageEn => 'English';
+
+  @override
+  String get backups_typeLocal => 'Local';
+
+  @override
+  String get backups_typeSftp => 'SFTP';
+
+  @override
+  String get backups_typeS3 => 'S3';
+
+  @override
+  String get backups_typeOss => 'Alibaba Cloud OSS';
+
+  @override
+  String get backups_typeCos => 'Tencent Cloud COS';
+
+  @override
+  String get backups_typeMinio => 'MinIO';
+
+  @override
+  String get backups_typeOneDrive => 'OneDrive';
+
+  @override
+  String get backups_typeWebdav => 'WebDAV';
+
+  @override
+  String get runtimes_emptyTitle => 'No runtimes installed';
+
+  @override
+  String get runtime_extensionsEmptyTitle => 'No extensions available';
+
+  @override
+  String get runtime_modulesEmptyTitle => 'No modules installed';
+
+  @override
+  String get websites_templatesEmptyTitle => 'No templates yet';
+
+  @override
+  String get websites_templateOutputsEmptyTitle => 'No generated sites yet';
+
+  @override
+  String get host_sshUnavailableTitle => 'SSH service unavailable';
+
+  @override
+  String get host_disksEmptyTitle => 'No disks detected';
+
+  @override
+  String get host_diagnosticsEmptyTitle => 'No diagnostics yet';
+
+  @override
+  String get host_diagSnapshotEmptyTitle => 'No snapshots yet';
+
+  @override
+  String get toolbox_ftpEmptyTitle => 'No FTP accounts yet';
+
+  @override
+  String get toolbox_sshBanEmptyTitle => 'No banned IPs';
+
+  @override
+  String get toolbox_clamScanEmptyTitle => 'No scan records yet';
+
+  @override
+  String get panelSettings_notificationMethodsEmptyTitle =>
+      'No notification methods configured';
+
+  @override
+  String get process_emptyTitle => 'No processes';
+
+  @override
+  String get terminal_emptySessionsTitle => 'No terminal sessions';
+
+  @override
+  String get files_historyEmptyTitle => 'No file history';
+
+  @override
+  String get files_aiHitsEmptyTitle => 'No matching files';
+
+  @override
+  String get websites_loadBalanceEmptyTitle => 'No upstream nodes';
 }

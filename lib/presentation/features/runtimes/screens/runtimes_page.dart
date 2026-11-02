@@ -78,7 +78,7 @@ class RuntimesPage extends ConsumerWidget {
         isEmpty: (data) => data.items.isEmpty,
         empty: EmptyState(
           icon: TablerIcons.brand_docker,
-          title: l10n.more_runtimes,
+          title: l10n.runtimes_emptyTitle,
           message: l10n.state_empty,
         ),
         builder: (data) => ListView.builder(
@@ -86,6 +86,8 @@ class RuntimesPage extends ConsumerWidget {
           itemCount: data.items.length,
           itemBuilder: (context, index) {
             final runtime = data.items[index];
+            final imageLine = _joinNonEmpty([runtime.image, runtime.version]);
+            final locationLine = _joinNonEmpty([runtime.port, runtime.path]);
             return Padding(
               padding: const EdgeInsets.only(bottom: AppTokens.s12),
               child: TonalCard(
@@ -133,25 +135,29 @@ class RuntimesPage extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: AppTokens.s8),
-                    Text(
-                      _joinNonEmpty([runtime.image, runtime.version]),
-                      style: AppTextStyles.caption.copyWith(
-                        color: context.scheme.onSurfaceVariant,
-                        fontFamily: 'monospace',
+                    if (imageLine.isNotEmpty) ...[
+                      const SizedBox(height: AppTokens.s8),
+                      Text(
+                        imageLine,
+                        style: AppTextStyles.caption.copyWith(
+                          color: context.scheme.onSurfaceVariant,
+                          fontFamily: 'monospace',
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: AppTokens.s4),
-                    Text(
-                      _joinNonEmpty([runtime.port, runtime.path]),
-                      style: AppTextStyles.caption.copyWith(
-                        color: context.scheme.onSurfaceVariant,
+                    ],
+                    if (locationLine.isNotEmpty) ...[
+                      const SizedBox(height: AppTokens.s4),
+                      Text(
+                        locationLine,
+                        style: AppTextStyles.caption.copyWith(
+                          color: context.scheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    ],
                   ],
                 ),
               ),
@@ -473,5 +479,5 @@ String _joinNonEmpty(List<String> values) {
       .map((value) => value.trim())
       .where((value) => value.isNotEmpty)
       .toList(growable: false);
-  return parts.isEmpty ? '-' : parts.join(' · ');
+  return parts.join(' · ');
 }

@@ -63,4 +63,19 @@ void main() {
       expect(ratio, greaterThanOrEqualTo(4.5));
     }
   });
+
+  test('input hint keeps 4.5:1 against its fill', () {
+    for (final brightness in Brightness.values) {
+      final input = AppTheme.build(brightness).inputDecorationTheme;
+      final hint = input.hintStyle!.color!;
+      final fill = input.fillColor!;
+      final blended = Color.alphaBlend(hint, fill);
+      final ratio = contrastRatio(blended, fill);
+      expect(
+        ratio,
+        greaterThanOrEqualTo(4.5),
+        reason: '$brightness hint ratio $ratio',
+      );
+    }
+  });
 }

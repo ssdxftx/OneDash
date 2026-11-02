@@ -583,7 +583,7 @@ class _TerminalSessionsSheetState
         else if (_sessions.isEmpty)
           EmptyState(
             icon: TablerIcons.terminal_2,
-            title: l10n.terminal_sessions,
+            title: l10n.terminal_emptySessionsTitle,
             message: l10n.terminal_sessionsEmpty,
             compact: true,
           )

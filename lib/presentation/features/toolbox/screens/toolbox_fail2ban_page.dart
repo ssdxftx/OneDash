@@ -315,7 +315,7 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
                 if (_banned.isEmpty)
                   EmptyState(
                     icon: TablerIcons.shield_check,
-                    title: l10n.toolbox_sshBan,
+                    title: l10n.toolbox_sshBanEmptyTitle,
                     message: l10n.state_empty,
                     compact: true,
                   )

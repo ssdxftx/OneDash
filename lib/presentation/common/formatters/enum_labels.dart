@@ -53,3 +53,16 @@ String taskStatusLabel(String raw, AppLocalizations l10n) =>
       'stopped' || 'exited' => l10n.containers_stopped,
       _ => raw,
     };
+
+String backupAccountTypeLabel(String raw, AppLocalizations l10n) =>
+    switch (raw.toLowerCase()) {
+      'local' => l10n.backups_typeLocal,
+      'sftp' => l10n.backups_typeSftp,
+      's3' => l10n.backups_typeS3,
+      'oss' => l10n.backups_typeOss,
+      'cos' => l10n.backups_typeCos,
+      'minio' => l10n.backups_typeMinio,
+      'onedrive' => l10n.backups_typeOneDrive,
+      'webdav' => l10n.backups_typeWebdav,
+      _ => raw,
+    };

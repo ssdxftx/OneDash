@@ -176,7 +176,7 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
     if (summary == null) {
       return EmptyState(
         icon: TablerIcons.stethoscope,
-        title: l10n.host_diagnostics,
+        title: l10n.host_diagnosticsEmptyTitle,
         message: l10n.state_empty,
       );
     }
@@ -312,7 +312,7 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
           if (snapshot == null || snapshot.groups.isEmpty)
             EmptyState(
               icon: TablerIcons.stack_2,
-              title: l10n.host_diagSnapshot,
+              title: l10n.host_diagSnapshotEmptyTitle,
               message: l10n.state_empty,
               compact: true,
             )

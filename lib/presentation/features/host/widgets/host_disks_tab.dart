@@ -245,7 +245,7 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
     if (_disks.isEmpty) {
       return EmptyState(
         icon: TablerIcons.device_desktop,
-        title: l10n.host_disks,
+        title: l10n.host_disksEmptyTitle,
         message: l10n.state_empty,
       );
     }

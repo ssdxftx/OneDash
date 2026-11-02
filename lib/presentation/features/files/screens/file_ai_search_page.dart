@@ -182,7 +182,7 @@ class _FileAiSearchPageState extends ConsumerState<FileAiSearchPage> {
             if (result.hits.isEmpty)
               EmptyState(
                 icon: TablerIcons.search_off,
-                title: l10n.files_aiHits,
+                title: l10n.files_aiHitsEmptyTitle,
                 message: l10n.files_aiEmpty,
                 compact: true,
               )

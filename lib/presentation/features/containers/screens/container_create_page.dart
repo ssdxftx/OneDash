@@ -13,6 +13,7 @@ import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/form_footer.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
@@ -566,8 +567,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
           ),
         ],
       ),
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.all(AppTokens.s16),
+      bottomNavigationBar: FormFooter(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

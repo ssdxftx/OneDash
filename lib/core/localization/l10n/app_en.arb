@@ -6817,5 +6817,109 @@
   "panelSettings_languageEn": "English",
   "@panelSettings_languageEn": {
     "description": "English language label."
+  },
+  "backups_typeLocal": "Local",
+  "@backups_typeLocal": {
+    "description": "Backup account type."
+  },
+  "backups_typeSftp": "SFTP",
+  "@backups_typeSftp": {
+    "description": "Backup account type."
+  },
+  "backups_typeS3": "S3",
+  "@backups_typeS3": {
+    "description": "Backup account type."
+  },
+  "backups_typeOss": "Alibaba Cloud OSS",
+  "@backups_typeOss": {
+    "description": "Backup account type."
+  },
+  "backups_typeCos": "Tencent Cloud COS",
+  "@backups_typeCos": {
+    "description": "Backup account type."
+  },
+  "backups_typeMinio": "MinIO",
+  "@backups_typeMinio": {
+    "description": "Backup account type."
+  },
+  "backups_typeOneDrive": "OneDrive",
+  "@backups_typeOneDrive": {
+    "description": "Backup account type."
+  },
+  "backups_typeWebdav": "WebDAV",
+  "@backups_typeWebdav": {
+    "description": "Backup account type."
+  },
+  "runtimes_emptyTitle": "No runtimes installed",
+  "@runtimes_emptyTitle": {
+    "description": "Empty state title for runtimes."
+  },
+  "runtime_extensionsEmptyTitle": "No extensions available",
+  "@runtime_extensionsEmptyTitle": {
+    "description": "Empty state title for PHP extensions."
+  },
+  "runtime_modulesEmptyTitle": "No modules installed",
+  "@runtime_modulesEmptyTitle": {
+    "description": "Empty state title for Node modules."
+  },
+  "websites_templatesEmptyTitle": "No templates yet",
+  "@websites_templatesEmptyTitle": {
+    "description": "Empty state title for website templates."
+  },
+  "websites_templateOutputsEmptyTitle": "No generated sites yet",
+  "@websites_templateOutputsEmptyTitle": {
+    "description": "Empty state title for template outputs."
+  },
+  "host_sshUnavailableTitle": "SSH service unavailable",
+  "@host_sshUnavailableTitle": {
+    "description": "Empty state title when SSH info is missing."
+  },
+  "host_disksEmptyTitle": "No disks detected",
+  "@host_disksEmptyTitle": {
+    "description": "Empty state title for disks."
+  },
+  "host_diagnosticsEmptyTitle": "No diagnostics yet",
+  "@host_diagnosticsEmptyTitle": {
+    "description": "Empty state title for diagnostics."
+  },
+  "host_diagSnapshotEmptyTitle": "No snapshots yet",
+  "@host_diagSnapshotEmptyTitle": {
+    "description": "Empty state title for diagnostics snapshots."
+  },
+  "toolbox_ftpEmptyTitle": "No FTP accounts yet",
+  "@toolbox_ftpEmptyTitle": {
+    "description": "Empty state title for FTP accounts."
+  },
+  "toolbox_sshBanEmptyTitle": "No banned IPs",
+  "@toolbox_sshBanEmptyTitle": {
+    "description": "Empty state title for banned IPs."
+  },
+  "toolbox_clamScanEmptyTitle": "No scan records yet",
+  "@toolbox_clamScanEmptyTitle": {
+    "description": "Empty state title for antivirus scans."
+  },
+  "panelSettings_notificationMethodsEmptyTitle": "No notification methods configured",
+  "@panelSettings_notificationMethodsEmptyTitle": {
+    "description": "Empty state title for notification methods."
+  },
+  "process_emptyTitle": "No processes",
+  "@process_emptyTitle": {
+    "description": "Empty state title for processes."
+  },
+  "terminal_emptySessionsTitle": "No terminal sessions",
+  "@terminal_emptySessionsTitle": {
+    "description": "Empty state title for terminal sessions."
+  },
+  "files_historyEmptyTitle": "No file history",
+  "@files_historyEmptyTitle": {
+    "description": "Empty state title for file history."
+  },
+  "files_aiHitsEmptyTitle": "No matching files",
+  "@files_aiHitsEmptyTitle": {
+    "description": "Empty state title for AI file search."
+  },
+  "websites_loadBalanceEmptyTitle": "No upstream nodes",
+  "@websites_loadBalanceEmptyTitle": {
+    "description": "Empty state title for load balance upstreams."
   }
 }

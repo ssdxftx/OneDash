@@ -65,6 +65,14 @@ class TaskFailedException implements Exception {
       'TaskFailedException(subject: $subject, timedOut: $timedOut): $detail';
 }
 
+/// 请求的记录在远端列表中不存在。
+class RecordNotFoundException implements Exception {
+  const RecordNotFoundException();
+
+  @override
+  String toString() => 'RecordNotFoundException';
+}
+
 /// 本地保存的服务器记录已不存在。
 class ServerNotFoundException implements Exception {
   const ServerNotFoundException();

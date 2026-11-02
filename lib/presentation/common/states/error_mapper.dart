@@ -84,6 +84,14 @@ ErrorViewData mapError(Object error, AppLocalizations l10n) {
       kind: ErrorKind.server,
     );
   }
+  if (error is RecordNotFoundException) {
+    return ErrorViewData(
+      icon: TablerIcons.plug_off,
+      title: l10n.error_not_found_title,
+      message: l10n.error_not_found_message,
+      kind: ErrorKind.notFound,
+    );
+  }
   if (error is ServerNotFoundException) {
     return ErrorViewData(
       icon: TablerIcons.server_off,

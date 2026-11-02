@@ -295,7 +295,7 @@ class _HostPageState extends ConsumerState<HostPage> {
         if (info == null) {
           return EmptyState(
             icon: TablerIcons.terminal_2,
-            title: l10n.host_ssh,
+            title: l10n.host_sshUnavailableTitle,
             message: l10n.state_empty,
           );
         }

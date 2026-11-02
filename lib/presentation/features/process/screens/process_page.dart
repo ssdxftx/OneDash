@@ -50,7 +50,7 @@ class ProcessPage extends ConsumerWidget {
         isEmpty: (items) => items.isEmpty,
         empty: EmptyState(
           icon: TablerIcons.cpu,
-          title: l10n.more_process,
+          title: l10n.process_emptyTitle,
           message: l10n.state_empty,
         ),
         builder: (items) => ListView.builder(

@@ -9745,6 +9745,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get panelSettings_languageEn;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'Local'**
+  String get backups_typeLocal;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'SFTP'**
+  String get backups_typeSftp;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'S3'**
+  String get backups_typeS3;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'Alibaba Cloud OSS'**
+  String get backups_typeOss;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'Tencent Cloud COS'**
+  String get backups_typeCos;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'MinIO'**
+  String get backups_typeMinio;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'OneDrive'**
+  String get backups_typeOneDrive;
+
+  /// Backup account type.
+  ///
+  /// In en, this message translates to:
+  /// **'WebDAV'**
+  String get backups_typeWebdav;
+
+  /// Empty state title for runtimes.
+  ///
+  /// In en, this message translates to:
+  /// **'No runtimes installed'**
+  String get runtimes_emptyTitle;
+
+  /// Empty state title for PHP extensions.
+  ///
+  /// In en, this message translates to:
+  /// **'No extensions available'**
+  String get runtime_extensionsEmptyTitle;
+
+  /// Empty state title for Node modules.
+  ///
+  /// In en, this message translates to:
+  /// **'No modules installed'**
+  String get runtime_modulesEmptyTitle;
+
+  /// Empty state title for website templates.
+  ///
+  /// In en, this message translates to:
+  /// **'No templates yet'**
+  String get websites_templatesEmptyTitle;
+
+  /// Empty state title for template outputs.
+  ///
+  /// In en, this message translates to:
+  /// **'No generated sites yet'**
+  String get websites_templateOutputsEmptyTitle;
+
+  /// Empty state title when SSH info is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH service unavailable'**
+  String get host_sshUnavailableTitle;
+
+  /// Empty state title for disks.
+  ///
+  /// In en, this message translates to:
+  /// **'No disks detected'**
+  String get host_disksEmptyTitle;
+
+  /// Empty state title for diagnostics.
+  ///
+  /// In en, this message translates to:
+  /// **'No diagnostics yet'**
+  String get host_diagnosticsEmptyTitle;
+
+  /// Empty state title for diagnostics snapshots.
+  ///
+  /// In en, this message translates to:
+  /// **'No snapshots yet'**
+  String get host_diagSnapshotEmptyTitle;
+
+  /// Empty state title for FTP accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'No FTP accounts yet'**
+  String get toolbox_ftpEmptyTitle;
+
+  /// Empty state title for banned IPs.
+  ///
+  /// In en, this message translates to:
+  /// **'No banned IPs'**
+  String get toolbox_sshBanEmptyTitle;
+
+  /// Empty state title for antivirus scans.
+  ///
+  /// In en, this message translates to:
+  /// **'No scan records yet'**
+  String get toolbox_clamScanEmptyTitle;
+
+  /// Empty state title for notification methods.
+  ///
+  /// In en, this message translates to:
+  /// **'No notification methods configured'**
+  String get panelSettings_notificationMethodsEmptyTitle;
+
+  /// Empty state title for processes.
+  ///
+  /// In en, this message translates to:
+  /// **'No processes'**
+  String get process_emptyTitle;
+
+  /// Empty state title for terminal sessions.
+  ///
+  /// In en, this message translates to:
+  /// **'No terminal sessions'**
+  String get terminal_emptySessionsTitle;
+
+  /// Empty state title for file history.
+  ///
+  /// In en, this message translates to:
+  /// **'No file history'**
+  String get files_historyEmptyTitle;
+
+  /// Empty state title for AI file search.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching files'**
+  String get files_aiHitsEmptyTitle;
+
+  /// Empty state title for load balance upstreams.
+  ///
+  /// In en, this message translates to:
+  /// **'No upstream nodes'**
+  String get websites_loadBalanceEmptyTitle;
 }
 
 class _AppLocalizationsDelegate

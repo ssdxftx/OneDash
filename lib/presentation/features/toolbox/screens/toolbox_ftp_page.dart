@@ -188,7 +188,7 @@ class _ToolboxFtpPageState extends ConsumerState<ToolboxFtpPage> {
           if (_accounts.isEmpty)
             EmptyState(
               icon: TablerIcons.folder,
-              title: l10n.toolbox_ftp,
+              title: l10n.toolbox_ftpEmptyTitle,
               message: l10n.state_empty,
               compact: true,
             )

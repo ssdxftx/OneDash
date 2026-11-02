@@ -19,6 +19,7 @@ import '../../../common/components/skeleton.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -430,6 +431,7 @@ class _ComposeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final scheme = context.scheme;
     final running =
         item.runningCount >= item.containerCount && item.containerCount > 0;
@@ -441,6 +443,13 @@ class _ComposeCard extends StatelessWidget {
           Row(
             children: [
               StatusDot(status: running ? 'running' : 'stopped'),
+              const SizedBox(width: AppTokens.s8),
+              Text(
+                taskStatusLabel(running ? 'running' : 'stopped', l10n),
+                style: AppTextStyles.caption.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
               const SizedBox(width: AppTokens.s8),
               Expanded(
                 child: Text(

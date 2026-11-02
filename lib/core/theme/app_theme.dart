@@ -140,7 +140,7 @@ abstract final class AppTheme {
           vertical: AppTokens.s12,
         ),
         hintStyle: AppTextStyles.bodyM.copyWith(
-          color: scheme.onSurfaceVariant.withValues(alpha: 0.6),
+          color: scheme.onSurfaceVariant.withValues(alpha: 0.8),
           fontWeight: FontWeight.w400,
         ),
         labelStyle: AppTextStyles.bodyM.copyWith(

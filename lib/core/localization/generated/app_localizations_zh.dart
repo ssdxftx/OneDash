@@ -4980,4 +4980,82 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get panelSettings_languageEn => 'English';
+
+  @override
+  String get backups_typeLocal => '本地';
+
+  @override
+  String get backups_typeSftp => 'SFTP';
+
+  @override
+  String get backups_typeS3 => 'S3';
+
+  @override
+  String get backups_typeOss => '阿里云 OSS';
+
+  @override
+  String get backups_typeCos => '腾讯云 COS';
+
+  @override
+  String get backups_typeMinio => 'MinIO';
+
+  @override
+  String get backups_typeOneDrive => 'OneDrive';
+
+  @override
+  String get backups_typeWebdav => 'WebDAV';
+
+  @override
+  String get runtimes_emptyTitle => '暂无已安装运行时';
+
+  @override
+  String get runtime_extensionsEmptyTitle => '暂无可用扩展';
+
+  @override
+  String get runtime_modulesEmptyTitle => '暂无已安装模块';
+
+  @override
+  String get websites_templatesEmptyTitle => '暂无模板';
+
+  @override
+  String get websites_templateOutputsEmptyTitle => '暂无生成结果';
+
+  @override
+  String get host_sshUnavailableTitle => 'SSH 服务不可用';
+
+  @override
+  String get host_disksEmptyTitle => '未检测到磁盘';
+
+  @override
+  String get host_diagnosticsEmptyTitle => '暂无诊断数据';
+
+  @override
+  String get host_diagSnapshotEmptyTitle => '暂无快照';
+
+  @override
+  String get toolbox_ftpEmptyTitle => '暂无 FTP 账号';
+
+  @override
+  String get toolbox_sshBanEmptyTitle => '暂无被封禁 IP';
+
+  @override
+  String get toolbox_clamScanEmptyTitle => '暂无扫描记录';
+
+  @override
+  String get panelSettings_notificationMethodsEmptyTitle => '尚未配置通知方式';
+
+  @override
+  String get process_emptyTitle => '暂无进程';
+
+  @override
+  String get terminal_emptySessionsTitle => '暂无终端会话';
+
+  @override
+  String get files_historyEmptyTitle => '暂无文件历史';
+
+  @override
+  String get files_aiHitsEmptyTitle => '没有匹配文件';
+
+  @override
+  String get websites_loadBalanceEmptyTitle => '暂无上游节点';
 }

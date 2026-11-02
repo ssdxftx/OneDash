@@ -117,7 +117,7 @@ class _PhpExtensionsTabState extends ConsumerState<_PhpExtensionsTab> {
         if (support == null || support.isEmpty) {
           return EmptyState(
             icon: TablerIcons.puzzle,
-            title: l10n.runtime_extensions,
+            title: l10n.runtime_extensionsEmptyTitle,
             message: l10n.state_empty,
           );
         }
@@ -734,7 +734,7 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
               if (items.isEmpty) {
                 return EmptyState(
                   icon: TablerIcons.package,
-                  title: l10n.runtime_modules,
+                  title: l10n.runtime_modulesEmptyTitle,
                   message: l10n.state_empty,
                 );
               }
@@ -752,8 +752,10 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
                         SplitListTile(
                           leading: const Icon(TablerIcons.package),
                           title: name,
-                          subtitle:
-                              '${item['version'] ?? ''} · ${item['description'] ?? ''}',
+                          subtitle: _joinNonEmpty([
+                            '${item['version'] ?? ''}',
+                            '${item['description'] ?? ''}',
+                          ]),
                           trailing: busy
                               ? const SizedBox(
                                   width: 20,
@@ -788,4 +790,11 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
       ],
     );
   }
+}
+
+String _joinNonEmpty(List<String> values) {
+  return values
+      .map((value) => value.trim())
+      .where((value) => value.isNotEmpty)
+      .join(' · ');
 }

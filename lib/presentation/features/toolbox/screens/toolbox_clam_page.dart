@@ -312,7 +312,7 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
           if (_tasks.isEmpty)
             EmptyState(
               icon: TablerIcons.virus,
-              title: l10n.toolbox_scanRecords,
+              title: l10n.toolbox_clamScanEmptyTitle,
               message: l10n.toolbox_noScans,
               compact: true,
             )

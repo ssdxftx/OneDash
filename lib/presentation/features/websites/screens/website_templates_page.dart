@@ -166,7 +166,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                 : _templates.isEmpty
                 ? EmptyState(
                     icon: TablerIcons.layout,
-                    title: l10n.websites_templates,
+                    title: l10n.websites_templatesEmptyTitle,
                     message: l10n.websites_templateEmpty,
                     actionLabel: l10n.websites_templateAdd,
                     onAction: _openEditor,
@@ -864,7 +864,7 @@ class _TemplateOutputsSheetState extends ConsumerState<_TemplateOutputsSheet> {
         else if (_outputs.isEmpty)
           EmptyState(
             icon: TablerIcons.folder,
-            title: l10n.websites_templateOutputs,
+            title: l10n.websites_templateOutputsEmptyTitle,
             message: l10n.websites_templateOutputEmpty,
             compact: true,
           )
