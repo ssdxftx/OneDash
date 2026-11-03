@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/localization/generated/app_localizations.dart';
 import '../../../core/theme/tokens.dart';
 
 /// 一组列表项共用一张圆角卡，内部 1px 分隔线，首尾无分隔线。
@@ -92,6 +93,12 @@ class SplitListTile extends StatelessWidget {
         : scheme.onSurfaceVariant.withValues(alpha: 0.38);
 
     final hasValue = value != null;
+    final placeholder = Localizations.of<AppLocalizations>(
+      context,
+      AppLocalizations,
+    )?.common_notAvailable;
+    final isPlaceholder =
+        hasValue && placeholder != null && value == placeholder;
     final titleStyle = (hasValue ? AppTextStyles.bodyS : AppTextStyles.bodyL)
         .copyWith(
           color: hasValue && !danger ? scheme.onSurfaceVariant : titleColor,
@@ -99,7 +106,9 @@ class SplitListTile extends StatelessWidget {
         );
     final baseValueStyle = AppTextStyles.bodyL.copyWith(
       color: enabled
-          ? scheme.onSurface
+          ? isPlaceholder
+                ? scheme.onSurfaceVariant
+                : scheme.onSurface
           : scheme.onSurface.withValues(alpha: 0.38),
       fontWeight: FontWeight.w500,
     );

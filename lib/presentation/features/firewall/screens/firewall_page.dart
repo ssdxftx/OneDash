@@ -25,6 +25,7 @@ import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../../servers/providers/servers_provider.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class _FirewallData {
   const _FirewallData({
@@ -1326,7 +1327,7 @@ class _SettingsTab extends StatelessWidget {
               for (final backup in data.backups)
                 SplitListTile(
                   leading: const Icon(TablerIcons.archive),
-                  title: '${backup['name'] ?? ''}',
+                  title: displayValue(context, backup['name']?.toString()),
                   subtitle: [
                     '${backup['provider'] ?? ''}',
                     l10n.firewall_rulesCount(

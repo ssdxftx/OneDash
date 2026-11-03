@@ -15,6 +15,7 @@ import '../../../common/components/buttons.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class ToolboxFtpPage extends ConsumerStatefulWidget {
   const ToolboxFtpPage({super.key});
@@ -198,8 +199,8 @@ class _ToolboxFtpPageState extends ConsumerState<ToolboxFtpPage> {
                 for (final item in _accounts)
                   SplitListTile(
                     leading: const Icon(TablerIcons.user),
-                    title: '${item['user'] ?? ''}',
-                    subtitle: '${item['path'] ?? ''}',
+                    title: displayValue(context, item['user']?.toString()),
+                    subtitle: displayValue(context, item['path']?.toString()),
                     trailing: IconButton(
                       tooltip: l10n.action_delete,
                       icon: const Icon(TablerIcons.trash),

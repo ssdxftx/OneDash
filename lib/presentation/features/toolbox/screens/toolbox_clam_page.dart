@@ -332,8 +332,12 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
                 for (final task in _tasks)
                   SplitListTile(
                     leading: const Icon(TablerIcons.scan),
-                    title: '${task['name'] ?? ''}',
-                    subtitle: '${task['path'] ?? ''} · ${task['status'] ?? ''}',
+                    title: displayValue(context, task['name']?.toString()),
+                    subtitle: [
+                      displayValue(context, task['path']?.toString()),
+                      if ((task['status']?.toString() ?? '').isNotEmpty)
+                        task['status'].toString(),
+                    ].join(' · '),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

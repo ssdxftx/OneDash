@@ -227,10 +227,11 @@ class _AlertCard extends StatelessWidget {
       onTap: onTap,
       child: LayoutBuilder(
         builder: (context, constraints) {
+          final scale = MediaQuery.textScalerOf(context).scale(1);
           final compact =
               constraints.maxWidth < 320 ||
-              (MediaQuery.textScalerOf(context).scale(1) >= 1.3 &&
-                  constraints.maxWidth < 430);
+              (scale >= 1.3 && constraints.maxWidth < 430);
+          final stackControls = scale > 0 && constraints.maxWidth / scale < 210;
           final meta = compact
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,6 +254,7 @@ class _AlertCard extends StatelessWidget {
                       child: _metaText(
                         l10n.alerts_metaType(alertTypeLabel(alert.type, l10n)),
                         scheme,
+                        maxLines: 2,
                       ),
                     ),
                     Text(
@@ -267,6 +269,7 @@ class _AlertCard extends StatelessWidget {
                           alertMethodLabel(alert.method, l10n),
                         ),
                         scheme,
+                        maxLines: 2,
                       ),
                     ),
                   ],
@@ -330,13 +333,18 @@ class _AlertCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(child: meta),
-                        if (compact)
+                        if (stackControls)
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [menu, toggle],
                           )
+                        else if (!compact)
+                          toggle
                         else
-                          toggle,
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [menu, toggle],
+                          ),
                       ],
                     ),
                   ],

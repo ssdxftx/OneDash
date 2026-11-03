@@ -418,3 +418,11 @@ README 中不记录真实仓库凭据；表单仅在会话内使用。
 - compact 告警卡的 `⋯` 与开关放右侧同一竖列，meta 不再被两个控件同时挤压。
 - 空值统一用 `displayValue(context, value)` 返回 `common_notAvailable`，禁止在 UI 写裸 `'-'`；语义性短横线（文件类型、切分、时间戳）除外。
 - 告警卡 compact 行为由 `test/widget/alerts_card_test.dart` 在 320dp / 1.3x 固定。
+
+## v38 验收报告 v18 修复
+
+- 告警卡 `compact` 只决定 meta 是否两列；控件竖排由 1.0x 等效宽度 `maxWidth / scale < 210` 单独判定，避免常规屏被撑高。
+- compact 控件分支必须三条齐全：竖排、并排、非 compact 仅开关；`⋯` 不能在任何分支丢失。
+- 告警卡测试必须加载 MiSans 实字体，并用文本高度断言单行，`didExceedMaxLines` 对 `maxLines: 2` 的折行无效。
+- 告警卡回归固定 320/1.0、360/1.0 卡高 ≤108 与控件同行，以及 390/1.0 英文 meta 不省略。
+- `SplitListTile` 的 `common_notAvailable` 占位值使用次要色，其它值保持主色层级。
