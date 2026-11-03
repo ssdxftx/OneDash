@@ -666,6 +666,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get databases_newPassword => 'New Password';
 
   @override
+  String get common_notAvailable => 'Not available';
+
+  @override
   String get common_empty_title => 'Nothing here yet';
 
   @override

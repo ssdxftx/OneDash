@@ -28,6 +28,7 @@ import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 final _backupRecordsProvider = FutureProvider.autoDispose
     .family<PageResult<BackupRecordDto>, String>((ref, type) async {
@@ -525,7 +526,7 @@ class _BackupTab extends ConsumerWidget {
                       ),
                       Text(
                         record.createdAt == null
-                            ? '-'
+                            ? displayValue(context, null)
                             : formatListTime(record.createdAt, l10n),
                         style: AppTextStyles.caption.copyWith(
                           color: context.scheme.onSurfaceVariant,

@@ -660,6 +660,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get databases_newPassword => '新密码';
 
   @override
+  String get common_notAvailable => '未获取';
+
+  @override
   String get common_empty_title => '这里还没有内容';
 
   @override

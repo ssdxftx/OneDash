@@ -113,7 +113,7 @@ class RuleInfoDto {
       case 'tcp/udp':
         return 'TCP/UDP';
       default:
-        return protocol ?? '-';
+        return protocol ?? '';
     }
   }
 

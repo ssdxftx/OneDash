@@ -19,6 +19,7 @@ import '../../../common/components/section_header.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class WebsiteTemplatesPage extends ConsumerStatefulWidget {
   const WebsiteTemplatesPage({super.key, required this.serverId});
@@ -543,7 +544,7 @@ class _TemplateEditorSheetState extends ConsumerState<_TemplateEditorSheet> {
                 ),
                 const SizedBox(height: AppTokens.s4),
                 Text(
-                  _filePath.isEmpty ? '-' : _filePath,
+                  displayValue(context, _filePath),
                   style: AppTextStyles.bodyS,
                 ),
                 const SizedBox(height: AppTokens.s8),

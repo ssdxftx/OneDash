@@ -26,6 +26,7 @@ import '../../servers/providers/servers_provider.dart';
 import '../../../common/states/error_toast.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../providers/app_store_provider.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class AppStorePage extends ConsumerStatefulWidget {
   const AppStorePage({super.key, required this.serverId, this.initialTab = 0});
@@ -429,7 +430,9 @@ class _AppCard extends StatelessWidget {
           ),
           const Spacer(),
           Text(
-            app.versions.isEmpty ? '-' : app.versions.first,
+            app.versions.isEmpty
+                ? displayValue(context, null)
+                : app.versions.first,
             style: AppTextStyles.caption.copyWith(
               color: scheme.onSurfaceVariant,
             ),

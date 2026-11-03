@@ -25,6 +25,7 @@ import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../widgets/host_diagnostics_tab.dart';
 import '../widgets/host_disks_tab.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class HostPage extends ConsumerStatefulWidget {
   const HostPage({super.key, required this.serverId});
@@ -202,8 +203,12 @@ class _HostPageState extends ConsumerState<HostPage> {
                   _setting['monitorInterval'] == null &&
                       _setting['monitorStoreDays'] == null
                   ? null
-                  : '${_setting['monitorInterval'] ?? '-'}s · '
-                        '${_setting['monitorStoreDays'] ?? '-'}d',
+                  : [
+                      if (_setting['monitorInterval'] != null)
+                        '${_setting['monitorInterval']}s',
+                      if (_setting['monitorStoreDays'] != null)
+                        '${_setting['monitorStoreDays']}d',
+                    ].join(' · '),
               trailing: const Icon(TablerIcons.chevron_right),
               onTap: _editMonitorSettings,
             ),
@@ -764,7 +769,12 @@ class _HostPageState extends ConsumerState<HostPage> {
                 for (final item in items)
                   ListTile(
                     dense: true,
-                    title: Text('${item['username'] ?? item['user'] ?? '-'}'),
+                    title: Text(
+                      displayValue(
+                        context,
+                        (item['username'] ?? item['user'])?.toString(),
+                      ),
+                    ),
                     subtitle: Text(
                       '${item['clientIP'] ?? item['ip'] ?? ''} '
                       '${item['connectTime'] ?? ''}',

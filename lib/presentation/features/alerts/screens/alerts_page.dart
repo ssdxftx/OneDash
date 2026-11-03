@@ -285,6 +285,11 @@ class _AlertCard extends StatelessWidget {
               PopupMenuItem(value: 'delete', child: Text(l10n.common_delete)),
             ],
           );
+          final toggle = Switch(
+            value: enabled,
+            onChanged: (_) => onToggle(),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          );
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -322,15 +327,16 @@ class _AlertCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(child: meta),
-                        if (compact) menu,
-                        Switch(
-                          value: enabled,
-                          onChanged: (_) => onToggle(),
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                        ),
+                        if (compact)
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [menu, toggle],
+                          )
+                        else
+                          toggle,
                       ],
                     ),
                   ],

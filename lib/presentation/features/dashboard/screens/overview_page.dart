@@ -23,6 +23,7 @@ import '../../../common/states/error_state.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../providers/overview_provider.dart';
 import '../utils/dashboard_health.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class OverviewPage extends ConsumerStatefulWidget {
   const OverviewPage({super.key, required this.serverId});
@@ -774,7 +775,7 @@ class _InfoRow extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              value.isEmpty ? '-' : value,
+              displayValue(context, value),
               style: AppTextStyles.bodyM.copyWith(
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),

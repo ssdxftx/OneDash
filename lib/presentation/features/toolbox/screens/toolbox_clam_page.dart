@@ -17,6 +17,7 @@ import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class ToolboxClamPage extends ConsumerStatefulWidget {
   const ToolboxClamPage({super.key});
@@ -300,11 +301,14 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
               ),
               SplitListTile(
                 title: l10n.toolbox_version,
-                subtitle: '${_base['version'] ?? '-'}',
+                subtitle: displayValue(context, _base['version']?.toString()),
               ),
               SplitListTile(
                 title: l10n.toolbox_virusDatabase,
-                subtitle: '${_base['freshVersion'] ?? '-'}',
+                subtitle: displayValue(
+                  context,
+                  _base['freshVersion']?.toString(),
+                ),
               ),
             ],
           ),

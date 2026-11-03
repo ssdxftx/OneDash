@@ -21,6 +21,7 @@ import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../providers/cronjobs_provider.dart';
 import '../widgets/cronjob_records_sheet.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class CronjobsPage extends ConsumerWidget {
   const CronjobsPage({super.key, required this.serverId});
@@ -304,7 +305,7 @@ class _CronjobCard extends StatelessWidget {
           ),
           const SizedBox(height: AppTokens.s8),
           Text(
-            item.spec.isEmpty ? '-' : item.spec,
+            displayValue(context, item.spec),
             style: AppTextStyles.bodyS.copyWith(
               color: scheme.onSurfaceVariant,
               fontFamily: 'monospace',

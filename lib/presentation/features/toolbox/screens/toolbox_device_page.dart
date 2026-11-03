@@ -16,6 +16,7 @@ import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class ToolboxDevicePage extends ConsumerStatefulWidget {
   const ToolboxDevicePage({super.key});
@@ -85,17 +86,17 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
             children: [
               SplitListTile(
                 title: l10n.toolbox_timezone,
-                subtitle: '${_base['timeZone'] ?? '-'}',
+                subtitle: displayValue(context, _base['timeZone']?.toString()),
                 trailing: const Icon(TablerIcons.edit),
                 onTap: _editTimezone,
               ),
               SplitListTile(
                 title: l10n.toolbox_localTime,
-                subtitle: '${_base['localTime'] ?? '-'}',
+                subtitle: displayValue(context, _base['localTime']?.toString()),
               ),
               SplitListTile(
                 title: l10n.toolbox_hostname,
-                subtitle: '${_base['hostname'] ?? '-'}',
+                subtitle: displayValue(context, _base['hostname']?.toString()),
               ),
             ],
           ),
@@ -105,13 +106,13 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
             children: [
               SplitListTile(
                 title: l10n.toolbox_dns,
-                subtitle: dns.isEmpty ? '-' : dns,
+                subtitle: displayValue(context, dns),
                 trailing: const Icon(TablerIcons.edit),
                 onTap: () => _editDns(dns),
               ),
               for (final swap in swaps.whereType<Map>())
                 SplitListTile(
-                  title: '${swap['path'] ?? '-'}',
+                  title: displayValue(context, swap['path']?.toString()),
                   subtitle:
                       '${formatBytes(swap['size'])} · ${swap['used'] ?? ''}',
                 ),

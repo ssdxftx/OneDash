@@ -33,7 +33,7 @@ String healthLabel(double score, AppLocalizations l10n) {
 }
 
 String formatUptime(int seconds, AppLocalizations l10n) {
-  if (seconds <= 0) return '-';
+  if (seconds <= 0) return l10n.common_notAvailable;
   final days = seconds ~/ 86400;
   final hours = (seconds % 86400) ~/ 3600;
   final minutes = (seconds % 3600) ~/ 60;

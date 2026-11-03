@@ -15,6 +15,7 @@ import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 final _processesProvider = FutureProvider.autoDispose<List<ProcessInfo>>((
   ref,
@@ -91,7 +92,7 @@ class ProcessPage extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            '${item.address.isEmpty ? '-' : item.address}:${item.port.isEmpty ? '-' : item.port} · ${item.protocol}',
+                            '${displayValue(context, item.address)}${item.port.isEmpty ? '' : ':${item.port}'} · ${item.protocol}',
                             style: AppTextStyles.caption.copyWith(
                               color: context.scheme.onSurfaceVariant,
                             ),

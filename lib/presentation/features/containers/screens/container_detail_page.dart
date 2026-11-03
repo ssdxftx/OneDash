@@ -18,6 +18,7 @@ import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
+import '../../../common/formatters/value_labels.dart';
 
 final _containerInfoProvider = FutureProvider.autoDispose
     .family<ContainerInfoDto, String>((ref, name) {
@@ -219,7 +220,7 @@ class _OverviewTab extends ConsumerWidget {
                       ),
                       Text(
                         stats.valueOrNull == null
-                            ? '-'
+                            ? displayValue(context, null)
                             : formatBytes(stats.value!.memory),
                         style: AppTextStyles.caption,
                       ),

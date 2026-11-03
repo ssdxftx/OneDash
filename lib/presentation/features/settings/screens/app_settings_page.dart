@@ -12,6 +12,7 @@ import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../providers/app_settings_provider.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class AppSettingsPage extends ConsumerStatefulWidget {
   const AppSettingsPage({super.key});
@@ -165,7 +166,7 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
               SplitListTile(
                 leading: const Icon(TablerIcons.info_circle),
                 title: l10n.settings_version,
-                subtitle: _version.isEmpty ? '-' : _version,
+                subtitle: displayValue(context, _version),
               ),
               SplitListTile(
                 leading: const Icon(TablerIcons.license),

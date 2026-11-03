@@ -16,6 +16,7 @@ import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class ToolboxFail2banPage extends ConsumerStatefulWidget {
   const ToolboxFail2banPage({super.key});
@@ -101,7 +102,7 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
   SplitListTile _confTile(String key, String label, {bool numeric = false}) {
     return SplitListTile(
       title: label,
-      subtitle: '${_base[key] ?? '-'}',
+      subtitle: displayValue(context, _base[key]?.toString()),
       trailing: const Icon(TablerIcons.edit),
       onTap: () =>
           _editConf(key, label, '${_base[key] ?? ''}', numeric: numeric),
@@ -283,7 +284,10 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
                     ),
                     SplitListTile(
                       title: l10n.toolbox_version,
-                      subtitle: '${_base['version'] ?? '-'}',
+                      subtitle: displayValue(
+                        context,
+                        _base['version']?.toString(),
+                      ),
                     ),
                   ],
                 ),
@@ -302,7 +306,10 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
                       _confTile('findTime', l10n.toolbox_findTime),
                       SplitListTile(
                         title: l10n.toolbox_banAction,
-                        subtitle: '${_base['banAction'] ?? '-'}',
+                        subtitle: displayValue(
+                          context,
+                          _base['banAction']?.toString(),
+                        ),
                         trailing: const Icon(TablerIcons.edit),
                         onTap: _editBanAction,
                       ),

@@ -934,6 +934,10 @@
   "@databases_newPassword": {
     "description": "New password field label."
   },
+  "common_notAvailable": "Not available",
+  "@common_notAvailable": {
+    "description": "Placeholder for a value that could not be read."
+  },
   "common_empty_title": "Nothing here yet",
   "@common_empty_title": {
     "description": "OneDash UI string"

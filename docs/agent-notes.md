@@ -412,3 +412,9 @@ README 中不记录真实仓库凭据；表单仅在会话内使用。
 - 详情值必须走 `value` 通道；`trailing: Text` 只用于真正的尾部控件，不用于承载值。
 - 同一张 `SplitListGroup` 内保持一种行语义：subtitle + trailing 与 value 两类行拆卡，不混排。
 - compact 告警 meta 用「短标签 + Expanded 值」两列，冒号跟随标签；标签文案含本地化分隔符。
+
+## v37 验收报告 v17 修复
+
+- compact 告警卡的 `⋯` 与开关放右侧同一竖列，meta 不再被两个控件同时挤压。
+- 空值统一用 `displayValue(context, value)` 返回 `common_notAvailable`，禁止在 UI 写裸 `'-'`；语义性短横线（文件类型、切分、时间戳）除外。
+- 告警卡 compact 行为由 `test/widget/alerts_card_test.dart` 在 320dp / 1.3x 固定。

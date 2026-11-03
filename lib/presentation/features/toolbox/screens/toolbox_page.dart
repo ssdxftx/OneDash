@@ -15,6 +15,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class ToolboxData {
   const ToolboxData({
@@ -89,7 +90,10 @@ class ToolboxPage extends ConsumerWidget {
                 SplitListTile(
                   leading: const Icon(TablerIcons.clock),
                   title: l10n.toolbox_time,
-                  subtitle: '${value.device['timeZone'] ?? '-'}',
+                  subtitle: displayValue(
+                    context,
+                    value.device['timeZone']?.toString(),
+                  ),
                   trailing: const Icon(TablerIcons.chevron_right),
                   onTap: () => context.push('/s/$serverId/more/toolbox/device'),
                 ),
@@ -218,8 +222,11 @@ class _CleanScanSheet extends StatelessWidget {
               children: [
                 for (final item in group.value.whereType<Map>())
                   SplitListTile(
-                    title:
-                        '${item['label'] ?? item['name'] ?? item['path'] ?? '-'}',
+                    title: displayValue(
+                      context,
+                      (item['label'] ?? item['name'] ?? item['path'])
+                          ?.toString(),
+                    ),
                     subtitle: formatBytes(item['size']),
                   ),
               ],

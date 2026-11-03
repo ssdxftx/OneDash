@@ -35,6 +35,7 @@ import '../../../common/states/error_state.dart';
 import '../providers/websites_provider.dart';
 import '../../../common/states/error_toast.dart';
 import 'websites_page.dart';
+import '../../../common/formatters/value_labels.dart';
 
 final _websiteLogFuture = FutureProvider.autoDispose
     .family<List<String>, String>((ref, key) async {
@@ -1252,7 +1253,7 @@ class _Row extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              value.isEmpty ? '-' : value,
+              displayValue(context, value),
               textAlign: TextAlign.end,
               style: AppTextStyles.bodyM,
               maxLines: 2,

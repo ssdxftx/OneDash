@@ -1310,6 +1310,12 @@ abstract class AppLocalizations {
   /// **'New Password'**
   String get databases_newPassword;
 
+  /// Placeholder for a value that could not be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get common_notAvailable;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:

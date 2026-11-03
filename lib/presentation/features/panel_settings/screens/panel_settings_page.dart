@@ -19,6 +19,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class _PanelSettingsData {
   const _PanelSettingsData(this.settings, this.core);
@@ -144,7 +145,7 @@ class _PanelSettingsBody extends ConsumerWidget {
                   SplitListTile(
                     leading: const Icon(TablerIcons.world_www),
                     title: l10n.panelSettings_openWeb,
-                    subtitle: serverUrl?.toString() ?? '-',
+                    subtitle: displayValue(context, serverUrl?.toString()),
                     trailing: const Icon(TablerIcons.external_link),
                     onTap: serverUrl == null
                         ? null

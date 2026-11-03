@@ -17,6 +17,7 @@ import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class RuntimeDetailPage extends ConsumerStatefulWidget {
   const RuntimeDetailPage({
@@ -527,7 +528,10 @@ class _FpmTabState extends ConsumerState<_FpmTab> {
                 children: [
                   for (final item in data.status)
                     SplitListTile(
-                      title: '${item['name'] ?? item['pool'] ?? '-'}',
+                      title: displayValue(
+                        context,
+                        (item['name'] ?? item['pool'])?.toString(),
+                      ),
                       subtitle: item.entries
                           .where((entry) => entry.key != 'name')
                           .map((entry) => '${entry.key}: ${entry.value}')

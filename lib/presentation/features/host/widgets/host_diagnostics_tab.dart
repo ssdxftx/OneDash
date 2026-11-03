@@ -20,6 +20,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../common/formatters/value_labels.dart';
 
 class HostDiagnosticsTab extends ConsumerStatefulWidget {
   const HostDiagnosticsTab({super.key, required this.serverId});
@@ -240,15 +241,14 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
                       if (_componentResult!.exists) ...[
                         SplitListTile(
                           title: l10n.toolbox_version,
-                          value: _componentResult!.version.isEmpty
-                              ? '-'
-                              : _componentResult!.version,
+                          value: displayValue(
+                            context,
+                            _componentResult!.version,
+                          ),
                         ),
                         SplitListTile(
                           title: l10n.host_diagComponentPath,
-                          value: _componentResult!.path.isEmpty
-                              ? '-'
-                              : _componentResult!.path,
+                          value: displayValue(context, _componentResult!.path),
                         ),
                       ],
                     ],
