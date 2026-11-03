@@ -106,7 +106,8 @@
   "panelSettings_alertList": "告警列表",
   "panelSettings_alertLogs": "告警日志",
   "panelSettings_noAlertRules": "暂无告警规则",
-  "alerts_cardMeta": "类型：{type} · 方式：{method}",
+  "alerts_metaType": "类型：{type}",
+  "alerts_metaMethod": "方式：{method}",
   "panelSettings_deleted": "已删除",
   "panelSettings_deleteFailed": "删除失败",
   "panelSettings_logsCleared": "日志已清空",
@@ -1647,7 +1648,7 @@
   "more_databasesCount": "{count} 个数据库",
   "more_cronjobsCount": "{count} 个计划任务",
   "websites_templateVariableCount": "{count} 个变量",
-  "server_edit_portHelper": "1Panel 默认端口为 9999",
+  "server_edit_portHelper": "默认 9999",
   "log_emptyMessage": "该分类暂时没有日志记录。",
   "process_emptyMessage": "服务器当前没有可显示的进程。",
   "runtimes_emptyMessage": "从应用商店安装运行时后会显示在这里。"

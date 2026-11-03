@@ -17,6 +17,7 @@ import '../../../common/components/skeleton.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../../common/states/empty_state.dart';
 import '../../../common/states/async_state_view.dart';
 import '../providers/database_detail_provider.dart';
 import '../widgets/database_advanced_tab.dart';
@@ -120,28 +121,32 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
                 const SizedBox(height: AppTokens.s24),
                 SplitListGroup(
                   children: [
-                    _CopyRow(
-                      label: l10n.databases_address,
-                      value: _conn('host', state),
-                      onCopy: _copy,
-                    ),
-                    _CopyRow(
-                      label: l10n.databases_port,
-                      value: _conn('port', state),
-                      onCopy: _copy,
-                    ),
-                    _CopyRow(
-                      label: l10n.databases_username,
-                      value: state.item.username,
-                      onCopy: _copy,
-                    ),
-                    _PasswordRow(
-                      label: l10n.databases_password,
-                      value: state.item.password,
-                      visible: _showPassword,
-                      onToggle: _togglePassword,
-                      onCopy: _copy,
-                    ),
+                    if ((_conn('host', state) ?? '').isNotEmpty)
+                      _CopyRow(
+                        label: l10n.databases_address,
+                        value: _conn('host', state)!,
+                        onCopy: _copy,
+                      ),
+                    if ((_conn('port', state) ?? '').isNotEmpty)
+                      _CopyRow(
+                        label: l10n.databases_port,
+                        value: _conn('port', state)!,
+                        onCopy: _copy,
+                      ),
+                    if (state.item.username.trim().isNotEmpty)
+                      _CopyRow(
+                        label: l10n.databases_username,
+                        value: state.item.username,
+                        onCopy: _copy,
+                      ),
+                    if (state.item.password.isNotEmpty)
+                      _PasswordRow(
+                        label: l10n.databases_password,
+                        value: state.item.password,
+                        visible: _showPassword,
+                        onToggle: _togglePassword,
+                        onCopy: _copy,
+                      ),
                   ],
                 ),
                 const SizedBox(height: AppTokens.s24),
@@ -217,10 +222,10 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
     return from.isEmpty ? 'local' : from;
   }
 
-  String _conn(String key, DatabaseDetailState state) {
+  String? _conn(String key, DatabaseDetailState state) {
     final value = state.connection[key];
     if (value != null && '$value'.isNotEmpty) return '$value';
-    return '-';
+    return null;
   }
 
   Future<void> _showStatus(DatabaseDetailState state) async {
@@ -241,7 +246,11 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
             Text(l10n.databases_status, style: AppTextStyles.titleL),
             const SizedBox(height: AppTokens.s16),
             if (status.isEmpty)
-              Text(l10n.state_empty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.database,
+                title: l10n.state_empty,
+              )
             else
               SplitListGroup(
                 children: [
@@ -400,7 +409,7 @@ class _CopyRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return SplitListTile(
       title: label,
-      subtitle: value,
+      value: value,
       trailing: IconButton(
         tooltip: AppLocalizations.of(context).action_copy,
         icon: const Icon(TablerIcons.copy, size: AppTokens.iconList),

@@ -21,7 +21,8 @@ void main() {
     );
   });
 
-  test('list time preserves the fallback for unparseable values', () {
+  test('list time hides null values unless a fallback is supplied', () {
+    expect(formatListTime(null, l10n), '');
     expect(formatListTime(null, l10n, fallback: 'raw'), 'raw');
   });
 }

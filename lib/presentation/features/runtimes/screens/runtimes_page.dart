@@ -54,7 +54,7 @@ class RuntimesPage extends ConsumerWidget {
             onPressed: () => _create(context, ref),
           ),
           AppIconButton(
-            icon: TablerIcons.refresh,
+            icon: TablerIcons.cloud_download,
             tooltip: l10n.runtimes_sync,
             onPressed: () async {
               try {
@@ -82,7 +82,7 @@ class RuntimesPage extends ConsumerWidget {
           message: l10n.runtimes_emptyMessage,
         ),
         builder: (data) => ListView.builder(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           itemCount: data.items.length,
           itemBuilder: (context, index) {
             final runtime = data.items[index];

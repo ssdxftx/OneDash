@@ -153,7 +153,7 @@ class _PhpExtensionsTabState extends ConsumerState<_PhpExtensionsTab> {
             ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.all(AppTokens.s16),
+                padding: const EdgeInsets.all(AppTokens.pagePadding),
                 itemCount: support.length,
                 itemBuilder: (context, index) {
                   final item = support[index];
@@ -214,7 +214,11 @@ class _PhpExtensionsTabState extends ConsumerState<_PhpExtensionsTab> {
             Text(l10n.runtime_extensionPresets, style: AppTextStyles.titleL),
             const SizedBox(height: AppTokens.s16),
             if (result.isEmpty)
-              Text(l10n.state_empty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.puzzle,
+                title: l10n.state_empty,
+              )
             else
               SplitListGroup(
                 children: [
@@ -629,7 +633,11 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
             Text(l10n.runtime_scripts, style: AppTextStyles.titleL),
             const SizedBox(height: AppTokens.s16),
             if (scripts.isEmpty)
-              Text(l10n.state_empty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.terminal_2,
+                title: l10n.state_empty,
+              )
             else
               SplitListGroup(
                 children: [
@@ -739,7 +747,7 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
                 );
               }
               return ListView.builder(
-                padding: const EdgeInsets.all(AppTokens.s16),
+                padding: const EdgeInsets.all(AppTokens.pagePadding),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   final item = items[index];

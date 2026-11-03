@@ -86,4 +86,29 @@ void main() {
     );
     expect(tester.getTopRight(find.textContaining('已过期')).dx, greaterThan(200));
   });
+
+  testWidgets('value rows mute the label and emphasize the value', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: const Scaffold(
+          body: SizedBox(
+            width: 390,
+            child: TonalCard(
+              child: SplitListGroup(
+                children: [SplitListTile(title: '端口', value: '9090')],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text('端口'));
+    final value = tester.widget<Text>(find.text('9090'));
+    expect(label.style?.fontSize, AppTextStyles.bodyS.fontSize);
+    expect(value.style?.fontSize, AppTextStyles.bodyL.fontSize);
+  });
 }

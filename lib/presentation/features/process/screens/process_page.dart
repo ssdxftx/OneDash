@@ -54,7 +54,7 @@ class ProcessPage extends ConsumerWidget {
           message: l10n.process_emptyMessage,
         ),
         builder: (items) => ListView.builder(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           itemCount: items.length,
           itemBuilder: (context, index) {
             final item = items[index];

@@ -486,13 +486,19 @@
   "@panelSettings_noAlertRules": {
     "description": "Empty state for alert rules."
   },
-  "alerts_cardMeta": "Type: {type} · Method: {method}",
-  "@alerts_cardMeta": {
-    "description": "Alert card metadata line.",
+  "alerts_metaType": "Type: {type}",
+  "@alerts_metaType": {
+    "description": "Alert card type metadata segment.",
     "placeholders": {
       "type": {
         "type": "String"
-      },
+      }
+    }
+  },
+  "alerts_metaMethod": "Method: {method}",
+  "@alerts_metaMethod": {
+    "description": "Alert card method metadata segment.",
+    "placeholders": {
       "method": {
         "type": "String"
       }
@@ -6974,7 +6980,7 @@
   "@websites_templateVariableCount": {
     "description": "Template variable count."
   },
-  "server_edit_portHelper": "1Panel listens on 9999 by default",
+  "server_edit_portHelper": "Default 9999",
   "@server_edit_portHelper": {
     "description": "Helper for the panel port field."
   },

@@ -356,8 +356,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get panelSettings_noAlertRules => 'No alert rules';
 
   @override
-  String alerts_cardMeta(String type, String method) {
-    return 'Type: $type · Method: $method';
+  String alerts_metaType(String type) {
+    return 'Type: $type';
+  }
+
+  @override
+  String alerts_metaMethod(String method) {
+    return 'Method: $method';
   }
 
   @override
@@ -5231,7 +5236,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get server_edit_portHelper => '1Panel listens on 9999 by default';
+  String get server_edit_portHelper => 'Default 9999';
 
   @override
   String get log_emptyMessage => 'No log entries in this category yet.';

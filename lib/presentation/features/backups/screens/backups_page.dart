@@ -55,6 +55,21 @@ class BackupsPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.backups_title,
         actions: [
+          AppIconButton(
+            icon: TablerIcons.refresh,
+            tooltip: l10n.action_refresh,
+            onPressed: () {
+              for (final type in const [
+                'app',
+                'database',
+                'website',
+                'directory',
+                'container',
+              ]) {
+                ref.invalidate(_backupRecordsProvider(type));
+              }
+            },
+          ),
           PopupMenuButton<String>(
             tooltip: l10n.action_more,
             icon: const Icon(TablerIcons.dots),
@@ -449,7 +464,7 @@ class _BackupTab extends ConsumerWidget {
         onAction: () => _create(context, ref),
       ),
       builder: (data) => ListView.builder(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         itemCount: data.items.length,
         itemBuilder: (context, index) {
           final record = data.items[index];

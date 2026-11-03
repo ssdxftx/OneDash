@@ -133,6 +133,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
               ),
               actions: [
                 AppIconButton(
+                  icon: TablerIcons.refresh,
+                  tooltip: l10n.action_refresh,
+                  onPressed: () =>
+                      ref.read(websitesProvider.notifier).refresh(),
+                ),
+                AppIconButton(
                   icon: _searching ? TablerIcons.x : TablerIcons.search,
                   tooltip: l10n.action_search,
                   onPressed: () {
@@ -173,8 +179,6 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                       });
                     } else if (value == 'templates') {
                       context.push('/s/${widget.serverId}/websites/templates');
-                    } else if (value == 'refresh') {
-                      ref.read(websitesProvider.notifier).refresh();
                     }
                   },
                   itemBuilder: (context) => [
@@ -189,10 +193,6 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                     PopupMenuItem(
                       value: 'templates',
                       child: Text(l10n.websites_templates),
-                    ),
-                    PopupMenuItem(
-                      value: 'refresh',
-                      child: Text(l10n.action_refresh),
                     ),
                   ],
                 ),

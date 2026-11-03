@@ -380,3 +380,12 @@ README 中不记录真实仓库凭据；表单仅在会话内使用。
 - 列表时间统一 `formatListTime`（7 天内相对、之后绝对），详情时间统一 `formatLocalDateTime`；`formatTimeAgo` / `formatFileModTime` 已删除。
 - 空态：首屏列表必须提供 `actionLabel`，模块文案替代 `state_empty`。
 - 新增 `tool/check_ui_consistency.py`，校验刷新首位、无 FAB 与时间死代码。
+
+## v33 验收报告 v13 修复
+
+- 同一 `actions` 内的图标必须唯一；运行环境同步与列表刷新要使用不同图标，避免用户无法区分读操作与写操作。
+- 页面栏内的刷新只能出现在 AppBar 首位；`PopupMenuButton` 内出现刷新视为违规，守卫脚本已覆盖该形态并接入 CI。
+- 窄屏 meta 在 1.3x 下必须按语义分段换行，冒号和值不能被拆开；常规宽度用 `Flexible` 段内省略。
+- 详情信息行使用 `SplitListTile.value`，值为空时整行隐藏；标签 `bodyS + onSurfaceVariant`，值 `bodyL + w500`。
+- `formatListTime` 的 null 默认值为空串，调用方需要占位时显式传 fallback；服务端时间字符串解析失败时保留原值。
+- 底部信息列表的空态使用 `EmptyState(compact: true)`，不再用裸 `Text(state_empty)`。

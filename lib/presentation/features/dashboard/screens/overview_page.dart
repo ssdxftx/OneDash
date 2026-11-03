@@ -293,7 +293,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
         ),
       ),
       SliverPadding(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         sliver: SliverGrid(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,

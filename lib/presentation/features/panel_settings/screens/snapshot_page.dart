@@ -73,7 +73,7 @@ class SnapshotPage extends ConsumerWidget {
           message: l10n.panelSettings_noSnapshotsHint,
         ),
         builder: (items) => ListView.separated(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           itemCount: items.length,
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {

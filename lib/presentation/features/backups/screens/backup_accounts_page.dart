@@ -65,7 +65,7 @@ class BackupAccountsPage extends ConsumerWidget {
           message: l10n.backups_noAccountsHint,
         ),
         builder: (items) => ListView.separated(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           itemCount: items.length,
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {
@@ -353,7 +353,11 @@ class BackupAccountsPage extends ConsumerWidget {
             Text(l10n.backups_buckets, style: AppTextStyles.titleL),
             const SizedBox(height: AppTokens.s16),
             if (buckets.isEmpty)
-              Text(l10n.state_empty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.cloud_off,
+                title: l10n.state_empty,
+              )
             else
               for (final bucket in buckets)
                 ListTile(dense: true, title: Text('$bucket')),

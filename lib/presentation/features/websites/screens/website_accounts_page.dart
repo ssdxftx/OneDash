@@ -300,7 +300,7 @@ class _AcmeTab extends ConsumerWidget {
               message: l10n.websites_noAcmeHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {
@@ -524,7 +524,7 @@ class _DnsTab extends ConsumerWidget {
               message: l10n.websites_noDnsHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {
@@ -781,7 +781,7 @@ class _CaTab extends ConsumerWidget {
               message: l10n.websites_noCaHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {

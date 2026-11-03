@@ -75,19 +75,6 @@ class ServersPage extends ConsumerWidget {
                   child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(
-                          AppTokens.s16,
-                          AppTokens.s8,
-                          AppTokens.s16,
-                          AppTokens.s8,
-                        ),
-                        sliver: SliverToBoxAdapter(
-                          child: _AddServerCard(
-                            onTap: () => context.push('/servers/add'),
-                          ),
-                        ),
-                      ),
                       if (items.isNotEmpty) ...[
                         SliverToBoxAdapter(
                           child: Padding(
@@ -233,47 +220,6 @@ class _EmptyServers extends StatelessWidget {
       message: l10n.servers_empty_message,
       actionLabel: l10n.servers_add,
       onAction: onAdd,
-    );
-  }
-}
-
-class _AddServerCard extends StatelessWidget {
-  const _AddServerCard({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final scheme = context.scheme;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppTokens.rLg),
-        child: Container(
-          height: 72,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppTokens.rLg),
-            border: Border.all(color: scheme.outlineVariant),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                TablerIcons.plus,
-                size: AppTokens.iconList,
-                color: scheme.primary,
-              ),
-              const SizedBox(width: AppTokens.s8),
-              Text(
-                l10n.servers_add,
-                style: AppTextStyles.label.copyWith(color: scheme.primary),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

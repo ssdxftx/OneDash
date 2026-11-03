@@ -126,7 +126,7 @@ class _FavoritesTab extends ConsumerWidget {
         message: l10n.files_noFavoritesHint,
       ),
       builder: (items) => ListView.separated(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         itemCount: items.length,
         separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
         itemBuilder: (context, index) {
@@ -249,7 +249,7 @@ class _RecycleTab extends ConsumerWidget {
               message: l10n.files_recycleEmptyHint,
             ),
             builder: (data) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               itemCount: data.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {
@@ -334,7 +334,7 @@ class _SharesTab extends ConsumerWidget {
         message: l10n.files_noSharesHint,
       ),
       builder: (items) => ListView.separated(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         itemCount: items.length,
         separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
         itemBuilder: (context, index) {
@@ -525,7 +525,7 @@ class _RemoteDownloadTab extends ConsumerWidget {
               message: l10n.files_noRemoteDownloadsHint,
             ),
             builder: (data) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               itemCount: data.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {

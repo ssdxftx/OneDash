@@ -141,6 +141,12 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
               ),
               actions: [
                 AppIconButton(
+                  icon: TablerIcons.refresh,
+                  tooltip: l10n.action_refresh,
+                  onPressed: () =>
+                      ref.read(containersProvider.notifier).refresh(),
+                ),
+                AppIconButton(
                   icon: _searching ? TablerIcons.x : TablerIcons.search,
                   tooltip: l10n.action_search,
                   onPressed: () {
@@ -181,8 +187,6 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                           );
                         }
                       });
-                    } else if (value == 'refresh') {
-                      ref.read(containersProvider.notifier).refresh();
                     } else if (value == 'docker') {
                       context.push('/s/${widget.serverId}/containers/docker');
                     } else if (value == 'resources') {
@@ -201,10 +205,6 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                             ? l10n.files_cancelSelection
                             : l10n.files_selectAll,
                       ),
-                    ),
-                    PopupMenuItem(
-                      value: 'refresh',
-                      child: Text(l10n.action_refresh),
                     ),
                     PopupMenuItem(
                       value: 'docker',

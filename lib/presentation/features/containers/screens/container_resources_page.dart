@@ -384,7 +384,11 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
             ),
             const SizedBox(height: AppTokens.s16),
             if (items.isEmpty)
-              Text(l10n.state_empty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.box,
+                title: l10n.state_empty,
+              )
             else
               SplitListGroup(
                 children: [
@@ -652,7 +656,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
               message: l10n.containers_pullImageHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
               itemBuilder: (context, index) {
@@ -860,7 +864,7 @@ class _NetworksTabState extends ConsumerState<_NetworksTab> {
               message: l10n.containers_createNetworkHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
               itemBuilder: (context, index) {
@@ -1064,7 +1068,7 @@ class _ReposTab extends ConsumerWidget {
               message: l10n.containers_noReposHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {
@@ -1153,7 +1157,11 @@ class _ReposTab extends ConsumerWidget {
             Text(l10n.action_search, style: AppTextStyles.titleL),
             const SizedBox(height: AppTokens.s16),
             if (result.items.isEmpty)
-              Text(l10n.state_empty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.building_warehouse,
+                title: l10n.state_empty,
+              )
             else
               SplitListGroup(
                 children: [

@@ -350,8 +350,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get panelSettings_noAlertRules => '暂无告警规则';
 
   @override
-  String alerts_cardMeta(String type, String method) {
-    return '类型：$type · 方式：$method';
+  String alerts_metaType(String type) {
+    return '类型：$type';
+  }
+
+  @override
+  String alerts_metaMethod(String method) {
+    return '方式：$method';
   }
 
   @override
@@ -5109,7 +5114,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get server_edit_portHelper => '1Panel 默认端口为 9999';
+  String get server_edit_portHelper => '默认 9999';
 
   @override
   String get log_emptyMessage => '该分类暂时没有日志记录。';

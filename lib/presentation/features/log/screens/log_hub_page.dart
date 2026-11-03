@@ -255,7 +255,7 @@ class _LogTab extends ConsumerWidget {
         message: l10n.log_emptyMessage,
       ),
       builder: (items) => ListView.builder(
-        padding: const EdgeInsets.all(AppTokens.s16),
+        padding: const EdgeInsets.all(AppTokens.pagePadding),
         itemCount: items.length,
         itemBuilder: (context, i) {
           final item = items[i];

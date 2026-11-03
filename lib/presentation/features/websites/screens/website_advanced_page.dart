@@ -1623,7 +1623,7 @@ class _RedirectTab extends ConsumerWidget {
               message: l10n.websites_noRedirectsHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.s16),
+              padding: const EdgeInsets.all(AppTokens.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {

@@ -605,9 +605,10 @@ class _TerminalSessionsSheetState
                           session['attached'] == true
                               ? l10n.terminal_sessionAttached
                               : l10n.terminal_sessionDetached,
-                          formatLocalDateTime(
-                            '${session['createdAt'] ?? ''}',
-                            fallback: '',
+                          formatListTime(
+                            DateTime.tryParse('${session['createdAt'] ?? ''}'),
+                            l10n,
+                            fallback: '${session['createdAt'] ?? ''}',
                           ),
                         ].where((value) => value.isNotEmpty).join(' · '),
                         trailing: TextButton(

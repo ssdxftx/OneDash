@@ -6,6 +6,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/toolbox_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
@@ -222,19 +223,24 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
             Text(l10n.toolbox_clamRecords, style: AppTextStyles.titleL),
             const SizedBox(height: AppTokens.s16),
             if (records.isEmpty)
-              Text(
-                l10n.toolbox_clamNoRecords,
-                style: AppTextStyles.bodyM.copyWith(
-                  color: context.scheme.onSurfaceVariant,
-                ),
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.shield_off,
+                title: l10n.toolbox_clamNoRecords,
               )
             else
               SplitListGroup(
                 children: [
                   for (final record in records)
                     SplitListTile(
-                      title:
+                      title: formatListTime(
+                        DateTime.tryParse(
                           '${record['scanDate'] ?? record['startTime'] ?? ''}',
+                        ),
+                        l10n,
+                        fallback:
+                            '${record['scanDate'] ?? record['startTime'] ?? ''}',
+                      ),
                       subtitle:
                           '${record['status'] ?? ''} · ${record['infectedFiles'] ?? '0'}',
                     ),

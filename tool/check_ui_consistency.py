@@ -26,6 +26,26 @@ def action_icons(source: str) -> list[str]:
     return icons
 
 
+def _balanced_block(source: str, open_index: int, opening: str, closing: str) -> str:
+    depth = 0
+    for index in range(open_index, len(source)):
+        if source[index] == opening:
+            depth += 1
+        elif source[index] == closing:
+            depth -= 1
+            if depth == 0:
+                return source[open_index + 1 : index]
+    return source[open_index + 1 :]
+
+
+def _call_blocks(source: str, name: str) -> list[str]:
+    blocks: list[str] = []
+    for match in re.finditer(rf"{name}(?:<[^>]*>)?\s*\(", source):
+        open_index = source.index("(", match.start())
+        blocks.append(_balanced_block(source, open_index, "(", ")"))
+    return blocks
+
+
 def main() -> int:
     failures: list[str] = []
     for path in FEATURES.rglob("*.dart"):
@@ -44,9 +64,18 @@ def main() -> int:
                     depth -= 1
                 cursor += 1
             icons = re.findall(r"TablerIcons\.(\w+)", block[: cursor - 1])
+            line = source[: match.start()].count("\n") + 1
             if "refresh" in icons and icons.index("refresh") != 0:
-                line = source[: match.start()].count("\n") + 1
                 failures.append(f"{relative}:{line}: refresh must be the first action")
+            duplicates = {icon for icon in icons if icons.count(icon) > 1}
+            for icon in sorted(duplicates):
+                failures.append(f"{relative}:{line}: duplicate action icon {icon}")
+        for block in _call_blocks(source, "PopupMenuButton"):
+            if "action_refresh" in block or "TablerIcons.refresh" in block:
+                line = source[: source.find(block)].count("\n") + 1
+                failures.append(
+                    f"{relative}:{line}: refresh must live in the app bar, not the menu"
+                )
 
     dead_helpers = ["formatTimeAgo(", "formatFileModTime("]
     for helper in dead_helpers:

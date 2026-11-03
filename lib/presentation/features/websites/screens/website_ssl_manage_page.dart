@@ -81,7 +81,7 @@ class WebsiteSslManagePage extends ConsumerWidget {
           onAction: () => _upload(context, ref),
         ),
         builder: (items) => ListView.separated(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           itemCount: items.length,
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {
@@ -421,7 +421,11 @@ class WebsiteSslManagePage extends ConsumerWidget {
             Text(l10n.websites_checkDns, style: AppTextStyles.titleL),
             const SizedBox(height: AppTokens.s16),
             if (results.isEmpty)
-              Text(l10n.state_empty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.world_off,
+                title: l10n.state_empty,
+              )
             else
               SplitListGroup(
                 children: [

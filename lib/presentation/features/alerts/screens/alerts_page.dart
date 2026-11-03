@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/alert/alert_dto.dart';
 import '../../../../data/repositories_impl/alert_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
@@ -110,7 +111,7 @@ class _AlertListTab extends ConsumerWidget {
           );
         }
         return ListView.separated(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           itemCount: items.length,
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {
@@ -190,6 +191,15 @@ class _AlertCard extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onDelete;
 
+  Widget _metaText(String text, ColorScheme scheme) {
+    return Text(
+      text,
+      style: AppTextStyles.bodyS.copyWith(color: scheme.onSurfaceVariant),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -202,7 +212,48 @@ class _AlertCard extends StatelessWidget {
           final compact =
               constraints.maxWidth < 320 ||
               MediaQuery.textScalerOf(context).scale(1) >= 1.3;
+          final meta = compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _metaText(
+                      l10n.alerts_metaType(alertTypeLabel(alert.type, l10n)),
+                      scheme,
+                    ),
+                    _metaText(
+                      l10n.alerts_metaMethod(
+                        alertMethodLabel(alert.method, l10n),
+                      ),
+                      scheme,
+                    ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Flexible(
+                      child: _metaText(
+                        l10n.alerts_metaType(alertTypeLabel(alert.type, l10n)),
+                        scheme,
+                      ),
+                    ),
+                    Text(
+                      ' · ',
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                    Flexible(
+                      child: _metaText(
+                        l10n.alerts_metaMethod(
+                          alertMethodLabel(alert.method, l10n),
+                        ),
+                        scheme,
+                      ),
+                    ),
+                  ],
+                );
           return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 40,
@@ -223,48 +274,49 @@ class _AlertCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      alert.title.isEmpty ? alert.type : alert.title,
-                      style: AppTextStyles.titleM,
-                      maxLines: compact ? 2 : 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            alert.title.isEmpty ? alert.type : alert.title,
+                            style: AppTextStyles.titleM,
+                            maxLines: compact ? 2 : 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        PopupMenuButton<String>(
+                          tooltip: l10n.action_more,
+                          icon: Icon(
+                            TablerIcons.dots,
+                            size: AppTokens.iconList,
+                            color: scheme.onSurfaceVariant,
+                          ),
+                          onSelected: (value) {
+                            if (value == 'delete') onDelete();
+                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Text(l10n.common_delete),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      l10n.alerts_cardMeta(
-                        alertTypeLabel(alert.type, l10n),
-                        alertMethodLabel(alert.method, l10n),
-                      ),
-                      style: AppTextStyles.bodyS.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                      maxLines: compact ? 2 : 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Expanded(child: meta),
+                        Switch(
+                          value: enabled,
+                          onChanged: (_) => onToggle(),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ),
-              Switch(
-                value: enabled,
-                onChanged: (_) => onToggle(),
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              PopupMenuButton<String>(
-                tooltip: l10n.action_more,
-                icon: Icon(
-                  TablerIcons.dots,
-                  size: AppTokens.iconList,
-                  color: scheme.onSurfaceVariant,
-                ),
-                onSelected: (value) {
-                  if (value == 'delete') onDelete();
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Text(l10n.common_delete),
-                  ),
-                ],
               ),
             ],
           );
@@ -346,7 +398,7 @@ class _AlertLogTab extends ConsumerWidget {
                     message: l10n.panelSettings_alertLogs,
                   )
                 : ListView.separated(
-                    padding: const EdgeInsets.all(AppTokens.s16),
+                    padding: const EdgeInsets.all(AppTokens.pagePadding),
                     itemCount: items.length,
                     separatorBuilder: (_, _) =>
                         const SizedBox(height: AppTokens.s8),
@@ -391,7 +443,11 @@ class _AlertLogTab extends ConsumerWidget {
                                 ),
                                 const Spacer(),
                                 Text(
-                                  log.createdAt ?? '',
+                                  formatListTime(
+                                    DateTime.tryParse(log.createdAt ?? ''),
+                                    l10n,
+                                    fallback: log.createdAt ?? '',
+                                  ),
                                   style: AppTextStyles.caption.copyWith(
                                     color: context.scheme.onSurfaceVariant,
                                   ),

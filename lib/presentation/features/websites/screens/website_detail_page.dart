@@ -1103,7 +1103,11 @@ class _LogsTab extends ConsumerWidget {
             else if (log.hasError)
               Text(describeError(log.error!, l10n))
             else if ((log.valueOrNull ?? const []).isEmpty)
-              Text(l10n.state_empty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.file_text,
+                title: l10n.state_empty,
+              )
             else
               Flexible(
                 child: ListView(

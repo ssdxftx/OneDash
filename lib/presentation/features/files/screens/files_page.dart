@@ -136,7 +136,11 @@ class _FilesPageState extends ConsumerState<FilesPage> {
             Text(l10n.files_checkExistence, style: AppTextStyles.titleL),
             const SizedBox(height: AppTokens.s16),
             if (items.isEmpty)
-              Text(l10n.state_empty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.file_off,
+                title: l10n.state_empty,
+              )
             else
               SplitListGroup(
                 children: [

@@ -27,6 +27,12 @@ jobs:
       - name: Check error leaks
         run: tool/check_error_leaks.sh
 
+      - name: Check action reachability
+        run: tool/check_action_reachability.sh
+
+      - name: Check UI consistency
+        run: python3 tool/check_ui_consistency.py
+
       - name: Analyze
         run: flutter analyze --fatal-infos
 

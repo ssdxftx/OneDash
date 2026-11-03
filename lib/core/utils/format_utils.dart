@@ -39,7 +39,7 @@ String formatRelativeTime(DateTime? time, AppLocalizations l10n) {
 String formatListTime(
   DateTime? time,
   AppLocalizations l10n, {
-  String fallback = '-',
+  String fallback = '',
 }) {
   if (time == null) return fallback;
   final diff = DateTime.now().difference(time.toLocal());

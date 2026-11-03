@@ -159,7 +159,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                 message: l10n.databases_empty_message,
               ),
               builder: (_) => ListView.builder(
-                padding: const EdgeInsets.all(AppTokens.s16),
+                padding: const EdgeInsets.all(AppTokens.pagePadding),
                 itemCount: filtered.length,
                 itemBuilder: (context, index) {
                   final item = filtered[index];
@@ -631,7 +631,11 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
         if (_loading)
           const SkeletonList(itemCount: 3)
         else if (_items.isEmpty)
-          Text(l10n.state_empty)
+          EmptyState(
+            compact: true,
+            icon: TablerIcons.database_off,
+            title: l10n.state_empty,
+          )
         else
           Flexible(
             child: ListView(

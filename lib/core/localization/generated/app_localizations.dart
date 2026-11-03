@@ -734,11 +734,17 @@ abstract class AppLocalizations {
   /// **'No alert rules'**
   String get panelSettings_noAlertRules;
 
-  /// Alert card metadata line.
+  /// Alert card type metadata segment.
   ///
   /// In en, this message translates to:
-  /// **'Type: {type} · Method: {method}'**
-  String alerts_cardMeta(String type, String method);
+  /// **'Type: {type}'**
+  String alerts_metaType(String type);
+
+  /// Alert card method metadata segment.
+  ///
+  /// In en, this message translates to:
+  /// **'Method: {method}'**
+  String alerts_metaMethod(String method);
 
   /// Toast shown after deleting an item.
   ///
@@ -9983,7 +9989,7 @@ abstract class AppLocalizations {
   /// Helper for the panel port field.
   ///
   /// In en, this message translates to:
-  /// **'1Panel listens on 9999 by default'**
+  /// **'Default 9999'**
   String get server_edit_portHelper;
 
   /// No log entries in this category yet.

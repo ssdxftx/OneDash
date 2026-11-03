@@ -19,6 +19,7 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/task_progress_sheet.dart';
+import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
 
 Future<void> showContainerActions(
@@ -177,7 +178,7 @@ Future<void> showContainerActions(
             children: [
               ActionSheetRow(
                 icon: TablerIcons.edit,
-                iconColor: colors.chart2,
+                iconColor: colors.info,
                 title: l10n.containers_edit,
                 subtitle: l10n.containers_editSubtitle,
                 onTap: () {
@@ -189,7 +190,7 @@ Future<void> showContainerActions(
               ),
               ActionSheetRow(
                 icon: TablerIcons.arrow_up_circle,
-                iconColor: colors.chart3,
+                iconColor: colors.info,
                 title: l10n.containers_upgrade,
                 subtitle: l10n.containers_upgradeSubtitle,
                 onTap: () {
@@ -199,7 +200,7 @@ Future<void> showContainerActions(
               ),
               ActionSheetRow(
                 icon: TablerIcons.camera,
-                iconColor: colors.chart4,
+                iconColor: colors.info,
                 title: l10n.containers_commit,
                 subtitle: l10n.containers_commitSubtitle,
                 onTap: () {
@@ -420,7 +421,11 @@ Future<void> _showUsers(
           Text(l10n.containers_users, style: AppTextStyles.titleL),
           const SizedBox(height: AppTokens.s16),
           if (users.isEmpty)
-            Text(l10n.state_empty)
+            EmptyState(
+              compact: true,
+              icon: TablerIcons.users,
+              title: l10n.state_empty,
+            )
           else
             SplitListGroup(
               children: [

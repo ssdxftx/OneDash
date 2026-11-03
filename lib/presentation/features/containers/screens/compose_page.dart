@@ -73,7 +73,7 @@ class ComposePage extends ConsumerWidget {
           message: l10n.containers_empty_message,
         ),
         builder: (data) => ListView.builder(
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           itemCount: data.items.length,
           itemBuilder: (context, index) {
             final item = data.items[index];
@@ -120,7 +120,11 @@ class ComposePage extends ConsumerWidget {
             ),
             const SizedBox(height: AppTokens.s8),
             if (result.items.isEmpty)
-              Text(l10n.state_empty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.template,
+                title: l10n.state_empty,
+              )
             else
               Flexible(
                 child: ListView(

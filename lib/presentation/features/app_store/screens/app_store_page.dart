@@ -256,7 +256,7 @@ class _CatalogTab extends ConsumerWidget {
           onRefresh: () => ref.refresh(appCatalogProvider(query).future),
           child: GridView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(AppTokens.s16),
+            padding: const EdgeInsets.all(AppTokens.pagePadding),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               mainAxisSpacing: AppTokens.s12,
@@ -306,7 +306,7 @@ class _InstalledTab extends ConsumerWidget {
         onRefresh: () => ref.refresh(installedAppsProvider.future),
         child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(AppTokens.s16),
+          padding: const EdgeInsets.all(AppTokens.pagePadding),
           itemCount: data.items.length,
           itemBuilder: (context, index) {
             final app = data.items[index];
