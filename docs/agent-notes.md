@@ -426,3 +426,8 @@ README 中不记录真实仓库凭据；表单仅在会话内使用。
 - 告警卡测试必须加载 MiSans 实字体，并用文本高度断言单行，`didExceedMaxLines` 对 `maxLines: 2` 的折行无效。
 - 告警卡回归固定 320/1.0、360/1.0 卡高 ≤108 与控件同行，以及 390/1.0 英文 meta 不省略。
 - `SplitListTile` 的 `common_notAvailable` 占位值使用次要色，其它值保持主色层级。
+
+## v39 验收报告 v19 修复
+
+- 常规宽度告警 meta 保持为单个 `Text` 句子，类型与方式共用一段文本流；禁止拆成两个 `Flexible` 形成左右分栏。
+- 告警 meta 回归用「完整句子是单 widget + 分段 Text 不存在」验证，比行高阈值更能识别分栏；`didExceedMaxLines` 继续守住省略号。

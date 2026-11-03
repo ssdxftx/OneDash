@@ -191,15 +191,6 @@ class _AlertCard extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onDelete;
 
-  Widget _metaText(String text, ColorScheme scheme, {int maxLines = 1}) {
-    return Text(
-      text,
-      style: AppTextStyles.bodyS.copyWith(color: scheme.onSurfaceVariant),
-      maxLines: maxLines,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-
   Widget _metaRow(String label, String value, ColorScheme scheme) {
     final style = AppTextStyles.bodyS.copyWith(color: scheme.onSurfaceVariant);
     return Row(
@@ -248,31 +239,15 @@ class _AlertCard extends StatelessWidget {
                     ),
                   ],
                 )
-              : Row(
-                  children: [
-                    Flexible(
-                      child: _metaText(
-                        l10n.alerts_metaType(alertTypeLabel(alert.type, l10n)),
-                        scheme,
-                        maxLines: 2,
-                      ),
-                    ),
-                    Text(
-                      ' · ',
-                      style: AppTextStyles.bodyS.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                    Flexible(
-                      child: _metaText(
-                        l10n.alerts_metaMethod(
-                          alertMethodLabel(alert.method, l10n),
-                        ),
-                        scheme,
-                        maxLines: 2,
-                      ),
-                    ),
-                  ],
+              : Text(
+                  '${l10n.alerts_metaType(alertTypeLabel(alert.type, l10n))}'
+                  ' · '
+                  '${l10n.alerts_metaMethod(alertMethodLabel(alert.method, l10n))}',
+                  style: AppTextStyles.bodyS.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 );
           final menu = PopupMenuButton<String>(
             tooltip: l10n.action_more,

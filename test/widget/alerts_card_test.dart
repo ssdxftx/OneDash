@@ -150,11 +150,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    final method = tester.renderObject<RenderParagraph>(
-      find.text('Method: Telegram'),
-    );
-    expect(method.didExceedMaxLines, isFalse);
-    expect(tester.getSize(find.text('Method: Telegram')).height, lessThan(40));
+    const meta = 'Type: CPU · Method: Telegram';
+    final paragraph = tester.renderObject<RenderParagraph>(find.text(meta));
+    expect(paragraph.didExceedMaxLines, isFalse);
+    expect(find.text('Type: CPU'), findsNothing);
+    expect(find.text('Method: Telegram'), findsNothing);
   });
 
   testWidgets('360dp / 1.0x keeps controls on one row', (tester) async {
