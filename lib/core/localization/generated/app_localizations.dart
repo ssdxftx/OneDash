@@ -734,11 +734,23 @@ abstract class AppLocalizations {
   /// **'No alert rules'**
   String get panelSettings_noAlertRules;
 
+  /// Short type label for compact alert cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Type: '**
+  String get alerts_metaTypeLabel;
+
   /// Alert card type metadata segment.
   ///
   /// In en, this message translates to:
   /// **'Type: {type}'**
   String alerts_metaType(String type);
+
+  /// Short method label for compact alert cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Method: '**
+  String get alerts_metaMethodLabel;
 
   /// Alert card method metadata segment.
   ///
@@ -3853,6 +3865,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Container endpoint'**
   String get firewall_dockerEndpoint;
+
+  /// Firewall service information section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Service info'**
+  String get firewall_settingsService;
 
   /// Firewall backend label.
   ///

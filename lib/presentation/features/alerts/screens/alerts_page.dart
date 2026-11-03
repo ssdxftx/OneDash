@@ -200,6 +200,24 @@ class _AlertCard extends StatelessWidget {
     );
   }
 
+  Widget _metaRow(String label, String value, ColorScheme scheme) {
+    final style = AppTextStyles.bodyS.copyWith(color: scheme.onSurfaceVariant);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: style, maxLines: 1),
+        Expanded(
+          child: Text(
+            value,
+            style: style,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -217,17 +235,15 @@ class _AlertCard extends StatelessWidget {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _metaText(
-                      l10n.alerts_metaType(alertTypeLabel(alert.type, l10n)),
+                    _metaRow(
+                      l10n.alerts_metaTypeLabel,
+                      alertTypeLabel(alert.type, l10n),
                       scheme,
-                      maxLines: 2,
                     ),
-                    _metaText(
-                      l10n.alerts_metaMethod(
-                        alertMethodLabel(alert.method, l10n),
-                      ),
+                    _metaRow(
+                      l10n.alerts_metaMethodLabel,
+                      alertMethodLabel(alert.method, l10n),
                       scheme,
-                      maxLines: 2,
                     ),
                   ],
                 )

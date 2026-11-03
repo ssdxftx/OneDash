@@ -350,9 +350,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get panelSettings_noAlertRules => '暂无告警规则';
 
   @override
+  String get alerts_metaTypeLabel => '类型：';
+
+  @override
   String alerts_metaType(String type) {
     return '类型：$type';
   }
+
+  @override
+  String get alerts_metaMethodLabel => '方式：';
 
   @override
   String alerts_metaMethod(String method) {
@@ -1983,6 +1989,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get firewall_dockerEndpoint => '容器端口';
+
+  @override
+  String get firewall_settingsService => '服务信息';
 
   @override
   String get firewall_settingsBackend => '防火墙后端';

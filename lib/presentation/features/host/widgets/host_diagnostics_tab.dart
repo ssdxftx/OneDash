@@ -233,20 +233,20 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
                     children: [
                       SplitListTile(
                         title: l10n.host_diagComponentExists,
-                        subtitle: _componentResult!.exists
+                        value: _componentResult!.exists
                             ? l10n.common_yes
                             : l10n.host_diagComponentMissing,
                       ),
                       if (_componentResult!.exists) ...[
                         SplitListTile(
                           title: l10n.toolbox_version,
-                          subtitle: _componentResult!.version.isEmpty
+                          value: _componentResult!.version.isEmpty
                               ? '-'
                               : _componentResult!.version,
                         ),
                         SplitListTile(
                           title: l10n.host_diagComponentPath,
-                          subtitle: _componentResult!.path.isEmpty
+                          value: _componentResult!.path.isEmpty
                               ? '-'
                               : _componentResult!.path,
                         ),

@@ -64,6 +64,45 @@ void main() {
     );
   });
 
+  testWidgets('long value stacks below the label instead of squeezing it', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(1.3)),
+          child: child!,
+        ),
+        home: const Scaffold(
+          body: SizedBox(
+            width: 320,
+            child: TonalCard(
+              child: SplitListGroup(
+                children: [
+                  SplitListTile(title: '到期时间', value: '已过期 · 2026-10-01'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.text('到期时间')).width, greaterThan(40));
+    expect(
+      tester.getCenter(find.text('到期时间')).dy,
+      lessThan(tester.getCenter(find.textContaining('已过期')).dy),
+    );
+  });
+
   testWidgets('short title and value stay on one row at 390dp/1.0x', (
     tester,
   ) async {

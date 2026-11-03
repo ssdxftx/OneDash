@@ -132,16 +132,26 @@ class SplitListTile extends StatelessWidget {
                         _trailingWidth(context, trailing!) -
                         AppTokens.s8
                   : null;
-              final stackValue =
-                  hasCombo &&
-                  _comboOverflows(
+              final stackValueOnly =
+                  valueWidget != null &&
+                  trailing == null &&
+                  _overflows(
                     context,
                     constraints.maxWidth,
                     titleStyle,
                     valueWidget,
-                    trailing!,
-                    comboLimit,
                   );
+              final stackValue =
+                  (hasCombo &&
+                      _comboOverflows(
+                        context,
+                        constraints.maxWidth,
+                        titleStyle,
+                        valueWidget,
+                        trailing!,
+                        comboLimit,
+                      )) ||
+                  stackValueOnly;
               final trailingText =
                   valueWidget == null && _isText(effectiveTrailing)
                   ? effectiveTrailing

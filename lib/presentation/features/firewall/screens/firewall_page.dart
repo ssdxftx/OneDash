@@ -1232,16 +1232,31 @@ class _SettingsTab extends StatelessWidget {
               onTap: onSelectBackend,
             ),
             SplitListTile(
-              leading: const Icon(TablerIcons.info_circle),
-              title: l10n.firewall_settingsVersion,
-              value: data.base.version,
-            ),
-            SplitListTile(
               leading: const Icon(TablerIcons.file_code),
               title: l10n.firewall_nativeDetail,
               subtitle: l10n.firewall_nativeDetailHint,
               trailing: const Icon(TablerIcons.chevron_right),
               onTap: onNativeDetail,
+            ),
+            SplitListTile(
+              leading: const Icon(TablerIcons.world),
+              title: l10n.firewall_settingsIpv6,
+              subtitle: l10n.firewall_settingsIpv6Hint,
+              trailing: Switch(
+                value: settings.ipv6Enabled,
+                onChanged: onIpv6Changed,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppTokens.s24),
+        SectionHeader(title: l10n.firewall_settingsService),
+        SplitListGroup(
+          children: [
+            SplitListTile(
+              leading: const Icon(TablerIcons.info_circle),
+              title: l10n.firewall_settingsVersion,
+              value: data.base.version,
             ),
             SplitListTile(
               leading: const Icon(TablerIcons.network),
@@ -1252,15 +1267,6 @@ class _SettingsTab extends StatelessWidget {
               leading: const Icon(TablerIcons.terminal),
               title: l10n.firewall_settingsSshPort,
               value: settings.sshPort,
-            ),
-            SplitListTile(
-              leading: const Icon(TablerIcons.world),
-              title: l10n.firewall_settingsIpv6,
-              subtitle: l10n.firewall_settingsIpv6Hint,
-              trailing: Switch(
-                value: settings.ipv6Enabled,
-                onChanged: onIpv6Changed,
-              ),
             ),
           ],
         ),

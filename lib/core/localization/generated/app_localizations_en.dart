@@ -356,9 +356,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get panelSettings_noAlertRules => 'No alert rules';
 
   @override
+  String get alerts_metaTypeLabel => 'Type: ';
+
+  @override
   String alerts_metaType(String type) {
     return 'Type: $type';
   }
+
+  @override
+  String get alerts_metaMethodLabel => 'Method: ';
 
   @override
   String alerts_metaMethod(String method) {
@@ -2035,6 +2041,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get firewall_dockerEndpoint => 'Container endpoint';
+
+  @override
+  String get firewall_settingsService => 'Service info';
 
   @override
   String get firewall_settingsBackend => 'Firewall backend';

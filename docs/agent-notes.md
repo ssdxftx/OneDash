@@ -405,3 +405,10 @@ README 中不记录真实仓库凭据；表单仅在会话内使用。
 - 告警卡 compact 判据同时看宽度与字号：`maxWidth < 320 || (scale >= 1.3 && maxWidth < 430)`。
 - compact 告警 meta 允许两行，渠道名不因菜单挤占而截断。
 - 数据库密码行同样走 `value` 通道，与用户名行保持一致层级。
+
+## v36 验收报告 v16 修复
+
+- `SplitListTile` 的 value-only 行同样参与溢出判定：`stackValueOnly` 命中后标题整行、值下堆，禁止把标签挤成 0 宽。
+- 详情值必须走 `value` 通道；`trailing: Text` 只用于真正的尾部控件，不用于承载值。
+- 同一张 `SplitListGroup` 内保持一种行语义：subtitle + trailing 与 value 两类行拆卡，不混排。
+- compact 告警 meta 用「短标签 + Expanded 值」两列，冒号跟随标签；标签文案含本地化分隔符。

@@ -486,6 +486,10 @@
   "@panelSettings_noAlertRules": {
     "description": "Empty state for alert rules."
   },
+  "alerts_metaTypeLabel": "Type: ",
+  "@alerts_metaTypeLabel": {
+    "description": "Short type label for compact alert cards."
+  },
   "alerts_metaType": "Type: {type}",
   "@alerts_metaType": {
     "description": "Alert card type metadata segment.",
@@ -494,6 +498,10 @@
         "type": "String"
       }
     }
+  },
+  "alerts_metaMethodLabel": "Method: ",
+  "@alerts_metaMethodLabel": {
+    "description": "Short method label for compact alert cards."
   },
   "alerts_metaMethod": "Method: {method}",
   "@alerts_metaMethod": {
@@ -2758,6 +2766,10 @@
   "firewall_dockerEndpoint": "Container endpoint",
   "@firewall_dockerEndpoint": {
     "description": "Docker container endpoint label."
+  },
+  "firewall_settingsService": "Service info",
+  "@firewall_settingsService": {
+    "description": "Firewall service information section title."
   },
   "firewall_settingsBackend": "Firewall backend",
   "@firewall_settingsBackend": {
