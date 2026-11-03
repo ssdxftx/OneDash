@@ -70,6 +70,10 @@ def main() -> int:
             duplicates = {icon for icon in icons if icons.count(icon) > 1}
             for icon in sorted(duplicates):
                 failures.append(f"{relative}:{line}: duplicate action icon {icon}")
+            if "plus" in icons and icons[-1] != "plus":
+                failures.append(
+                    f"{relative}:{line}: create action must be the last action"
+                )
         for block in _call_blocks(source, "PopupMenuButton"):
             if "action_refresh" in block or "TablerIcons.refresh" in block:
                 line = source[: source.find(block)].count("\n") + 1

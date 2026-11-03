@@ -152,12 +152,6 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                     });
                   },
                 ),
-                AppIconButton(
-                  icon: TablerIcons.plus,
-                  tooltip: l10n.websites_create,
-                  onPressed: () =>
-                      context.push('/s/${widget.serverId}/websites/create'),
-                ),
                 PopupMenuButton<String>(
                   tooltip: l10n.action_more,
                   icon: const Icon(TablerIcons.dots),
@@ -195,6 +189,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                       child: Text(l10n.websites_templates),
                     ),
                   ],
+                ),
+                AppIconButton(
+                  icon: TablerIcons.plus,
+                  tooltip: l10n.websites_create,
+                  onPressed: () =>
+                      context.push('/s/${widget.serverId}/websites/create'),
                 ),
               ],
             ),

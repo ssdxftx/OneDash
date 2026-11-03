@@ -49,11 +49,6 @@ class RuntimesPage extends ConsumerWidget {
             onPressed: () => ref.invalidate(_runtimesProvider),
           ),
           AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.runtime_create,
-            onPressed: () => _create(context, ref),
-          ),
-          AppIconButton(
             icon: TablerIcons.cloud_download,
             tooltip: l10n.runtimes_sync,
             onPressed: () async {
@@ -68,6 +63,11 @@ class RuntimesPage extends ConsumerWidget {
                 showErrorToast(context, error);
               }
             },
+          ),
+          AppIconButton(
+            icon: TablerIcons.plus,
+            tooltip: l10n.runtime_create,
+            onPressed: () => _create(context, ref),
           ),
         ],
       ),

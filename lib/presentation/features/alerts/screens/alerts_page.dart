@@ -252,6 +252,20 @@ class _AlertCard extends StatelessWidget {
                     ),
                   ],
                 );
+          final menu = PopupMenuButton<String>(
+            tooltip: l10n.action_more,
+            icon: Icon(
+              TablerIcons.dots,
+              size: AppTokens.iconList,
+              color: scheme.onSurfaceVariant,
+            ),
+            onSelected: (value) {
+              if (value == 'delete') onDelete();
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(value: 'delete', child: Text(l10n.common_delete)),
+            ],
+          );
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -284,29 +298,14 @@ class _AlertCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        PopupMenuButton<String>(
-                          tooltip: l10n.action_more,
-                          icon: Icon(
-                            TablerIcons.dots,
-                            size: AppTokens.iconList,
-                            color: scheme.onSurfaceVariant,
-                          ),
-                          onSelected: (value) {
-                            if (value == 'delete') onDelete();
-                          },
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text(l10n.common_delete),
-                            ),
-                          ],
-                        ),
+                        if (!compact) menu,
                       ],
                     ),
                     const SizedBox(height: 2),
                     Row(
                       children: [
                         Expanded(child: meta),
+                        if (compact) menu,
                         Switch(
                           value: enabled,
                           onChanged: (_) => onToggle(),

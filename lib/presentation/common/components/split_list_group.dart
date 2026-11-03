@@ -101,8 +101,8 @@ class SplitListTile extends StatelessWidget {
           : scheme.onSurface.withValues(alpha: 0.38),
       fontWeight: FontWeight.w500,
     );
-    final effectiveTrailing =
-        trailing ?? (hasValue ? Text(value!, style: valueStyle) : null);
+    final valueWidget = hasValue ? Text(value!, style: valueStyle) : null;
+    final effectiveTrailing = trailing ?? valueWidget;
 
     return InkWell(
       onTap: enabled ? onTap : null,
@@ -119,17 +119,36 @@ class SplitListTile extends StatelessWidget {
               final trailingLimit = constraints.maxWidth.isFinite
                   ? constraints.maxWidth * 0.6
                   : null;
+              final hasCombo = valueWidget != null && trailing != null;
+              final comboLimit = hasCombo && trailingLimit != null
+                  ? trailingLimit -
+                        _trailingWidth(context, trailing!) -
+                        AppTokens.s8
+                  : null;
+              final stackValue =
+                  hasCombo &&
+                  _comboOverflows(
+                    context,
+                    constraints.maxWidth,
+                    titleStyle,
+                    valueWidget,
+                    trailing!,
+                    comboLimit,
+                  );
+              final trailingText =
+                  valueWidget == null && _isText(effectiveTrailing)
+                  ? effectiveTrailing
+                  : null;
               final stackTrailing =
-                  effectiveTrailing != null &&
-                  _isText(effectiveTrailing) &&
+                  trailingText != null &&
                   _overflows(
                     context,
                     constraints.maxWidth,
                     titleStyle,
-                    effectiveTrailing,
+                    trailingText,
                   );
               return Row(
-                crossAxisAlignment: stackTrailing
+                crossAxisAlignment: stackTrailing || stackValue
                     ? CrossAxisAlignment.start
                     : CrossAxisAlignment.center,
                 children: [
@@ -149,12 +168,27 @@ class SplitListTile extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          title,
-                          style: titleStyle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        if (stackValue && trailing != null)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  title,
+                                  style: titleStyle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              trailing!,
+                            ],
+                          )
+                        else
+                          Text(
+                            title,
+                            style: titleStyle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         if (subtitle != null) ...[
                           const SizedBox(height: 2),
                           Text(
@@ -165,10 +199,19 @@ class SplitListTile extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
+                        if (stackValue) ...[
+                          const SizedBox(height: 2),
+                          _buildTrailing(
+                            valueWidget,
+                            null,
+                            alignStart: true,
+                            allowWrap: true,
+                          ),
+                        ],
                         if (stackTrailing) ...[
                           const SizedBox(height: 2),
                           _buildTrailing(
-                            effectiveTrailing,
+                            trailingText,
                             null,
                             alignStart: true,
                             allowWrap: true,
@@ -177,12 +220,22 @@ class SplitListTile extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (effectiveTrailing != null && !stackTrailing) ...[
+                  if (effectiveTrailing != null &&
+                      !stackTrailing &&
+                      !stackValue) ...[
                     const SizedBox(width: AppTokens.s12),
-                    _buildTrailing(
-                      effectiveTrailing,
-                      _isText(effectiveTrailing) ? null : trailingLimit,
-                    ),
+                    if (hasCombo)
+                      _buildComboValue(
+                        valueWidget,
+                        trailing!,
+                        stackValue: stackValue,
+                        valueLimit: comboLimit,
+                      )
+                    else
+                      _buildTrailing(
+                        effectiveTrailing,
+                        _isText(effectiveTrailing) ? null : trailingLimit,
+                      ),
                   ],
                 ],
               );
@@ -193,7 +246,97 @@ class SplitListTile extends StatelessWidget {
     );
   }
 
-  bool _isText(Widget widget) => widget is Text && widget.data != null;
+  bool _isText(Widget? widget) => widget is Text && widget.data != null;
+
+  Widget _buildComboValue(
+    Widget value,
+    Widget trailing, {
+    required bool stackValue,
+    required double? valueLimit,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (!stackValue) ...[
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: valueLimit ?? double.infinity,
+            ),
+            child: _buildTrailing(value, null),
+          ),
+          const SizedBox(width: AppTokens.s8),
+        ],
+        trailing,
+      ],
+    );
+  }
+
+  bool _comboOverflows(
+    BuildContext context,
+    double availableWidth,
+    TextStyle titleStyle,
+    Widget value,
+    Widget trailing,
+    double? valueLimit,
+  ) {
+    if (!availableWidth.isFinite) return false;
+    final textScaler = MediaQuery.textScalerOf(context);
+    final direction = Directionality.of(context);
+    final titlePainter = TextPainter(
+      text: TextSpan(text: title, style: titleStyle),
+      textDirection: direction,
+      textScaler: textScaler,
+      maxLines: 1,
+    )..layout();
+    final valueText = value as Text;
+    final valuePainter = TextPainter(
+      text: TextSpan(
+        text: valueText.data,
+        style: valueText.style ?? DefaultTextStyle.of(context).style,
+      ),
+      textDirection: direction,
+      textScaler: textScaler,
+      maxLines: 1,
+    )..layout();
+    final leadingWidth = leading == null
+        ? 0.0
+        : AppTokens.iconLeading + AppTokens.s12;
+    final rowWidth = availableWidth - leadingWidth;
+    final combined =
+        titlePainter.width +
+        AppTokens.s12 +
+        valuePainter.width +
+        AppTokens.s8 +
+        _trailingWidth(context, trailing);
+    final valueOverLimit =
+        valueLimit != null && valuePainter.width > valueLimit;
+    return combined > rowWidth || valueOverLimit;
+  }
+
+  double _trailingWidth(BuildContext context, Widget trailing) {
+    if (trailing is IconButton) return 48;
+    if (trailing is Text && trailing.data != null) {
+      final painter = TextPainter(
+        text: TextSpan(
+          text: trailing.data,
+          style: trailing.style ?? DefaultTextStyle.of(context).style,
+        ),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+        maxLines: 1,
+      )..layout();
+      return painter.width;
+    }
+    if (trailing is SizedBox && trailing.width != null) {
+      return trailing.width!;
+    }
+    if (trailing is Row) {
+      return trailing.children
+          .map((child) => _trailingWidth(context, child))
+          .fold<double>(0, (sum, width) => sum + width);
+    }
+    return 48;
+  }
 
   bool _overflows(
     BuildContext context,

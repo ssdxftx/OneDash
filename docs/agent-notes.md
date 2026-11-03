@@ -389,3 +389,11 @@ README 中不记录真实仓库凭据；表单仅在会话内使用。
 - 详情信息行使用 `SplitListTile.value`，值为空时整行隐藏；标签 `bodyS + onSurfaceVariant`，值 `bodyL + w500`。
 - `formatListTime` 的 null 默认值为空串，调用方需要占位时显式传 fallback；服务端时间字符串解析失败时保留原值。
 - 底部信息列表的空态使用 `EmptyState(compact: true)`，不再用裸 `Text(state_empty)`。
+
+## v34 验收报告 v14 修复
+
+- `SplitListTile` 的 `value` 与 `trailing` 可以共存；常规宽度值在 trailing 左侧，窄屏值落到标题下方，禁止让 trailing 静默吞掉值。
+- 窄屏告警卡的 `⋯` 与开关同处 meta 行，标题独占整行，避免标题最后一个字单独换行。
+- 审计类时间在 24 小时到 7 天之间必须保留时分，使用 `MM-dd HH:mm`；`formatListTime` 已统一。
+- AppBar 动作顺序固定为「刷新 → 次要动作 → ＋」，`＋` 恒为最后一个 action，守卫脚本会拦截。
+- 改动共享组件后，必须补一条同时覆盖 `value` 与 `trailing` 的回归用例，不能只靠页面截图。

@@ -160,12 +160,6 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                     });
                   },
                 ),
-                AppIconButton(
-                  icon: TablerIcons.plus,
-                  tooltip: l10n.containers_create,
-                  onPressed: () =>
-                      context.push('/s/${widget.serverId}/containers/create'),
-                ),
                 PopupMenuButton<String>(
                   tooltip: l10n.action_more,
                   icon: const Icon(TablerIcons.dots),
@@ -219,6 +213,12 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                       child: Text(l10n.containers_prune),
                     ),
                   ],
+                ),
+                AppIconButton(
+                  icon: TablerIcons.plus,
+                  tooltip: l10n.containers_create,
+                  onPressed: () =>
+                      context.push('/s/${widget.serverId}/containers/create'),
                 ),
               ],
             ),

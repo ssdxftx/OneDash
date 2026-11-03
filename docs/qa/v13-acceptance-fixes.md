@@ -2,6 +2,8 @@
 
 基线：`14485ff`（v13 验收对象）。本轮处理 R1-R5、D1-D5、C1/C7 收口项与守卫脚本缺口。
 
+> 后续修正：R4 的 `_CopyRow` 同时传 `value` 与 `trailing` 导致值被覆盖，已在 `docs/qa/v14-acceptance-fixes.md` 修复并补回归。
+
 ## 应修项
 
 - R1 运行环境双刷新：同步运行环境改用 `TablerIcons.cloud_download`，列表刷新保持首位，两个动作语义可区分。

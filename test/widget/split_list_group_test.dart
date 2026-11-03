@@ -111,4 +111,90 @@ void main() {
     expect(label.style?.fontSize, AppTextStyles.bodyS.fontSize);
     expect(value.style?.fontSize, AppTextStyles.bodyL.fontSize);
   });
+
+  testWidgets('value survives when trailing is present', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: Scaffold(
+          body: SizedBox(
+            width: 390,
+            child: TonalCard(
+              child: SplitListGroup(
+                children: [
+                  SplitListTile(
+                    title: '用户名',
+                    value: 'app',
+                    trailing: IconButton(
+                      tooltip: '复制',
+                      icon: const Icon(Icons.copy),
+                      onPressed: () {},
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('app'), findsOneWidget);
+    expect(find.byIcon(Icons.copy), findsOneWidget);
+    expect(
+      tester.getCenter(find.text('app')).dx,
+      greaterThan(tester.getCenter(find.text('用户名')).dx),
+    );
+  });
+
+  testWidgets('long value stays complete beside trailing at 320dp/1.3x', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(1.3)),
+          child: child!,
+        ),
+        home: Scaffold(
+          body: SizedBox(
+            width: 320,
+            child: TonalCard(
+              child: SplitListGroup(
+                children: [
+                  SplitListTile(
+                    title: '连接地址',
+                    value: 'db-cluster.internal',
+                    trailing: IconButton(
+                      tooltip: '复制',
+                      icon: const Icon(Icons.copy),
+                      onPressed: () {},
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    final value = tester.renderObject<RenderParagraph>(
+      find.text('db-cluster.internal'),
+    );
+    expect(value.didExceedMaxLines, isFalse);
+    expect(find.byIcon(Icons.copy), findsOneWidget);
+  });
 }

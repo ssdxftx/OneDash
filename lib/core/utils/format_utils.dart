@@ -35,7 +35,7 @@ String formatRelativeTime(DateTime? time, AppLocalizations l10n) {
   }
 }
 
-/// 列表统一时间：7 天内用相对时间，更早用绝对日期。
+/// 列表统一时间：24 小时内用相对时间，7 天内保留时分，更早用绝对日期。
 String formatListTime(
   DateTime? time,
   AppLocalizations l10n, {
@@ -44,7 +44,8 @@ String formatListTime(
   if (time == null) return fallback;
   final diff = DateTime.now().difference(time.toLocal());
   if (!diff.isNegative && diff.inDays <= 7) {
-    return formatRelativeTime(time, l10n);
+    if (diff.inHours < 24) return formatRelativeTime(time, l10n);
+    return DateFormat('MM-dd HH:mm', l10n.localeName).format(time.toLocal());
   }
   return formatLocalDateTime(time.toIso8601String(), locale: l10n.localeName);
 }
