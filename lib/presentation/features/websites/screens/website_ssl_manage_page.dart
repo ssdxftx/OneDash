@@ -153,26 +153,22 @@ class WebsiteSslManagePage extends ConsumerWidget {
                     children: [
                       SplitListTile(
                         title: l10n.websites_sslProvider,
-                        trailing: Text(sslProviderLabel(cert.provider, l10n)),
+                        value: sslProviderLabel(cert.provider, l10n),
                       ),
                       SplitListTile(
                         title: l10n.websites_sslExpire,
-                        trailing: Text(
-                          expiry == null
-                              ? cert.expireDate
-                              : '${expiry.label} · ${cert.expireDate}',
-                          style: expiry == null
-                              ? null
-                              : TextStyle(color: expiry.color),
-                        ),
+                        value: expiry == null
+                            ? cert.expireDate
+                            : '${expiry.label} · ${cert.expireDate}',
+                        valueStyle: expiry == null
+                            ? null
+                            : TextStyle(color: expiry.color),
                       ),
                       SplitListTile(
                         title: l10n.websites_autoRenew,
-                        trailing: Text(
-                          cert.autoRenew
-                              ? l10n.websites_enabled
-                              : l10n.websites_disabled,
-                        ),
+                        value: cert.autoRenew
+                            ? l10n.websites_enabled
+                            : l10n.websites_disabled,
                       ),
                     ],
                   ),

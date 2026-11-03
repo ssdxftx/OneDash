@@ -1234,7 +1234,7 @@ class _SettingsTab extends StatelessWidget {
             SplitListTile(
               leading: const Icon(TablerIcons.info_circle),
               title: l10n.firewall_settingsVersion,
-              trailing: Text(data.base.version),
+              value: data.base.version,
             ),
             SplitListTile(
               leading: const Icon(TablerIcons.file_code),
@@ -1246,12 +1246,12 @@ class _SettingsTab extends StatelessWidget {
             SplitListTile(
               leading: const Icon(TablerIcons.network),
               title: l10n.firewall_settingsPanelPort,
-              trailing: Text(settings.panelPort),
+              value: settings.panelPort,
             ),
             SplitListTile(
               leading: const Icon(TablerIcons.terminal),
               title: l10n.firewall_settingsSshPort,
-              trailing: Text(settings.sshPort),
+              value: settings.sshPort,
             ),
             SplitListTile(
               leading: const Icon(TablerIcons.world),

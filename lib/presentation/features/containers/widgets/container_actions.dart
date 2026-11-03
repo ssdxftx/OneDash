@@ -827,31 +827,31 @@ class _ContainerMonitorSheetState
             children: [
               SplitListTile(
                 title: l10n.dashboard_cpu,
-                trailing: Text('${stats.cpuPercent.toStringAsFixed(1)}%'),
+                value: '${stats.cpuPercent.toStringAsFixed(1)}%',
               ),
               SplitListTile(
                 title: l10n.dashboard_memory,
-                trailing: Text(formatBytes(stats.memory)),
+                value: formatBytes(stats.memory),
               ),
               SplitListTile(
                 title: l10n.containers_cache,
-                trailing: Text(formatBytes(stats.cache)),
+                value: formatBytes(stats.cache),
               ),
               SplitListTile(
                 title: l10n.containers_diskRead,
-                trailing: Text(formatBytes(stats.ioRead)),
+                value: formatBytes(stats.ioRead),
               ),
               SplitListTile(
                 title: l10n.containers_diskWrite,
-                trailing: Text(formatBytes(stats.ioWrite)),
+                value: formatBytes(stats.ioWrite),
               ),
               SplitListTile(
                 title: l10n.containers_networkRX,
-                trailing: Text(formatBytes(stats.networkRX)),
+                value: formatBytes(stats.networkRX),
               ),
               SplitListTile(
                 title: l10n.containers_networkTX,
-                trailing: Text(formatBytes(stats.networkTX)),
+                value: formatBytes(stats.networkTX),
               ),
             ],
           ),

@@ -259,13 +259,10 @@ Future<void> _showSizes(BuildContext context, WidgetRef ref) async {
           const SizedBox(height: AppTokens.s16),
           SplitListGroup(
             children: [
-              SplitListTile(
-                title: l10n.backups_recordCount,
-                trailing: Text('$count'),
-              ),
+              SplitListTile(title: l10n.backups_recordCount, value: '$count'),
               SplitListTile(
                 title: l10n.backups_totalSize,
-                trailing: Text(formatBytes(total)),
+                value: formatBytes(total),
               ),
             ],
           ),

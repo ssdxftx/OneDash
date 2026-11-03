@@ -112,6 +112,38 @@ void main() {
     expect(value.style?.fontSize, AppTextStyles.bodyL.fontSize);
   });
 
+  testWidgets('valueStyle keeps the value layer with a custom color', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: const Scaffold(
+          body: SizedBox(
+            width: 390,
+            child: TonalCard(
+              child: SplitListGroup(
+                children: [
+                  SplitListTile(
+                    title: '到期时间',
+                    value: '已过期',
+                    valueStyle: TextStyle(color: Color(0xFFB3261E)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text('到期时间'));
+    final value = tester.widget<Text>(find.text('已过期'));
+    expect(label.style?.fontSize, AppTextStyles.bodyS.fontSize);
+    expect(value.style?.fontSize, AppTextStyles.bodyL.fontSize);
+    expect(value.style?.color, const Color(0xFFB3261E));
+  });
+
   testWidgets('value survives when trailing is present', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;

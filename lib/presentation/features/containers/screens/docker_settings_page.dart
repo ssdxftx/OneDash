@@ -135,19 +135,19 @@ class _DockerSettingsPageState extends ConsumerState<DockerSettingsPage> {
               children: [
                 SplitListTile(
                   title: l10n.containers_usageContainers,
-                  trailing: Text(formatBytes(stats.containerUsage)),
+                  value: formatBytes(stats.containerUsage),
                 ),
                 SplitListTile(
                   title: l10n.containers_usageImages,
-                  trailing: Text(formatBytes(stats.imageUsage)),
+                  value: formatBytes(stats.imageUsage),
                 ),
                 SplitListTile(
                   title: l10n.containers_usageVolumes,
-                  trailing: Text(formatBytes(stats.volumeUsage)),
+                  value: formatBytes(stats.volumeUsage),
                 ),
                 SplitListTile(
                   title: l10n.containers_usageBuildCache,
-                  trailing: Text(formatBytes(stats.buildCacheUsage)),
+                  value: formatBytes(stats.buildCacheUsage),
                 ),
               ],
             ),

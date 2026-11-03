@@ -192,22 +192,22 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
               SplitListTile(
                 leading: const Icon(TablerIcons.cpu),
                 title: l10n.host_diagRss,
-                trailing: Text(formatBytes(summary.rss)),
+                value: formatBytes(summary.rss),
               ),
               SplitListTile(
                 leading: const Icon(TablerIcons.stack_2),
                 title: l10n.host_diagHeap,
-                trailing: Text(formatBytes(summary.heapAlloc)),
+                value: formatBytes(summary.heapAlloc),
               ),
               SplitListTile(
                 leading: const Icon(TablerIcons.box),
                 title: l10n.host_diagObjects,
-                trailing: Text('${summary.heapObjects}'),
+                value: '${summary.heapObjects}',
               ),
               SplitListTile(
                 leading: const Icon(TablerIcons.activity),
                 title: l10n.host_diagGoroutines,
-                trailing: Text('${summary.goroutines}'),
+                value: '${summary.goroutines}',
               ),
             ],
           ),

@@ -55,6 +55,7 @@ class SplitListTile extends StatelessWidget {
     this.subtitle,
     this.subtitleStyle,
     this.value,
+    this.valueStyle,
     this.leading,
     this.trailing,
     this.onTap,
@@ -68,6 +69,7 @@ class SplitListTile extends StatelessWidget {
   final String? subtitle;
   final TextStyle? subtitleStyle;
   final String? value;
+  final TextStyle? valueStyle;
   final Widget? leading;
   final Widget? trailing;
   final VoidCallback? onTap;
@@ -95,13 +97,18 @@ class SplitListTile extends StatelessWidget {
           color: hasValue && !danger ? scheme.onSurfaceVariant : titleColor,
           fontWeight: FontWeight.w500,
         );
-    final valueStyle = AppTextStyles.bodyL.copyWith(
+    final baseValueStyle = AppTextStyles.bodyL.copyWith(
       color: enabled
           ? scheme.onSurface
           : scheme.onSurface.withValues(alpha: 0.38),
       fontWeight: FontWeight.w500,
     );
-    final valueWidget = hasValue ? Text(value!, style: valueStyle) : null;
+    final effectiveValueStyle = valueStyle == null
+        ? baseValueStyle
+        : baseValueStyle.merge(valueStyle);
+    final valueWidget = hasValue
+        ? Text(value!, style: effectiveValueStyle)
+        : null;
     final effectiveTrailing = trailing ?? valueWidget;
 
     return InkWell(

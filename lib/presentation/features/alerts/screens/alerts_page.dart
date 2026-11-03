@@ -191,11 +191,11 @@ class _AlertCard extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onDelete;
 
-  Widget _metaText(String text, ColorScheme scheme) {
+  Widget _metaText(String text, ColorScheme scheme, {int maxLines = 1}) {
     return Text(
       text,
       style: AppTextStyles.bodyS.copyWith(color: scheme.onSurfaceVariant),
-      maxLines: 1,
+      maxLines: maxLines,
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -211,7 +211,8 @@ class _AlertCard extends StatelessWidget {
         builder: (context, constraints) {
           final compact =
               constraints.maxWidth < 320 ||
-              MediaQuery.textScalerOf(context).scale(1) >= 1.3;
+              (MediaQuery.textScalerOf(context).scale(1) >= 1.3 &&
+                  constraints.maxWidth < 430);
           final meta = compact
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,12 +220,14 @@ class _AlertCard extends StatelessWidget {
                     _metaText(
                       l10n.alerts_metaType(alertTypeLabel(alert.type, l10n)),
                       scheme,
+                      maxLines: 2,
                     ),
                     _metaText(
                       l10n.alerts_metaMethod(
                         alertMethodLabel(alert.method, l10n),
                       ),
                       scheme,
+                      maxLines: 2,
                     ),
                   ],
                 )

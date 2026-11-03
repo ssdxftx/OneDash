@@ -397,3 +397,11 @@ README 中不记录真实仓库凭据；表单仅在会话内使用。
 - 审计类时间在 24 小时到 7 天之间必须保留时分，使用 `MM-dd HH:mm`；`formatListTime` 已统一。
 - AppBar 动作顺序固定为「刷新 → 次要动作 → ＋」，`＋` 恒为最后一个 action，守卫脚本会拦截。
 - 改动共享组件后，必须补一条同时覆盖 `value` 与 `trailing` 的回归用例，不能只靠页面截图。
+
+## v35 验收报告 v15 优化
+
+- `SplitListTile.valueStyle` 与默认值样式合并，调用方只覆盖颜色等差异；详情值仍保持 bodyL，标签保持 bodyS。
+- 需要语义色（证书到期红等）的值走 `value` + `valueStyle`，禁止再退回 `trailing: Text` 绕过层级。
+- 告警卡 compact 判据同时看宽度与字号：`maxWidth < 320 || (scale >= 1.3 && maxWidth < 430)`。
+- compact 告警 meta 允许两行，渠道名不因菜单挤占而截断。
+- 数据库密码行同样走 `value` 通道，与用户名行保持一致层级。

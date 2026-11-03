@@ -255,10 +255,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
               SplitListGroup(
                 children: [
                   for (final entry in status.entries)
-                    SplitListTile(
-                      title: entry.key,
-                      trailing: Text(entry.value),
-                    ),
+                    SplitListTile(title: entry.key, value: entry.value),
                 ],
               ),
           ],
@@ -438,7 +435,7 @@ class _PasswordRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return SplitListTile(
       title: label,
-      subtitle: visible ? value : '••••••••',
+      value: visible ? value : '••••••••',
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
