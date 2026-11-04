@@ -15,6 +15,7 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/skeleton.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../servers/providers/servers_provider.dart';
@@ -480,20 +481,17 @@ class _PanelSettingsBody extends ConsumerWidget {
     final key = TextEditingController();
     String ssl = 'Enable';
     String sslType = 'import-paste';
-    final saved = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.92,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.panelSettings_panelSsl,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(l10n.panelSettings_panelSsl, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s8),
             Text(
               l10n.panelSettings_panelSslWarning,
               style: AppTextStyles.bodyS.copyWith(
-                color: sheetContext.appColors.warning,
+                color: pageContext.appColors.warning,
               ),
             ),
             const SizedBox(height: AppTokens.s16),
@@ -558,11 +556,6 @@ class _PanelSettingsBody extends ConsumerWidget {
                 maxLines: 6,
               ),
             ],
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
           ],
         ),
       ),
@@ -599,30 +592,26 @@ class _PanelSettingsBody extends ConsumerWidget {
       final secret = '${data['secret'] ?? ''}';
       if (!context.mounted) return;
       final controller = TextEditingController();
-      final saved = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.panelSettings_mfa, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s12),
-            SelectableText(
-              secret.isEmpty ? l10n.state_empty : secret,
-              style: AppTextStyles.bodyM.copyWith(fontFamily: 'monospace'),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            AppTextField(
-              controller: controller,
-              label: l10n.panelSettings_mfaCode,
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.panelSettings_bindMfa,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
-          ],
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.panelSettings_mfa,
+            saveLabel: l10n.panelSettings_bindMfa,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              SelectableText(
+                secret.isEmpty ? l10n.state_empty : secret,
+                style: AppTextStyles.bodyM.copyWith(fontFamily: 'monospace'),
+              ),
+              const SizedBox(height: AppTokens.s16),
+              AppTextField(
+                controller: controller,
+                label: l10n.panelSettings_mfaCode,
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
         ),
       );
       final code = controller.text.trim();
@@ -696,40 +685,32 @@ class _PanelSettingsBody extends ConsumerWidget {
     final oldPassword = TextEditingController();
     final newPassword = TextEditingController();
     final confirm = TextEditingController();
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.panelSettings_panelLoginPassword,
-            style: AppTextStyles.titleL,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: oldPassword,
-            label: l10n.panelSettings_oldPassword,
-            obscure: true,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: newPassword,
-            label: l10n.panelSettings_newPassword,
-            obscure: true,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: confirm,
-            label: l10n.panelSettings_confirmPassword,
-            obscure: true,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.panelSettings_panelLoginPassword,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: oldPassword,
+              label: l10n.panelSettings_oldPassword,
+              obscure: true,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: newPassword,
+              label: l10n.panelSettings_newPassword,
+              obscure: true,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: confirm,
+              label: l10n.panelSettings_confirmPassword,
+              obscure: true,
+            ),
+          ],
+        ),
       ),
     );
     final oldValue = oldPassword.text;
@@ -764,35 +745,30 @@ class _PanelSettingsBody extends ConsumerWidget {
     _PanelSettingsData data,
   ) async {
     final controller = TextEditingController(text: data.value('serverPort'));
-    final value = await showAppSheet<int>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.panelSettings_panelPort, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s8),
-          Text(
-            l10n.panelSettings_portChangeWarning,
-            style: AppTextStyles.bodyS.copyWith(
-              color: context.scheme.onSurfaceVariant,
+    final value = await pushFormPage<int>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.panelSettings_panelPort,
+          onSave: () async {
+            final port = int.tryParse(controller.text.trim());
+            if (port == null) return;
+            Navigator.of(pageContext).pop(port);
+          },
+          children: [
+            Text(
+              l10n.panelSettings_portChangeWarning,
+              style: AppTextStyles.bodyS.copyWith(
+                color: pageContext.scheme.onSurfaceVariant,
+              ),
             ),
-          ),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () {
-              final port = int.tryParse(controller.text.trim());
-              if (port == null) return;
-              Navigator.of(sheetContext).pop(port);
-            },
-          ),
-        ],
+            const SizedBox(height: AppTokens.s16),
+            AppTextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -816,22 +792,17 @@ class _PanelSettingsBody extends ConsumerWidget {
     _PanelSettingsData data,
   ) async {
     final controller = TextEditingController(text: data.value('bindDomain'));
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.panelSettings_bindDomain, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, hint: 'panel.example.com'),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () =>
-                Navigator.of(sheetContext).pop(controller.text.trim()),
-          ),
-        ],
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.panelSettings_bindDomain,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [
+            AppTextField(controller: controller, hint: 'panel.example.com'),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -967,9 +938,9 @@ Future<String?> _editValue(
   List<TextInputFormatter>? inputFormatters,
   int maxLines = 1,
 }) {
-  return showAppSheet<String>(
-    context: context,
-    builder: (context) => _ValueEditorSheet(
+  return pushFormPage<String>(
+    context,
+    _ValueEditorSheet(
       title: title,
       initial: initial,
       hint: hint,
@@ -1017,21 +988,22 @@ class _ValueEditorSheetState extends State<_ValueEditorSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final scheme = context.scheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
+    return SimpleFormPage(
+      title: widget.title,
+      onSave: () async {
+        final value = _controller.text.trim();
+        if (!context.mounted) return;
+        Navigator.of(context).pop(value.isEmpty ? null : value);
+      },
       children: [
-        Text(widget.title, style: AppTextStyles.titleL),
         if (widget.description != null) ...[
-          const SizedBox(height: AppTokens.s8),
           Text(
             widget.description!,
             style: AppTextStyles.bodyS.copyWith(color: scheme.onSurfaceVariant),
           ),
+          const SizedBox(height: AppTokens.s16),
         ],
-        const SizedBox(height: AppTokens.s16),
         TextField(
           controller: _controller,
           autofocus: true,
@@ -1039,27 +1011,6 @@ class _ValueEditorSheetState extends State<_ValueEditorSheet> {
           inputFormatters: widget.inputFormatters,
           maxLines: widget.maxLines,
           decoration: InputDecoration(hintText: widget.hint),
-        ),
-        const SizedBox(height: AppTokens.s24),
-        Row(
-          children: [
-            Expanded(
-              child: SecondaryButton(
-                label: l10n.action_cancel,
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-            const SizedBox(width: AppTokens.s12),
-            Expanded(
-              child: PrimaryButton(
-                label: l10n.action_save,
-                onPressed: () {
-                  final value = _controller.text.trim();
-                  Navigator.of(context).pop(value.isEmpty ? null : value);
-                },
-              ),
-            ),
-          ],
         ),
       ],
     );

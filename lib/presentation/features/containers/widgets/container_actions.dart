@@ -13,6 +13,7 @@ import '../../../../data/dto/container/container_search_dto.dart';
 import '../../../../data/dto/container/container_stats_dto.dart';
 import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/action_sheet.dart';
+import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -21,6 +22,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import 'container_log_page.dart';
 
 Future<void> showContainerActions(
   BuildContext context,
@@ -28,209 +30,293 @@ Future<void> showContainerActions(
   required int serverId,
   required ContainerItemDto item,
   required Future<void> Function() onChanged,
-}) async {
-  final l10n = AppLocalizations.of(context);
-  final state = item.state.toLowerCase();
-  final running = state == 'running';
-  final paused = state == 'paused';
-  final stopped = state == 'exited' || state == 'stopped' || state == 'created';
-  final colors = context.appColors;
-
-  await showAppSheet<void>(
+}) {
+  return showAppSheet<void>(
     context: context,
-    maxHeightFactor: 0.85,
-    builder: (sheetContext) => ActionSheetScaffold(
-      infoCard: ActionSheetInfoCard(
-        leading: _ContainerGlyph(state: state),
-        title: item.name,
-        subtitle: item.imageName,
-        trailing: ActionSheetStatusPill(
-          label: _stateLabel(item.state, l10n),
-          color: colors.status(state),
+    maxHeightFactor: 0.9,
+    builder: (sheetContext) => _ContainerActionsBody(
+      hostContext: context,
+      ref: ref,
+      serverId: serverId,
+      item: item,
+      onChanged: onChanged,
+      fullPage: false,
+    ),
+  );
+}
+
+Future<void> showContainerActionsPage(
+  BuildContext context,
+  WidgetRef ref, {
+  required int serverId,
+  required ContainerItemDto item,
+  required Future<void> Function() onChanged,
+}) {
+  return Navigator.of(context, rootNavigator: true).push<void>(
+    MaterialPageRoute<void>(
+      builder: (_) => Scaffold(
+        appBar: AppBarLarge(title: item.name, subtitle: item.imageName),
+        body: ListView(
+          padding: const EdgeInsets.fromLTRB(
+            AppTokens.pagePadding,
+            AppTokens.s8,
+            AppTokens.pagePadding,
+            AppTokens.s32,
+          ),
+          children: [
+            _ContainerActionsBody(
+              hostContext: context,
+              ref: ref,
+              serverId: serverId,
+              item: item,
+              onChanged: onChanged,
+              fullPage: true,
+            ),
+          ],
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ActionSheetSection(
-            title: l10n.containers_groupMaintenance,
-            icon: TablerIcons.tool,
-            children: [
-              ActionSheetRow(
-                icon: TablerIcons.terminal_2,
-                iconColor: colors.info,
-                title: l10n.containers_terminal,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  context.push(
-                    '/s/$serverId/terminal?container=${Uri.encodeComponent(item.name)}',
-                  );
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.file_text,
-                iconColor: colors.info,
-                title: l10n.containers_viewLogs,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _showLogs(context, ref, item.name);
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.eraser,
-                iconColor: colors.warning,
-                title: l10n.containers_cleanLogs,
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  await _cleanLogs(context, ref, item, onChanged);
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.users,
-                iconColor: colors.info,
-                title: l10n.containers_users,
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  await _showUsers(context, ref, item.name);
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.activity,
-                iconColor: colors.info,
-                title: l10n.containers_liveMonitor,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _showMonitor(context, ref, item);
-                },
-              ),
-            ],
-          ),
-          ActionSheetSection(
-            title: l10n.containers_groupLifecycle,
-            icon: TablerIcons.refresh,
-            children: [
-              ActionSheetRow(
-                icon: TablerIcons.player_play,
-                iconColor: colors.success,
-                title: l10n.containers_start,
-                enabled: stopped,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _operate(context, ref, item, 'start', onChanged);
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.player_stop,
-                iconColor: colors.warning,
-                title: l10n.containers_stop,
-                enabled: running || paused,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _operate(context, ref, item, 'stop', onChanged);
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.refresh,
-                iconColor: colors.info,
-                title: l10n.containers_restart,
-                enabled: running,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _operate(context, ref, item, 'restart', onChanged);
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.player_pause,
-                iconColor: colors.warning,
-                title: l10n.containers_pause,
-                enabled: running,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _operate(context, ref, item, 'pause', onChanged);
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.player_play,
-                iconColor: colors.success,
-                title: l10n.containers_resume,
-                enabled: paused,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _operate(context, ref, item, 'unpause', onChanged);
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.hand_stop,
-                iconColor: colors.danger,
-                title: l10n.containers_kill,
-                enabled: running || paused,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _operate(context, ref, item, 'kill', onChanged);
-                },
-              ),
-            ],
-          ),
-          ActionSheetSection(
-            title: l10n.containers_groupConfig,
-            icon: TablerIcons.settings,
-            children: [
-              ActionSheetRow(
-                icon: TablerIcons.edit,
-                iconColor: colors.info,
-                title: l10n.containers_edit,
-                subtitle: l10n.containers_editSubtitle,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  context.push(
-                    '/s/$serverId/containers/${Uri.encodeComponent(item.name)}/edit',
-                  );
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.arrow_up_circle,
-                iconColor: colors.info,
-                title: l10n.containers_upgrade,
-                subtitle: l10n.containers_upgradeSubtitle,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _upgrade(context, ref, item, onChanged);
-                },
-              ),
-              ActionSheetRow(
-                icon: TablerIcons.camera,
-                iconColor: colors.info,
-                title: l10n.containers_commit,
-                subtitle: l10n.containers_commitSubtitle,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _commit(context, ref, item, onChanged);
-                },
-              ),
-            ],
-          ),
-          ActionSheetSection(
-            title: l10n.containers_groupDanger,
-            icon: TablerIcons.alert_triangle,
-            children: [
-              ActionSheetRow(
-                icon: TablerIcons.trash,
-                iconColor: colors.danger,
-                title: l10n.containers_remove,
-                subtitle: l10n.containers_removeSubtitle,
-                danger: true,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _remove(context, ref, item, onChanged);
-                },
-              ),
-            ],
-          ),
-        ],
       ),
     ),
   );
+}
+
+class _ContainerActionsBody extends StatelessWidget {
+  const _ContainerActionsBody({
+    required this.hostContext,
+    required this.ref,
+    required this.serverId,
+    required this.item,
+    required this.onChanged,
+    required this.fullPage,
+  });
+
+  final BuildContext hostContext;
+  final WidgetRef ref;
+  final int serverId;
+  final ContainerItemDto item;
+  final Future<void> Function() onChanged;
+  final bool fullPage;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final state = item.state.toLowerCase();
+    final running = state == 'running';
+    final paused = state == 'paused';
+    final stopped =
+        state == 'exited' || state == 'stopped' || state == 'created';
+    final colors = context.appColors;
+    final infoCard = ActionSheetInfoCard(
+      leading: _ContainerGlyph(state: state),
+      title: item.name,
+      subtitle: item.imageName,
+      trailing: ActionSheetStatusPill(
+        label: _stateLabel(item.state, l10n),
+        color: colors.status(state),
+      ),
+    );
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ActionSheetSection(
+          title: l10n.containers_groupMaintenance,
+          icon: TablerIcons.tool,
+          children: [
+            ActionSheetRow(
+              icon: TablerIcons.terminal_2,
+              iconColor: colors.info,
+              title: l10n.containers_terminal,
+              onTap: () {
+                Navigator.of(context).pop();
+                hostContext.push(
+                  '/s/$serverId/terminal?container=${Uri.encodeComponent(item.name)}',
+                );
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.file_text,
+              iconColor: colors.info,
+              title: l10n.containers_viewLogs,
+              onTap: () {
+                Navigator.of(context).pop();
+                _showLogs(hostContext, ref, item.name);
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.eraser,
+              iconColor: colors.warning,
+              title: l10n.containers_cleanLogs,
+              onTap: () async {
+                Navigator.of(context).pop();
+                await _cleanLogs(hostContext, ref, item, onChanged);
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.users,
+              iconColor: colors.info,
+              title: l10n.containers_users,
+              onTap: () async {
+                Navigator.of(context).pop();
+                await _showUsers(hostContext, ref, item.name);
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.activity,
+              iconColor: colors.info,
+              title: l10n.containers_liveMonitor,
+              onTap: () {
+                Navigator.of(context).pop();
+                _showMonitor(hostContext, ref, item);
+              },
+            ),
+          ],
+        ),
+        ActionSheetSection(
+          title: l10n.containers_groupLifecycle,
+          icon: TablerIcons.refresh,
+          children: [
+            ActionSheetRow(
+              icon: TablerIcons.info_circle,
+              iconColor: colors.info,
+              title: l10n.error_details,
+              onTap: () {
+                Navigator.of(context).pop();
+                hostContext.push(
+                  '/s/$serverId/containers/${Uri.encodeComponent(item.name)}',
+                );
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.player_play,
+              iconColor: colors.success,
+              title: l10n.containers_start,
+              enabled: stopped,
+              onTap: () {
+                Navigator.of(context).pop();
+                _operate(hostContext, ref, item, 'start', onChanged);
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.player_stop,
+              iconColor: colors.warning,
+              title: l10n.containers_stop,
+              enabled: running || paused,
+              onTap: () {
+                Navigator.of(context).pop();
+                _operate(hostContext, ref, item, 'stop', onChanged);
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.refresh,
+              iconColor: colors.info,
+              title: l10n.containers_restart,
+              enabled: running,
+              onTap: () {
+                Navigator.of(context).pop();
+                _operate(hostContext, ref, item, 'restart', onChanged);
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.player_pause,
+              iconColor: colors.warning,
+              title: l10n.containers_pause,
+              enabled: running,
+              onTap: () {
+                Navigator.of(context).pop();
+                _operate(hostContext, ref, item, 'pause', onChanged);
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.player_play,
+              iconColor: colors.success,
+              title: l10n.containers_resume,
+              enabled: paused,
+              onTap: () {
+                Navigator.of(context).pop();
+                _operate(hostContext, ref, item, 'unpause', onChanged);
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.hand_stop,
+              iconColor: colors.danger,
+              title: l10n.containers_kill,
+              enabled: running || paused,
+              onTap: () {
+                Navigator.of(context).pop();
+                _operate(hostContext, ref, item, 'kill', onChanged);
+              },
+            ),
+          ],
+        ),
+        ActionSheetSection(
+          title: l10n.containers_groupConfig,
+          icon: TablerIcons.settings,
+          children: [
+            ActionSheetRow(
+              icon: TablerIcons.edit,
+              iconColor: colors.info,
+              title: l10n.containers_edit,
+              subtitle: l10n.containers_editSubtitle,
+              onTap: () {
+                Navigator.of(context).pop();
+                hostContext.push(
+                  '/s/$serverId/containers/${Uri.encodeComponent(item.name)}/edit',
+                );
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.arrow_up_circle,
+              iconColor: colors.info,
+              title: l10n.containers_upgrade,
+              subtitle: l10n.containers_upgradeSubtitle,
+              onTap: () {
+                Navigator.of(context).pop();
+                _upgrade(hostContext, ref, item, onChanged);
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.camera,
+              iconColor: colors.info,
+              title: l10n.containers_commit,
+              subtitle: l10n.containers_commitSubtitle,
+              onTap: () {
+                Navigator.of(context).pop();
+                _commit(hostContext, ref, item, onChanged);
+              },
+            ),
+          ],
+        ),
+        ActionSheetSection(
+          title: l10n.containers_groupDanger,
+          icon: TablerIcons.alert_triangle,
+          children: [
+            ActionSheetRow(
+              icon: TablerIcons.trash,
+              iconColor: colors.danger,
+              title: l10n.containers_remove,
+              subtitle: l10n.containers_removeSubtitle,
+              danger: true,
+              onTap: () {
+                Navigator.of(context).pop();
+                _remove(hostContext, ref, item, onChanged);
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+    if (!fullPage) {
+      return ActionSheetScaffold(infoCard: infoCard, child: content);
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        infoCard,
+        const SizedBox(height: AppTokens.s20),
+        content,
+      ],
+    );
+  }
 }
 
 Future<void> _operate(
@@ -395,10 +481,11 @@ Future<void> _showLogs(
   WidgetRef ref,
   String containerName,
 ) {
-  return showAppSheet<void>(
-    context: context,
-    maxHeightFactor: 0.85,
-    builder: (sheetContext) => _ContainerLogSheet(containerName: containerName),
+  return openContainerLogs(
+    context,
+    ref,
+    containerName: containerName,
+    subtitle: containerName,
   );
 }
 
@@ -645,104 +732,6 @@ class _CommitSheetState extends State<_CommitSheet> {
   }
 }
 
-class _ContainerLogSheet extends ConsumerStatefulWidget {
-  const _ContainerLogSheet({required this.containerName});
-
-  final String containerName;
-
-  @override
-  ConsumerState<_ContainerLogSheet> createState() => _ContainerLogSheetState();
-}
-
-class _ContainerLogSheetState extends ConsumerState<_ContainerLogSheet> {
-  String _log = '';
-  Object? _error;
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final repository = await ref.read(containerRepositoryProvider.future);
-      final log = await repository.getContainerLog(
-        containerName: widget.containerName,
-        since: '1h',
-        tail: '500',
-        follow: false,
-        timestamp: true,
-      );
-      if (!mounted) return;
-      setState(() {
-        _log = log;
-        _loading = false;
-      });
-    } catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _error = error;
-        _loading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                l10n.containers_viewLogs,
-                style: AppTextStyles.titleL,
-              ),
-            ),
-            IconButton(
-              tooltip: l10n.action_refresh,
-              onPressed: _load,
-              icon: const Icon(TablerIcons.refresh),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppTokens.s8),
-        if (_loading)
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppTokens.s24),
-              child: CircularProgressIndicator(),
-            ),
-          )
-        else if (_error != null)
-          Text(
-            describeError(_error!, l10n),
-            style: AppTextStyles.bodyM.copyWith(color: context.scheme.error),
-          )
-        else
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 360),
-            child: SingleChildScrollView(
-              child: SelectableText(
-                _log.isEmpty ? l10n.containers_logsEmpty : _log,
-                style: AppTextStyles.caption.copyWith(fontFamily: 'monospace'),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
 class _ContainerMonitorSheet extends ConsumerStatefulWidget {
   const _ContainerMonitorSheet({required this.containerID, required this.name});
 
@@ -754,21 +743,40 @@ class _ContainerMonitorSheet extends ConsumerStatefulWidget {
       _ContainerMonitorSheetState();
 }
 
-class _ContainerMonitorSheetState
-    extends ConsumerState<_ContainerMonitorSheet> {
+class _ContainerMonitorSheetState extends ConsumerState<_ContainerMonitorSheet>
+    with WidgetsBindingObserver {
   Timer? _timer;
   ContainerStatsDto? _stats;
   Object? _error;
   bool _loading = true;
+  bool _inFlight = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load();
-    _timer = Timer.periodic(const Duration(seconds: 3), (_) => _load());
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 4), (_) => _load());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _startTimer();
+      _load();
+    } else {
+      _timer?.cancel();
+    }
   }
 
   Future<void> _load() async {
+    if (_inFlight) return;
+    _inFlight = true;
     try {
       final repository = await ref.read(containerRepositoryProvider.future);
       final stats = await repository.getContainerStats(widget.containerID);
@@ -784,11 +792,14 @@ class _ContainerMonitorSheetState
         _error = error;
         _loading = false;
       });
+    } finally {
+      _inFlight = false;
     }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     super.dispose();
   }

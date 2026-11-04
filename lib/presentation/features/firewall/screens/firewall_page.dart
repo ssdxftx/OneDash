@@ -11,6 +11,7 @@ import '../../../../data/dto/firewall/firewall_v2_dto.dart';
 import '../../../../data/repositories_impl/firewall_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -588,20 +589,35 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
       text: existing?.sources.join(', ') ?? '',
     );
     String protocol = existing?.protocol == 'udp' ? 'udp' : 'tcp';
-    final rule = await showAppSheet<FirewallWhitelistRule>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final rule = await pushFormPage<FirewallWhitelistRule>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setSheetState) => SimpleFormPage(
+          title: existing == null
+              ? l10n.firewall_whitelistAdd
+              : l10n.firewall_whitelistEdit,
+          onSave: () async {
+            final port = portController.text.trim();
+            final sources = sourcesController.text
+                .split(',')
+                .map((value) => value.trim())
+                .where((value) => value.isNotEmpty)
+                .toList();
+            if (port.isEmpty || sources.isEmpty) {
+              AppToast.warning(pageContext, l10n.firewall_whitelistRequired);
+              return;
+            }
+            Navigator.of(pageContext).pop(
+              FirewallWhitelistRule({
+                'port': port,
+                'protocol': protocol,
+                if (existing != null && existing.type.isNotEmpty)
+                  'type': existing.type,
+                'sources': sources,
+              }),
+            );
+          },
           children: [
-            Text(
-              existing == null
-                  ? l10n.firewall_whitelistAdd
-                  : l10n.firewall_whitelistEdit,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(
               controller: portController,
               label: l10n.firewall_whitelistPort,
@@ -626,31 +642,6 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
               controller: sourcesController,
               label: l10n.firewall_whitelistSources,
               hint: l10n.firewall_whitelistSourcesHint,
-            ),
-            const SizedBox(height: AppTokens.s24),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () {
-                final port = portController.text.trim();
-                final sources = sourcesController.text
-                    .split(',')
-                    .map((value) => value.trim())
-                    .where((value) => value.isNotEmpty)
-                    .toList();
-                if (port.isEmpty || sources.isEmpty) {
-                  AppToast.warning(context, l10n.firewall_whitelistRequired);
-                  return;
-                }
-                Navigator.of(sheetContext).pop(
-                  FirewallWhitelistRule({
-                    'port': port,
-                    'protocol': protocol,
-                    if (existing != null && existing.type.isNotEmpty)
-                      'type': existing.type,
-                    'sources': sources,
-                  }),
-                );
-              },
             ),
           ],
         ),
@@ -908,40 +899,60 @@ class _RuleTile extends StatelessWidget {
       ),
       title: _ruleAddress(rule, l10n),
       subtitle: subtitle,
-      trailing: canManage
-          ? PopupMenuButton<String>(
-              tooltip: l10n.action_more,
-              icon: Icon(
-                TablerIcons.dots_vertical,
-                color: scheme.onSurfaceVariant,
+      trailing: Icon(TablerIcons.chevron_right, color: scheme.onSurfaceVariant),
+      onTap: canManage ? () => _showActions(context, l10n) : null,
+    );
+  }
+
+  Future<void> _showActions(BuildContext context, AppLocalizations l10n) async {
+    await showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(_ruleTitle(item.rule, l10n), style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          SplitListGroup(
+            children: [
+              SplitListTile(
+                leading: const Icon(TablerIcons.edit),
+                title: l10n.firewall_editRule,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  onEdit();
+                },
               ),
-              onSelected: (value) {
-                if (value == 'edit') onEdit();
-                if (value == 'delete') onDelete();
-                if (value == 'up') onMoveUp();
-                if (value == 'down') onMoveDown();
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'edit',
-                  child: Text(l10n.firewall_editRule),
-                ),
-                PopupMenuItem(
-                  value: 'up',
-                  enabled: item.position != null && item.position! > 1,
-                  child: Text(l10n.firewall_moveUp),
-                ),
-                PopupMenuItem(
-                  value: 'down',
-                  child: Text(l10n.firewall_moveDown),
-                ),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Text(l10n.firewall_deleteRule),
-                ),
-              ],
-            )
-          : null,
+              SplitListTile(
+                leading: const Icon(TablerIcons.arrow_up),
+                title: l10n.firewall_moveUp,
+                enabled: item.position != null && item.position! > 1,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  onMoveUp();
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.arrow_down),
+                title: l10n.firewall_moveDown,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  onMoveDown();
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.trash),
+                title: l10n.firewall_deleteRule,
+                danger: true,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  onDelete();
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1047,31 +1058,57 @@ class _ForwardTab extends StatelessWidget {
                     _familyLabel(rule.family),
                     if (rule.interface.isNotEmpty) rule.interface,
                   ].join(' · '),
-                  trailing: PopupMenuButton<String>(
-                    tooltip: l10n.action_more,
-                    icon: Icon(
-                      TablerIcons.dots_vertical,
-                      color: scheme.onSurfaceVariant,
-                    ),
-                    onSelected: (value) {
-                      if (value == 'edit') onEdit(rule);
-                      if (value == 'delete') onDelete(rule);
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'edit',
-                        child: Text(l10n.action_edit),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Text(l10n.action_delete),
-                      ),
-                    ],
+                  trailing: Icon(
+                    TablerIcons.chevron_right,
+                    color: scheme.onSurfaceVariant,
                   ),
+                  onTap: () => _showForwardActions(context, l10n, rule),
                 ),
             ],
           ),
       ],
+    );
+  }
+
+  Future<void> _showForwardActions(
+    BuildContext context,
+    AppLocalizations l10n,
+    FirewallForwardRule rule,
+  ) async {
+    await showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${rule.port}/${rule.protocol} → ${rule.targetIP}:${rule.targetPort}',
+            style: AppTextStyles.titleL,
+          ),
+          const SizedBox(height: AppTokens.s16),
+          SplitListGroup(
+            children: [
+              SplitListTile(
+                leading: const Icon(TablerIcons.edit),
+                title: l10n.action_edit,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  onEdit(rule);
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.trash),
+                title: l10n.action_delete,
+                danger: true,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  onDelete(rule);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

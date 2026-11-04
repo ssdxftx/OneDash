@@ -12,8 +12,8 @@ import '../../../../data/dto/runtime/runtime_dto.dart';
 import '../../../../data/repositories_impl/runtime_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
@@ -82,7 +82,7 @@ class RuntimesPage extends ConsumerWidget {
           message: l10n.runtimes_emptyMessage,
         ),
         builder: (data) => ListView.builder(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           itemCount: data.items.length,
           itemBuilder: (context, index) {
             final runtime = data.items[index];
@@ -91,9 +91,7 @@ class RuntimesPage extends ConsumerWidget {
             return Padding(
               padding: const EdgeInsets.only(bottom: AppTokens.s12),
               child: TonalCard(
-                onTap: () => context.push(
-                  '/s/$serverId/more/runtimes/${runtime.id}?type=${Uri.encodeComponent(runtime.type)}&name=${Uri.encodeComponent(runtime.name)}',
-                ),
+                onTap: () => _showActions(context, ref, runtime),
                 onLongPress: () => _showActions(context, ref, runtime),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,14 +122,10 @@ class RuntimesPage extends ConsumerWidget {
                             style: AppTextStyles.caption,
                           ),
                         ),
-                        IconButton(
-                          tooltip: l10n.action_more,
-                          visualDensity: VisualDensity.compact,
-                          icon: const Icon(
-                            TablerIcons.dots,
-                            size: AppTokens.iconList,
-                          ),
-                          onPressed: () => _showActions(context, ref, runtime),
+                        Icon(
+                          TablerIcons.chevron_right,
+                          size: AppTokens.iconList,
+                          color: context.scheme.onSurfaceVariant,
                         ),
                       ],
                     ),
@@ -193,6 +187,68 @@ class RuntimesPage extends ConsumerWidget {
           SplitListGroup(
             children: [
               SplitListTile(
+                leading: const Icon(TablerIcons.info_circle),
+                title: l10n.error_details,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  context.push(
+                    '/s/$serverId/more/runtimes/${runtime.id}'
+                    '?type=${Uri.encodeComponent(runtime.type)}'
+                    '&name=${Uri.encodeComponent(runtime.name)}',
+                  );
+                },
+              ),
+              if (runtime.type.startsWith('php')) ...[
+                SplitListTile(
+                  leading: const Icon(TablerIcons.puzzle),
+                  title: l10n.runtime_extensions,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/$serverId/more/runtimes/${runtime.id}/extensions'
+                      '?type=${Uri.encodeComponent(runtime.type)}'
+                      '&name=${Uri.encodeComponent(runtime.name)}',
+                    );
+                  },
+                ),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.file_code),
+                  title: l10n.runtime_phpIni,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/$serverId/more/runtimes/${runtime.id}/ini'
+                      '?type=${Uri.encodeComponent(runtime.type)}'
+                      '&name=${Uri.encodeComponent(runtime.name)}',
+                    );
+                  },
+                ),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.settings),
+                  title: l10n.runtime_fpm,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/$serverId/more/runtimes/${runtime.id}/fpm'
+                      '?type=${Uri.encodeComponent(runtime.type)}'
+                      '&name=${Uri.encodeComponent(runtime.name)}',
+                    );
+                  },
+                ),
+              ] else if (runtime.type == 'node')
+                SplitListTile(
+                  leading: const Icon(TablerIcons.puzzle),
+                  title: l10n.runtime_modules,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/$serverId/more/runtimes/${runtime.id}/modules'
+                      '?type=${Uri.encodeComponent(runtime.type)}'
+                      '&name=${Uri.encodeComponent(runtime.name)}',
+                    );
+                  },
+                ),
+              SplitListTile(
                 leading: const Icon(TablerIcons.player_play),
                 title: running ? l10n.containers_stop : l10n.containers_start,
                 onTap: () async {
@@ -251,52 +307,47 @@ class RuntimesPage extends ConsumerWidget {
     final port = TextEditingController();
     final remark = TextEditingController();
     final params = TextEditingController(text: '{}');
-    final saved = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.92,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.runtime_create, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: name, label: l10n.runtime_name),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: type, label: l10n.runtime_typeLabel),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: image, label: l10n.runtime_image),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: appDetailId,
-            label: l10n.runtime_appDetailId,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: resource, label: l10n.runtime_resource),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: version, label: l10n.runtime_version),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: codeDir, label: l10n.runtime_codeDir),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: port,
-            label: l10n.runtime_port,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: remark, label: l10n.runtime_remark),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: params,
-            label: l10n.runtime_paramsJson,
-            maxLines: 5,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_create,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.runtime_create,
+          saveLabel: l10n.action_create,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: name, label: l10n.runtime_name),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: type, label: l10n.runtime_typeLabel),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: image, label: l10n.runtime_image),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: appDetailId,
+              label: l10n.runtime_appDetailId,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: resource, label: l10n.runtime_resource),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: version, label: l10n.runtime_version),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: codeDir, label: l10n.runtime_codeDir),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: port,
+              label: l10n.runtime_port,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: remark, label: l10n.runtime_remark),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: params,
+              label: l10n.runtime_paramsJson,
+              maxLines: 5,
+            ),
+          ],
+        ),
       ),
     );
     final nameValue = name.text.trim();
@@ -370,25 +421,20 @@ class RuntimesPage extends ConsumerWidget {
       final name = TextEditingController(text: detail.name);
       final remark = TextEditingController(text: detail.remark);
       final port = TextEditingController(text: detail.port);
-      final saved = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.action_edit, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
-            AppTextField(controller: name, label: l10n.runtime_name),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: port, label: l10n.runtime_port),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: remark, label: l10n.runtime_remark),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
-          ],
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.action_edit,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              AppTextField(controller: name, label: l10n.runtime_name),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(controller: port, label: l10n.runtime_port),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(controller: remark, label: l10n.runtime_remark),
+            ],
+          ),
         ),
       );
       final nameValue = name.text.trim();

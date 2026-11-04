@@ -8,20 +8,17 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/file/file_item_dto.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
-import '../../../common/components/buttons.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/states/error_toast.dart';
 
 Future<bool> showFilePermissionSheet(
   BuildContext context, {
   required FileItemDto item,
 }) async {
-  final updated = await showModalBottomSheet<bool>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withValues(alpha: 0.4),
-    builder: (context) => _FilePermissionSheet(item: item),
+  final updated = await pushFormPage<bool>(
+    context,
+    _FilePermissionSheet(item: item),
   );
   return updated ?? false;
 }
@@ -119,40 +116,37 @@ class _FilePermissionSheetState extends ConsumerState<_FilePermissionSheet> {
       final repository = await ref.read(fileRepositoryProvider.future);
       final data = await repository.getUserGroups();
       if (!mounted) return;
-      await showModalBottomSheet<void>(
+      await showAppSheet<void>(
         context: context,
-        isScrollControlled: true,
-        useSafeArea: true,
-        builder: (context) => SafeArea(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(AppTokens.pagePadding),
-                child: Text(l10n.files_pickOwner, style: AppTextStyles.titleL),
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.files_pickOwner, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s8),
+            for (final user in data.users)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(TablerIcons.user),
+                title: Text(user.username),
+                subtitle: Text(user.group),
+                onTap: () {
+                  _user.text = user.username;
+                  _group.text = user.group;
+                  Navigator.of(sheetContext).pop();
+                },
               ),
-              for (final user in data.users)
-                ListTile(
-                  leading: const Icon(TablerIcons.user),
-                  title: Text(user.username),
-                  subtitle: Text(user.group),
-                  onTap: () {
-                    _user.text = user.username;
-                    _group.text = user.group;
-                    Navigator.of(context).pop();
-                  },
-                ),
-              for (final group in data.groups)
-                ListTile(
-                  leading: const Icon(TablerIcons.users_group),
-                  title: Text(group),
-                  onTap: () {
-                    _group.text = group;
-                    Navigator.of(context).pop();
-                  },
-                ),
-            ],
-          ),
+            for (final group in data.groups)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(TablerIcons.users_group),
+                title: Text(group),
+                onTap: () {
+                  _group.text = group;
+                  Navigator.of(sheetContext).pop();
+                },
+              ),
+          ],
         ),
       );
     } catch (error) {
@@ -190,102 +184,67 @@ class _FilePermissionSheetState extends ConsumerState<_FilePermissionSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.sizeOf(context).height * 0.92,
-      ),
-      decoration: BoxDecoration(
-        color: context.scheme.surfaceContainer,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppTokens.rSheet),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: ListView(
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(
-            AppTokens.s20,
-            AppTokens.s20,
-            AppTokens.s20,
-            AppTokens.s20,
+    return SimpleFormPage(
+      title: l10n.files_permission,
+      subtitle: widget.item.name,
+      saving: _saving,
+      onSave: _save,
+      children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: _pickOwner,
+            icon: const Icon(TablerIcons.users, size: 18),
+            label: Text(l10n.files_pickOwner),
           ),
-          children: [
-            Text(l10n.files_permission, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s4),
-            Text(
-              widget.item.name,
-              style: AppTextStyles.bodyS.copyWith(
-                color: context.scheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: AppTokens.s20),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: _pickOwner,
-                icon: const Icon(Icons.group_outlined, size: 18),
-                label: Text(l10n.files_pickOwner),
-              ),
-            ),
-            for (var group = 0; group < 3; group++) ...[
-              Text(
-                group == 0
-                    ? l10n.files_permissionOwner
-                    : group == 1
-                    ? l10n.files_permissionGroup
-                    : l10n.files_permissionPublic,
-                style: AppTextStyles.bodyM,
-              ),
-              Row(
-                children: [
-                  for (var bit = 0; bit < 3; bit++)
-                    Expanded(
-                      child: CheckboxListTile(
-                        contentPadding: EdgeInsets.zero,
-                        dense: true,
-                        title: Text(switch (bit) {
-                          0 => l10n.files_permissionRead,
-                          1 => l10n.files_permissionWrite,
-                          _ => l10n.files_permissionExecute,
-                        }),
-                        value: _bits[group][bit],
-                        onChanged: (_) => _toggle(group, bit),
-                      ),
-                    ),
-                ],
-              ),
-            ],
-            const SizedBox(height: AppTokens.s8),
-            AppTextField(
-              controller: _mode,
-              label: l10n.files_permissionMode,
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp('[0-7]')),
-                LengthLimitingTextInputFormatter(4),
-              ],
-              onChanged: (value) {
-                if (value.length < 3) return;
-                setState(() => _applyMode(value.padLeft(4, '0')));
-              },
-            ),
-            const SizedBox(height: AppTokens.s20),
-            AppTextField(controller: _user, label: l10n.files_permissionUser),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(
-              controller: _group,
-              label: l10n.files_permissionGroupName,
-            ),
-            const SizedBox(height: AppTokens.s24),
-            PrimaryButton(
-              label: l10n.action_save,
-              loading: _saving,
-              onPressed: _save,
-            ),
-          ],
         ),
-      ),
+        for (var group = 0; group < 3; group++) ...[
+          Text(
+            group == 0
+                ? l10n.files_permissionOwner
+                : group == 1
+                ? l10n.files_permissionGroup
+                : l10n.files_permissionPublic,
+            style: AppTextStyles.bodyM,
+          ),
+          Row(
+            children: [
+              for (var bit = 0; bit < 3; bit++)
+                Expanded(
+                  child: CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    title: Text(switch (bit) {
+                      0 => l10n.files_permissionRead,
+                      1 => l10n.files_permissionWrite,
+                      _ => l10n.files_permissionExecute,
+                    }),
+                    value: _bits[group][bit],
+                    onChanged: (_) => _toggle(group, bit),
+                  ),
+                ),
+            ],
+          ),
+        ],
+        const SizedBox(height: AppTokens.s8),
+        AppTextField(
+          controller: _mode,
+          label: l10n.files_permissionMode,
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp('[0-7]')),
+            LengthLimitingTextInputFormatter(4),
+          ],
+          onChanged: (value) {
+            if (value.length < 3) return;
+            setState(() => _applyMode(value.padLeft(4, '0')));
+          },
+        ),
+        const SizedBox(height: AppTokens.s20),
+        AppTextField(controller: _user, label: l10n.files_permissionUser),
+        const SizedBox(height: AppTokens.s12),
+        AppTextField(controller: _group, label: l10n.files_permissionGroupName),
+      ],
     );
   }
 }

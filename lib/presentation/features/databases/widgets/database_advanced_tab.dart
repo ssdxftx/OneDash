@@ -6,12 +6,14 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/database_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
+import '../../log/screens/log_preview_page.dart';
 
 class DatabaseAdvancedTab extends ConsumerWidget {
   const DatabaseAdvancedTab({
@@ -33,7 +35,7 @@ class DatabaseAdvancedTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         TonalCard(
           child: Column(
@@ -130,25 +132,19 @@ class DatabaseAdvancedTab extends ConsumerWidget {
         for (final entry in values.entries)
           entry.key: TextEditingController(text: entry.value),
       };
-      final saved = await showAppSheet<bool>(
-        context: context,
-        maxHeightFactor: 0.92,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.databases_variables, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s12),
-            for (final entry in controllers.entries) ...[
-              AppTextField(controller: entry.value, label: entry.key),
-              const SizedBox(height: AppTokens.s8),
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.databases_variables,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              for (final entry in controllers.entries) ...[
+                AppTextField(controller: entry.value, label: entry.key),
+                const SizedBox(height: AppTokens.s8),
+              ],
             ],
-            const SizedBox(height: AppTokens.s8),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
-          ],
+          ),
         ),
       );
       final request = [
@@ -230,22 +226,14 @@ class DatabaseAdvancedTab extends ConsumerWidget {
       );
       if (!context.mounted) return;
       final controller = TextEditingController(text: content);
-      final saved = await showAppSheet<bool>(
-        context: context,
-        maxHeightFactor: 0.95,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.databases_configFile, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: controller, maxLines: 16),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
-          ],
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.databases_configFile,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [AppTextField(controller: controller, maxLines: 16)],
+          ),
         ),
       );
       final text = controller.text;
@@ -270,30 +258,24 @@ class DatabaseAdvancedTab extends ConsumerWidget {
       final repository = await ref.read(databaseRepositoryProvider.future);
       final log = await repository.readSlowLog(type: type, name: instance);
       if (!context.mounted) return;
-      await showAppSheet<void>(
-        context: context,
-        maxHeightFactor: 0.92,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.databases_slowLog, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s4),
-            Text(
-              log.path,
-              style: AppTextStyles.caption.copyWith(
-                color: context.scheme.onSurfaceVariant,
-                fontFamily: 'monospace',
+      await Navigator.of(context, rootNavigator: true).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => LogPreviewPage(
+            title: l10n.databases_slowLog,
+            subtitle: log.path,
+            sources: [
+              LogSourceOption(
+                label: l10n.databases_slowLog,
+                load: () async {
+                  final current = await repository.readSlowLog(
+                    type: type,
+                    name: instance,
+                  );
+                  return current.lines;
+                },
               ),
-            ),
-            const SizedBox(height: AppTokens.s12),
-            SelectableText(
-              log.lines.isEmpty
-                  ? l10n.databases_slowLogEmpty
-                  : log.lines.join('\n'),
-              style: AppTextStyles.caption.copyWith(fontFamily: 'monospace'),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     } catch (error) {
@@ -311,33 +293,28 @@ class DatabaseAdvancedTab extends ConsumerWidget {
       final timeout = TextEditingController(text: conf.timeout);
       final maxclients = TextEditingController(text: conf.maxclients);
       final maxmemory = TextEditingController(text: conf.maxmemory);
-      final saved = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.databases_redisConfig, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
-            AppTextField(
-              controller: timeout,
-              label: 'timeout',
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(
-              controller: maxclients,
-              label: 'maxclients',
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: maxmemory, label: 'maxmemory'),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
-          ],
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.databases_redisConfig,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              AppTextField(
+                controller: timeout,
+                label: 'timeout',
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: maxclients,
+                label: 'maxclients',
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(controller: maxmemory, label: 'maxmemory'),
+            ],
+          ),
         ),
       );
       final values = (
@@ -367,21 +344,20 @@ class DatabaseAdvancedTab extends ConsumerWidget {
   Future<void> _changeRedisPassword(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.databases_redisPassword, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, obscure: true, autofocus: true),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(controller.text),
-          ),
-        ],
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.databases_redisPassword,
+          onSave: () async => Navigator.of(pageContext).pop(controller.text),
+          children: [
+            AppTextField(
+              controller: controller,
+              obscure: true,
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -413,17 +389,13 @@ class DatabaseAdvancedTab extends ConsumerWidget {
       final appendfsync = TextEditingController(text: persistence.appendfsync);
       bool aof = persistence.aofEnabled == 'yes';
       bool rdb = persistence.rdbEnabled == 'yes';
-      final saved = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      final saved = await pushFormPage<bool>(
+        context,
+        StatefulBuilder(
+          builder: (pageContext, setState) => SimpleFormPage(
+            title: l10n.databases_redisPersistence,
+            onSave: () async => Navigator.of(pageContext).pop(true),
             children: [
-              Text(
-                l10n.databases_redisPersistence,
-                style: AppTextStyles.titleL,
-              ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('AOF'),
@@ -439,11 +411,6 @@ class DatabaseAdvancedTab extends ConsumerWidget {
                 onChanged: (value) => setState(() => rdb = value),
               ),
               AppTextField(controller: save, label: 'save'),
-              const SizedBox(height: AppTokens.s16),
-              PrimaryButton(
-                label: l10n.action_save,
-                onPressed: () => Navigator.of(sheetContext).pop(true),
-              ),
             ],
           ),
         ),

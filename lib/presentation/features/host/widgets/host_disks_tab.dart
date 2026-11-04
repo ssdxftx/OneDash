@@ -9,6 +9,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/host/disk_dto.dart';
 import '../../../../data/repositories_impl/host_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -155,25 +156,27 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
     var fs = filesystem.isEmpty ? 'ext4' : filesystem;
     var autoMount = true;
     var noFail = true;
-    return showAppSheet<DiskPartitionReq>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              partition ? l10n.host_diskPartition : l10n.host_diskMount,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s8),
-            Text(
-              device,
-              style: AppTextStyles.bodyS.copyWith(
-                color: context.scheme.onSurfaceVariant,
+    return pushFormPage<DiskPartitionReq>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setSheetState) => SimpleFormPage(
+          title: partition ? l10n.host_diskPartition : l10n.host_diskMount,
+          subtitle: device,
+          saveLabel: partition ? l10n.host_diskPartition : l10n.host_diskMount,
+          onSave: () async {
+            final path = mountPoint.text.trim();
+            if (path.isEmpty) return;
+            Navigator.of(pageContext).pop(
+              DiskPartitionReq(
+                device: device,
+                filesystem: fs,
+                mountPoint: path,
+                label: label.text.trim(),
+                autoMount: autoMount,
               ),
-            ),
-            const SizedBox(height: AppTokens.s16),
+            );
+          },
+          children: [
             DropdownButtonFormField<String>(
               initialValue: fs,
               decoration: InputDecoration(labelText: l10n.host_diskFilesystem),
@@ -210,23 +213,6 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
                 value: noFail,
                 onChanged: (value) => setSheetState(() => noFail = value),
               ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: partition ? l10n.host_diskPartition : l10n.host_diskMount,
-              onPressed: () {
-                final path = mountPoint.text.trim();
-                if (path.isEmpty) return;
-                Navigator.of(sheetContext).pop(
-                  DiskPartitionReq(
-                    device: device,
-                    filesystem: fs,
-                    mountPoint: path,
-                    label: label.text.trim(),
-                    autoMount: autoMount,
-                  ),
-                );
-              },
-            ),
           ],
         ),
       ),
@@ -252,7 +238,7 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         children: [
           if (_disks.systemDisks.isNotEmpty) ...[
             SectionHeader(title: l10n.host_diskSystem),

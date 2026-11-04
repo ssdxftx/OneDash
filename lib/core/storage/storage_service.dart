@@ -33,6 +33,7 @@ class StorageService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final StreamController<void> _serversChangedController =
       StreamController<void>.broadcast();
+  List<Server>? _serversCache;
   static const _legacyAllowInsecureConnectionsKey =
       'allow_insecure_connections';
   static const _serversFileName = 'servers.json';
@@ -143,18 +144,31 @@ class StorageService {
   }
 
   Future<List<Server>> _readServers() async {
-    if (!await _serversFile.exists()) return [];
+    final cached = _serversCache;
+    if (cached != null) return List<Server>.of(cached);
+    if (!await _serversFile.exists()) {
+      _serversCache = const [];
+      return [];
+    }
 
     final content = await _serversFile.readAsString();
-    if (content.trim().isEmpty) return [];
+    if (content.trim().isEmpty) {
+      _serversCache = const [];
+      return [];
+    }
 
     final json = jsonDecode(content);
-    if (json is! List) return [];
+    if (json is! List) {
+      _serversCache = const [];
+      return [];
+    }
 
-    return json
+    final servers = json
         .whereType<Map>()
         .map((item) => Server.fromJson(Map<String, Object?>.from(item)))
         .toList();
+    _serversCache = servers;
+    return List<Server>.of(servers);
   }
 
   Future<void> _writeServers(
@@ -172,6 +186,7 @@ class StorageService {
     final tmpFile = File('${_serversFile.path}.tmp');
     await tmpFile.writeAsString('$content\n', flush: true);
     await tmpFile.rename(_serversFile.path);
+    _serversCache = List<Server>.of(servers);
     if (notify) {
       _serversChangedController.add(null);
     }

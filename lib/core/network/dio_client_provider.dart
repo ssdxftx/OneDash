@@ -19,14 +19,14 @@ Future<DioClient> dioClient(Ref ref, int serverId) async {
     throw const ServerNotFoundException();
   }
   final apiKey = await storage.getApiKey(serverId) ?? '';
-  final settings = await ref.watch(appSettingsControllerProvider.future);
+  final settings = ref.watch(networkSettingsProvider);
   final userAgent = await DioClient.defaultUserAgent();
 
   final client = DioClient(
     baseUrl: server.baseUrl.toString(),
     apiKey: apiKey,
-    requestTimeout: Duration(seconds: settings.requestTimeoutSeconds),
-    customHeaders: settings.customHeaders,
+    requestTimeout: Duration(seconds: settings.timeoutSeconds),
+    customHeaders: settings.headers,
     userAgent: userAgent,
     allowInsecureConnections: server.allowInsecureConnections,
   );

@@ -120,6 +120,16 @@ ErrorViewData mapError(Object error, AppLocalizations l10n) {
       kind: ErrorKind.business,
     );
   }
+  if (error is ApiBusinessException && error.statusCode == 401) {
+    return ErrorViewData(
+      icon: TablerIcons.lock,
+      title: l10n.error_auth_title,
+      message: l10n.error_auth_message,
+      actionLabel: l10n.common_retry,
+      secondaryActionLabel: l10n.server_edit_edit_title,
+      kind: ErrorKind.auth,
+    );
+  }
   if (error is ApiBusinessException) {
     return ErrorViewData(
       icon: TablerIcons.alert_triangle,

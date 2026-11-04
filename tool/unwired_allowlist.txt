@@ -25,6 +25,8 @@ app_api.dart:checkInstalledByKey
 firewall_api.dart:createRules
 firewall_api.dart:deleteRules
 
+file_api.dart:readRuntimeLog
+
 # Reviewed exceptions for the mobile client.
 # These endpoints are web-only flows, helper/internal calls, or require device
 # file pickers / app-detail context that OneDash does not expose yet.

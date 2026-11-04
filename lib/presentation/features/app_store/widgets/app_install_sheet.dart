@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
@@ -13,7 +12,16 @@ import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/states/error_toast.dart';
+
+Future<bool> showAppInstallPage(BuildContext context, AppDetailDto app) async {
+  final installed = await pushFormPage<bool>(
+    context,
+    AppInstallSheet(app: app),
+  );
+  return installed ?? false;
+}
 
 class AppInstallSheet extends ConsumerStatefulWidget {
   const AppInstallSheet({super.key, required this.app});
@@ -171,35 +179,13 @@ class _AppInstallSheetState extends ConsumerState<AppInstallSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final scheme = context.scheme;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SimpleFormPage(
+      title: widget.app.name,
+      subtitle: widget.app.key,
+      saveLabel: l10n.apps_install,
+      saving: _installing,
+      onSave: _install,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(widget.app.name, style: AppTextStyles.titleL),
-                  Text(
-                    widget.app.key,
-                    style: AppTextStyles.bodyS.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            IconButton(
-              tooltip: l10n.action_close,
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(TablerIcons.x),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppTokens.s16),
         if (widget.app.versions.length > 1) ...[
           SectionHeader(title: l10n.apps_version),
           DropdownButtonFormField<String>(
@@ -242,14 +228,6 @@ class _AppInstallSheetState extends ConsumerState<AppInstallSheet> {
               _buildField(field),
               const SizedBox(height: AppTokens.s12),
             ],
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.apps_install,
-            icon: TablerIcons.download,
-            loading: _installing,
-            onPressed: _installing ? null : _install,
-          ),
-          const SizedBox(height: AppTokens.s8),
         ],
       ],
     );

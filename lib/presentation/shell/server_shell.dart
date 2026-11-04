@@ -8,6 +8,7 @@ import '../../core/localization/generated/app_localizations.dart';
 import '../../core/theme/tokens.dart';
 import '../common/components/server_switcher_sheet.dart';
 import '../features/servers/providers/servers_provider.dart';
+import '../features/settings/providers/app_settings_provider.dart';
 
 class ServerShell extends ConsumerWidget {
   const ServerShell({
@@ -62,7 +63,13 @@ class _ServerShellScaffold extends ConsumerWidget {
               ? NavigationDestinationLabelBehavior.onlyShowSelected
               : NavigationDestinationLabelBehavior.alwaysShow,
           onDestinationSelected: (index) {
-            HapticFeedback.selectionClick();
+            final haptics =
+                ref
+                    .read(appSettingsControllerProvider)
+                    .valueOrNull
+                    ?.hapticsEnabled ??
+                true;
+            if (haptics) HapticFeedback.selectionClick();
             navigationShell.goBranch(
               index,
               initialLocation: index == navigationShell.currentIndex,

@@ -160,10 +160,40 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                     });
                   },
                 ),
-                PopupMenuButton<String>(
+                AppIconButton(
+                  icon: TablerIcons.dots,
                   tooltip: l10n.action_more,
-                  icon: const Icon(TablerIcons.dots),
-                  onSelected: (value) {
+                  onPressed: () async {
+                    final value = await showSelectionMenu<String>(
+                      context,
+                      options: [
+                        SelectionOption(
+                          label: _selectionMode
+                              ? l10n.files_cancelSelection
+                              : l10n.files_selectAll,
+                          value: 'select',
+                          icon: _selectionMode
+                              ? TablerIcons.square_x
+                              : TablerIcons.checkbox,
+                        ),
+                        SelectionOption(
+                          label: l10n.containers_dockerSettings,
+                          value: 'docker',
+                          icon: TablerIcons.brand_docker,
+                        ),
+                        SelectionOption(
+                          label: l10n.containers_resources,
+                          value: 'resources',
+                          icon: TablerIcons.chart_pie,
+                        ),
+                        SelectionOption(
+                          label: l10n.containers_prune,
+                          value: 'prune',
+                          icon: TablerIcons.eraser,
+                        ),
+                      ],
+                    );
+                    if (!context.mounted || value == null) return;
                     if (value == 'select') {
                       setState(() {
                         if (_selectionMode) {
@@ -182,37 +212,17 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                         }
                       });
                     } else if (value == 'docker') {
-                      context.push('/s/${widget.serverId}/containers/docker');
+                      await context.push(
+                        '/s/${widget.serverId}/containers/docker',
+                      );
                     } else if (value == 'resources') {
-                      context.push(
+                      await context.push(
                         '/s/${widget.serverId}/containers/resources',
                       );
                     } else if (value == 'prune') {
-                      _prune();
+                      await _prune();
                     }
                   },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'select',
-                      child: Text(
-                        _selectionMode
-                            ? l10n.files_cancelSelection
-                            : l10n.files_selectAll,
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'docker',
-                      child: Text(l10n.containers_dockerSettings),
-                    ),
-                    PopupMenuItem(
-                      value: 'resources',
-                      child: Text(l10n.containers_resources),
-                    ),
-                    PopupMenuItem(
-                      value: 'prune',
-                      child: Text(l10n.containers_prune),
-                    ),
-                  ],
                 ),
                 AppIconButton(
                   icon: TablerIcons.plus,
@@ -328,13 +338,16 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                               ? () {
                                   if (!item.isFromCompose) _toggle(item.name);
                                 }
-                              : () => context.push(
-                                  '/s/${widget.serverId}/containers/${Uri.encodeComponent(item.name)}',
-                                ),
+                              : () => _showActions(item),
                           onLongPress: () {
                             if (!item.isFromCompose) _toggle(item.name);
                           },
-                          onMore: () => _showActions(item),
+                          onToggle: () => _operateQuick(
+                            item,
+                            item.state.toLowerCase() == 'running'
+                                ? 'stop'
+                                : 'start',
+                          ),
                         ),
                       );
                     },
@@ -372,8 +385,37 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
     );
   }
 
+  Future<void> _operateQuick(ContainerItemDto item, String operation) async {
+    final l10n = AppLocalizations.of(context);
+    final repository = await ref.read(containerRepositoryProvider.future);
+    if (!mounted) return;
+    final taskID = const Uuid().v4();
+    final success = await TaskProgressSheet.run(
+      context,
+      title: operation == 'start'
+          ? l10n.containers_start
+          : l10n.containers_stop,
+      task: (controller) async {
+        await repository.operateContainer(
+          names: [item.name],
+          operation: operation,
+          taskID: taskID,
+        );
+        await repository.waitForTask(
+          taskID,
+          onUpdate: (log) {
+            if (log.lines.isNotEmpty) controller.log(log.lines.last);
+          },
+        );
+      },
+    );
+    if (!success || !mounted) return;
+    AppToast.success(context, l10n.action_done);
+    await ref.read(containersProvider.notifier).refresh();
+  }
+
   Future<void> _showActions(ContainerItemDto item) async {
-    await showContainerActions(
+    await showContainerActionsPage(
       context,
       ref,
       serverId: widget.serverId,
@@ -432,7 +474,7 @@ class _ContainerCard extends StatelessWidget {
     required this.selected,
     required this.selectable,
     required this.selectionMode,
-    required this.onMore,
+    required this.onToggle,
   });
 
   final ContainerItemDto item;
@@ -443,7 +485,7 @@ class _ContainerCard extends StatelessWidget {
   final bool selected;
   final bool selectable;
   final bool selectionMode;
-  final VoidCallback onMore;
+  final VoidCallback onToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -479,10 +521,17 @@ class _ContainerCard extends StatelessWidget {
               if (!selectionMode) ...[
                 const SizedBox(width: AppTokens.s4),
                 IconButton(
-                  tooltip: l10n.action_more,
+                  tooltip: item.state.toLowerCase() == 'running'
+                      ? l10n.containers_stop
+                      : l10n.containers_start,
                   visualDensity: VisualDensity.compact,
-                  icon: const Icon(TablerIcons.dots, size: AppTokens.iconList),
-                  onPressed: onMore,
+                  icon: Icon(
+                    item.state.toLowerCase() == 'running'
+                        ? TablerIcons.player_pause
+                        : TablerIcons.player_play,
+                    size: AppTokens.iconList,
+                  ),
+                  onPressed: onToggle,
                 ),
               ],
               if (item.isFromCompose)

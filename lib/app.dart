@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -6,9 +8,11 @@ import 'package:toastification/toastification.dart';
 
 import 'core/localization/generated/app_localizations.dart';
 import 'core/localization/locale_controller.dart';
+import 'core/platform/secure_screen.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
+import 'presentation/features/settings/providers/app_settings_provider.dart';
 
 class OneDashApp extends ConsumerWidget {
   const OneDashApp({super.key});
@@ -17,6 +21,17 @@ class OneDashApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeControllerProvider);
     final localeOption = ref.watch(localeControllerProvider);
+    final listAnimations = ref.watch(
+      appSettingsControllerProvider.select(
+        (value) => value.valueOrNull?.listAnimationsEnabled ?? true,
+      ),
+    );
+    ref.listen(
+      appSettingsControllerProvider.select(
+        (value) => value.valueOrNull?.secureScreenEnabled ?? false,
+      ),
+      (_, enabled) => unawaited(setSecureScreen(enabled)),
+    );
 
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
@@ -53,9 +68,12 @@ class OneDashApp extends ConsumerWidget {
               final systemScale = MediaQuery.textScalerOf(context).scale(1);
               final scale = (systemScale * theme.textScale).clamp(0.85, 1.5);
               return MediaQuery(
-                data: MediaQuery.of(
-                  context,
-                ).copyWith(textScaler: TextScaler.linear(scale)),
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: TextScaler.linear(scale),
+                  disableAnimations:
+                      MediaQuery.disableAnimationsOf(context) ||
+                      !listAnimations,
+                ),
                 child: child ?? const SizedBox.shrink(),
               );
             },

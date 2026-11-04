@@ -9,10 +9,12 @@ class SplitListGroup extends StatelessWidget {
     super.key,
     required this.children,
     this.padding = EdgeInsets.zero,
+    this.flat = false,
   });
 
   final List<Widget> children;
   final EdgeInsetsGeometry padding;
+  final bool flat;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,8 @@ class SplitListGroup extends StatelessWidget {
       rows.add(children[i]);
     }
 
+    final body = Column(mainAxisSize: MainAxisSize.min, children: rows);
+    if (flat) return Padding(padding: padding, child: body);
     return Padding(
       padding: padding,
       child: Material(
@@ -42,7 +46,7 @@ class SplitListGroup extends StatelessWidget {
           side: BorderSide(color: scheme.outlineVariant),
         ),
         clipBehavior: Clip.antiAlias,
-        child: Column(mainAxisSize: MainAxisSize.min, children: rows),
+        child: body,
       ),
     );
   }
@@ -55,6 +59,7 @@ class SplitListTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.subtitleStyle,
+    this.subtitleMaxLines = 2,
     this.value,
     this.valueStyle,
     this.leading,
@@ -69,6 +74,7 @@ class SplitListTile extends StatelessWidget {
   final String title;
   final String? subtitle;
   final TextStyle? subtitleStyle;
+  final int? subtitleMaxLines;
   final String? value;
   final TextStyle? valueStyle;
   final Widget? leading;
@@ -221,7 +227,7 @@ class SplitListTile extends StatelessWidget {
                             subtitle!,
                             style: (subtitleStyle ?? AppTextStyles.bodyS)
                                 .copyWith(color: subtitleColor),
-                            maxLines: 2,
+                            maxLines: subtitleMaxLines,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],

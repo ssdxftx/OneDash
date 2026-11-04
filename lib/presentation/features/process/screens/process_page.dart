@@ -55,13 +55,14 @@ class ProcessPage extends ConsumerWidget {
           message: l10n.process_emptyMessage,
         ),
         builder: (items) => ListView.builder(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           itemCount: items.length,
           itemBuilder: (context, index) {
             final item = items[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: AppTokens.s8),
               child: TonalCard(
+                onTap: () => _showActions(context, ref, item),
                 onLongPress: () => _showActions(context, ref, item),
                 child: Row(
                   children: [
@@ -73,11 +74,12 @@ class ProcessPage extends ConsumerWidget {
                         color: context.scheme.surfaceContainerHigh,
                         borderRadius: BorderRadius.circular(AppTokens.rSm),
                       ),
-                      child: Text(
-                        '${item.pid}',
-                        style: AppTextStyles.caption,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          '${item.pid}',
+                          style: AppTextStyles.caption,
+                        ),
                       ),
                     ),
                     const SizedBox(width: AppTokens.s12),
@@ -102,15 +104,20 @@ class ProcessPage extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    Text(item.user, style: AppTextStyles.caption),
-                    IconButton(
-                      tooltip: l10n.action_more,
-                      visualDensity: VisualDensity.compact,
-                      icon: const Icon(
-                        TablerIcons.dots,
-                        size: AppTokens.iconList,
+                    SizedBox(
+                      width: 72,
+                      child: Text(
+                        item.user,
+                        style: AppTextStyles.caption,
+                        textAlign: TextAlign.end,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      onPressed: () => _showActions(context, ref, item),
+                    ),
+                    Icon(
+                      TablerIcons.chevron_right,
+                      size: AppTokens.iconList,
+                      color: context.scheme.onSurfaceVariant,
                     ),
                   ],
                 ),

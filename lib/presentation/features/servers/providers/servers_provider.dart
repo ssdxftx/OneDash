@@ -25,17 +25,25 @@ class ServersController extends AsyncNotifier<List<Server>> {
 
   Future<void> delete(int id) async {
     await ref.read(serverRepositoryProvider).remove(id);
+    ref.invalidate(lastServerIdProvider);
     await refresh();
   }
 
   Future<void> touch(int id) async {
     final repository = ref.read(serverRepositoryProvider);
     final server = await repository.find(id);
-    if (server == null) return;
-    server.lastUsedAt = DateTime.now();
-    await repository.update(server);
+    final now = DateTime.now();
+    final shouldPersist =
+        server != null &&
+        (server.lastUsedAt == null ||
+            now.difference(server.lastUsedAt!).inSeconds >= 60);
+    if (server != null && shouldPersist) {
+      server.lastUsedAt = now;
+      await repository.update(server);
+    }
     await ref.read(storageServiceProvider).setString('last_server_id', '$id');
-    await refresh();
+    ref.invalidate(lastServerIdProvider);
+    if (shouldPersist) await refresh();
   }
 }
 
@@ -66,15 +74,12 @@ final serverHealthProvider = FutureProvider.autoDispose
         final repository = await ref.watch(
           dashboardRepositoryForServerProvider(serverId).future,
         );
-        final dashboard = await repository.getDashboardBase(
+        final dashboard = await repository.getDashboardSnapshot(
           ioOption: 'all',
           netOption: 'all',
         );
         stopwatch.stop();
-        final current = await repository.getDashboardCurrent(
-          ioOption: 'all',
-          netOption: 'all',
-        );
+        final current = dashboard.current;
         final disk = current.disks.isEmpty
             ? null
             : current.disks
@@ -86,7 +91,7 @@ final serverHealthProvider = FutureProvider.autoDispose
           cpuPercent: current.cpuUsedPercent,
           memoryPercent: current.memoryUsedPercent,
           diskPercent: disk,
-          hostname: dashboard.hostname,
+          hostname: dashboard.base.hostname,
         );
       } catch (_) {
         stopwatch.stop();

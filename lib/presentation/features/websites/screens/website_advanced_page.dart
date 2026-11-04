@@ -18,6 +18,7 @@ import '../../../../data/repositories_impl/setting_repository_impl.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -152,7 +153,7 @@ class _BasicTab extends ConsumerWidget {
       builder: (data) {
         final site = data.website;
         return ListView(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           children: [
             TonalCard(
               child: Row(
@@ -230,15 +231,13 @@ class _BasicTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
     bool pinned = favorite;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.websites_descriptionPin,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(l10n.websites_descriptionPin, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(
               controller: controller,
               label: l10n.websites_description,
@@ -248,11 +247,6 @@ class _BasicTab extends ConsumerWidget {
               title: Text(l10n.websites_pin),
               value: pinned,
               onChanged: (value) => setState(() => pinned = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),
@@ -341,15 +335,13 @@ class _BasicTab extends ConsumerWidget {
     final remark = TextEditingController(text: site.remark);
     final alias = TextEditingController(text: detail.alias);
     bool favorite = detail.favorite;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.websites_editInfo,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(l10n.websites_editInfo, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(controller: remark, label: l10n.websites_remark),
             const SizedBox(height: AppTokens.s12),
             AppTextField(controller: alias, label: l10n.websites_websiteAlias),
@@ -358,11 +350,6 @@ class _BasicTab extends ConsumerWidget {
               title: Text(l10n.websites_favorite),
               value: favorite,
               onChanged: (value) => setState(() => favorite = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),
@@ -402,15 +389,13 @@ class _BasicTab extends ConsumerWidget {
         text: config.indexFiles.join('\n'),
       );
       bool enable = config.enable;
-      final saved = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      final saved = await pushFormPage<bool>(
+        context,
+        StatefulBuilder(
+          builder: (pageContext, setState) => SimpleFormPage(
+            title: l10n.websites_indexConfig,
+            onSave: () async => Navigator.of(pageContext).pop(true),
             children: [
-              Text(l10n.websites_indexConfig, style: AppTextStyles.titleL),
-              const SizedBox(height: AppTokens.s12),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.websites_enabled),
@@ -422,11 +407,6 @@ class _BasicTab extends ConsumerWidget {
                 label: l10n.websites_indexFiles,
                 hint: 'index.html\nindex.php',
                 maxLines: 6,
-              ),
-              const SizedBox(height: AppTokens.s16),
-              PrimaryButton(
-                label: l10n.action_save,
-                onPressed: () => Navigator.of(sheetContext).pop(true),
               ),
             ],
           ),
@@ -460,14 +440,13 @@ class _BasicTab extends ConsumerWidget {
       final ip = TextEditingController(text: '${config.perIpLimit ?? 0}');
       final rate = TextEditingController(text: '${config.rateKb ?? 0}');
       bool enable = config.enable;
-      final saved = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      final saved = await pushFormPage<bool>(
+        context,
+        StatefulBuilder(
+          builder: (pageContext, setState) => SimpleFormPage(
+            title: l10n.websites_limitConfig,
+            onSave: () async => Navigator.of(pageContext).pop(true),
             children: [
-              Text(l10n.websites_limitConfig, style: AppTextStyles.titleL),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.websites_enabled),
@@ -490,11 +469,6 @@ class _BasicTab extends ConsumerWidget {
                 controller: rate,
                 label: l10n.websites_rateKb,
                 keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: AppTokens.s16),
-              PrimaryButton(
-                label: l10n.action_save,
-                onPressed: () => Navigator.of(sheetContext).pop(true),
               ),
             ],
           ),
@@ -532,30 +506,25 @@ class _BasicTab extends ConsumerWidget {
       if (!context.mounted) return;
       final user = TextEditingController(text: dir.user);
       final group = TextEditingController(text: dir.userGroup);
-      final saved = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.websites_dirPermission, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s4),
-            Text(
-              dir.dirs.join('\n'),
-              style: AppTextStyles.caption.copyWith(
-                color: context.scheme.onSurfaceVariant,
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.websites_dirPermission,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              Text(
+                dir.dirs.join('\n'),
+                style: AppTextStyles.caption.copyWith(
+                  color: pageContext.scheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            AppTextField(controller: user, label: l10n.websites_owner),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: group, label: l10n.websites_group),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
-          ],
+              const SizedBox(height: AppTokens.s16),
+              AppTextField(controller: user, label: l10n.websites_owner),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(controller: group, label: l10n.websites_group),
+            ],
+          ),
         ),
       );
       final owner = user.text.trim();
@@ -633,7 +602,7 @@ class _SecurityTab extends ConsumerWidget {
     final leech = ref.watch(_leechProvider(websiteId));
     final realIp = ref.watch(_realIpProvider(websiteId));
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         _StatusCard(
           title: l10n.websites_accessAuth,
@@ -762,20 +731,24 @@ class _SecurityTab extends ConsumerWidget {
     final password = TextEditingController(text: current?.password ?? '');
     final remark = TextEditingController(text: current?.remark ?? '');
     String? formError;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: current == null
+              ? l10n.websites_addPathAuth
+              : l10n.websites_editPathAuth,
+          onSave: () async {
+            if (path.text.trim().isEmpty ||
+                name.text.trim().isEmpty ||
+                username.text.trim().isEmpty ||
+                password.text.isEmpty) {
+              setState(() => formError = l10n.websites_requiredFields);
+              return;
+            }
+            Navigator.of(pageContext).pop(true);
+          },
           children: [
-            Text(
-              current == null
-                  ? l10n.websites_addPathAuth
-                  : l10n.websites_editPathAuth,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(controller: path, label: l10n.websites_path),
             const SizedBox(height: AppTokens.s12),
             AppTextField(controller: name, label: l10n.files_name),
@@ -794,24 +767,10 @@ class _SecurityTab extends ConsumerWidget {
               Text(
                 formError!,
                 style: AppTextStyles.bodyS.copyWith(
-                  color: sheetContext.appColors.danger,
+                  color: pageContext.appColors.danger,
                 ),
               ),
             ],
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () {
-                if (path.text.trim().isEmpty ||
-                    name.text.trim().isEmpty ||
-                    username.text.trim().isEmpty ||
-                    password.text.isEmpty) {
-                  setState(() => formError = l10n.websites_requiredFields);
-                  return;
-                }
-                Navigator.of(sheetContext).pop(true);
-              },
-            ),
           ],
         ),
       ),
@@ -893,14 +852,30 @@ class _SecurityTab extends ConsumerWidget {
     final remark = TextEditingController(text: first?.remark ?? '');
     bool enable = current.enable;
     String? formError;
-    final request = await showAppSheet<WebsiteAuthUpdateReq>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final request = await pushFormPage<WebsiteAuthUpdateReq>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.websites_accessAuth,
+          onSave: () async {
+            final usernameValue = user.text.trim();
+            if (enable && usernameValue.isEmpty) {
+              setState(() => formError = l10n.websites_usernameRequired);
+              return;
+            }
+            Navigator.of(pageContext).pop(
+              WebsiteAuthUpdateReq(
+                websiteId: websiteId,
+                operate: enable
+                    ? (first == null ? 'create' : 'edit')
+                    : 'disable',
+                username: usernameValue,
+                password: password.text,
+                remark: remark.text.trim(),
+              ),
+            );
+          },
           children: [
-            Text(l10n.websites_accessAuth, style: AppTextStyles.titleL),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.websites_enabled),
@@ -921,32 +896,10 @@ class _SecurityTab extends ConsumerWidget {
               Text(
                 formError!,
                 style: AppTextStyles.bodyS.copyWith(
-                  color: sheetContext.appColors.danger,
+                  color: pageContext.appColors.danger,
                 ),
               ),
             ],
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () {
-                final usernameValue = user.text.trim();
-                if (enable && usernameValue.isEmpty) {
-                  setState(() => formError = l10n.websites_usernameRequired);
-                  return;
-                }
-                Navigator.of(sheetContext).pop(
-                  WebsiteAuthUpdateReq(
-                    websiteId: websiteId,
-                    operate: enable
-                        ? (first == null ? 'create' : 'edit')
-                        : 'disable',
-                    username: usernameValue,
-                    password: password.text,
-                    remark: remark.text.trim(),
-                  ),
-                );
-              },
-            ),
           ],
         ),
       ),
@@ -980,14 +933,23 @@ class _SecurityTab extends ConsumerWidget {
     bool cors = current.cors;
     bool credentials = current.allowCredentials;
     bool preflight = current.preflight;
-    final request = await showAppSheet<WebsiteCorsDto>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final request = await pushFormPage<WebsiteCorsDto>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: 'CORS',
+          onSave: () async => Navigator.of(pageContext).pop(
+            WebsiteCorsDto(
+              websiteID: websiteId,
+              cors: cors,
+              allowOrigins: origins.text.trim(),
+              allowMethods: methods.text.trim(),
+              allowHeaders: headers.text.trim(),
+              allowCredentials: credentials,
+              preflight: preflight,
+            ),
+          ),
           children: [
-            const Text('CORS', style: AppTextStyles.titleL),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.websites_enabled),
@@ -1019,21 +981,6 @@ class _SecurityTab extends ConsumerWidget {
               title: Text(l10n.websites_preflight),
               value: preflight,
               onChanged: (value) => setState(() => preflight = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(
-                WebsiteCorsDto(
-                  websiteID: websiteId,
-                  cors: cors,
-                  allowOrigins: origins.text.trim(),
-                  allowMethods: methods.text.trim(),
-                  allowHeaders: headers.text.trim(),
-                  allowCredentials: credentials,
-                  preflight: preflight,
-                ),
-              ),
             ),
           ],
         ),
@@ -1067,14 +1014,28 @@ class _SecurityTab extends ConsumerWidget {
     bool enable = current.enable;
     bool blocked = current.blocked;
     bool logEnable = current.logEnable;
-    final request = await showAppSheet<WebsiteLeechUpdateReq>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final request = await pushFormPage<WebsiteLeechUpdateReq>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.websites_leech,
+          onSave: () async => Navigator.of(pageContext).pop(
+            WebsiteLeechUpdateReq(
+              websiteID: websiteId,
+              enable: enable,
+              cache: current.cache,
+              cacheTime: current.cacheTime,
+              cacheUint: current.cacheUint,
+              extensions: extensions.text.trim(),
+              returnCode: returnCode.text.trim(),
+              domains: current.serverNames.join(','),
+              noneRef: current.noneRef,
+              logEnable: logEnable,
+              blocked: blocked,
+              serverNames: current.serverNames,
+            ),
+          ),
           children: [
-            Text(l10n.websites_leech, style: AppTextStyles.titleL),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.websites_enabled),
@@ -1103,26 +1064,6 @@ class _SecurityTab extends ConsumerWidget {
               title: Text(l10n.websites_logEnabled),
               value: logEnable,
               onChanged: (value) => setState(() => logEnable = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(
-                WebsiteLeechUpdateReq(
-                  websiteID: websiteId,
-                  enable: enable,
-                  cache: current.cache,
-                  cacheTime: current.cacheTime,
-                  cacheUint: current.cacheUint,
-                  extensions: extensions.text.trim(),
-                  returnCode: returnCode.text.trim(),
-                  domains: current.serverNames.join(','),
-                  noneRef: current.noneRef,
-                  logEnable: logEnable,
-                  blocked: blocked,
-                  serverNames: current.serverNames,
-                ),
-              ),
             ),
           ],
         ),
@@ -1154,14 +1095,21 @@ class _SecurityTab extends ConsumerWidget {
     final header = TextEditingController(text: current.ipHeader);
     final other = TextEditingController(text: current.ipOther);
     bool open = current.open;
-    final request = await showAppSheet<WebsiteRealIpDto>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final request = await pushFormPage<WebsiteRealIpDto>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.websites_realIp,
+          onSave: () async => Navigator.of(pageContext).pop(
+            WebsiteRealIpDto(
+              websiteID: websiteId,
+              open: open,
+              ipFrom: from.text.trim(),
+              ipHeader: header.text.trim(),
+              ipOther: other.text.trim(),
+            ),
+          ),
           children: [
-            Text(l10n.websites_realIp, style: AppTextStyles.titleL),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.websites_enabled),
@@ -1181,19 +1129,6 @@ class _SecurityTab extends ConsumerWidget {
             ),
             const SizedBox(height: AppTokens.s12),
             AppTextField(controller: other, label: l10n.websites_ipOther),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(
-                WebsiteRealIpDto(
-                  websiteID: websiteId,
-                  open: open,
-                  ipFrom: from.text.trim(),
-                  ipHeader: header.text.trim(),
-                  ipOther: other.text.trim(),
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -1343,7 +1278,7 @@ class _RewriteTabState extends ConsumerState<_RewriteTab> {
     final l10n = AppLocalizations.of(context);
     if (_loading) return const SkeletonList(itemCount: 4);
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         if (_templates.isNotEmpty) ...[
           Text(l10n.websites_rewriteTemplates, style: AppTextStyles.bodyS),
@@ -1411,29 +1346,15 @@ class _RedirectTab extends ConsumerWidget {
   ) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: item.content);
-    final saved = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.92,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.websites_editSource, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s4),
-          Text(
-            item.name,
-            style: AppTextStyles.caption.copyWith(
-              color: sheetContext.scheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, maxLines: 18),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_editSource,
+          subtitle: item.name,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [AppTextField(controller: controller, maxLines: 18)],
+        ),
       ),
     );
     final content = controller.text;
@@ -1468,20 +1389,15 @@ class _RedirectTab extends ConsumerWidget {
     bool keepPath = current?.keepPath ?? true;
     bool enable = current?.enable ?? true;
     bool redirectRoot = current?.redirectRoot ?? false;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: current == null
+              ? l10n.websites_addRedirect
+              : l10n.websites_editRedirect,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(
-              current == null
-                  ? l10n.websites_addRedirect
-                  : l10n.websites_editRedirect,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(controller: name, label: l10n.files_name),
             const SizedBox(height: AppTokens.s12),
             DropdownButtonFormField<String>(
@@ -1548,11 +1464,6 @@ class _RedirectTab extends ConsumerWidget {
               title: Text(l10n.websites_enabled),
               value: enable,
               onChanged: (value) => setState(() => enable = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),
@@ -1623,7 +1534,7 @@ class _RedirectTab extends ConsumerWidget {
               message: l10n.websites_noRedirectsHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.pagePadding),
+              padding: EdgeInsets.all(context.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {
@@ -1773,7 +1684,7 @@ class _OpenRestyTabState extends ConsumerState<_OpenRestyTab> {
     final l10n = AppLocalizations.of(context);
     if (_loading) return const SkeletonList(itemCount: 6);
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         Text(l10n.websites_openRestyPerformance, style: AppTextStyles.titleS),
         const SizedBox(height: AppTokens.s8),

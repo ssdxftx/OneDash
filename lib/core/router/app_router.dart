@@ -56,6 +56,7 @@ import '../../presentation/features/websites/screens/website_ssl_manage_page.dar
 import '../../presentation/features/websites/screens/website_groups_page.dart';
 import '../../presentation/features/websites/screens/website_templates_page.dart';
 import '../../presentation/features/websites/screens/website_detail_page.dart';
+import '../../presentation/features/websites/widgets/website_log_page.dart';
 import '../../presentation/features/websites/screens/websites_page.dart';
 import '../../presentation/shell/server_shell.dart';
 import 'transitions.dart';
@@ -228,9 +229,93 @@ final appRouter = GoRouter(
                         WebsiteDetailPage(
                           serverId: _serverId(state),
                           siteId: state.pathParameters['siteId'] ?? '',
+                          initialTab:
+                              int.tryParse(
+                                state.uri.queryParameters['tab'] ?? '',
+                              ) ??
+                              0,
                         ),
                       ),
                       routes: [
+                        GoRoute(
+                          path: 'config',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            WebsiteTabPage(
+                              serverId: _serverId(state),
+                              websiteId:
+                                  int.tryParse(
+                                    state.pathParameters['siteId'] ?? '',
+                                  ) ??
+                                  0,
+                              tab: 0,
+                            ),
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'domains',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            WebsiteTabPage(
+                              serverId: _serverId(state),
+                              websiteId:
+                                  int.tryParse(
+                                    state.pathParameters['siteId'] ?? '',
+                                  ) ??
+                                  0,
+                              tab: 1,
+                            ),
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'proxy',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            WebsiteTabPage(
+                              serverId: _serverId(state),
+                              websiteId:
+                                  int.tryParse(
+                                    state.pathParameters['siteId'] ?? '',
+                                  ) ??
+                                  0,
+                              tab: 3,
+                            ),
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'load-balance',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            WebsiteTabPage(
+                              serverId: _serverId(state),
+                              websiteId:
+                                  int.tryParse(
+                                    state.pathParameters['siteId'] ?? '',
+                                  ) ??
+                                  0,
+                              tab: 4,
+                            ),
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'logs',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            WebsiteLogsPage(
+                              serverId: _serverId(state),
+                              websiteId:
+                                  int.tryParse(
+                                    state.pathParameters['siteId'] ?? '',
+                                  ) ??
+                                  0,
+                            ),
+                          ),
+                        ),
                         GoRoute(
                           path: 'advanced',
                           parentNavigatorKey: _rootNavigatorKey,
@@ -411,6 +496,42 @@ final appRouter = GoRouter(
                                   state.uri.queryParameters['instance'] ?? '',
                             ),
                           ),
+                          routes: [
+                            GoRoute(
+                              path: 'users',
+                              parentNavigatorKey: _rootNavigatorKey,
+                              pageBuilder: (context, state) => slidePage(
+                                state,
+                                DatabaseTabPage(
+                                  serverId: _serverId(state),
+                                  databaseName:
+                                      state.pathParameters['name'] ?? '',
+                                  type: state.uri.queryParameters['type'] ?? '',
+                                  instance:
+                                      state.uri.queryParameters['instance'] ??
+                                      '',
+                                  tab: 1,
+                                ),
+                              ),
+                            ),
+                            GoRoute(
+                              path: 'advanced',
+                              parentNavigatorKey: _rootNavigatorKey,
+                              pageBuilder: (context, state) => slidePage(
+                                state,
+                                DatabaseTabPage(
+                                  serverId: _serverId(state),
+                                  databaseName:
+                                      state.pathParameters['name'] ?? '',
+                                  type: state.uri.queryParameters['type'] ?? '',
+                                  instance:
+                                      state.uri.queryParameters['instance'] ??
+                                      '',
+                                  tab: 2,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -562,6 +683,32 @@ final appRouter = GoRouter(
                           name: state.uri.queryParameters['name'] ?? '',
                         ),
                       ),
+                      routes: [
+                        for (final tab in const [
+                          ('extensions', 0),
+                          ('ini', 1),
+                          ('fpm', 2),
+                          ('modules', 3),
+                        ])
+                          GoRoute(
+                            path: tab.$1,
+                            parentNavigatorKey: _rootNavigatorKey,
+                            pageBuilder: (context, state) => slidePage(
+                              state,
+                              RuntimeTabPage(
+                                serverId: _serverId(state),
+                                id:
+                                    int.tryParse(
+                                      state.pathParameters['id'] ?? '',
+                                    ) ??
+                                    0,
+                                type: state.uri.queryParameters['type'] ?? '',
+                                name: state.uri.queryParameters['name'] ?? '',
+                                tab: tab.$2,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     GoRoute(
                       path: 'host-tools',

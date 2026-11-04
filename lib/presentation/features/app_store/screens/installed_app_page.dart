@@ -11,6 +11,7 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/status_dot.dart';
@@ -69,46 +70,68 @@ class InstalledAppPage extends ConsumerWidget {
                     '/s/$serverId/terminal?container=${Uri.encodeComponent(container)}',
                   ),
           ),
-          PopupMenuButton<String>(
+          AppIconButton(
+            icon: TablerIcons.dots,
             tooltip: l10n.action_more,
-            onSelected: (value) {
+            onPressed: () async {
               final app = info.valueOrNull;
               if (app == null) return;
+              final value = await showSelectionMenu<String>(
+                context,
+                options: [
+                  SelectionOption(
+                    label: l10n.apps_upgrade,
+                    value: 'upgrade',
+                    icon: TablerIcons.arrow_up_circle,
+                  ),
+                  SelectionOption(
+                    label: l10n.apps_editParams,
+                    value: 'params',
+                    icon: TablerIcons.adjustments,
+                  ),
+                  SelectionOption(
+                    label: l10n.apps_changePort,
+                    value: 'port',
+                    icon: TablerIcons.plug,
+                  ),
+                  SelectionOption(
+                    label: l10n.apps_connInfo,
+                    value: 'conn',
+                    icon: TablerIcons.info_circle,
+                  ),
+                  SelectionOption(
+                    label: ignored == null
+                        ? l10n.apps_ignoreUpdate
+                        : l10n.apps_cancelIgnoreUpdate,
+                    value: ignored == null ? 'ignore' : 'cancelIgnore',
+                    icon: TablerIcons.bell_off,
+                  ),
+                  SelectionOption(
+                    label: l10n.apps_uninstall,
+                    value: 'uninstall',
+                    icon: TablerIcons.trash,
+                    danger: true,
+                  ),
+                ],
+              );
+              if (!context.mounted) return;
               switch (value) {
                 case 'upgrade':
-                  _upgrade(context, ref, id, app);
+                  await _upgrade(context, ref, id, app);
                 case 'params':
-                  _editParams(context, ref, id);
+                  await _editParams(context, ref, id);
                 case 'port':
-                  _changePort(context, ref, app);
+                  await _changePort(context, ref, app);
                 case 'conn':
-                  _showConnInfo(context, ref, app);
+                  await _showConnInfo(context, ref, app);
                 case 'ignore':
-                  _ignoreUpdate(context, ref, id, app);
+                  await _ignoreUpdate(context, ref, id, app);
                 case 'cancelIgnore':
-                  _cancelIgnore(context, ref, id);
+                  await _cancelIgnore(context, ref, id);
                 case 'uninstall':
-                  _uninstall(context, ref, id, app);
+                  await _uninstall(context, ref, id, app);
               }
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'upgrade', child: Text(l10n.apps_upgrade)),
-              PopupMenuItem(value: 'params', child: Text(l10n.apps_editParams)),
-              PopupMenuItem(value: 'port', child: Text(l10n.apps_changePort)),
-              PopupMenuItem(value: 'conn', child: Text(l10n.apps_connInfo)),
-              PopupMenuItem(
-                value: ignored == null ? 'ignore' : 'cancelIgnore',
-                child: Text(
-                  ignored == null
-                      ? l10n.apps_ignoreUpdate
-                      : l10n.apps_cancelIgnoreUpdate,
-                ),
-              ),
-              PopupMenuItem(
-                value: 'uninstall',
-                child: Text(l10n.apps_uninstall),
-              ),
-            ],
           ),
         ],
       ),
@@ -116,7 +139,7 @@ class InstalledAppPage extends ConsumerWidget {
         value: info,
         onRetry: () => ref.invalidate(installedInfoProvider(id)),
         builder: (app) => ListView(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           children: [
             TonalCard(
               child: Row(
@@ -127,12 +150,19 @@ class InstalledAppPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(app.name, style: AppTextStyles.titleM),
+                        Text(
+                          app.name,
+                          style: AppTextStyles.titleM,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         Text(
                           '${app.version} · ${app.httpPort}',
                           style: AppTextStyles.bodyS.copyWith(
                             color: context.scheme.onSurfaceVariant,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -426,21 +456,19 @@ class InstalledAppPage extends ConsumerWidget {
       final memory = TextEditingController(text: '${data.memoryLimit}');
       final dockerCompose = TextEditingController(text: data.dockerCompose);
       bool advanced = false;
-      final saved = await showAppSheet<bool>(
-        context: context,
-        maxHeightFactor: 0.92,
-        builder: (sheetContext) => StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      final saved = await pushFormPage<bool>(
+        context,
+        StatefulBuilder(
+          builder: (pageContext, setState) => SimpleFormPage(
+            title: l10n.apps_editParams,
+            onSave: () async => Navigator.of(pageContext).pop(true),
             children: [
-              Text(l10n.apps_editParams, style: AppTextStyles.titleL),
-              const SizedBox(height: AppTokens.s16),
               for (final field in data.params)
                 if (field.edit) ...[
                   AppTextField(
                     controller: controllers[field.key],
-                    label: Localizations.localeOf(context).languageCode == 'zh'
+                    label:
+                        Localizations.localeOf(pageContext).languageCode == 'zh'
                         ? field.labelZh
                         : field.labelEn,
                   ),
@@ -489,11 +517,6 @@ class InstalledAppPage extends ConsumerWidget {
                   maxLines: 8,
                 ),
               ],
-              const SizedBox(height: AppTokens.s16),
-              PrimaryButton(
-                label: l10n.action_save,
-                onPressed: () => Navigator.of(sheetContext).pop(true),
-              ),
             ],
           ),
         ),
@@ -542,29 +565,24 @@ class InstalledAppPage extends ConsumerWidget {
   ) async {
     final l10n = AppLocalizations.of(context);
     final port = TextEditingController(text: '${app.httpPort}');
-    final value = await showAppSheet<int>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.apps_changePort, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: port,
-            label: l10n.apps_port,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () {
-              final parsed = int.tryParse(port.text.trim());
-              if (parsed == null) return;
-              Navigator.of(sheetContext).pop(parsed);
-            },
-          ),
-        ],
+    final value = await pushFormPage<int>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.apps_changePort,
+          onSave: () async {
+            final parsed = int.tryParse(port.text.trim());
+            if (parsed == null) return;
+            Navigator.of(pageContext).pop(parsed);
+          },
+          children: [
+            AppTextField(
+              controller: port,
+              label: l10n.apps_port,
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
       ),
     );
     port.dispose();

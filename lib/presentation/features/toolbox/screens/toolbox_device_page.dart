@@ -10,8 +10,8 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/toolbox_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
-import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
@@ -79,7 +79,7 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         children: [
           SectionHeader(title: l10n.toolbox_timeSection),
           SplitListGroup(
@@ -132,34 +132,32 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
   Future<void> _editTimezone() async {
     final l10n = AppLocalizations.of(context);
     final controller = ValueNotifier<String>('${_base['timeZone'] ?? ''}');
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.toolbox_timezone, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          ValueListenableBuilder<String>(
-            valueListenable: controller,
-            builder: (context, selected, _) => DropdownButtonFormField<String>(
-              initialValue: _zones.contains(selected) ? selected : null,
-              decoration: InputDecoration(labelText: l10n.toolbox_timezone),
-              items: [
-                for (final zone in _zones)
-                  DropdownMenuItem(value: zone, child: Text(zone)),
-              ],
-              onChanged: (next) {
-                if (next != null) controller.value = next;
-              },
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.toolbox_timezone,
+          onSave: () async => Navigator.of(pageContext).pop(controller.value),
+          children: [
+            ValueListenableBuilder<String>(
+              valueListenable: controller,
+              builder: (context, selected, _) =>
+                  DropdownButtonFormField<String>(
+                    initialValue: _zones.contains(selected) ? selected : null,
+                    decoration: InputDecoration(
+                      labelText: l10n.toolbox_timezone,
+                    ),
+                    items: [
+                      for (final zone in _zones)
+                        DropdownMenuItem(value: zone, child: Text(zone)),
+                    ],
+                    onChanged: (next) {
+                      if (next != null) controller.value = next;
+                    },
+                  ),
             ),
-          ),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(controller.value),
-          ),
-        ],
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -170,25 +168,20 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
   Future<void> _editDns(String current) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: current);
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.toolbox_dns, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            helper: '8.8.8.8,1.1.1.1',
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(controller.text),
-          ),
-        ],
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.toolbox_dns,
+          onSave: () async => Navigator.of(pageContext).pop(controller.text),
+          children: [
+            AppTextField(
+              controller: controller,
+              helper: '8.8.8.8,1.1.1.1',
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -215,27 +208,23 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
     final l10n = AppLocalizations.of(context);
     final path = TextEditingController(text: '/swapfile');
     final size = TextEditingController(text: '1024');
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.toolbox_addSwap, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: path, label: l10n.toolbox_swapPath),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: size,
-            label: l10n.toolbox_swapSize,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_create,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.toolbox_addSwap,
+          saveLabel: l10n.action_create,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: path, label: l10n.toolbox_swapPath),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: size,
+              label: l10n.toolbox_swapSize,
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
       ),
     );
     final swapPath = path.text.trim();

@@ -8,10 +8,11 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/database/database_instance_dto.dart';
 import '../../../../data/repositories_impl/database_repository_impl.dart';
+import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/skeleton.dart';
@@ -159,7 +160,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                 message: l10n.databases_empty_message,
               ),
               builder: (_) => ListView.builder(
-                padding: const EdgeInsets.all(AppTokens.pagePadding),
+                padding: EdgeInsets.all(context.pagePadding),
                 itemCount: filtered.length,
                 itemBuilder: (context, index) {
                   final item = filtered[index];
@@ -167,9 +168,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                     padding: const EdgeInsets.only(bottom: AppTokens.s12),
                     child: _DatabaseCard(
                       item: item,
-                      onTap: () => context.push(
-                        '/s/${widget.serverId}/more/databases/${Uri.encodeComponent(item.name)}?type=${Uri.encodeComponent(item.dbType)}&instance=${Uri.encodeComponent(item.instanceName)}',
-                      ),
+                      onTap: () => _showActions(item),
                       onLongPress: () => _showActions(item),
                     ),
                   );
@@ -244,77 +243,134 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
     ref.invalidate(_databasesProvider);
   }
 
+  String _detailPath(DatabaseSearchItemDto item) {
+    return '/s/${widget.serverId}/more/databases/'
+        '${Uri.encodeComponent(item.name)}'
+        '?type=${Uri.encodeComponent(item.dbType)}'
+        '&instance=${Uri.encodeComponent(item.instanceName)}';
+  }
+
   Future<void> _showActions(DatabaseSearchItemDto item) async {
     final l10n = AppLocalizations.of(context);
+    final colors = context.appColors;
     await showAppSheet<void>(
       context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(item.name, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s4),
-          Text(
-            '${item.instanceName} · ${item.username}',
-            style: AppTextStyles.bodyS.copyWith(
-              color: context.scheme.onSurfaceVariant,
+      maxHeightFactor: 0.9,
+      builder: (sheetContext) => ActionSheetScaffold(
+        infoCard: ActionSheetInfoCard(
+          leading: Container(
+            decoration: BoxDecoration(
+              color: colors.info.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTokens.rMd),
+            ),
+            child: Icon(
+              TablerIcons.database,
+              color: colors.info,
+              size: AppTokens.iconNav,
             ),
           ),
-          const SizedBox(height: AppTokens.s16),
-          SplitListGroup(
-            children: [
-              SplitListTile(
-                leading: const Icon(TablerIcons.copy),
-                title: l10n.action_copy,
-                subtitle: item.name,
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  await Clipboard.setData(ClipboardData(text: item.name));
-                  if (!context.mounted) return;
-                  // ignore: use_build_context_synchronously
-                  AppToast.success(context, l10n.action_copy);
-                },
-              ),
-              SplitListTile(
-                leading: const Icon(TablerIcons.trash),
-                title: l10n.action_delete,
-                danger: true,
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  final confirmed = await showConfirmSheet(
-                    context,
-                    title: l10n.action_delete,
-                    message: item.name,
-                    confirmLabel: l10n.action_delete,
-                    requireText: item.name,
-                  );
-                  if (!confirmed) return;
-                  try {
-                    final repository = await ref.read(
-                      databaseRepositoryProvider.future,
+          title: item.name,
+          subtitle: '${item.instanceName} · ${item.username}',
+          trailing: ActionSheetStatusPill(label: item.from, color: colors.info),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ActionSheetSection(
+              title: l10n.containers_groupConfig,
+              icon: TablerIcons.settings,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.info_circle,
+                  iconColor: colors.info,
+                  title: l10n.error_details,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(_detailPath(item));
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.users,
+                  iconColor: colors.info,
+                  title: l10n.databases_usersGrants,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push('${_detailPath(item)}/users');
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.adjustments,
+                  iconColor: colors.chart3,
+                  title: l10n.databases_advanced,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push('${_detailPath(item)}/advanced');
+                  },
+                ),
+              ],
+            ),
+            ActionSheetSection(
+              title: l10n.containers_groupMaintenance,
+              icon: TablerIcons.tool,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.copy,
+                  iconColor: colors.info,
+                  title: l10n.action_copy,
+                  subtitle: item.name,
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await Clipboard.setData(ClipboardData(text: item.name));
+                    if (!mounted) return;
+                    AppToast.success(context, l10n.action_copy);
+                  },
+                ),
+              ],
+            ),
+            ActionSheetSection(
+              title: l10n.containers_groupDanger,
+              icon: TablerIcons.alert_triangle,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.trash,
+                  iconColor: colors.danger,
+                  title: l10n.action_delete,
+                  danger: true,
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    final confirmed = await showConfirmSheet(
+                      context,
+                      title: l10n.action_delete,
+                      message: item.name,
+                      confirmLabel: l10n.action_delete,
+                      requireText: item.name,
                     );
-                    await repository.deleteDatabase(
-                      id: item.id,
-                      type: item.from,
-                      database: item.name,
-                      forceDelete: false,
-                      deleteBackup: false,
-                    );
-                    if (!context.mounted) return;
-                    // ignore: use_build_context_synchronously
-                    AppToast.success(context, l10n.action_done);
-                    ref.invalidate(_databasesProvider);
-                  } catch (error) {
-                    if (!context.mounted) return;
-                    // ignore: use_build_context_synchronously
-                    showErrorToast(context, error);
-                  }
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: AppTokens.s8),
-        ],
+                    if (!confirmed || !mounted) return;
+                    try {
+                      final repository = await ref.read(
+                        databaseRepositoryProvider.future,
+                      );
+                      await repository.deleteDatabase(
+                        id: item.id,
+                        type: item.from,
+                        database: item.name,
+                        forceDelete: false,
+                        deleteBackup: false,
+                      );
+                      if (!mounted) return;
+                      AppToast.success(context, l10n.action_done);
+                      ref.invalidate(_databasesProvider);
+                    } catch (error) {
+                      if (!mounted) return;
+                      showErrorToast(context, error);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -435,21 +491,15 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
     final description = TextEditingController(text: current?.description ?? '');
     final type = current?.type ?? 'mysql';
     bool ssl = current?.ssl ?? false;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.92,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: current == null
+              ? l10n.databases_addRemote
+              : l10n.databases_editRemote,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(
-              current == null
-                  ? l10n.databases_addRemote
-                  : l10n.databases_editRemote,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(controller: name, label: l10n.files_name),
             const SizedBox(height: AppTokens.s12),
             AppTextField(controller: address, label: l10n.databases_address),
@@ -477,11 +527,6 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
               title: Text(l10n.databases_ssl),
               value: ssl,
               onChanged: (value) => setState(() => ssl = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),
@@ -648,33 +693,48 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
                     subtitle: Text(
                       '${item.type} · ${item.address}${item.port == 0 ? '' : ':${item.port}'}',
                     ),
-                    trailing: PopupMenuButton<String>(
+                    trailing: IconButton(
                       tooltip: l10n.action_more,
                       icon: const Icon(TablerIcons.dots),
-                      onSelected: (value) {
-                        if (value == 'load') _loadDatabases(item);
-                        if (value == 'test') _test(item);
-                        if (value == 'edit') _edit(item);
-                        if (value == 'delete') _delete(item);
+                      onPressed: () async {
+                        final value = await showSelectionMenu<String>(
+                          context,
+                          options: [
+                            SelectionOption(
+                              label: l10n.databases_loadDatabases,
+                              value: 'load',
+                              icon: TablerIcons.database_import,
+                            ),
+                            SelectionOption(
+                              label: l10n.databases_testConnection,
+                              value: 'test',
+                              icon: TablerIcons.plug_connected,
+                            ),
+                            SelectionOption(
+                              label: l10n.action_edit,
+                              value: 'edit',
+                              icon: TablerIcons.edit,
+                            ),
+                            SelectionOption(
+                              label: l10n.action_delete,
+                              value: 'delete',
+                              icon: TablerIcons.trash,
+                              danger: true,
+                            ),
+                          ],
+                        );
+                        if (value == null || !mounted) return;
+                        switch (value) {
+                          case 'load':
+                            await _loadDatabases(item);
+                          case 'test':
+                            await _test(item);
+                          case 'edit':
+                            await _edit(item);
+                          case 'delete':
+                            await _delete(item);
+                        }
                       },
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: 'load',
-                          child: Text(l10n.databases_loadDatabases),
-                        ),
-                        PopupMenuItem(
-                          value: 'test',
-                          child: Text(l10n.databases_testConnection),
-                        ),
-                        PopupMenuItem(
-                          value: 'edit',
-                          child: Text(l10n.action_edit),
-                        ),
-                        PopupMenuItem(
-                          value: 'delete',
-                          child: Text(l10n.action_delete),
-                        ),
-                      ],
                     ),
                   ),
               ],

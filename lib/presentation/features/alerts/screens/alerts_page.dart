@@ -10,10 +10,12 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/alert/alert_dto.dart';
 import '../../../../data/repositories_impl/alert_repository_impl.dart';
+import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/skeleton.dart';
@@ -111,19 +113,14 @@ class _AlertListTab extends ConsumerWidget {
           );
         }
         return ListView.separated(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           itemCount: items.length,
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {
             final alert = items[index];
             return _AlertCard(
               alert: alert,
-              onTap: () async {
-                await context.push(
-                  '/s/$serverId/more/alerts/form?id=${alert.id}',
-                );
-                ref.invalidate(_alertsProvider);
-              },
+              onTap: () => _showActions(context, ref, alert),
               onToggle: () async {
                 try {
                   final repository = await ref.read(
@@ -143,38 +140,152 @@ class _AlertListTab extends ConsumerWidget {
                   );
                 }
               },
-              onDelete: () async {
-                final confirmed = await showConfirmSheet(
-                  context,
-                  title: l10n.common_delete,
-                  message: l10n.panelSettings_deleteAlertConfirm(
-                    alert.title.isEmpty ? alert.type : alert.title,
-                  ),
-                  confirmLabel: l10n.common_delete,
-                );
-                if (!confirmed || !context.mounted) return;
-                try {
-                  final repository = await ref.read(
-                    alertRepositoryProvider.future,
-                  );
-                  await repository.deleteAlert(alert.id);
-                  if (!context.mounted) return;
-                  AppToast.success(context, l10n.panelSettings_deleted);
-                  ref.invalidate(_alertsProvider);
-                } catch (error) {
-                  if (!context.mounted) return;
-                  showErrorToast(
-                    context,
-                    error,
-                    prefix: l10n.panelSettings_deleteFailed,
-                  );
-                }
-              },
             );
           },
         );
       },
     );
+  }
+
+  Future<void> _showActions(
+    BuildContext context,
+    WidgetRef ref,
+    AlertInfo alert,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final colors = context.appColors;
+    final enabled = alert.status == 'Enable';
+    final name = alert.title.isEmpty ? alert.type : alert.title;
+    await showAppSheet<void>(
+      context: context,
+      maxHeightFactor: 0.9,
+      builder: (sheetContext) => ActionSheetScaffold(
+        infoCard: ActionSheetInfoCard(
+          leading: Container(
+            decoration: BoxDecoration(
+              color: (enabled ? colors.success : colors.info).withValues(
+                alpha: 0.1,
+              ),
+              borderRadius: BorderRadius.circular(AppTokens.rMd),
+            ),
+            child: Icon(
+              TablerIcons.bell,
+              color: enabled ? colors.success : colors.info,
+              size: AppTokens.iconNav,
+            ),
+          ),
+          title: name,
+          subtitle:
+              '${alertTypeLabel(alert.type, l10n)} · '
+              '${alertMethodLabel(alert.method, l10n)}',
+          trailing: ActionSheetStatusPill(
+            label: enabled ? l10n.cronjobs_enabled : l10n.cronjobs_disabled,
+            color: enabled ? colors.success : colors.info,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ActionSheetSection(
+              title: l10n.containers_groupConfig,
+              icon: TablerIcons.settings,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.edit,
+                  iconColor: colors.info,
+                  title: l10n.action_edit,
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await context.push(
+                      '/s/$serverId/more/alerts/form?id=${alert.id}',
+                    );
+                    ref.invalidate(_alertsProvider);
+                  },
+                ),
+                ActionSheetRow(
+                  icon: enabled
+                      ? TablerIcons.player_pause
+                      : TablerIcons.player_play,
+                  iconColor: enabled ? colors.warning : colors.success,
+                  title: enabled ? l10n.cronjobs_disable : l10n.cronjobs_enable,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _toggle(context, ref, alert);
+                  },
+                ),
+              ],
+            ),
+            ActionSheetSection(
+              title: l10n.containers_groupDanger,
+              icon: TablerIcons.alert_triangle,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.trash,
+                  iconColor: colors.danger,
+                  title: l10n.common_delete,
+                  danger: true,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _delete(context, ref, alert);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _toggle(
+    BuildContext context,
+    WidgetRef ref,
+    AlertInfo alert,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(alertRepositoryProvider.future);
+      await repository.updateAlertStatus(
+        alert.id,
+        alert.status == 'Enable' ? 'Disable' : 'Enable',
+      );
+      ref.invalidate(_alertsProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(
+        context,
+        error,
+        prefix: l10n.panelSettings_operationFailed,
+      );
+    }
+  }
+
+  Future<void> _delete(
+    BuildContext context,
+    WidgetRef ref,
+    AlertInfo alert,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.common_delete,
+      message: l10n.panelSettings_deleteAlertConfirm(
+        alert.title.isEmpty ? alert.type : alert.title,
+      ),
+      confirmLabel: l10n.common_delete,
+    );
+    if (!confirmed || !context.mounted) return;
+    try {
+      final repository = await ref.read(alertRepositoryProvider.future);
+      await repository.deleteAlert(alert.id);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.panelSettings_deleted);
+      ref.invalidate(_alertsProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error, prefix: l10n.panelSettings_deleteFailed);
+    }
   }
 }
 
@@ -183,13 +294,11 @@ class _AlertCard extends StatelessWidget {
     required this.alert,
     required this.onTap,
     required this.onToggle,
-    required this.onDelete,
   });
 
   final AlertInfo alert;
   final VoidCallback onTap;
   final VoidCallback onToggle;
-  final VoidCallback onDelete;
 
   Widget _metaRow(String label, String value, ColorScheme scheme) {
     final style = AppTextStyles.bodyS.copyWith(color: scheme.onSurfaceVariant);
@@ -222,7 +331,6 @@ class _AlertCard extends StatelessWidget {
           final compact =
               constraints.maxWidth < 320 ||
               (scale >= 1.3 && constraints.maxWidth < 430);
-          final stackControls = scale > 0 && constraints.maxWidth / scale < 210;
           final meta = compact
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,20 +357,6 @@ class _AlertCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 );
-          final menu = PopupMenuButton<String>(
-            tooltip: l10n.action_more,
-            icon: Icon(
-              TablerIcons.dots,
-              size: AppTokens.iconList,
-              color: scheme.onSurfaceVariant,
-            ),
-            onSelected: (value) {
-              if (value == 'delete') onDelete();
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'delete', child: Text(l10n.common_delete)),
-            ],
-          );
           final toggle = Switch(
             value: enabled,
             onChanged: (_) => onToggle(),
@@ -300,7 +394,6 @@ class _AlertCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        if (!compact) menu,
                       ],
                     ),
                     const SizedBox(height: 2),
@@ -308,18 +401,7 @@ class _AlertCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(child: meta),
-                        if (stackControls)
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [menu, toggle],
-                          )
-                        else if (!compact)
-                          toggle
-                        else
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [menu, toggle],
-                          ),
+                        toggle,
                       ],
                     ),
                   ],
@@ -405,7 +487,7 @@ class _AlertLogTab extends ConsumerWidget {
                     message: l10n.panelSettings_alertLogs,
                   )
                 : ListView.separated(
-                    padding: const EdgeInsets.all(AppTokens.pagePadding),
+                    padding: EdgeInsets.all(context.pagePadding),
                     itemCount: items.length,
                     separatorBuilder: (_, _) =>
                         const SizedBox(height: AppTokens.s8),
@@ -489,7 +571,7 @@ class _AlertSettingsTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final configs = ref.watch(_alertConfigsProvider);
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         Text(
           l10n.panelSettings_webPanelRequired,
@@ -594,21 +676,26 @@ class _AlertSettingsTab extends ConsumerWidget {
     );
     final content = TextEditingController(text: config?.config ?? '');
     var status = config?.status == 'Enable' || config == null;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.92,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: current == null
+              ? l10n.alerts_addNotification
+              : l10n.alerts_editNotification,
+          onSave: () async {
+            final raw = content.text.trim();
+            if (raw.isNotEmpty) {
+              try {
+                jsonDecode(raw);
+              } catch (_) {
+                AppToast.warning(pageContext, l10n.alerts_configInvalid);
+                return;
+              }
+            }
+            Navigator.of(pageContext).pop(true);
+          },
           children: [
-            Text(
-              current == null
-                  ? l10n.alerts_addNotification
-                  : l10n.alerts_editNotification,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(controller: title, label: l10n.alerts_title),
             const SizedBox(height: AppTokens.s12),
             AppTextField(controller: type, label: l10n.alerts_type),
@@ -623,11 +710,6 @@ class _AlertSettingsTab extends ConsumerWidget {
               title: Text(l10n.websites_enabled),
               value: status,
               onChanged: (value) => setState(() => status = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),

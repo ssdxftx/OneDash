@@ -11,6 +11,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../data/dto/website/website_dto.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
+import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -19,10 +20,10 @@ import '../../../common/components/filter_chips.dart';
 import '../../../common/components/search_field.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/skeleton.dart';
-import '../../../common/components/split_list_group.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
+import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/refreshable_empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -152,10 +153,30 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                     });
                   },
                 ),
-                PopupMenuButton<String>(
+                AppIconButton(
+                  icon: TablerIcons.dots,
                   tooltip: l10n.action_more,
-                  icon: const Icon(TablerIcons.dots),
-                  onSelected: (value) {
+                  onPressed: () async {
+                    final value = await showSelectionMenu<String>(
+                      context,
+                      options: [
+                        SelectionOption(
+                          label: _selectionMode
+                              ? l10n.files_cancelSelection
+                              : l10n.files_selectAll,
+                          value: 'select',
+                          icon: _selectionMode
+                              ? TablerIcons.square_x
+                              : TablerIcons.checkbox,
+                        ),
+                        SelectionOption(
+                          label: l10n.websites_templates,
+                          value: 'templates',
+                          icon: TablerIcons.layout,
+                        ),
+                      ],
+                    );
+                    if (!mounted || value == null) return;
                     if (value == 'select') {
                       setState(() {
                         if (_selectionMode) {
@@ -172,23 +193,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                         }
                       });
                     } else if (value == 'templates') {
-                      context.push('/s/${widget.serverId}/websites/templates');
+                      if (!context.mounted) return;
+                      await context.push(
+                        '/s/${widget.serverId}/websites/templates',
+                      );
                     }
                   },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'select',
-                      child: Text(
-                        _selectionMode
-                            ? l10n.files_cancelSelection
-                            : l10n.files_selectAll,
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'templates',
-                      child: Text(l10n.websites_templates),
-                    ),
-                  ],
                 ),
                 AppIconButton(
                   icon: TablerIcons.plus,
@@ -276,11 +286,8 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                             selectionMode: _selectionMode,
                             onTap: _selectionMode
                                 ? () => _toggle(site)
-                                : () => context.push(
-                                    '/s/${widget.serverId}/websites/${site.id}',
-                                  ),
+                                : () => _showSiteActions(site),
                             onLongPress: () => _toggle(site),
-                            onMore: () => _showSiteActions(site),
                           ),
                         );
                       },
@@ -319,72 +326,206 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
     );
   }
 
+  String _statusLabel(String status, AppLocalizations l10n) {
+    return switch (status.toLowerCase()) {
+      'running' => l10n.websites_running,
+      'stopped' => l10n.websites_stopped,
+      _ => status,
+    };
+  }
+
   Future<void> _showSiteActions(WebsiteDto site) async {
     final l10n = AppLocalizations.of(context);
     final running = site.status.toLowerCase() == 'running';
+    final colors = context.appColors;
     await showAppSheet<void>(
       context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(site.primaryDomain, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s4),
-          Text(
-            site.type,
-            style: AppTextStyles.bodyS.copyWith(
-              color: context.scheme.onSurfaceVariant,
+      maxHeightFactor: 0.9,
+      builder: (sheetContext) => ActionSheetScaffold(
+        infoCard: ActionSheetInfoCard(
+          leading: Container(
+            decoration: BoxDecoration(
+              color: colors.info.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTokens.rMd),
+            ),
+            child: Icon(
+              TablerIcons.world,
+              color: colors.info,
+              size: AppTokens.iconNav,
             ),
           ),
-          const SizedBox(height: AppTokens.s16),
-          SplitListGroup(
-            children: [
-              SplitListTile(
-                leading: Icon(
-                  running ? TablerIcons.player_pause : TablerIcons.player_play,
-                ),
-                title: running ? l10n.websites_stop : l10n.websites_start,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _operateSite(site, running ? 'stop' : 'start');
-                },
-              ),
-              SplitListTile(
-                leading: const Icon(TablerIcons.copy),
-                title: l10n.websites_copyDomain,
-                onTap: () async {
-                  await Clipboard.setData(
-                    ClipboardData(text: site.primaryDomain),
-                  );
-                  if (!sheetContext.mounted) return;
-                  Navigator.of(sheetContext).pop();
-                  if (!mounted) return;
-                  AppToast.success(
-                    context,
-                    l10n.common_copiedLabel(site.primaryDomain),
-                  );
-                },
-              ),
-              SplitListTile(
-                leading: const Icon(TablerIcons.world),
-                title: l10n.websites_open,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _openSite(site);
-                },
-              ),
-              SplitListTile(
-                leading: const Icon(TablerIcons.trash),
-                title: l10n.websites_delete,
-                danger: true,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  _deleteSite(site);
-                },
-              ),
-            ],
+          title: site.primaryDomain,
+          subtitle: site.type,
+          trailing: ActionSheetStatusPill(
+            label: _statusLabel(site.status, l10n),
+            color: running ? colors.success : colors.info,
           ),
-        ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ActionSheetSection(
+              title: l10n.containers_groupLifecycle,
+              icon: TablerIcons.refresh,
+              children: [
+                ActionSheetRow(
+                  icon: running
+                      ? TablerIcons.player_pause
+                      : TablerIcons.player_play,
+                  iconColor: running ? colors.warning : colors.success,
+                  title: running ? l10n.websites_stop : l10n.websites_start,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _operateSite(site, running ? 'stop' : 'start');
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.eye,
+                  iconColor: colors.info,
+                  title: l10n.websites_open,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _openSite(site);
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.copy,
+                  iconColor: colors.info,
+                  title: l10n.websites_copyDomain,
+                  onTap: () async {
+                    await Clipboard.setData(
+                      ClipboardData(text: site.primaryDomain),
+                    );
+                    if (!sheetContext.mounted) return;
+                    Navigator.of(sheetContext).pop();
+                    if (!mounted) return;
+                    AppToast.success(
+                      context,
+                      l10n.common_copiedLabel(site.primaryDomain),
+                    );
+                  },
+                ),
+              ],
+            ),
+            ActionSheetSection(
+              title: l10n.containers_groupConfig,
+              icon: TablerIcons.settings,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.info_circle,
+                  iconColor: colors.info,
+                  title: l10n.error_details,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/${widget.serverId}/websites/${site.id}/config',
+                    );
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.world_www,
+                  iconColor: colors.chart2,
+                  title: l10n.websites_domains,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/${widget.serverId}/websites/${site.id}/domains',
+                    );
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.lock,
+                  iconColor: colors.success,
+                  title: l10n.websites_sslCertificate,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/${widget.serverId}/websites/${site.id}/ssl'
+                      '?domain=${Uri.encodeComponent(site.primaryDomain)}',
+                    );
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.arrows_exchange,
+                  iconColor: colors.chart2,
+                  title: l10n.websites_proxySettings,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/${widget.serverId}/websites/${site.id}/proxy',
+                    );
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.sitemap,
+                  iconColor: colors.chart2,
+                  title: l10n.websites_loadBalance,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/${widget.serverId}/websites/${site.id}/load-balance',
+                    );
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.adjustments,
+                  iconColor: colors.chart3,
+                  title: l10n.websites_advanced,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/${widget.serverId}/websites/${site.id}/advanced',
+                    );
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.certificate,
+                  iconColor: colors.chart3,
+                  title: l10n.websites_certificateAccounts,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push('/s/${widget.serverId}/websites/accounts');
+                  },
+                ),
+              ],
+            ),
+            ActionSheetSection(
+              title: l10n.websites_logs,
+              icon: TablerIcons.file_text,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.file_text,
+                  iconColor: colors.info,
+                  title: l10n.websites_logs,
+                  subtitle: l10n.websites_liveLogHint,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/${widget.serverId}/websites/${site.id}/logs',
+                    );
+                  },
+                ),
+              ],
+            ),
+            ActionSheetSection(
+              title: l10n.containers_groupDanger,
+              icon: TablerIcons.alert_triangle,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.trash,
+                  iconColor: colors.danger,
+                  title: l10n.websites_delete,
+                  danger: true,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _deleteSite(site);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -571,7 +712,6 @@ class _WebsiteCard extends StatelessWidget {
     required this.onLongPress,
     required this.selected,
     required this.selectionMode,
-    required this.onMore,
   });
 
   final WebsiteDto site;
@@ -579,18 +719,12 @@ class _WebsiteCard extends StatelessWidget {
   final VoidCallback onLongPress;
   final bool selected;
   final bool selectionMode;
-  final VoidCallback onMore;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = context.scheme;
-    final typeLabel = switch (site.type.toLowerCase()) {
-      'static' => l10n.websites_static,
-      'proxy' || 'reverse_proxy' => l10n.websites_proxy,
-      'php' => l10n.websites_php,
-      _ => site.type,
-    };
+    final typeLabel = websiteTypeLabel(site.type, l10n);
     final expiry = _parseDate(site.sslExpireDate).isAfter(DateTime(2000))
         ? _parseDate(site.sslExpireDate)
         : _parseDate(site.expireDate);
@@ -651,11 +785,10 @@ class _WebsiteCard extends StatelessWidget {
                 ),
               if (!selectionMode) ...[
                 const SizedBox(width: AppTokens.s4),
-                IconButton(
-                  tooltip: l10n.action_more,
-                  visualDensity: VisualDensity.compact,
-                  icon: const Icon(TablerIcons.dots, size: AppTokens.iconList),
-                  onPressed: onMore,
+                Icon(
+                  TablerIcons.chevron_right,
+                  size: AppTokens.iconList,
+                  color: scheme.onSurfaceVariant,
                 ),
               ],
             ],

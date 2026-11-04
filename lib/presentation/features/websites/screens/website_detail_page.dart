@@ -14,13 +14,14 @@ import '../../../../data/dto/website/website_proxy_dto.dart';
 import '../../../../data/dto/website/website_domain_req.dart';
 import '../../../../data/dto/website/website_log_dto.dart';
 import '../../../../data/dto/website/website_resource_dto.dart';
-import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../widgets/website_load_balance_tab.dart';
+import '../widgets/website_log_page.dart';
 import '../widgets/website_ssl_sheet.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
@@ -35,33 +36,20 @@ import '../../../common/states/error_state.dart';
 import '../providers/websites_provider.dart';
 import '../../../common/states/error_toast.dart';
 import 'websites_page.dart';
+import '../../../common/formatters/enum_labels.dart';
 import '../../../common/formatters/value_labels.dart';
-
-final _websiteLogFuture = FutureProvider.autoDispose
-    .family<List<String>, String>((ref, key) async {
-      final parts = key.split('|');
-      final id = int.tryParse(parts.first) ?? 0;
-      final name = parts.length > 1 ? parts[1] : '';
-      final repository = await ref.watch(fileRepositoryProvider.future);
-      final log = await repository.readRuntimeLog(
-        id: id,
-        type: 'website',
-        name: name,
-        pageSize: 300,
-        latest: true,
-      );
-      return log.lines;
-    }, name: 'websiteLogFuture');
 
 class WebsiteDetailPage extends ConsumerWidget {
   const WebsiteDetailPage({
     super.key,
     required this.serverId,
     required this.siteId,
+    this.initialTab = 0,
   });
 
   final int serverId;
   final String siteId;
+  final int initialTab;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -73,52 +61,68 @@ class WebsiteDetailPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBarLarge(
         title: site?.primaryDomain ?? l10n.websites_title,
-        subtitle: site?.type,
+        subtitle: site == null ? null : websiteTypeLabel(site.type, l10n),
         actions: [
           if (site != null)
-            PopupMenuButton<String>(
+            AppIconButton(
+              icon: TablerIcons.dots,
               tooltip: l10n.action_more,
-              onSelected: (value) {
-                if (value == 'toggle') {
-                  _operate(
-                    context,
-                    ref,
-                    site,
-                    site.status.toLowerCase() == 'running' ? 'stop' : 'start',
-                  );
+              onPressed: () async {
+                final running = site.status.toLowerCase() == 'running';
+                final value = await showSelectionMenu<String>(
+                  context,
+                  options: [
+                    SelectionOption(
+                      label: running ? l10n.websites_stop : l10n.websites_start,
+                      value: 'toggle',
+                      icon: running
+                          ? TablerIcons.player_pause
+                          : TablerIcons.player_play,
+                    ),
+                    SelectionOption(
+                      label: l10n.websites_open,
+                      value: 'open',
+                      icon: TablerIcons.eye,
+                    ),
+                    SelectionOption(
+                      label: l10n.websites_advanced,
+                      value: 'advanced',
+                      icon: TablerIcons.adjustments,
+                    ),
+                    SelectionOption(
+                      label: l10n.websites_certificateAccounts,
+                      value: 'accounts',
+                      icon: TablerIcons.certificate,
+                    ),
+                    SelectionOption(
+                      label: l10n.websites_delete,
+                      value: 'delete',
+                      icon: TablerIcons.trash,
+                      danger: true,
+                    ),
+                  ],
+                );
+                if (!context.mounted) return;
+                switch (value) {
+                  case 'toggle':
+                    await _operate(
+                      context,
+                      ref,
+                      site,
+                      running ? 'stop' : 'start',
+                    );
+                  case 'open':
+                    await _open(context, site);
+                  case 'advanced':
+                    await context.push(
+                      '/s/$serverId/websites/${site.id}/advanced',
+                    );
+                  case 'accounts':
+                    await context.push('/s/$serverId/websites/accounts');
+                  case 'delete':
+                    await _delete(context, ref, site);
                 }
-                if (value == 'open') _open(context, site);
-                if (value == 'advanced') {
-                  context.push('/s/$serverId/websites/${site.id}/advanced');
-                }
-                if (value == 'accounts') {
-                  context.push('/s/$serverId/websites/accounts');
-                }
-                if (value == 'delete') _delete(context, ref, site);
               },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'toggle',
-                  child: Text(
-                    site.status.toLowerCase() == 'running'
-                        ? l10n.websites_stop
-                        : l10n.websites_start,
-                  ),
-                ),
-                PopupMenuItem(value: 'open', child: Text(l10n.websites_open)),
-                PopupMenuItem(
-                  value: 'advanced',
-                  child: Text(l10n.websites_advanced),
-                ),
-                PopupMenuItem(
-                  value: 'accounts',
-                  child: Text(l10n.websites_certificateAccounts),
-                ),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Text(l10n.websites_delete),
-                ),
-              ],
             ),
         ],
       ),
@@ -129,6 +133,7 @@ class WebsiteDetailPage extends ConsumerWidget {
           onRetry: () => ref.invalidate(websiteDetailProvider(id)),
         ),
         data: (data) => SegmentedTabsView(
+          initialIndex: initialTab.clamp(0, 5),
           labels: [
             l10n.websites_basicConfig,
             l10n.websites_domains,
@@ -236,7 +241,7 @@ class _ConfigTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final site = detail.website;
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         TonalCard(
           child: Row(
@@ -385,48 +390,22 @@ class _ConfigTab extends ConsumerWidget {
       final config = await repository.getWebsiteConfig(site.id);
       if (!context.mounted) return;
       final controller = TextEditingController(text: config.content);
-      final confirmed = await showAppSheet<bool>(
-        context: context,
-        maxHeightFactor: 0.95,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.websites_configFile, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s4),
-            Text(
-              config.path,
-              style: AppTextStyles.caption.copyWith(
-                color: context.scheme.onSurfaceVariant,
-                fontFamily: 'monospace',
+      final confirmed = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.websites_configFile,
+            subtitle: config.path,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              TextField(
+                controller: controller,
+                maxLines: 14,
+                style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                decoration: const InputDecoration(border: OutlineInputBorder()),
               ),
-            ),
-            const SizedBox(height: AppTokens.s12),
-            TextField(
-              controller: controller,
-              maxLines: 14,
-              style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
-              decoration: const InputDecoration(border: OutlineInputBorder()),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            Row(
-              children: [
-                Expanded(
-                  child: SecondaryButton(
-                    label: l10n.action_cancel,
-                    onPressed: () => Navigator.of(sheetContext).pop(false),
-                  ),
-                ),
-                const SizedBox(width: AppTokens.s12),
-                Expanded(
-                  child: PrimaryButton(
-                    label: l10n.action_save,
-                    onPressed: () => Navigator.of(sheetContext).pop(true),
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       );
       if (confirmed == true) {
@@ -449,22 +428,15 @@ class _ConfigTab extends ConsumerWidget {
   ) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: site.siteDir);
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.websites_siteDirectory, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, autofocus: true),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () =>
-                Navigator.of(sheetContext).pop(controller.text.trim()),
-          ),
-        ],
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_siteDirectory,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [AppTextField(controller: controller, autofocus: true)],
+        ),
       ),
     );
     controller.dispose();
@@ -491,7 +463,7 @@ class _DomainsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         if (detail.domains.isEmpty)
           Padding(
@@ -543,26 +515,22 @@ class _DomainsTab extends ConsumerWidget {
   Future<void> _addDomain(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.websites_addDomain, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            hint: 'example.com',
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.websites_addDomainAction,
-            onPressed: () =>
-                Navigator.of(sheetContext).pop(controller.text.trim()),
-          ),
-        ],
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_addDomain,
+          saveLabel: l10n.websites_addDomainAction,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [
+            AppTextField(
+              controller: controller,
+              hint: 'example.com',
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -672,7 +640,7 @@ class _SslTab extends StatelessWidget {
       );
     }
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         TonalCard(
           child: Column(
@@ -684,7 +652,10 @@ class _SslTab extends StatelessWidget {
                 children: [
                   StatusDot(status: ssl.status.toLowerCase()),
                   const SizedBox(width: AppTokens.s8),
-                  Text(ssl.status, style: AppTextStyles.bodyS),
+                  Text(
+                    sslStatusLabel(ssl.status, l10n),
+                    style: AppTextStyles.bodyS,
+                  ),
                 ],
               ),
             ],
@@ -762,7 +733,7 @@ class _ProxyTab extends ConsumerWidget {
               message: l10n.websites_noReverseProxyHint,
             ),
             builder: (items) => ListView(
-              padding: const EdgeInsets.all(AppTokens.pagePadding),
+              padding: EdgeInsets.all(context.pagePadding),
               children: [
                 for (final proxy in items)
                   Padding(
@@ -854,20 +825,23 @@ class _ProxyTab extends ConsumerWidget {
     bool sni = current?.sni ?? false;
     bool sslVerify = current?.sslVerify ?? false;
     String? formError;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: current == null
+              ? l10n.websites_addProxy
+              : l10n.websites_editProxy,
+          onSave: () async {
+            final proxyName = name.text.trim();
+            final proxyPass = pass.text.trim();
+            if (proxyName.isEmpty || proxyPass.isEmpty) {
+              setState(() => formError = l10n.websites_proxyRequired);
+              return;
+            }
+            Navigator.of(pageContext).pop(true);
+          },
           children: [
-            Text(
-              current == null
-                  ? l10n.websites_addProxy
-                  : l10n.websites_editProxy,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(controller: name, label: l10n.websites_proxyName),
             const SizedBox(height: AppTokens.s12),
             AppTextField(
@@ -910,23 +884,10 @@ class _ProxyTab extends ConsumerWidget {
               Text(
                 formError!,
                 style: AppTextStyles.bodyS.copyWith(
-                  color: sheetContext.appColors.danger,
+                  color: pageContext.appColors.danger,
                 ),
               ),
             ],
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () {
-                final proxyName = name.text.trim();
-                final proxyPass = pass.text.trim();
-                if (proxyName.isEmpty || proxyPass.isEmpty) {
-                  setState(() => formError = l10n.websites_proxyRequired);
-                  return;
-                }
-                Navigator.of(sheetContext).pop(true);
-              },
-            ),
           ],
         ),
       ),
@@ -974,29 +935,15 @@ class _ProxyTab extends ConsumerWidget {
   ) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: proxy.content);
-    final saved = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.92,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.websites_editSource, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s4),
-          Text(
-            proxy.name,
-            style: AppTextStyles.caption.copyWith(
-              color: sheetContext.scheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, maxLines: 18),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_editSource,
+          subtitle: proxy.name,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [AppTextField(controller: controller, maxLines: 18)],
+        ),
       ),
     );
     final content = controller.text;
@@ -1071,65 +1018,6 @@ class _LogsTab extends ConsumerWidget {
   final int serverId;
   final WebsiteDetailDto detail;
 
-  Future<void> _showLog(
-    BuildContext context,
-    WidgetRef ref,
-    String name,
-    String title,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    final key = '${detail.website.id}|$name';
-    await showAppSheet<void>(
-      context: context,
-      maxHeightFactor: 0.9,
-      builder: (sheetContext) {
-        final log = ref.watch(_websiteLogFuture(key));
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(child: Text(title, style: AppTextStyles.titleL)),
-                IconButton(
-                  tooltip: l10n.action_refresh,
-                  icon: const Icon(TablerIcons.refresh),
-                  onPressed: () => ref.invalidate(_websiteLogFuture(key)),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppTokens.s8),
-            if (log.isLoading)
-              const Center(child: CircularProgressIndicator())
-            else if (log.hasError)
-              Text(describeError(log.error!, l10n))
-            else if ((log.valueOrNull ?? const []).isEmpty)
-              EmptyState(
-                compact: true,
-                icon: TablerIcons.file_text,
-                title: l10n.state_empty,
-              )
-            else
-              Flexible(
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    for (final line in log.valueOrNull ?? const [])
-                      Text(
-                        line,
-                        style: AppTextStyles.caption.copyWith(
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-          ],
-        );
-      },
-    );
-  }
-
   Future<void> _toggleLog(
     BuildContext context,
     WidgetRef ref,
@@ -1155,43 +1043,21 @@ class _LogsTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final scheme = context.scheme;
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         SplitListGroup(
           children: [
             SplitListTile(
               leading: const Icon(TablerIcons.file_text),
-              title: l10n.websites_accessLog,
-              subtitle: detail.accessLogPath,
-              trailing: const Icon(TablerIcons.chevron_right),
-              onTap: () => context.push(
-                '/s/$serverId/files?path=${Uri.encodeComponent(detail.accessLogPath)}',
-              ),
-            ),
-            SplitListTile(
-              leading: const Icon(TablerIcons.file_alert),
-              title: l10n.websites_errorLog,
-              subtitle: detail.errorLogPath,
-              trailing: const Icon(TablerIcons.chevron_right),
-              onTap: () => context.push(
-                '/s/$serverId/files?path=${Uri.encodeComponent(detail.errorLogPath)}',
-              ),
-            ),
-            SplitListTile(
-              leading: const Icon(TablerIcons.file_text),
-              title: l10n.websites_viewAccessLog,
+              title: l10n.websites_logs,
               subtitle: l10n.websites_liveLogHint,
-              trailing: const Icon(TablerIcons.eye),
-              onTap: () =>
-                  _showLog(context, ref, 'access.log', l10n.websites_accessLog),
-            ),
-            SplitListTile(
-              leading: const Icon(TablerIcons.file_alert),
-              title: l10n.websites_viewErrorLog,
-              subtitle: l10n.websites_liveLogHint,
-              trailing: const Icon(TablerIcons.eye),
-              onTap: () =>
-                  _showLog(context, ref, 'error.log', l10n.websites_errorLog),
+              trailing: const Icon(TablerIcons.chevron_right),
+              onTap: () => openWebsiteLogs(
+                context,
+                ref,
+                websiteId: detail.website.id,
+                subtitle: detail.website.primaryDomain,
+              ),
             ),
           ],
         ),
@@ -1261,6 +1127,58 @@ class _Row extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Fullscreen host for one website tab, used by the action menu and deep links.
+class WebsiteTabPage extends ConsumerWidget {
+  const WebsiteTabPage({
+    super.key,
+    required this.serverId,
+    required this.websiteId,
+    required this.tab,
+  });
+
+  final int serverId;
+  final int websiteId;
+  final int tab;
+
+  String _title(AppLocalizations l10n) {
+    return switch (tab) {
+      0 => l10n.websites_basicConfig,
+      1 => l10n.websites_domains,
+      3 => l10n.websites_proxySettings,
+      4 => l10n.websites_loadBalance,
+      5 => l10n.websites_logs,
+      _ => l10n.websites_title,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final detail = ref.watch(websiteDetailProvider(websiteId));
+    return Scaffold(
+      appBar: AppBarLarge(
+        title: detail.valueOrNull?.website.primaryDomain ?? l10n.websites_title,
+        subtitle: _title(l10n),
+      ),
+      body: detail.when(
+        loading: () => const SkeletonList(itemCount: 6),
+        error: (error, stack) => ErrorState(
+          data: mapError(error, l10n),
+          onRetry: () => ref.invalidate(websiteDetailProvider(websiteId)),
+        ),
+        data: (data) => switch (tab) {
+          0 => _ConfigTab(detail: data),
+          1 => _DomainsTab(detail: data),
+          3 => _ProxyTab(detail: data),
+          4 => WebsiteLoadBalanceTab(websiteId: data.website.id),
+          5 => _LogsTab(serverId: serverId, detail: data),
+          _ => _ConfigTab(detail: data),
+        },
       ),
     );
   }

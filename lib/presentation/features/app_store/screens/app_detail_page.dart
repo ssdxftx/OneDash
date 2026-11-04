@@ -8,8 +8,8 @@ import '../../../../data/dto/app/app_detail_dto.dart';
 import '../../../../data/dto/app/app_installed_check_req.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
-import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/simple_markdown.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/components/app_toast.dart';
@@ -34,7 +34,7 @@ class AppDetailPage extends ConsumerWidget {
         value: detail,
         onRetry: () => ref.invalidate(appDetailProvider(appId)),
         builder: (app) => ListView(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           children: [
             TonalCard(
               child: Column(
@@ -75,7 +75,7 @@ class AppDetailPage extends ConsumerWidget {
             ),
             if (app.readMe.isNotEmpty) ...[
               const SizedBox(height: AppTokens.s24),
-              TonalCard(child: Text(app.readMe, style: AppTextStyles.bodyS)),
+              TonalCard(child: SimpleMarkdown(data: app.readMe)),
             ],
             const SizedBox(height: AppTokens.s24),
             PrimaryButton(
@@ -116,10 +116,6 @@ class AppDetailPage extends ConsumerWidget {
       return;
     }
     if (!context.mounted) return;
-    await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.95,
-      builder: (_) => AppInstallSheet(app: app),
-    );
+    await showAppInstallPage(context, app);
   }
 }

@@ -9,9 +9,9 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/toolbox_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/empty_state.dart';
@@ -117,34 +117,29 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
   }) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: current);
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            keyboardType: numeric ? TextInputType.number : TextInputType.text,
-            autofocus: true,
-          ),
-          if (key == 'banTime' || key == 'findTime') ...[
-            const SizedBox(height: AppTokens.s8),
-            Text(
-              l10n.toolbox_durationHint,
-              style: AppTextStyles.bodyS.copyWith(
-                color: context.scheme.onSurfaceVariant,
-              ),
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: label,
+          onSave: () async => Navigator.of(pageContext).pop(controller.text),
+          children: [
+            AppTextField(
+              controller: controller,
+              keyboardType: numeric ? TextInputType.number : TextInputType.text,
+              autofocus: true,
             ),
+            if (key == 'banTime' || key == 'findTime') ...[
+              const SizedBox(height: AppTokens.s8),
+              Text(
+                l10n.toolbox_durationHint,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: pageContext.scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ],
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(controller.text),
-          ),
-        ],
+        ),
       ),
     );
     controller.dispose();
@@ -172,15 +167,13 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
       'ufw',
     ];
     if (!options.contains(action)) action = options.first;
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final value = await pushFormPage<String>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setSheetState) => SimpleFormPage(
+          title: l10n.toolbox_banAction,
+          onSave: () async => Navigator.of(pageContext).pop(action),
           children: [
-            Text(l10n.toolbox_banAction, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
             DropdownButtonFormField<String>(
               initialValue: action,
               items: [
@@ -190,11 +183,6 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
               onChanged: (next) {
                 if (next != null) setSheetState(() => action = next);
               },
-            ),
-            const SizedBox(height: AppTokens.s24),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(action),
             ),
           ],
         ),
@@ -261,7 +249,7 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
               message: l10n.toolbox_notInstalledHint,
             )
           : ListView(
-              padding: const EdgeInsets.all(AppTokens.pagePadding),
+              padding: EdgeInsets.all(context.pagePadding),
               children: [
                 SplitListGroup(
                   children: [

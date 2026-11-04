@@ -24,6 +24,15 @@ class DashboardRepositoryImpl implements DashboardRepository {
   }) => _dashboardApi.getDashboard(ioOption: ioOption, netOption: netOption);
 
   @override
+  Future<Dashboard> getDashboardSnapshot({
+    required String ioOption,
+    required String netOption,
+  }) => _dashboardApi.getDashboardSnapshot(
+    ioOption: ioOption,
+    netOption: netOption,
+  );
+
+  @override
   Future<DashboardBase> getDashboardBase({
     required String ioOption,
     required String netOption,

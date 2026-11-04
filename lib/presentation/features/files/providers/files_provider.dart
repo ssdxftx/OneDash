@@ -43,9 +43,12 @@ class FilesController
   String _search = '';
   String _sortBy = 'name';
   bool _loadingMore = false;
+  bool _disposed = false;
 
   @override
   Future<FilesState> build(String path) async {
+    _disposed = false;
+    ref.onDispose(() => _disposed = true);
     final repository = await ref.read(fileRepositoryProvider.future);
     final folder = await repository.searchFiles(
       path: path,
@@ -109,10 +112,12 @@ class FilesController
         search: _search,
         sortBy: _sortBy,
       );
+      if (_disposed) return;
+      final latest = state.valueOrNull ?? current;
       _page++;
       state = AsyncData(
-        current.copyWith(
-          items: _sort([...current.items, ...?folder.items]),
+        latest.copyWith(
+          items: _sort([...latest.items, ...?folder.items]),
           total: folder.itemTotal,
           loadingMore: false,
         ),

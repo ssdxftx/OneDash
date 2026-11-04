@@ -46,6 +46,20 @@ final appSettingsControllerProvider =
       name: 'appSettingsControllerProvider',
     );
 
+/// Only the fields the network layer depends on, so toggling haptics or
+/// appearance does not rebuild every server's HTTP connection pool.
+typedef NetworkSettings = ({int timeoutSeconds, Map<String, String> headers});
+
+final networkSettingsProvider = Provider<NetworkSettings>((ref) {
+  final settings = ref.watch(appSettingsControllerProvider).valueOrNull;
+  return (
+    timeoutSeconds:
+        settings?.requestTimeoutSeconds ??
+        AppSettingsController.defaultRequestTimeoutSeconds,
+    headers: settings?.customHeaders ?? const <String, String>{},
+  );
+}, name: 'networkSettingsProvider');
+
 class AppSettingsController extends AsyncNotifier<AppSettings> {
   static const defaultRequestTimeoutSeconds = 60;
   static const _timeoutKey = 'settings_request_timeout_seconds';

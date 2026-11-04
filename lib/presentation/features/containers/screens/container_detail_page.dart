@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
@@ -49,21 +50,41 @@ class ContainerDetailPage extends ConsumerStatefulWidget {
       _ContainerDetailPageState();
 }
 
-class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage> {
+class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage>
+    with WidgetsBindingObserver {
   final LogBuffer _logBuffer = LogBuffer();
   Timer? _timer;
   bool _paused = false;
+  bool _fetching = false;
   int _tabIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 3), (_) {
+    WidgetsBinding.instance.addObserver(this);
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (_tabIndex == 1 && !_paused) _fetchLogs();
     });
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _startTimer();
+      if (_tabIndex == 1 && !_paused) _fetchLogs();
+    } else {
+      _timer?.cancel();
+    }
+  }
+
   Future<void> _fetchLogs() async {
+    if (_fetching) return;
+    _fetching = true;
     try {
       final repository = await ref.read(containerRepositoryProvider.future);
       final log = await repository.getContainerLog(
@@ -75,16 +96,20 @@ class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage> {
       );
       if (!mounted) return;
       final lines = log.split('\n');
+      if (listEquals(_logBuffer.lines, lines)) return;
       _logBuffer.clear();
       _logBuffer.addAll(lines);
       setState(() {});
     } catch (_) {
       // 日志轮询失败静默，等待下一次。
+    } finally {
+      _fetching = false;
     }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     super.dispose();
   }
@@ -150,7 +175,7 @@ class _OverviewTab extends ConsumerWidget {
       value: info,
       onRetry: () => ref.invalidate(_containerInfoProvider(containerName)),
       builder: (data) => ListView(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         children: [
           TonalCard(
             child: Row(
@@ -254,6 +279,7 @@ class _OverviewTab extends ConsumerWidget {
                 SplitListTile(
                   title: l10n.containers_mountedVolumes,
                   subtitle: data.volumes.map((v) => v.sourceDir).join('\n'),
+                  subtitleMaxLines: null,
                 ),
             ],
           ),
@@ -276,7 +302,7 @@ class _ConfigTab extends ConsumerWidget {
       value: info,
       onRetry: () => ref.invalidate(_containerInfoProvider(containerName)),
       builder: (data) => ListView(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         children: [
           SplitListGroup(
             children: [
@@ -284,6 +310,7 @@ class _ConfigTab extends ConsumerWidget {
                 SplitListTile(
                   title: l10n.containers_envVars,
                   subtitle: data.env.join('\n'),
+                  subtitleMaxLines: null,
                   subtitleStyle: AppTextStyles.bodyM.copyWith(
                     fontFamily: 'monospace',
                     color: context.scheme.onSurface,
@@ -293,6 +320,7 @@ class _ConfigTab extends ConsumerWidget {
                 SplitListTile(
                   title: l10n.containers_command,
                   subtitle: data.cmd!.join(' '),
+                  subtitleMaxLines: null,
                   subtitleStyle: AppTextStyles.bodyM.copyWith(
                     fontFamily: 'monospace',
                     color: context.scheme.onSurface,
@@ -302,6 +330,7 @@ class _ConfigTab extends ConsumerWidget {
                 SplitListTile(
                   title: l10n.containers_entrypoint,
                   subtitle: data.entrypoint!.join(' '),
+                  subtitleMaxLines: null,
                   subtitleStyle: AppTextStyles.bodyM.copyWith(
                     fontFamily: 'monospace',
                     color: context.scheme.onSurface,

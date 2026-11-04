@@ -13,6 +13,7 @@ import '../../../../data/repositories_impl/host_repository_impl.dart';
 import '../../../common/charts/area_chart.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -176,7 +177,7 @@ class _HostPageState extends ConsumerState<HostPage> {
 
   Widget _monitorTab(AppLocalizations l10n) {
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         AppFilterChips<int>(
           options: const [1, 6, 24],
@@ -305,7 +306,7 @@ class _HostPageState extends ConsumerState<HostPage> {
           );
         }
         return ListView(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           children: [
             SplitListGroup(
               children: [
@@ -391,14 +392,38 @@ class _HostPageState extends ConsumerState<HostPage> {
             const SizedBox(height: AppTokens.s24),
             SectionHeader(
               title: l10n.host_sshKeys,
-              trailing: PopupMenuButton<String>(
+              trailing: IconButton(
                 tooltip: l10n.action_more,
                 icon: const Icon(TablerIcons.dots),
-                onSelected: (value) {
+                onPressed: () async {
+                  final value = await showSelectionMenu<String>(
+                    context,
+                    options: [
+                      SelectionOption(
+                        label: l10n.host_syncKeys,
+                        value: 'sync',
+                        icon: TablerIcons.refresh,
+                      ),
+                      SelectionOption(
+                        label: l10n.host_generateKey,
+                        value: 'generate',
+                        icon: TablerIcons.key,
+                      ),
+                      if (_certs.isNotEmpty)
+                        SelectionOption(
+                          label: _certSelectionMode
+                              ? l10n.files_cancelSelection
+                              : l10n.files_selectAll,
+                          value: _certSelectionMode ? 'cancel' : 'select',
+                          icon: TablerIcons.checkbox,
+                        ),
+                    ],
+                  );
+                  if (!mounted) return;
                   if (value == 'sync') {
-                    _syncKeys();
+                    await _syncKeys();
                   } else if (value == 'generate') {
-                    _generateKey();
+                    await _generateKey();
                   } else if (value == 'select') {
                     setState(() {
                       _certSelecting = true;
@@ -413,22 +438,6 @@ class _HostPageState extends ConsumerState<HostPage> {
                     });
                   }
                 },
-                itemBuilder: (context) => [
-                  PopupMenuItem(value: 'sync', child: Text(l10n.host_syncKeys)),
-                  PopupMenuItem(
-                    value: 'generate',
-                    child: Text(l10n.host_generateKey),
-                  ),
-                  if (_certs.isNotEmpty)
-                    PopupMenuItem(
-                      value: _certSelectionMode ? 'cancel' : 'select',
-                      child: Text(
-                        _certSelectionMode
-                            ? l10n.files_cancelSelection
-                            : l10n.files_selectAll,
-                      ),
-                    ),
-                ],
               ),
             ),
             const SizedBox(height: AppTokens.s8),
@@ -546,39 +555,35 @@ class _HostPageState extends ConsumerState<HostPage> {
     final port = TextEditingController(text: '22');
     final user = TextEditingController(text: 'root');
     final password = TextEditingController();
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.host_testSsh, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: addr,
-            label: l10n.databases_address,
-            hint: '192.168.1.10',
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: port,
-            label: l10n.databases_port,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: user, label: l10n.databases_username),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: password,
-            label: l10n.databases_password,
-            obscure: true,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.host_testSsh,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.host_testSsh,
+          saveLabel: l10n.host_testSsh,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: addr,
+              label: l10n.databases_address,
+              hint: '192.168.1.10',
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: port,
+              label: l10n.databases_port,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: user, label: l10n.databases_username),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: password,
+              label: l10n.databases_password,
+              obscure: true,
+            ),
+          ],
+        ),
       ),
     );
     final addrValue = addr.text.trim();
@@ -668,36 +673,24 @@ class _HostPageState extends ConsumerState<HostPage> {
       final content = await repository.loadSshFile('sshdConfPath:$path');
       if (!mounted) return;
       final controller = TextEditingController(text: content);
-      final saved = await showAppSheet<bool>(
-        context: context,
-        maxHeightFactor: 0.92,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.host_sshConfigFile, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s4),
-            Text(
-              path,
-              style: AppTextStyles.caption.copyWith(
-                color: sheetContext.scheme.onSurfaceVariant,
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.host_sshConfigFile,
+            subtitle: path,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              AppTextField(controller: controller, maxLines: 16),
+              const SizedBox(height: AppTokens.s8),
+              Text(
+                l10n.host_sshConfigWarning,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: pageContext.appColors.warning,
+                ),
               ),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            AppTextField(controller: controller, maxLines: 16),
-            const SizedBox(height: AppTokens.s8),
-            Text(
-              l10n.host_sshConfigWarning,
-              style: AppTextStyles.bodyS.copyWith(
-                color: sheetContext.appColors.warning,
-              ),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
-          ],
+            ],
+          ),
         ),
       );
       final value = controller.text;
@@ -835,15 +828,14 @@ class _HostPageState extends ConsumerState<HostPage> {
     final name = TextEditingController();
     final passphrase = TextEditingController();
     var type = 'ed25519';
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final confirmed = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setSheetState) => SimpleFormPage(
+          title: l10n.host_generateKey,
+          saveLabel: l10n.action_create,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(l10n.host_generateKey, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(
               controller: name,
               label: l10n.host_keyName,
@@ -866,11 +858,6 @@ class _HostPageState extends ConsumerState<HostPage> {
               controller: passphrase,
               label: l10n.host_keyPassphrase,
               obscure: true,
-            ),
-            const SizedBox(height: AppTokens.s24),
-            PrimaryButton(
-              label: l10n.action_create,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),
@@ -906,27 +893,22 @@ class _HostPageState extends ConsumerState<HostPage> {
     final l10n = AppLocalizations.of(context);
     final name = TextEditingController(text: cert.name);
     final description = TextEditingController();
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.action_edit, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: name,
-            label: l10n.host_keyName,
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: description, label: l10n.websites_remark),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.action_edit,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: name,
+              label: l10n.host_keyName,
+              autofocus: true,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: description, label: l10n.websites_remark),
+          ],
+        ),
       ),
     );
     final keyName = name.text.trim();
@@ -988,15 +970,13 @@ class _HostPageState extends ConsumerState<HostPage> {
       text: '${_setting['monitorStoreDays'] ?? '7'}',
     );
     var enabled = '${_setting['monitorStatus'] ?? 'Enable'}' == 'Enable';
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final confirmed = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setSheetState) => SimpleFormPage(
+          title: l10n.host_monitorSettings,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(l10n.host_monitorSettings, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.host_monitorEnabled),
@@ -1013,11 +993,6 @@ class _HostPageState extends ConsumerState<HostPage> {
               controller: days,
               label: l10n.host_monitorStoreDays,
               keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: AppTokens.s24),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),
@@ -1054,25 +1029,20 @@ class _HostPageState extends ConsumerState<HostPage> {
   Future<void> _editPort(String current) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: current);
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.host_sshPort, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(controller.text),
-          ),
-        ],
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.host_sshPort,
+          onSave: () async => Navigator.of(pageContext).pop(controller.text),
+          children: [
+            AppTextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -1082,23 +1052,15 @@ class _HostPageState extends ConsumerState<HostPage> {
   }
 
   Future<void> _editSsh(String key, String label, String current) async {
-    final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: current);
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, autofocus: true),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(controller.text),
-          ),
-        ],
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: label,
+          onSave: () async => Navigator.of(pageContext).pop(controller.text),
+          children: [AppTextField(controller: controller, autofocus: true)],
+        ),
       ),
     );
     controller.dispose();

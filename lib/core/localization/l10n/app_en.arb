@@ -6315,7 +6315,7 @@
   },
   "logs_exported": "Exported to {path}",
   "@logs_exported": {
-    "description": "Export path.",
+    "description": "Toast shown after exporting a log file.",
     "placeholders": {
       "path": {
         "type": "String"
@@ -6966,7 +6966,12 @@
   },
   "servers_count": "{count} panels",
   "@servers_count": {
-    "description": "Connected panel count."
+    "description": "Connected panel count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "servers_sectionConnected": "Connected panels",
   "@servers_sectionConnected": {
@@ -6982,19 +6987,39 @@
   },
   "more_appsCount": "{count} apps",
   "@more_appsCount": {
-    "description": "Installed app count."
+    "description": "Installed app count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "more_databasesCount": "{count} databases",
   "@more_databasesCount": {
-    "description": "Database count."
+    "description": "Database count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "more_cronjobsCount": "{count} scheduled tasks",
   "@more_cronjobsCount": {
-    "description": "Scheduled task count."
+    "description": "Scheduled task count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "websites_templateVariableCount": "{count} variables",
   "@websites_templateVariableCount": {
-    "description": "Template variable count."
+    "description": "Template variable count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "server_edit_portHelper": "Default 9999",
   "@server_edit_portHelper": {
@@ -7011,5 +7036,91 @@
   "runtimes_emptyMessage": "Runtimes installed from the app store will appear here.",
   "@runtimes_emptyMessage": {
     "description": "Runtimes installed from the app store will appear here."
+  },
+  "logs_searchHint": "Search log lines",
+  "@logs_searchHint": {
+    "description": "Filter the loaded log buffer by text."
+  },
+  "logs_raw": "Raw",
+  "@logs_raw": {
+    "description": "Show original log lines."
+  },
+  "logs_structured": "Structured",
+  "@logs_structured": {
+    "description": "Parse time and level from log lines."
+  },
+  "logs_follow": "Follow",
+  "@logs_follow": {
+    "description": "Keep refreshing the log while open."
+  },
+  "logs_stopFollow": "Stop follow",
+  "@logs_stopFollow": {
+    "description": "Stop automatic log refresh."
+  },
+  "logs_loadEarlier": "Load earlier lines",
+  "@logs_loadEarlier": {
+    "description": "Reveal older lines from the loaded buffer."
+  },
+  "logs_noMatches": "No matching lines",
+  "@logs_noMatches": {
+    "description": "No log line matches the current search."
+  },
+  "logs_lineCount": "{count} lines",
+  "@logs_lineCount": {
+    "description": "Number of log lines currently loaded.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "logs_matchCount": "{count} matches",
+  "@logs_matchCount": {
+    "description": "Number of log lines matching the search.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "logs_following": "Following",
+  "@logs_following": {
+    "description": "Log auto refresh is active."
+  },
+  "apps_upgradable": "Updatable",
+  "@apps_upgradable": {
+    "description": "Installed apps that have a newer version."
+  },
+  "apps_allApps": "All apps",
+  "@apps_allApps": {
+    "description": "Catalog tab showing every app."
+  },
+  "apps_upgradableEmptyTitle": "No updates available",
+  "@apps_upgradableEmptyTitle": {
+    "description": "Empty state when no installed app can be upgraded."
+  },
+  "apps_upgradableEmptyMessage": "Every installed app is on its latest version.",
+  "@apps_upgradableEmptyMessage": {
+    "description": "Empty state detail for the upgradable tab."
+  },
+  "logs_system": "System logs",
+  "@logs_system": {
+    "description": "Open the server system log files."
+  },
+  "websites_sslStatusReady": "Issued",
+  "websites_sslStatusApplied": "Deployed",
+  "websites_sslStatusPending": "Processing",
+  "websites_sslStatusError": "Error",
+  "@websites_sslStatusReady": {
+    "description": "Certificate has been issued."
+  },
+  "@websites_sslStatusApplied": {
+    "description": "Certificate is deployed to the website."
+  },
+  "@websites_sslStatusPending": {
+    "description": "Certificate is being issued or deployed."
+  },
+  "@websites_sslStatusError": {
+    "description": "Certificate issuance or deployment failed."
   }
 }

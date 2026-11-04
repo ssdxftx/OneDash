@@ -9,6 +9,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/website/website_load_balance_dto.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -102,21 +103,32 @@ class _WebsiteLoadBalanceTabState extends ConsumerState<WebsiteLoadBalanceTab> {
       else
         _ServerDraft(),
     ];
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.95,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final confirmed = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setSheetState) => SimpleFormPage(
+          title: existing == null
+              ? l10n.websites_lbAdd
+              : l10n.websites_loadBalance,
+          onSave: () async {
+            final upstreamName = name.text.trim();
+            if (upstreamName.isEmpty) return;
+            final servers = drafts
+                .map((draft) => draft.toDto())
+                .where((server) => server.server.isNotEmpty)
+                .toList(growable: false);
+            if (servers.isEmpty) return;
+            Navigator.of(pageContext).pop(true);
+            unawaited(
+              _save(
+                existing: existing,
+                name: upstreamName,
+                algorithm: algorithm,
+                servers: servers,
+              ),
+            );
+          },
           children: [
-            Text(
-              existing == null
-                  ? l10n.websites_lbAdd
-                  : l10n.websites_loadBalance,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(
               controller: name,
               label: l10n.websites_lbName,
@@ -151,7 +163,7 @@ class _WebsiteLoadBalanceTabState extends ConsumerState<WebsiteLoadBalanceTab> {
               Padding(
                 padding: const EdgeInsets.only(bottom: AppTokens.s12),
                 child: _serverEditor(
-                  context,
+                  pageContext,
                   l10n,
                   index: i,
                   draft: drafts[i],
@@ -168,28 +180,6 @@ class _WebsiteLoadBalanceTabState extends ConsumerState<WebsiteLoadBalanceTab> {
               icon: TablerIcons.plus,
               onPressed: () {
                 setSheetState(() => drafts.add(_ServerDraft()));
-              },
-            ),
-            const SizedBox(height: AppTokens.s24),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () {
-                final upstreamName = name.text.trim();
-                if (upstreamName.isEmpty) return;
-                final servers = drafts
-                    .map((draft) => draft.toDto())
-                    .where((server) => server.server.isNotEmpty)
-                    .toList(growable: false);
-                if (servers.isEmpty) return;
-                Navigator.of(sheetContext).pop(true);
-                unawaited(
-                  _save(
-                    existing: existing,
-                    name: upstreamName,
-                    algorithm: algorithm,
-                    servers: servers,
-                  ),
-                );
               },
             ),
           ],
@@ -364,7 +354,7 @@ class _WebsiteLoadBalanceTabState extends ConsumerState<WebsiteLoadBalanceTab> {
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         children: [
           SectionHeader(
             title: l10n.websites_loadBalance,

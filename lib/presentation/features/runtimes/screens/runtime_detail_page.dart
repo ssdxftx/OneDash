@@ -10,6 +10,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/runtime_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -154,7 +155,7 @@ class _PhpExtensionsTabState extends ConsumerState<_PhpExtensionsTab> {
             ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.all(AppTokens.pagePadding),
+                padding: EdgeInsets.all(context.pagePadding),
                 itemCount: support.length,
                 itemBuilder: (context, index) {
                   final item = support[index];
@@ -478,7 +479,7 @@ class _FpmTabState extends ConsumerState<_FpmTab> {
         final data = snapshot.data;
         if (data == null) return const SizedBox.shrink();
         return ListView(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           children: [
             Text(l10n.runtime_fpmConfig, style: AppTextStyles.titleM),
             const SizedBox(height: AppTokens.s12),
@@ -598,27 +599,23 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
   Future<void> _showScripts() async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final dir = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.runtime_scripts, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            label: l10n.runtime_codeDir,
-            hint: '/opt/1panel/apps/node/project',
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_continue,
-            onPressed: () =>
-                Navigator.of(sheetContext).pop(controller.text.trim()),
-          ),
-        ],
+    final dir = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.runtime_scripts,
+          saveLabel: l10n.action_continue,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.runtime_codeDir,
+              hint: '/opt/1panel/apps/node/project',
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -665,26 +662,22 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
   Future<void> _install() async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final module = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.runtime_install, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            label: l10n.runtime_moduleHint,
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.runtime_install,
-            onPressed: () =>
-                Navigator.of(sheetContext).pop(controller.text.trim()),
-          ),
-        ],
+    final module = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.runtime_install,
+          saveLabel: l10n.runtime_install,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.runtime_moduleHint,
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -751,7 +744,7 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
                 );
               }
               return ListView.builder(
-                padding: const EdgeInsets.all(AppTokens.pagePadding),
+                padding: EdgeInsets.all(context.pagePadding),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   final item = items[index];
@@ -776,19 +769,30 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : PopupMenuButton<String>(
+                              : IconButton(
+                                  tooltip: l10n.action_more,
                                   icon: const Icon(TablerIcons.dots_vertical),
-                                  onSelected: (value) => _operate(value, name),
-                                  itemBuilder: (context) => [
-                                    PopupMenuItem(
-                                      value: 'update',
-                                      child: Text(l10n.runtime_update),
-                                    ),
-                                    PopupMenuItem(
-                                      value: 'uninstall',
-                                      child: Text(l10n.runtime_uninstall),
-                                    ),
-                                  ],
+                                  onPressed: () async {
+                                    final value =
+                                        await showSelectionMenu<String>(
+                                          context,
+                                          options: [
+                                            SelectionOption(
+                                              label: l10n.runtime_update,
+                                              value: 'update',
+                                              icon: TablerIcons.refresh,
+                                            ),
+                                            SelectionOption(
+                                              label: l10n.runtime_uninstall,
+                                              value: 'uninstall',
+                                              icon: TablerIcons.trash,
+                                              danger: true,
+                                            ),
+                                          ],
+                                        );
+                                    if (value == null) return;
+                                    await _operate(value, name);
+                                  },
                                 ),
                         ),
                       ],
@@ -809,4 +813,47 @@ String _joinNonEmpty(List<String> values) {
       .map((value) => value.trim())
       .where((value) => value.isNotEmpty)
       .join(' · ');
+}
+
+/// Fullscreen host for a single runtime configuration tab.
+class RuntimeTabPage extends StatelessWidget {
+  const RuntimeTabPage({
+    super.key,
+    required this.serverId,
+    required this.id,
+    required this.type,
+    required this.name,
+    required this.tab,
+  });
+
+  final int serverId;
+  final int id;
+  final String type;
+  final String name;
+  final int tab;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final label = switch (tab) {
+      0 =>
+        type.startsWith('php') ? l10n.runtime_extensions : l10n.runtime_modules,
+      1 => l10n.runtime_phpIni,
+      2 => l10n.runtime_fpm,
+      _ => l10n.runtime_modules,
+    };
+    final child = switch (tab) {
+      0 =>
+        type.startsWith('php')
+            ? _PhpExtensionsTab(id: id)
+            : _NodeModulesTab(id: id),
+      1 => _PhpIniTab(id: id),
+      2 => _FpmTab(id: id),
+      _ => _NodeModulesTab(id: id),
+    };
+    return Scaffold(
+      appBar: AppBarLarge(title: name, subtitle: label),
+      body: child,
+    );
+  }
 }

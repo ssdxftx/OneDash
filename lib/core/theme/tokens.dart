@@ -231,7 +231,7 @@ abstract final class AppTextStyles {
   );
   static const bodyS = TextStyle(
     fontFamily: 'MiSans',
-    fontSize: 12,
+    fontSize: 13,
     height: 1.45,
   );
   static const label = TextStyle(
@@ -242,8 +242,8 @@ abstract final class AppTextStyles {
   );
   static const caption = TextStyle(
     fontFamily: 'MiSans',
-    fontSize: 11,
-    height: 1.3,
+    fontSize: 12,
+    height: 1.35,
   );
   static const numeric = TextStyle(
     fontFamily: 'MiSans',
@@ -269,6 +269,11 @@ extension AppThemeContextX on BuildContext {
   TextTheme get texts => Theme.of(this).textTheme;
 
   bool get reduceMotion => MediaQuery.disableAnimationsOf(this);
+
+  /// Page padding grows on tablet-sized windows.
+  double get pagePadding => MediaQuery.sizeOf(this).width >= 600
+      ? AppTokens.pagePaddingWide
+      : AppTokens.pagePadding;
 
   Duration motion(Duration duration) => reduceMotion ? Duration.zero : duration;
 }

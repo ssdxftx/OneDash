@@ -9020,7 +9020,7 @@ abstract class AppLocalizations {
   /// **'Write a memo for this panel'**
   String get panelSettings_memoContentHint;
 
-  /// Export path.
+  /// Toast shown after exporting a log file.
   ///
   /// In en, this message translates to:
   /// **'Exported to {path}'**
@@ -9966,7 +9966,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} panels'**
-  String servers_count(Object count);
+  String servers_count(int count);
 
   /// Section title for connected panels.
   ///
@@ -9990,25 +9990,25 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} apps'**
-  String more_appsCount(Object count);
+  String more_appsCount(int count);
 
   /// Database count.
   ///
   /// In en, this message translates to:
   /// **'{count} databases'**
-  String more_databasesCount(Object count);
+  String more_databasesCount(int count);
 
   /// Scheduled task count.
   ///
   /// In en, this message translates to:
   /// **'{count} scheduled tasks'**
-  String more_cronjobsCount(Object count);
+  String more_cronjobsCount(int count);
 
   /// Template variable count.
   ///
   /// In en, this message translates to:
   /// **'{count} variables'**
-  String websites_templateVariableCount(Object count);
+  String websites_templateVariableCount(int count);
 
   /// Helper for the panel port field.
   ///
@@ -10033,6 +10033,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Runtimes installed from the app store will appear here.'**
   String get runtimes_emptyMessage;
+
+  /// Filter the loaded log buffer by text.
+  ///
+  /// In en, this message translates to:
+  /// **'Search log lines'**
+  String get logs_searchHint;
+
+  /// Show original log lines.
+  ///
+  /// In en, this message translates to:
+  /// **'Raw'**
+  String get logs_raw;
+
+  /// Parse time and level from log lines.
+  ///
+  /// In en, this message translates to:
+  /// **'Structured'**
+  String get logs_structured;
+
+  /// Keep refreshing the log while open.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow'**
+  String get logs_follow;
+
+  /// Stop automatic log refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop follow'**
+  String get logs_stopFollow;
+
+  /// Reveal older lines from the loaded buffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Load earlier lines'**
+  String get logs_loadEarlier;
+
+  /// No log line matches the current search.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching lines'**
+  String get logs_noMatches;
+
+  /// Number of log lines currently loaded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} lines'**
+  String logs_lineCount(int count);
+
+  /// Number of log lines matching the search.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} matches'**
+  String logs_matchCount(int count);
+
+  /// Log auto refresh is active.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get logs_following;
+
+  /// Installed apps that have a newer version.
+  ///
+  /// In en, this message translates to:
+  /// **'Updatable'**
+  String get apps_upgradable;
+
+  /// Catalog tab showing every app.
+  ///
+  /// In en, this message translates to:
+  /// **'All apps'**
+  String get apps_allApps;
+
+  /// Empty state when no installed app can be upgraded.
+  ///
+  /// In en, this message translates to:
+  /// **'No updates available'**
+  String get apps_upgradableEmptyTitle;
+
+  /// Empty state detail for the upgradable tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Every installed app is on its latest version.'**
+  String get apps_upgradableEmptyMessage;
+
+  /// Open the server system log files.
+  ///
+  /// In en, this message translates to:
+  /// **'System logs'**
+  String get logs_system;
+
+  /// Certificate has been issued.
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get websites_sslStatusReady;
+
+  /// Certificate is deployed to the website.
+  ///
+  /// In en, this message translates to:
+  /// **'Deployed'**
+  String get websites_sslStatusApplied;
+
+  /// Certificate is being issued or deployed.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing'**
+  String get websites_sslStatusPending;
+
+  /// Certificate issuance or deployment failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get websites_sslStatusError;
 }
 
 class _AppLocalizationsDelegate

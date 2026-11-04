@@ -7,9 +7,9 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/backup_account_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/formatters/enum_labels.dart';
@@ -65,7 +65,7 @@ class BackupAccountsPage extends ConsumerWidget {
           message: l10n.backups_noAccountsHint,
         ),
         builder: (items) => ListView.separated(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           itemCount: items.length,
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {
@@ -112,33 +112,48 @@ class BackupAccountsPage extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  PopupMenuButton<String>(
+                  IconButton(
                     tooltip: l10n.action_more,
                     icon: const Icon(TablerIcons.dots),
-                    onSelected: (value) {
-                      if (value == 'buckets') _buckets(context, ref, account);
-                      if (value == 'refresh') _refresh(context, ref, account);
-                      if (value == 'test') _test(context, ref, account);
-                      if (value == 'delete') _delete(context, ref, account);
+                    onPressed: () async {
+                      final value = await showSelectionMenu<String>(
+                        context,
+                        options: [
+                          SelectionOption(
+                            label: l10n.backups_listBuckets,
+                            value: 'buckets',
+                            icon: TablerIcons.bucket,
+                          ),
+                          SelectionOption(
+                            label: l10n.backups_refreshToken,
+                            value: 'refresh',
+                            icon: TablerIcons.refresh,
+                          ),
+                          SelectionOption(
+                            label: l10n.backups_testConnection,
+                            value: 'test',
+                            icon: TablerIcons.plug_connected,
+                          ),
+                          SelectionOption(
+                            label: l10n.action_delete,
+                            value: 'delete',
+                            icon: TablerIcons.trash,
+                            danger: true,
+                          ),
+                        ],
+                      );
+                      if (value == null || !context.mounted) return;
+                      switch (value) {
+                        case 'buckets':
+                          await _buckets(context, ref, account);
+                        case 'refresh':
+                          await _refresh(context, ref, account);
+                        case 'test':
+                          await _test(context, ref, account);
+                        case 'delete':
+                          await _delete(context, ref, account);
+                      }
                     },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'buckets',
-                        child: Text(l10n.backups_listBuckets),
-                      ),
-                      PopupMenuItem(
-                        value: 'refresh',
-                        child: Text(l10n.backups_refreshToken),
-                      ),
-                      PopupMenuItem(
-                        value: 'test',
-                        child: Text(l10n.backups_testConnection),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Text(l10n.action_delete),
-                      ),
-                    ],
                   ),
                 ],
               ),
@@ -174,21 +189,15 @@ class BackupAccountsPage extends ConsumerWidget {
         ? rawType
         : backupAccountTypes.first;
     bool rememberAuth = current?['rememberAuth'] == true;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.92,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: current == null
+              ? l10n.backups_addAccount
+              : l10n.backups_editAccount,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(
-              current == null
-                  ? l10n.backups_addAccount
-                  : l10n.backups_editAccount,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(controller: name, label: l10n.backups_accountName),
             const SizedBox(height: AppTokens.s12),
             if (isLocalAccount)
@@ -242,11 +251,6 @@ class BackupAccountsPage extends ConsumerWidget {
               title: Text(l10n.backups_rememberAuth),
               value: rememberAuth,
               onChanged: (value) => setState(() => rememberAuth = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),

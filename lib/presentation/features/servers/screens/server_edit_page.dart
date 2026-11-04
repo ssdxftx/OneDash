@@ -162,6 +162,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
           ..allowInsecureConnections = _allowInsecure
           ..updatedAt = DateTime.now();
         await repository.update(existing, apiKey: apiKey);
+        ref.invalidate(dioClientProvider(widget.serverId!));
         server = existing;
       } else {
         server = await repository.add(
@@ -332,16 +333,20 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
       '/api/v2/hosts/firewall/base',
       '/api/v2/hosts/terminal/local',
     ];
-    var supported = 0;
-    for (final path in probes) {
-      try {
-        await client.get<Map<String, dynamic>>(path);
-        supported++;
-      } catch (_) {
-        // 端点缺失视为能力不支持，不阻塞诊断。
-      }
-    }
-    client.dispose();
+    final probeClient = client;
+    final results = await Future.wait(
+      probes.map((path) async {
+        try {
+          await probeClient.get<Map<String, dynamic>>(path);
+          return true;
+        } catch (_) {
+          // 端点缺失视为能力不支持，不阻塞诊断。
+          return false;
+        }
+      }),
+    );
+    final supported = results.where((value) => value).length;
+    probeClient.dispose();
     await update(
       3,
       _DiagnosisStep(
@@ -397,7 +402,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           children: [
             SectionHeader(title: l10n.server_edit_address),
             TonalCard(

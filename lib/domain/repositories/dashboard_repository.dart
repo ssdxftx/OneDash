@@ -7,6 +7,11 @@ abstract class DashboardRepository {
     required String netOption,
   });
 
+  Future<Dashboard> getDashboardSnapshot({
+    required String ioOption,
+    required String netOption,
+  });
+
   Future<DashboardBase> getDashboardBase({
     required String ioOption,
     required String netOption,

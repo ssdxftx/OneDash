@@ -18,6 +18,7 @@ import '../../../../data/dto/file/file_item_dto.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -166,28 +167,22 @@ class _FilesPageState extends ConsumerState<FilesPage> {
   Future<void> _create({required bool isDir}) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final name = await showAppSheet<String>(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            isDir ? l10n.files_new_folder : l10n.files_new_file,
-            style: AppTextStyles.titleL,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            hint: l10n.files_nameHint,
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_create,
-            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
-          ),
-        ],
+    final name = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: isDir ? l10n.files_new_folder : l10n.files_new_file,
+          saveLabel: l10n.action_create,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [
+            AppTextField(
+              controller: controller,
+              hint: l10n.files_nameHint,
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -213,22 +208,18 @@ class _FilesPageState extends ConsumerState<FilesPage> {
   Future<void> _compress(FileItemDto item) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: '${item.name}.zip');
-    final name = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.files_compress, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, label: l10n.files_archiveName),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_create,
-            onPressed: () =>
-                Navigator.of(sheetContext).pop(controller.text.trim()),
-          ),
-        ],
+    final name = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.files_compress,
+          saveLabel: l10n.action_create,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [
+            AppTextField(controller: controller, label: l10n.files_archiveName),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -280,21 +271,15 @@ class _FilesPageState extends ConsumerState<FilesPage> {
   Future<void> _rename(FileItemDto item) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: item.name);
-    final name = await showAppSheet<String>(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.files_rename, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, autofocus: true),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
-          ),
-        ],
+    final name = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.files_rename,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [AppTextField(controller: controller, autofocus: true)],
+        ),
       ),
     );
     controller.dispose();
@@ -350,29 +335,39 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       await showDialog<void>(
         context: context,
         barrierColor: Colors.black,
-        builder: (dialogContext) => Dialog.fullscreen(
-          backgroundColor: Colors.black,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: InteractiveViewer(
-                  minScale: 0.5,
-                  maxScale: 6,
-                  child: Center(child: Image.memory(bytes)),
+        builder: (dialogContext) {
+          final decodeWidth =
+              (MediaQuery.sizeOf(dialogContext).width *
+                      MediaQuery.devicePixelRatioOf(dialogContext) *
+                      2)
+                  .round()
+                  .clamp(480, 4096);
+          return Dialog.fullscreen(
+            backgroundColor: Colors.black,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: InteractiveViewer(
+                    minScale: 0.5,
+                    maxScale: 6,
+                    child: Center(
+                      child: Image.memory(bytes, cacheWidth: decodeWidth),
+                    ),
+                  ),
                 ),
-              ),
-              Positioned(
-                top: MediaQuery.paddingOf(dialogContext).top + 8,
-                right: 8,
-                child: IconButton.filledTonal(
-                  tooltip: AppLocalizations.of(context).action_close,
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  icon: const Icon(Icons.close),
+                Positioned(
+                  top: MediaQuery.paddingOf(dialogContext).top + 8,
+                  right: 8,
+                  child: IconButton.filledTonal(
+                    tooltip: AppLocalizations.of(context).action_close,
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    icon: const Icon(Icons.close),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+          );
+        },
       );
     } catch (error) {
       if (!mounted) return;
@@ -468,10 +463,9 @@ class _FilesPageState extends ConsumerState<FilesPage> {
 
   Future<void> _moveCopy(FileItemDto item) async {
     final l10n = AppLocalizations.of(context);
-    final request = await showAppSheet<_MoveRequest>(
-      context: context,
-      builder: (sheetContext) =>
-          _MoveSheet(sourcePath: item.path, sourceDir: _path),
+    final request = await pushFormPage<_MoveRequest>(
+      context,
+      _MoveSheet(sourcePath: item.path, sourceDir: _path),
     );
     if (request == null || !mounted) return;
     try {
@@ -498,9 +492,9 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     final l10n = AppLocalizations.of(context);
     final paths = _selected.toList(growable: false);
     if (paths.isEmpty) return;
-    final request = await showAppSheet<_BatchRoleRequest>(
-      context: context,
-      builder: (sheetContext) => const _BatchRoleSheet(),
+    final request = await pushFormPage<_BatchRoleRequest>(
+      context,
+      const _BatchRoleSheet(),
     );
     if (request == null || !mounted) return;
     try {
@@ -919,7 +913,9 @@ class _FilesPageState extends ConsumerState<FilesPage> {
             },
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              itemExtent: 72,
+              itemExtent:
+                  72 *
+                  MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.8),
               itemCount: state.items.length,
               itemBuilder: (context, index) {
                 final item = state.items[index];
@@ -932,14 +928,8 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                       ? () => _toggleSelection(item)
                       : item.isDir
                       ? () => _openPath(item.path)
-                      : FileTypeUtils.isEditable(item)
-                      ? () => context.push(
-                          '/s/${widget.serverId}/files/edit?path=${Uri.encodeComponent(item.path)}',
-                        )
                       : () => _showActions(item),
                   onLongPress: () => _toggleSelection(item),
-                  onMore: () => _showActions(item),
-                  showMore: !_selectionMode,
                   onCalculateSize: item.isDir
                       ? () => _calculateDirSize(item)
                       : null,
@@ -1060,20 +1050,18 @@ class _MoveSheetState extends State<_MoveSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SimpleFormPage(
+      title: l10n.files_moveCopy,
+      subtitle: widget.sourcePath,
+      saveLabel: _copy ? l10n.files_copy : l10n.files_move,
+      onSave: () async {
+        final target = _target.text.trim();
+        if (target.isEmpty) return;
+        Navigator.of(
+          context,
+        ).pop(_MoveRequest(target: target, copy: _copy, cover: _cover));
+      },
       children: [
-        Text(l10n.files_moveCopy, style: AppTextStyles.titleL),
-        const SizedBox(height: AppTokens.s4),
-        Text(
-          widget.sourcePath,
-          style: AppTextStyles.caption.copyWith(
-            color: context.scheme.onSurfaceVariant,
-            fontFamily: 'monospace',
-          ),
-        ),
-        const SizedBox(height: AppTokens.s16),
         AppTextField(
           controller: _target,
           label: l10n.files_targetDirectory,
@@ -1091,17 +1079,6 @@ class _MoveSheetState extends State<_MoveSheet> {
           title: Text(l10n.files_overwrite),
           value: _cover,
           onChanged: (value) => setState(() => _cover = value),
-        ),
-        const SizedBox(height: AppTokens.s16),
-        PrimaryButton(
-          label: _copy ? l10n.files_copy : l10n.files_move,
-          onPressed: () {
-            final target = _target.text.trim();
-            if (target.isEmpty) return;
-            Navigator.of(
-              context,
-            ).pop(_MoveRequest(target: target, copy: _copy, cover: _cover));
-          },
         ),
       ],
     );
@@ -1146,12 +1123,22 @@ class _BatchRoleSheetState extends State<_BatchRoleSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SimpleFormPage(
+      title: l10n.files_batchPermission,
+      onSave: () async {
+        final text = _mode.text.trim();
+        if (!RegExp(r'^[0-7]{3,4}$').hasMatch(text)) return;
+        final mode = int.parse(text.padLeft(4, '0'), radix: 8);
+        Navigator.of(context).pop(
+          _BatchRoleRequest(
+            mode: mode,
+            user: _user.text.trim(),
+            group: _group.text.trim(),
+            sub: _sub,
+          ),
+        );
+      },
       children: [
-        Text(l10n.files_batchPermission, style: AppTextStyles.titleL),
-        const SizedBox(height: AppTokens.s16),
         AppTextField(
           controller: _mode,
           label: l10n.files_permissionMode,
@@ -1166,23 +1153,6 @@ class _BatchRoleSheetState extends State<_BatchRoleSheet> {
           title: Text(l10n.files_recursive),
           value: _sub,
           onChanged: (value) => setState(() => _sub = value),
-        ),
-        const SizedBox(height: AppTokens.s16),
-        PrimaryButton(
-          label: l10n.action_save,
-          onPressed: () {
-            final text = _mode.text.trim();
-            if (!RegExp(r'^[0-7]{3,4}$').hasMatch(text)) return;
-            final mode = int.parse(text.padLeft(4, '0'), radix: 8);
-            Navigator.of(context).pop(
-              _BatchRoleRequest(
-                mode: mode,
-                user: _user.text.trim(),
-                group: _group.text.trim(),
-                sub: _sub,
-              ),
-            );
-          },
         ),
       ],
     );
@@ -1251,8 +1221,6 @@ class _FileTile extends StatelessWidget {
     required this.item,
     required this.onTap,
     required this.onLongPress,
-    required this.onMore,
-    this.showMore = true,
     this.selected = false,
     this.dirSize,
     this.calculating = false,
@@ -1262,8 +1230,6 @@ class _FileTile extends StatelessWidget {
   final FileItemDto item;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
-  final VoidCallback onMore;
-  final bool showMore;
   final bool selected;
   final int? dirSize;
   final bool calculating;
@@ -1331,14 +1297,11 @@ class _FileTile extends StatelessWidget {
                 ],
               ),
             ),
-            if (item.isDir)
-              const Icon(TablerIcons.chevron_right, size: AppTokens.iconList)
-            else if (showMore)
-              IconButton(
-                tooltip: l10n.action_more,
-                icon: const Icon(TablerIcons.dots, size: AppTokens.iconList),
-                onPressed: onMore,
-              ),
+            Icon(
+              TablerIcons.chevron_right,
+              size: AppTokens.iconList,
+              color: scheme.onSurfaceVariant,
+            ),
           ],
         ),
       ),

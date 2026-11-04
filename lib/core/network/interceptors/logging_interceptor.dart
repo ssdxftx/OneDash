@@ -42,16 +42,22 @@ class LoggingInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    final status = err.response?.statusCode;
+    if (!kDebugMode) {
+      AppLogger.w(
+        _tag,
+        '${err.requestOptions.method} ${err.requestOptions.uri} -> $status',
+      );
+      return handler.next(err);
+    }
     AppLogger.w(
       _tag,
       '🚨 xxx ${err.requestOptions.method} ${err.requestOptions.uri} -> '
-      '${err.response?.statusCode} ${err.message}',
+      '$status ${err.message}',
     );
-
     if (err.response?.data != null) {
       AppLogger.w(_tag, '   body: ${err.response?.data}');
     }
-
     handler.next(err);
   }
 }

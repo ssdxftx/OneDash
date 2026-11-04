@@ -5214,7 +5214,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_loadBalanceEmptyTitle => 'No upstream nodes';
 
   @override
-  String servers_count(Object count) {
+  String servers_count(int count) {
     return '$count panels';
   }
 
@@ -5228,22 +5228,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toolbox_timeSection => 'Time zone and time';
 
   @override
-  String more_appsCount(Object count) {
+  String more_appsCount(int count) {
     return '$count apps';
   }
 
   @override
-  String more_databasesCount(Object count) {
+  String more_databasesCount(int count) {
     return '$count databases';
   }
 
   @override
-  String more_cronjobsCount(Object count) {
+  String more_cronjobsCount(int count) {
     return '$count scheduled tasks';
   }
 
   @override
-  String websites_templateVariableCount(Object count) {
+  String websites_templateVariableCount(int count) {
     return '$count variables';
   }
 
@@ -5260,4 +5260,66 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get runtimes_emptyMessage =>
       'Runtimes installed from the app store will appear here.';
+
+  @override
+  String get logs_searchHint => 'Search log lines';
+
+  @override
+  String get logs_raw => 'Raw';
+
+  @override
+  String get logs_structured => 'Structured';
+
+  @override
+  String get logs_follow => 'Follow';
+
+  @override
+  String get logs_stopFollow => 'Stop follow';
+
+  @override
+  String get logs_loadEarlier => 'Load earlier lines';
+
+  @override
+  String get logs_noMatches => 'No matching lines';
+
+  @override
+  String logs_lineCount(int count) {
+    return '$count lines';
+  }
+
+  @override
+  String logs_matchCount(int count) {
+    return '$count matches';
+  }
+
+  @override
+  String get logs_following => 'Following';
+
+  @override
+  String get apps_upgradable => 'Updatable';
+
+  @override
+  String get apps_allApps => 'All apps';
+
+  @override
+  String get apps_upgradableEmptyTitle => 'No updates available';
+
+  @override
+  String get apps_upgradableEmptyMessage =>
+      'Every installed app is on its latest version.';
+
+  @override
+  String get logs_system => 'System logs';
+
+  @override
+  String get websites_sslStatusReady => 'Issued';
+
+  @override
+  String get websites_sslStatusApplied => 'Deployed';
+
+  @override
+  String get websites_sslStatusPending => 'Processing';
+
+  @override
+  String get websites_sslStatusError => 'Error';
 }

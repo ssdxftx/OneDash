@@ -12,6 +12,7 @@ import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -482,44 +483,43 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
     final source = TextEditingController(text: 'scratch');
     final archive = TextEditingController(text: '/tmp/image.tar');
     final repo = TextEditingController(text: '0');
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(_operationLabel(operation, l10n), style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          if (operation == 'build') ...[
-            AppTextField(controller: source, label: l10n.containers_baseImage),
-            const SizedBox(height: AppTokens.s12),
-          ],
-          AppTextField(
-            controller: target,
-            label: operation == 'load'
-                ? l10n.containers_imageArchive
-                : operation == 'save'
-                ? l10n.files_path
-                : l10n.containers_newImageName,
-          ),
-          if (operation == 'build') ...[
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: archive, label: 'Dockerfile'),
-          ],
-          if (operation == 'push') ...[
-            const SizedBox(height: AppTokens.s12),
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: _operationLabel(operation, l10n),
+          saveLabel: _operationLabel(operation, l10n),
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            if (operation == 'build') ...[
+              AppTextField(
+                controller: source,
+                label: l10n.containers_baseImage,
+              ),
+              const SizedBox(height: AppTokens.s12),
+            ],
             AppTextField(
-              controller: repo,
-              label: l10n.containers_repoId,
-              keyboardType: TextInputType.number,
+              controller: target,
+              label: operation == 'load'
+                  ? l10n.containers_imageArchive
+                  : operation == 'save'
+                  ? l10n.files_path
+                  : l10n.containers_newImageName,
             ),
+            if (operation == 'build') ...[
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(controller: archive, label: 'Dockerfile'),
+            ],
+            if (operation == 'push') ...[
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: repo,
+                label: l10n.containers_repoId,
+                keyboardType: TextInputType.number,
+              ),
+            ],
           ],
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: _operationLabel(operation, l10n),
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+        ),
       ),
     );
     final value = target.text.trim();
@@ -656,7 +656,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
               message: l10n.containers_pullImageHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.pagePadding),
+              padding: EdgeInsets.all(context.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
               itemBuilder: (context, index) {
@@ -864,7 +864,7 @@ class _NetworksTabState extends ConsumerState<_NetworksTab> {
               message: l10n.containers_createNetworkHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.pagePadding),
+              padding: EdgeInsets.all(context.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
               itemBuilder: (context, index) {
@@ -1068,7 +1068,7 @@ class _ReposTab extends ConsumerWidget {
               message: l10n.containers_noReposHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.pagePadding),
+              padding: EdgeInsets.all(context.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {
@@ -1123,22 +1123,16 @@ class _ReposTab extends ConsumerWidget {
   Future<void> _search(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final query = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.action_search, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, autofocus: true),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_search,
-            onPressed: () =>
-                Navigator.of(sheetContext).pop(controller.text.trim()),
-          ),
-        ],
+    final query = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.action_search,
+          saveLabel: l10n.action_search,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [AppTextField(controller: controller, autofocus: true)],
+        ),
       ),
     );
     controller.dispose();

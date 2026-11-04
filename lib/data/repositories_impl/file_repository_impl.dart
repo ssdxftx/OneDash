@@ -296,6 +296,7 @@ class FileRepositoryImpl implements FileRepository {
     CancelToken? cancelToken,
   }) async {
     final filename = filePath.split('/').last;
+    if (startOffset >= fileSize) return;
     final chunkCount = (fileSize / _chunkSize).ceil();
     final firstChunk = min(startOffset ~/ _chunkSize, chunkCount - 1);
     for (int i = firstChunk; i < chunkCount; i++) {

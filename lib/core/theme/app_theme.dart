@@ -68,7 +68,12 @@ abstract final class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: scheme.surface,
       fontFamily: 'MiSans',
-      fontFamilyFallback: const ['Roboto'],
+      fontFamilyFallback: const [
+        'Noto Sans CJK SC',
+        'Noto Sans SC',
+        'Roboto',
+        'sans-serif',
+      ],
       textTheme: textTheme,
       extensions: <ThemeExtension<dynamic>>[semantic],
       splashFactory: InkSparkle.splashFactory,
@@ -140,7 +145,7 @@ abstract final class AppTheme {
           vertical: AppTokens.s12,
         ),
         hintStyle: AppTextStyles.bodyM.copyWith(
-          color: scheme.onSurfaceVariant.withValues(alpha: 0.8),
+          color: scheme.onSurfaceVariant,
           fontWeight: FontWeight.w400,
         ),
         labelStyle: AppTextStyles.bodyM.copyWith(

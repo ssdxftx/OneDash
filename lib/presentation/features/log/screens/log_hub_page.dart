@@ -12,6 +12,8 @@ import '../../../../data/repositories_impl/log_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../../data/repositories_impl/file_repository_impl.dart';
+import 'log_preview_page.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/skeleton.dart';
@@ -134,6 +136,11 @@ class LogHubPage extends ConsumerWidget {
         title: l10n.logs_title,
         actions: [
           AppIconButton(
+            icon: TablerIcons.file_text,
+            tooltip: l10n.logs_system,
+            onPressed: () => _openSystemLogs(context, ref),
+          ),
+          AppIconButton(
             icon: TablerIcons.trash,
             tooltip: l10n.logs_clean,
             onPressed: () => _openActions(context, ref),
@@ -159,6 +166,60 @@ class LogHubPage extends ConsumerWidget {
 }
 
 extension on LogHubPage {
+  Future<void> _openSystemLogs(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final logRepository = await ref.read(logRepositoryProvider.future);
+      final files = await logRepository.getSystemLogFiles();
+      if (!context.mounted) return;
+      if (files.isEmpty) {
+        AppToast.warning(context, l10n.log_empty);
+        return;
+      }
+      final selected = await showSelectionMenu<String>(
+        context,
+        title: l10n.logs_system,
+        options: [
+          for (final file in files)
+            SelectionOption(
+              label: file,
+              value: file,
+              icon: TablerIcons.file_text,
+            ),
+        ],
+      );
+      if (selected == null || !context.mounted) return;
+      final fileRepository = await ref.read(fileRepositoryProvider.future);
+      if (!context.mounted) return;
+      await Navigator.of(context, rootNavigator: true).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => LogPreviewPage(
+            title: selected,
+            subtitle: l10n.logs_system,
+            sources: [
+              LogSourceOption(
+                label: selected,
+                load: () async {
+                  final log = await fileRepository.readRuntimeLog(
+                    id: 0,
+                    type: 'system',
+                    name: selected,
+                    pageSize: 1000,
+                    latest: true,
+                  );
+                  return log.lines;
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _openActions(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     await showAppSheet<void>(
@@ -255,7 +316,7 @@ class _LogTab extends ConsumerWidget {
         message: l10n.log_emptyMessage,
       ),
       builder: (items) => ListView.builder(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         itemCount: items.length,
         itemBuilder: (context, i) {
           final item = items[i];

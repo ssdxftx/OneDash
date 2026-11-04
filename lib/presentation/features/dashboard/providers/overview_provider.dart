@@ -15,7 +15,6 @@ class OverviewState {
     required this.netDownHistory,
     required this.lastUpdated,
     this.stale = false,
-    this.lastError,
   });
 
   final Dashboard dashboard;
@@ -25,7 +24,6 @@ class OverviewState {
   final List<double> netDownHistory;
   final DateTime lastUpdated;
   final bool stale;
-  final String? lastError;
 
   OverviewState copyWith({
     Dashboard? dashboard,
@@ -35,7 +33,6 @@ class OverviewState {
     List<double>? netDownHistory,
     DateTime? lastUpdated,
     bool? stale,
-    String? lastError,
   }) {
     return OverviewState(
       dashboard: dashboard ?? this.dashboard,
@@ -45,7 +42,6 @@ class OverviewState {
       netDownHistory: netDownHistory ?? this.netDownHistory,
       lastUpdated: lastUpdated ?? this.lastUpdated,
       stale: stale ?? this.stale,
-      lastError: lastError ?? this.lastError,
     );
   }
 }
@@ -76,7 +72,7 @@ class OverviewController
     final repository = await ref.watch(
       dashboardRepositoryForServerProvider(serverId).future,
     );
-    final dashboard = await repository.getDashboard(
+    final dashboard = await repository.getDashboardSnapshot(
       ioOption: 'all',
       netOption: 'all',
     );
@@ -158,10 +154,9 @@ class OverviewController
           netDownHistory: netDown,
           lastUpdated: now,
           stale: false,
-          lastError: null,
         ),
       );
-      _schedule(const Duration(seconds: 2));
+      _schedule(const Duration(seconds: 3));
     } catch (error) {
       if (_disposed) return;
       _failureCount++;
@@ -172,9 +167,7 @@ class OverviewController
       };
       final latest = state.valueOrNull;
       if (latest != null) {
-        state = AsyncData(
-          latest.copyWith(stale: true, lastError: error.runtimeType.toString()),
-        );
+        state = AsyncData(latest.copyWith(stale: true));
       }
       _schedule(delay);
     } finally {

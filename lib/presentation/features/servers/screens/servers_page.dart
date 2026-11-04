@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/network/dio_client_provider.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../domain/entities/server.dart';
 import '../../../common/components/app_bar_large.dart';
@@ -20,6 +21,7 @@ import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../providers/servers_provider.dart';
+import '../../settings/providers/app_settings_provider.dart';
 
 class ServersPage extends ConsumerWidget {
   const ServersPage({super.key});
@@ -105,8 +107,19 @@ class ServersPage extends ConsumerWidget {
                                 child: _ServerCard(
                                   server: server,
                                   isCurrent: server.id == lastId,
+                                  onEdit: () => context.push(
+                                    '/servers/${server.id}/edit',
+                                  ),
                                   onTap: () async {
-                                    await HapticFeedback.selectionClick();
+                                    final haptics =
+                                        ref
+                                            .read(appSettingsControllerProvider)
+                                            .valueOrNull
+                                            ?.hapticsEnabled ??
+                                        true;
+                                    if (haptics) {
+                                      await HapticFeedback.selectionClick();
+                                    }
                                     await ref
                                         .read(serversProvider.notifier)
                                         .touch(server.id);
@@ -192,6 +205,7 @@ class ServersPage extends ConsumerWidget {
                   );
                   if (!confirmed) return;
                   await ref.read(serversProvider.notifier).delete(server.id);
+                  ref.invalidate(dioClientProvider(server.id));
                   if (context.mounted) {
                     AppToast.success(context, l10n.action_done);
                   }
@@ -230,12 +244,14 @@ class _ServerCard extends ConsumerWidget {
     required this.isCurrent,
     required this.onTap,
     required this.onLongPress,
+    required this.onEdit,
   });
 
   final Server server;
   final bool isCurrent;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -267,6 +283,16 @@ class _ServerCard extends ConsumerWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+              ),
+              IconButton(
+                tooltip: l10n.action_edit,
+                visualDensity: VisualDensity.compact,
+                icon: Icon(
+                  TablerIcons.edit,
+                  size: AppTokens.iconList,
+                  color: scheme.onSurfaceVariant,
+                ),
+                onPressed: onEdit,
               ),
               if (isCurrent)
                 Container(

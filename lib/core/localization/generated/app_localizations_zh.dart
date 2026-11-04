@@ -5092,7 +5092,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_loadBalanceEmptyTitle => '暂无上游节点';
 
   @override
-  String servers_count(Object count) {
+  String servers_count(int count) {
     return '$count 个面板';
   }
 
@@ -5106,22 +5106,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get toolbox_timeSection => '时区与时间';
 
   @override
-  String more_appsCount(Object count) {
+  String more_appsCount(int count) {
     return '$count 个应用';
   }
 
   @override
-  String more_databasesCount(Object count) {
+  String more_databasesCount(int count) {
     return '$count 个数据库';
   }
 
   @override
-  String more_cronjobsCount(Object count) {
+  String more_cronjobsCount(int count) {
     return '$count 个计划任务';
   }
 
   @override
-  String websites_templateVariableCount(Object count) {
+  String websites_templateVariableCount(int count) {
     return '$count 个变量';
   }
 
@@ -5136,4 +5136,65 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get runtimes_emptyMessage => '从应用商店安装运行时后会显示在这里。';
+
+  @override
+  String get logs_searchHint => '搜索日志行';
+
+  @override
+  String get logs_raw => '原文';
+
+  @override
+  String get logs_structured => '结构化';
+
+  @override
+  String get logs_follow => '跟随';
+
+  @override
+  String get logs_stopFollow => '停止跟随';
+
+  @override
+  String get logs_loadEarlier => '加载更早的行';
+
+  @override
+  String get logs_noMatches => '没有匹配的日志行';
+
+  @override
+  String logs_lineCount(int count) {
+    return '$count 行';
+  }
+
+  @override
+  String logs_matchCount(int count) {
+    return '匹配 $count 行';
+  }
+
+  @override
+  String get logs_following => '跟随中';
+
+  @override
+  String get apps_upgradable => '可升级';
+
+  @override
+  String get apps_allApps => '全部应用';
+
+  @override
+  String get apps_upgradableEmptyTitle => '暂无可用更新';
+
+  @override
+  String get apps_upgradableEmptyMessage => '所有已安装应用均为最新版本。';
+
+  @override
+  String get logs_system => '系统日志';
+
+  @override
+  String get websites_sslStatusReady => '已签发';
+
+  @override
+  String get websites_sslStatusApplied => '已部署';
+
+  @override
+  String get websites_sslStatusPending => '处理中';
+
+  @override
+  String get websites_sslStatusError => '异常';
 }

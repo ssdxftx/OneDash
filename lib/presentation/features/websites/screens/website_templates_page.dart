@@ -175,7 +175,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                 : RefreshIndicator(
                     onRefresh: _load,
                     child: ListView(
-                      padding: const EdgeInsets.all(AppTokens.pagePadding),
+                      padding: EdgeInsets.all(context.pagePadding),
                       children: [
                         for (final template in _templates)
                           Padding(
@@ -183,6 +183,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                               bottom: AppTokens.s12,
                             ),
                             child: TonalCard(
+                              onTap: () => _openEditor(template),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -217,32 +218,20 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                                           ),
                                         ),
                                       ),
-                                      PopupMenuButton<String>(
-                                        tooltip: l10n.action_more,
+                                      IconButton(
+                                        tooltip: l10n.websites_templateDelete,
+                                        visualDensity: VisualDensity.compact,
                                         icon: Icon(
-                                          TablerIcons.dots_vertical,
-                                          color:
-                                              context.scheme.onSurfaceVariant,
+                                          TablerIcons.trash,
+                                          size: AppTokens.iconList,
+                                          color: context.appColors.danger,
                                         ),
-                                        onSelected: (value) {
-                                          if (value == 'edit') {
-                                            _openEditor(template);
-                                          } else if (value == 'delete') {
-                                            _delete(template);
-                                          }
-                                        },
-                                        itemBuilder: (context) => [
-                                          PopupMenuItem(
-                                            value: 'edit',
-                                            child: Text(l10n.action_edit),
-                                          ),
-                                          PopupMenuItem(
-                                            value: 'delete',
-                                            child: Text(
-                                              l10n.websites_templateDelete,
-                                            ),
-                                          ),
-                                        ],
+                                        onPressed: () => _delete(template),
+                                      ),
+                                      Icon(
+                                        TablerIcons.chevron_right,
+                                        size: AppTokens.iconList,
+                                        color: context.scheme.onSurfaceVariant,
                                       ),
                                     ],
                                   ),

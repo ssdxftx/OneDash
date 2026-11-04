@@ -9,9 +9,9 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/toolbox_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -60,38 +60,34 @@ class _ToolboxFtpPageState extends ConsumerState<ToolboxFtpPage> {
     final password = TextEditingController();
     final path = TextEditingController(text: '/');
     final description = TextEditingController();
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.toolbox_ftpAdd, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: user,
-            label: l10n.toolbox_ftpUser,
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: password,
-            label: l10n.toolbox_ftpPassword,
-            obscure: true,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: path, label: l10n.toolbox_ftpPath),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: description,
-            label: l10n.databases_description,
-          ),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_create,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.toolbox_ftpAdd,
+          saveLabel: l10n.action_create,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: user,
+              label: l10n.toolbox_ftpUser,
+              autofocus: true,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: password,
+              label: l10n.toolbox_ftpPassword,
+              obscure: true,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: path, label: l10n.toolbox_ftpPath),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: description,
+              label: l10n.databases_description,
+            ),
+          ],
+        ),
       ),
     );
     final name = user.text.trim();
@@ -167,7 +163,7 @@ class _ToolboxFtpPageState extends ConsumerState<ToolboxFtpPage> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         children: [
           SplitListGroup(
             children: [

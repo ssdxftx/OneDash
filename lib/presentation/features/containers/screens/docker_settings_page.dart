@@ -8,6 +8,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
@@ -81,23 +82,18 @@ class _DockerSettingsPageState extends ConsumerState<DockerSettingsPage> {
     final l10n = AppLocalizations.of(context);
     final key = TextEditingController();
     final value = TextEditingController();
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.containers_daemonKeyValue, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: key, label: l10n.containers_daemonKey),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: value, label: l10n.containers_daemonValue),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.containers_daemonKeyValue,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: key, label: l10n.containers_daemonKey),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: value, label: l10n.containers_daemonValue),
+          ],
+        ),
       ),
     );
     final keyValue = key.text.trim();

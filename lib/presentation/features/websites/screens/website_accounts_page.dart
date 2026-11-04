@@ -14,6 +14,7 @@ import '../../../../data/dto/website/website_acme_account_dto.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -90,15 +91,14 @@ class _AcmeTab extends ConsumerWidget {
     String type = 'letsencrypt';
     bool useEab = false;
     bool useProxy = false;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.websites_addAcme,
+          saveLabel: l10n.action_create,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(l10n.websites_addAcme, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(controller: email, label: l10n.websites_email),
             const SizedBox(height: AppTokens.s12),
             DropdownButtonFormField<String>(
@@ -131,11 +131,6 @@ class _AcmeTab extends ConsumerWidget {
               title: Text(l10n.websites_useEab),
               value: useEab,
               onChanged: (value) => setState(() => useEab = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_create,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),
@@ -179,15 +174,13 @@ class _AcmeTab extends ConsumerWidget {
     final url = TextEditingController(text: account.url);
     String type = account.type.isEmpty ? 'letsencrypt' : account.type;
     bool useProxy = account.useProxy;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.action_edit,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(l10n.action_edit, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(controller: email, label: l10n.websites_email),
             const SizedBox(height: AppTokens.s12),
             DropdownButtonFormField<String>(
@@ -212,11 +205,6 @@ class _AcmeTab extends ConsumerWidget {
               title: Text(l10n.websites_useProxy),
               value: useProxy,
               onChanged: (value) => setState(() => useProxy = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),
@@ -300,7 +288,7 @@ class _AcmeTab extends ConsumerWidget {
               message: l10n.websites_noAcmeHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.pagePadding),
+              padding: EdgeInsets.all(context.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {
@@ -359,29 +347,25 @@ class _DnsTab extends ConsumerWidget {
     final name = TextEditingController();
     final type = TextEditingController(text: 'alidns');
     final auth = TextEditingController(text: '{\n  "AccessKey": ""\n}');
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.websites_addDns, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: name, label: l10n.files_name),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: type, label: l10n.websites_dnsType),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: auth,
-            label: l10n.websites_authorization,
-            maxLines: 6,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_create,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_addDns,
+          saveLabel: l10n.action_create,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: name, label: l10n.files_name),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: type, label: l10n.websites_dnsType),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: auth,
+              label: l10n.websites_authorization,
+              maxLines: 6,
+            ),
+          ],
+        ),
       ),
     );
     final dnsName = name.text.trim();
@@ -422,29 +406,24 @@ class _DnsTab extends ConsumerWidget {
     final auth = TextEditingController(
       text: const JsonEncoder.withIndent('  ').convert(account.authorization),
     );
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.action_edit, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: name, label: l10n.files_name),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: type, label: l10n.websites_dnsType),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: auth,
-            label: l10n.websites_authorization,
-            maxLines: 6,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.action_edit,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: name, label: l10n.files_name),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: type, label: l10n.websites_dnsType),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: auth,
+              label: l10n.websites_authorization,
+              maxLines: 6,
+            ),
+          ],
+        ),
       ),
     );
     final dnsName = name.text.trim();
@@ -524,7 +503,7 @@ class _DnsTab extends ConsumerWidget {
               message: l10n.websites_noDnsHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.pagePadding),
+              padding: EdgeInsets.all(context.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {
@@ -582,27 +561,23 @@ class _CaTab extends ConsumerWidget {
     final cn = TextEditingController();
     final country = TextEditingController(text: 'CN');
     final org = TextEditingController();
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.websites_addCa, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: name, label: l10n.files_name),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: cn, label: l10n.websites_commonName),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: country, label: l10n.websites_country),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: org, label: l10n.websites_organization),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_create,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_addCa,
+          saveLabel: l10n.action_create,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: name, label: l10n.files_name),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: cn, label: l10n.websites_commonName),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: country, label: l10n.websites_country),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: org, label: l10n.websites_organization),
+          ],
+        ),
       ),
     );
     final caName = name.text.trim();
@@ -641,29 +616,26 @@ class _CaTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final domains = TextEditingController();
     final description = TextEditingController();
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.websites_obtainCa, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: domains,
-            label: l10n.websites_domains,
-            hint: 'example.com',
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: description, label: l10n.websites_remark),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.websites_obtainCa,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_obtainCa,
+          saveLabel: l10n.action_continue,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: domains,
+              label: l10n.websites_domains,
+              hint: 'example.com',
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: description, label: l10n.websites_remark),
+          ],
+        ),
       ),
     );
+
     final domainValue = domains.text.trim();
     final note = description.text.trim();
     domains.dispose();
@@ -781,7 +753,7 @@ class _CaTab extends ConsumerWidget {
               message: l10n.websites_noCaHint,
             ),
             builder: (items) => ListView.separated(
-              padding: const EdgeInsets.all(AppTokens.pagePadding),
+              padding: EdgeInsets.all(context.pagePadding),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {

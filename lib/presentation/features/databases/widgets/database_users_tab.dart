@@ -9,8 +9,8 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/database/database_instance_dto.dart';
 import '../../../../data/repositories_impl/database_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/error_toast.dart';
@@ -106,7 +106,7 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
       return const Center(child: CircularProgressIndicator());
     }
     return ListView(
-      padding: const EdgeInsets.all(AppTokens.pagePadding),
+      padding: EdgeInsets.all(context.pagePadding),
       children: [
         Row(
           children: [
@@ -169,32 +169,48 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
       leading: const Icon(TablerIcons.user),
       title: username,
       subtitle: subtitle,
-      trailing: PopupMenuButton<String>(
+      trailing: IconButton(
+        tooltip: l10n.action_more,
         icon: const Icon(TablerIcons.dots_vertical),
-        onSelected: (value) {
+        onPressed: () async {
+          final value = await showSelectionMenu<String>(
+            context,
+            options: [
+              SelectionOption(
+                label: l10n.databases_changePassword,
+                value: 'password',
+                icon: TablerIcons.key,
+              ),
+              SelectionOption(
+                label: l10n.databases_grant,
+                value: 'grant',
+                icon: TablerIcons.shield_check,
+              ),
+              SelectionOption(
+                label: l10n.databases_revoke,
+                value: 'revoke',
+                icon: TablerIcons.shield_off,
+              ),
+              SelectionOption(
+                label: l10n.databases_deleteUser,
+                value: 'delete',
+                icon: TablerIcons.trash,
+                danger: true,
+              ),
+            ],
+          );
+          if (value == null || !context.mounted) return;
           switch (value) {
             case 'password':
-              _changeUserPassword(username, host);
+              await _changeUserPassword(username, host);
             case 'grant':
-              _grant(username, host);
+              await _grant(username, host);
             case 'revoke':
-              _revoke(username, host);
+              await _revoke(username, host);
             case 'delete':
-              _deleteUser(username, host);
+              await _deleteUser(username, host);
           }
         },
-        itemBuilder: (context) => [
-          PopupMenuItem(
-            value: 'password',
-            child: Text(l10n.databases_changePassword),
-          ),
-          PopupMenuItem(value: 'grant', child: Text(l10n.databases_grant)),
-          PopupMenuItem(value: 'revoke', child: Text(l10n.databases_revoke)),
-          PopupMenuItem(
-            value: 'delete',
-            child: Text(l10n.databases_deleteUser),
-          ),
-        ],
       ),
     );
   }
@@ -229,21 +245,28 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
           subtitle: _mongoPermission.isEmpty
               ? l10n.databases_noUsers
               : _permissionLabel(l10n, _mongoPermission),
-          trailing: PopupMenuButton<String>(
+          trailing: IconButton(
+            tooltip: l10n.action_more,
             icon: const Icon(TablerIcons.dots_vertical),
-            onSelected: _changeMongoPermission,
-            itemBuilder: (context) => [
-              for (final permission in const [
-                'read',
-                'readWrite',
-                'dbOwner',
-                'userAdmin',
-              ])
-                PopupMenuItem(
-                  value: permission,
-                  child: Text(_permissionLabel(l10n, permission)),
-                ),
-            ],
+            onPressed: () async {
+              final value = await showSelectionMenu<String>(
+                context,
+                options: [
+                  for (final permission in const [
+                    'read',
+                    'readWrite',
+                    'dbOwner',
+                    'userAdmin',
+                  ])
+                    SelectionOption(
+                      label: _permissionLabel(l10n, permission),
+                      value: permission,
+                    ),
+                ],
+              );
+              if (value == null || !context.mounted) return;
+              await _changeMongoPermission(value);
+            },
           ),
         ),
       ],
@@ -270,38 +293,33 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
     final host = TextEditingController(text: '%');
     final password = TextEditingController();
     final description = TextEditingController();
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.databases_addUser, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: username,
-            label: l10n.databases_username,
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: host, label: l10n.databases_host),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: password,
-            label: l10n.databases_password,
-            obscure: true,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: description,
-            label: l10n.databases_description,
-          ),
-          const SizedBox(height: AppTokens.s20),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.databases_addUser,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: username,
+              label: l10n.databases_username,
+              autofocus: true,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: host, label: l10n.databases_host),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: password,
+              label: l10n.databases_password,
+              obscure: true,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: description,
+              label: l10n.databases_description,
+            ),
+          ],
+        ),
       ),
     );
     final name = username.text.trim();
@@ -337,15 +355,13 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
     final username = TextEditingController();
     final password = TextEditingController();
     var superUser = false;
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final confirmed = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setSheetState) => SimpleFormPage(
+          title: l10n.databases_bindUser,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(l10n.databases_bindUser, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(
               controller: username,
               label: l10n.databases_username,
@@ -364,11 +380,6 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
                 value: superUser,
                 onChanged: (value) => setSheetState(() => superUser = value),
               ),
-            const SizedBox(height: AppTokens.s20),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
           ],
         ),
       ),
@@ -408,26 +419,21 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
   Future<void> _changeUserPassword(String username, String host) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.databases_changePassword, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            label: l10n.databases_newPassword,
-            obscure: true,
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s20),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.databases_changePassword,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.databases_newPassword,
+              obscure: true,
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     final value = controller.text;
@@ -452,25 +458,20 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
   Future<void> _grant(String username, String host) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: widget.item.name);
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.databases_grant, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            label: l10n.databases_grantDatabase,
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s20),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.databases_grant,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.databases_grantDatabase,
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     final db = controller.text.trim();
@@ -496,25 +497,20 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
   Future<void> _revoke(String username, String host) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: widget.item.name);
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.databases_revoke, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            label: l10n.databases_grantDatabase,
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s20),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.databases_revoke,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.databases_grantDatabase,
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     final db = controller.text.trim();

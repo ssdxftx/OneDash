@@ -61,7 +61,7 @@ class CronjobsPage extends ConsumerWidget {
           onAction: () => context.push('/s/$serverId/more/cronjobs/form'),
         ),
         builder: (data) => ListView.builder(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           itemCount: data.items.length,
           itemBuilder: (context, index) {
             final item = data.items[index];

@@ -123,8 +123,10 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
       final repository = await ref.read(
         hostRepositoryProvider(widget.serverId).future,
       );
-      final summary = await repository.getDiagnosticsSummary();
-      final snapshot = await repository.getGoroutineSnapshot();
+      final (summary, snapshot) = await (
+        repository.getDiagnosticsSummary(),
+        repository.getGoroutineSnapshot(),
+      ).wait;
       if (!mounted) return;
       setState(() {
         _summary = summary;
@@ -185,7 +187,7 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         children: [
           SectionHeader(title: l10n.host_diagSummary),
           SplitListGroup(
@@ -231,6 +233,7 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
                 if (_componentResult != null) ...[
                   const SizedBox(height: AppTokens.s16),
                   SplitListGroup(
+                    flat: true,
                     children: [
                       SplitListTile(
                         title: l10n.host_diagComponentExists,

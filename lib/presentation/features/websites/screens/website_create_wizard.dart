@@ -170,7 +170,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         children: [
           SectionHeader(title: l10n.websites_domains),
           TonalCard(

@@ -8,14 +8,17 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../data/dto/app/app_catalog_dto.dart';
+import '../../../../data/dto/app/app_installed_dto.dart';
+import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_icon.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/search_field.dart';
 import '../../../common/components/server_switcher_sheet.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
@@ -25,8 +28,8 @@ import '../../../common/states/refreshable_empty_state.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../../../common/states/error_toast.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
+import '../../containers/widgets/container_log_page.dart';
 import '../providers/app_store_provider.dart';
-import '../../../common/formatters/value_labels.dart';
 
 class AppStorePage extends ConsumerStatefulWidget {
   const AppStorePage({super.key, required this.serverId, this.initialTab = 0});
@@ -62,15 +65,13 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
         'uninstallDeleteBackup': config.uninstallDeleteBackup,
         'installAllowPort': config.installAllowPort,
       };
-      final saved = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      final saved = await pushFormPage<bool>(
+        context,
+        StatefulBuilder(
+          builder: (pageContext, setState) => SimpleFormPage(
+            title: l10n.apps_storeSettings,
+            onSave: () async => Navigator.of(pageContext).pop(true),
             children: [
-              Text(l10n.apps_storeSettings, style: AppTextStyles.titleL),
-              const SizedBox(height: AppTokens.s16),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.apps_uninstallDeleteImage),
@@ -97,11 +98,6 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
                 value: values['installAllowPort']!,
                 onChanged: (v) =>
                     setState(() => values['installAllowPort'] = v),
-              ),
-              const SizedBox(height: AppTokens.s16),
-              PrimaryButton(
-                label: l10n.action_save,
-                onPressed: () => Navigator.of(sheetContext).pop(true),
               ),
             ],
           ),
@@ -177,21 +173,43 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
               ref.invalidate(installedAppsProvider);
             },
           ),
-          PopupMenuButton<String>(
+          AppIconButton(
+            icon: TablerIcons.dots,
             tooltip: l10n.action_more,
-            onSelected: (value) {
-              if (value == 'remote') _sync(context, ref, remote: true);
-              if (value == 'local') _sync(context, ref, remote: false);
-              if (value == 'settings') _storeSettings(context, ref);
+            onPressed: () async {
+              final value = await showSelectionMenu<String>(
+                context,
+                options: [
+                  SelectionOption(
+                    label: l10n.apps_syncRemote,
+                    value: 'remote',
+                    icon: TablerIcons.cloud_download,
+                  ),
+                  SelectionOption(
+                    label: l10n.apps_syncLocal,
+                    value: 'local',
+                    icon: TablerIcons.database_import,
+                  ),
+                  SelectionOption(
+                    label: l10n.apps_storeSettings,
+                    value: 'settings',
+                    icon: TablerIcons.settings,
+                  ),
+                ],
+              );
+              if (!context.mounted) return;
+              if (value == 'remote') {
+                await _sync(context, ref, remote: true);
+                return;
+              }
+              if (value == 'local') {
+                await _sync(context, ref, remote: false);
+                return;
+              }
+              if (value == 'settings') {
+                await _storeSettings(context, ref);
+              }
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'remote', child: Text(l10n.apps_syncRemote)),
-              PopupMenuItem(value: 'local', child: Text(l10n.apps_syncLocal)),
-              PopupMenuItem(
-                value: 'settings',
-                child: Text(l10n.apps_storeSettings),
-              ),
-            ],
           ),
         ],
       ),
@@ -215,10 +233,15 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
           Expanded(
             child: SegmentedTabsView(
               initialIndex: widget.initialTab,
-              labels: [l10n.apps_title, l10n.apps_installed],
+              labels: [
+                l10n.apps_allApps,
+                l10n.apps_installed,
+                l10n.apps_upgradable,
+              ],
               children: [
                 _CatalogTab(serverId: widget.serverId, query: _query),
                 _InstalledTab(serverId: widget.serverId),
+                _InstalledTab(serverId: widget.serverId, onlyUpgradable: true),
               ],
             ),
           ),
@@ -251,114 +274,20 @@ class _CatalogTab extends ConsumerWidget {
           message: l10n.apps_emptyMessage,
         ),
       ),
-      builder: (data) {
-        final scale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.5);
-        return RefreshIndicator(
-          onRefresh: () => ref.refresh(appCatalogProvider(query).future),
-          child: GridView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(AppTokens.pagePadding),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: AppTokens.s12,
-              crossAxisSpacing: AppTokens.s12,
-              mainAxisExtent: 150 + (scale - 1) * 55,
-            ),
-            itemCount: data.items.length,
-            itemBuilder: (context, index) {
-              final app = data.items[index];
-              return _AppCard(
-                app: app,
-                onTap: () => context.push(
-                  '/s/$serverId/more/apps/${Uri.encodeComponent(app.key)}',
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _InstalledTab extends ConsumerWidget {
-  const _InstalledTab({required this.serverId});
-
-  final int serverId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final installed = ref.watch(installedAppsProvider);
-    return AsyncStateView(
-      value: installed,
-      onRetry: () => ref.invalidate(installedAppsProvider),
-      loading: const SkeletonList(itemCount: 8),
-      isEmpty: (data) => data.items.isEmpty,
-      empty: RefreshableEmptyState(
-        onRefresh: () => ref.refresh(installedAppsProvider.future),
-        child: EmptyState(
-          icon: TablerIcons.package,
-          title: l10n.apps_installedEmptyTitle,
-          message: l10n.apps_installedEmptyMessage,
-        ),
-      ),
       builder: (data) => RefreshIndicator(
-        onRefresh: () => ref.refresh(installedAppsProvider.future),
+        onRefresh: () => ref.refresh(appCatalogProvider(query).future),
         child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           itemCount: data.items.length,
           itemBuilder: (context, index) {
             final app = data.items[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: AppTokens.s12),
-              child: TonalCard(
-                onTap: () =>
-                    context.push('/s/$serverId/more/apps/installed/${app.id}'),
-                child: Row(
-                  children: [
-                    StatusDot(status: app.status.toLowerCase()),
-                    const SizedBox(width: AppTokens.s12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            app.displayName,
-                            style: AppTextStyles.titleM,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            '${app.version} · ${app.httpPort}',
-                            style: AppTextStyles.bodyS.copyWith(
-                              color: context.scheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (app.canUpdate)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppTokens.s8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: context.appColors.warning.withValues(
-                            alpha: 0.15,
-                          ),
-                          borderRadius: BorderRadius.circular(AppTokens.rXs),
-                        ),
-                        child: Text(
-                          l10n.apps_update_available,
-                          style: AppTextStyles.caption.copyWith(
-                            color: context.appColors.warning,
-                          ),
-                        ),
-                      ),
-                  ],
+              child: _AppRow(
+                app: app,
+                onTap: () => context.push(
+                  '/s/$serverId/more/apps/${Uri.encodeComponent(app.key)}',
                 ),
               ),
             );
@@ -369,8 +298,331 @@ class _InstalledTab extends ConsumerWidget {
   }
 }
 
-class _AppCard extends StatelessWidget {
-  const _AppCard({required this.app, required this.onTap});
+class _InstalledTab extends ConsumerWidget {
+  const _InstalledTab({required this.serverId, this.onlyUpgradable = false});
+
+  final int serverId;
+  final bool onlyUpgradable;
+
+  List<AppInstalledDto> _visible(List<AppInstalledDto> items) {
+    if (!onlyUpgradable) return items;
+    return items.where((item) => item.canUpdate).toList(growable: false);
+  }
+
+  Future<void> _showActions(
+    BuildContext context,
+    WidgetRef ref,
+    AppInstalledDto app,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final colors = context.appColors;
+    final running = app.status.toLowerCase() == 'running';
+    final hasContainer = app.container.trim().isNotEmpty;
+    await showAppSheet<void>(
+      context: context,
+      maxHeightFactor: 0.9,
+      builder: (sheetContext) => ActionSheetScaffold(
+        infoCard: ActionSheetInfoCard(
+          leading: AppIcon(name: app.displayName, icon: app.icon, size: 56),
+          title: app.displayName,
+          subtitle: '${app.version} · ${app.httpPort}',
+          trailing: ActionSheetStatusPill(
+            label: _statusLabel(app.status, l10n),
+            color: running ? colors.success : colors.info,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ActionSheetSection(
+              title: l10n.containers_groupConfig,
+              icon: TablerIcons.settings,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.info_circle,
+                  iconColor: colors.info,
+                  title: l10n.error_details,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.push(
+                      '/s/$serverId/more/apps/installed/${app.id}'
+                      '?detailId=${app.appDetailId}',
+                    );
+                  },
+                ),
+                if (hasContainer)
+                  ActionSheetRow(
+                    icon: TablerIcons.terminal_2,
+                    iconColor: colors.info,
+                    title: l10n.containers_terminal,
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      context.push(
+                        '/s/$serverId/terminal?container='
+                        '${Uri.encodeComponent(app.container)}',
+                      );
+                    },
+                  ),
+                if (hasContainer)
+                  ActionSheetRow(
+                    icon: TablerIcons.file_text,
+                    iconColor: colors.info,
+                    title: l10n.containers_viewLogs,
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      openContainerLogs(
+                        context,
+                        ref,
+                        containerName: app.container,
+                        subtitle: app.displayName,
+                      );
+                    },
+                  ),
+              ],
+            ),
+            ActionSheetSection(
+              title: l10n.containers_groupLifecycle,
+              icon: TablerIcons.refresh,
+              children: [
+                ActionSheetRow(
+                  icon: TablerIcons.player_play,
+                  iconColor: colors.success,
+                  title: l10n.containers_start,
+                  enabled: !running,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _operate(context, ref, app, 'start');
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.player_stop,
+                  iconColor: colors.warning,
+                  title: l10n.containers_stop,
+                  enabled: running,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _operate(context, ref, app, 'stop');
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.refresh,
+                  iconColor: colors.info,
+                  title: l10n.containers_restart,
+                  enabled: running,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _operate(context, ref, app, 'restart');
+                  },
+                ),
+              ],
+            ),
+            if (app.appDetailId > 0)
+              ActionSheetSection(
+                title: l10n.containers_groupDanger,
+                icon: TablerIcons.alert_triangle,
+                children: [
+                  ActionSheetRow(
+                    icon: TablerIcons.trash,
+                    iconColor: colors.danger,
+                    title: l10n.apps_uninstall,
+                    danger: true,
+                    onTap: () async {
+                      Navigator.of(sheetContext).pop();
+                      await _uninstall(context, ref, app);
+                    },
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _operate(
+    BuildContext context,
+    WidgetRef ref,
+    AppInstalledDto app,
+    String operation,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    if (app.appDetailId <= 0) {
+      AppToast.warning(context, l10n.apps_detailMissing);
+      return;
+    }
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      switch (operation) {
+        case 'start':
+          await repository.startInstalled(
+            installId: app.id,
+            detailId: app.appDetailId,
+          );
+        case 'stop':
+          await repository.stopInstalled(
+            installId: app.id,
+            detailId: app.appDetailId,
+          );
+        case 'restart':
+          await repository.restartInstalled(
+            installId: app.id,
+            detailId: app.appDetailId,
+          );
+      }
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(installedAppsProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _uninstall(
+    BuildContext context,
+    WidgetRef ref,
+    AppInstalledDto app,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.apps_uninstall,
+      message: l10n.apps_uninstallHint(app.displayName),
+      confirmLabel: l10n.apps_uninstall,
+      requireText: app.displayName,
+    );
+    if (!confirmed || !context.mounted) return;
+    final repository = await ref.read(appRepositoryProvider.future);
+    if (!context.mounted) return;
+    final taskID = const Uuid().v4();
+    final success = await TaskProgressSheet.run(
+      context,
+      title: l10n.apps_uninstall,
+      task: (controller) async {
+        await repository.uninstallApp(
+          installId: app.id,
+          detailId: app.appDetailId,
+          taskID: taskID,
+        );
+        for (var attempt = 0; attempt < 120; attempt++) {
+          final log = await repository.readTaskLog(taskID);
+          if (log.lines.isNotEmpty) controller.log(log.lines.last);
+          final status = log.taskStatus.toLowerCase();
+          if (status == 'success') return;
+          if (status == 'failed' || status == 'error' || status == 'canceled') {
+            throw Exception(log.lines.isEmpty ? 'Task failed' : log.lines.last);
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+        }
+      },
+    );
+    if (!success || !context.mounted) return;
+    AppToast.success(context, l10n.action_done);
+    ref.invalidate(installedAppsProvider);
+  }
+
+  String _statusLabel(String status, AppLocalizations l10n) {
+    return switch (status.toLowerCase()) {
+      'running' => l10n.common_running,
+      'stopped' || 'exited' || 'created' => l10n.common_stopped,
+      _ => status,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final installed = ref.watch(installedAppsProvider);
+    return AsyncStateView(
+      value: installed,
+      onRetry: () => ref.invalidate(installedAppsProvider),
+      loading: const SkeletonList(itemCount: 8),
+      isEmpty: (data) => _visible(data.items).isEmpty,
+      empty: RefreshableEmptyState(
+        onRefresh: () => ref.refresh(installedAppsProvider.future),
+        child: EmptyState(
+          icon: TablerIcons.package,
+          title: onlyUpgradable
+              ? l10n.apps_upgradableEmptyTitle
+              : l10n.apps_installedEmptyTitle,
+          message: onlyUpgradable
+              ? l10n.apps_upgradableEmptyMessage
+              : l10n.apps_installedEmptyMessage,
+        ),
+      ),
+      builder: (data) {
+        final visible = _visible(data.items);
+        return RefreshIndicator(
+          onRefresh: () => ref.refresh(installedAppsProvider.future),
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.all(context.pagePadding),
+            itemCount: visible.length,
+            itemBuilder: (context, index) {
+              final app = visible[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                child: TonalCard(
+                  onTap: () => _showActions(context, ref, app),
+                  child: Row(
+                    children: [
+                      AppIcon(name: app.displayName, icon: app.icon, size: 36),
+                      const SizedBox(width: AppTokens.s12),
+                      StatusDot(status: app.status.toLowerCase()),
+                      const SizedBox(width: AppTokens.s8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              app.displayName,
+                              style: AppTextStyles.titleM,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              '${app.version} · ${app.httpPort}',
+                              style: AppTextStyles.bodyS.copyWith(
+                                color: context.scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (app.canUpdate)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppTokens.s8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: context.appColors.warning.withValues(
+                              alpha: 0.15,
+                            ),
+                            borderRadius: BorderRadius.circular(AppTokens.rXs),
+                          ),
+                          child: Text(
+                            l10n.apps_update_available,
+                            style: AppTextStyles.caption.copyWith(
+                              color: context.appColors.warning,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _AppRow extends StatelessWidget {
+  const _AppRow({required this.app, required this.onTap});
 
   final AppCatalogDto app;
   final VoidCallback onTap;
@@ -380,64 +632,88 @@ class _AppCard extends StatelessWidget {
     final scheme = context.scheme;
     return TonalCard(
       onTap: onTap,
-      padding: const EdgeInsets.all(AppTokens.s12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                width: AppTokens.iconBadge,
-                height: AppTokens.iconBadge,
-                decoration: BoxDecoration(
-                  color: scheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(AppTokens.rSm),
-                ),
-                child: Center(
-                  child: Text(
-                    app.name.isEmpty ? '?' : app.name.substring(0, 1),
-                    style: AppTextStyles.titleS.copyWith(
-                      color: scheme.onPrimaryContainer,
+          AppIcon(name: app.name, icon: app.icon, size: 44),
+          const SizedBox(width: AppTokens.s12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        app.name,
+                        style: AppTextStyles.titleM,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
+                    if (app.installed) ...[
+                      const SizedBox(width: AppTokens.s8),
+                      Icon(
+                        TablerIcons.circle_check,
+                        size: 16,
+                        color: context.appColors.success,
+                      ),
+                    ],
+                  ],
                 ),
-              ),
-              const SizedBox(width: AppTokens.s8),
-              Expanded(
-                child: Text(
-                  app.name,
-                  style: AppTextStyles.titleS,
-                  maxLines: 1,
+                const SizedBox(height: 2),
+                Text(
+                  app.description,
+                  style: AppTextStyles.bodyS.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              if (app.installed)
-                Icon(
-                  TablerIcons.circle_check,
-                  size: 16,
-                  color: context.appColors.success,
+                const SizedBox(height: AppTokens.s8),
+                Wrap(
+                  spacing: AppTokens.s8,
+                  runSpacing: AppTokens.s4,
+                  children: [
+                    if (app.versions.isNotEmpty)
+                      _AppChip(label: app.versions.first),
+                    for (final tag in app.tags.take(2)) _AppChip(label: tag),
+                  ],
                 ),
-            ],
-          ),
-          const SizedBox(height: AppTokens.s8),
-          Text(
-            app.description,
-            style: AppTextStyles.caption.copyWith(
-              color: scheme.onSurfaceVariant,
+              ],
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
-          const Spacer(),
-          Text(
-            app.versions.isEmpty
-                ? displayValue(context, null)
-                : app.versions.first,
-            style: AppTextStyles.caption.copyWith(
-              color: scheme.onSurfaceVariant,
-            ),
+          const SizedBox(width: AppTokens.s8),
+          Icon(
+            TablerIcons.chevron_right,
+            size: AppTokens.iconList,
+            color: scheme.onSurfaceVariant,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AppChip extends StatelessWidget {
+  const _AppChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.scheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTokens.s8,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(AppTokens.rXs),
+      ),
+      child: Text(
+        label,
+        style: AppTextStyles.caption.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
   }

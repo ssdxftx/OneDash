@@ -6,7 +6,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/database/database_instance_dto.dart';
 import '../../../../data/repositories_impl/database_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
-import '../../../common/components/buttons.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/states/error_toast.dart';
 
 Future<bool> showDatabaseCreateSheet(
@@ -14,15 +14,27 @@ Future<bool> showDatabaseCreateSheet(
   required String type,
   required List<DatabaseInstanceDto> instances,
 }) async {
-  final created = await showModalBottomSheet<bool>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withValues(alpha: 0.4),
-    builder: (context) => DatabaseCreateSheet(type: type, instances: instances),
+  final created = await pushFormPage<bool>(
+    context,
+    DatabaseCreatePage(type: type, instances: instances),
   );
   return created ?? false;
+}
+
+class DatabaseCreatePage extends StatelessWidget {
+  const DatabaseCreatePage({
+    super.key,
+    required this.type,
+    required this.instances,
+  });
+
+  final String type;
+  final List<DatabaseInstanceDto> instances;
+
+  @override
+  Widget build(BuildContext context) {
+    return DatabaseCreateSheet(type: type, instances: instances);
+  }
 }
 
 class DatabaseCreateSheet extends ConsumerStatefulWidget {
@@ -185,49 +197,15 @@ class _DatabaseCreateSheetState extends ConsumerState<DatabaseCreateSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final title = _isRedis ? l10n.databases_redisRemote : l10n.databases_create;
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.sizeOf(context).height * 0.92,
-      ),
-      decoration: BoxDecoration(
-        color: context.scheme.surfaceContainer,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppTokens.rSheet),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            shrinkWrap: true,
-            padding: const EdgeInsets.fromLTRB(
-              AppTokens.s20,
-              AppTokens.s20,
-              AppTokens.s20,
-              AppTokens.s20,
-            ),
-            children: [
-              Text(title, style: AppTextStyles.titleL),
-              const SizedBox(height: AppTokens.s8),
-              Text(
-                widget.type,
-                style: AppTextStyles.bodyS.copyWith(
-                  color: context.scheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: AppTokens.s20),
-              if (_isRedis) ..._redisFields(l10n) else ..._instanceFields(l10n),
-              const SizedBox(height: AppTokens.s24),
-              PrimaryButton(
-                label: l10n.action_save,
-                loading: _saving,
-                onPressed: (!_isRedis && _instance == null) ? null : _submit,
-              ),
-            ],
-          ),
-        ),
-      ),
+    return SimpleFormPage(
+      title: title,
+      subtitle: widget.type,
+      formKey: _formKey,
+      saving: _saving,
+      onSave: _submit,
+      children: [
+        if (_isRedis) ..._redisFields(l10n) else ..._instanceFields(l10n),
+      ],
     );
   }
 

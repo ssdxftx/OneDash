@@ -300,16 +300,22 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
               onPressed: _showSessions,
               icon: const Icon(TablerIcons.list),
             ),
-            PopupMenuButton<double>(
+            IconButton(
               tooltip: l10n.terminal_fontSize,
               icon: const Icon(TablerIcons.text_size),
-              onSelected: (value) => setState(() => _fontSize = value),
-              itemBuilder: (context) => const [
-                PopupMenuItem(value: 12, child: Text('12')),
-                PopupMenuItem(value: 14, child: Text('14')),
-                PopupMenuItem(value: 16, child: Text('16')),
-                PopupMenuItem(value: 18, child: Text('18')),
-              ],
+              onPressed: () async {
+                final value = await showSelectionMenu<double>(
+                  context,
+                  options: const [
+                    SelectionOption(label: '12', value: 12),
+                    SelectionOption(label: '14', value: 14),
+                    SelectionOption(label: '16', value: 16),
+                    SelectionOption(label: '18', value: 18),
+                  ],
+                );
+                if (value == null || !mounted) return;
+                setState(() => _fontSize = value);
+              },
             ),
           ],
         ),

@@ -10,9 +10,9 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/toolbox_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/empty_state.dart';
@@ -86,15 +86,14 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
     final path = TextEditingController(text: '/tmp');
     final infectedDir = TextEditingController();
     var strategy = 'none';
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final confirmed = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setSheetState) => SimpleFormPage(
+          title: l10n.toolbox_clam,
+          saveLabel: l10n.action_create,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(l10n.toolbox_clam, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(
               controller: name,
               label: l10n.toolbox_scanName,
@@ -137,22 +136,11 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
                 label: l10n.toolbox_infectedDir,
               ),
             ],
-            const SizedBox(height: AppTokens.s24),
-            PrimaryButton(
-              label: l10n.action_create,
-              onPressed: () {
-                if ((strategy == 'move' || strategy == 'copy') &&
-                    infectedDir.text.trim().isEmpty) {
-                  AppToast.warning(context, l10n.toolbox_infectedDirRequired);
-                  return;
-                }
-                Navigator.of(sheetContext).pop(true);
-              },
-            ),
           ],
         ),
       ),
     );
+
     final taskName = name.text.trim();
     final scanPath = path.text.trim();
     final targetDir = infectedDir.text.trim();
@@ -284,7 +272,7 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         children: [
           SplitListGroup(
             children: [

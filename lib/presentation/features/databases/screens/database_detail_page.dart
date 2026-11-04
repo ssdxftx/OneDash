@@ -12,9 +12,9 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/segmented_tabs.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/empty_state.dart';
@@ -101,7 +101,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
           ],
           children: [
             ListView(
-              padding: const EdgeInsets.all(AppTokens.pagePadding),
+              padding: EdgeInsets.all(context.pagePadding),
               children: [
                 TonalCard(
                   child: Column(
@@ -287,29 +287,21 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
   Future<void> _changePassword(int id) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.databases_changePasswordSubtitle,
-            style: AppTextStyles.titleL,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            label: l10n.databases_newPassword,
-            obscure: true,
-            autofocus: true,
-          ),
-          const SizedBox(height: AppTokens.s24),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () => Navigator.of(sheetContext).pop(controller.text),
-          ),
-        ],
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.databases_changePasswordSubtitle,
+          onSave: () async => Navigator.of(pageContext).pop(controller.text),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.databases_newPassword,
+              obscure: true,
+              autofocus: true,
+            ),
+          ],
+        ),
       ),
     );
     controller.dispose();
@@ -455,6 +447,52 @@ class _PasswordRow extends StatelessWidget {
             onPressed: () => onCopy(value, label),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Fullscreen host for the users or advanced database tab.
+class DatabaseTabPage extends ConsumerWidget {
+  const DatabaseTabPage({
+    super.key,
+    required this.serverId,
+    required this.databaseName,
+    required this.type,
+    required this.instance,
+    required this.tab,
+  });
+
+  final int serverId;
+  final String databaseName;
+  final String type;
+  final String instance;
+  final int tab;
+
+  DatabaseKey get _key => (name: databaseName, type: type, instance: instance);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final detail = ref.watch(databaseDetailProvider(_key));
+    return Scaffold(
+      appBar: AppBarLarge(
+        title: databaseName,
+        subtitle: tab == 1
+            ? l10n.databases_usersGrants
+            : l10n.databases_advanced,
+      ),
+      body: AsyncStateView(
+        value: detail,
+        onRetry: () => ref.invalidate(databaseDetailProvider(_key)),
+        loading: const SkeletonList(itemCount: 6),
+        builder: (state) => tab == 1
+            ? DatabaseUsersTab(item: state.item, type: type, instance: instance)
+            : DatabaseAdvancedTab(
+                type: type,
+                instance: instance,
+                databaseName: databaseName,
+              ),
       ),
     );
   }

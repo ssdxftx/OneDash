@@ -14,8 +14,7 @@ import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/repositories_impl/backup_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
-import '../../../common/components/buttons.dart';
-import '../../../common/components/section_header.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/segmented_tabs.dart';
@@ -71,33 +70,40 @@ class BackupsPage extends ConsumerWidget {
               }
             },
           ),
-          PopupMenuButton<String>(
+          AppIconButton(
+            icon: TablerIcons.dots,
             tooltip: l10n.action_more,
-            icon: const Icon(TablerIcons.dots),
-            onSelected: (value) {
+            onPressed: () async {
+              final value = await showSelectionMenu<String>(
+                context,
+                options: [
+                  SelectionOption(
+                    label: l10n.backups_accounts,
+                    value: 'accounts',
+                    icon: TablerIcons.cloud,
+                  ),
+                  SelectionOption(
+                    label: l10n.backups_restoreFromFile,
+                    value: 'restore',
+                    icon: TablerIcons.restore,
+                  ),
+                  SelectionOption(
+                    label: l10n.backups_calculateSizes,
+                    value: 'sizes',
+                    icon: TablerIcons.ruler_measure,
+                  ),
+                ],
+              );
+              if (!context.mounted) return;
               switch (value) {
                 case 'accounts':
-                  context.push('/s/$serverId/more/backups/accounts');
+                  await context.push('/s/$serverId/more/backups/accounts');
                 case 'restore':
-                  _restoreFromFile(context, ref);
+                  await _restoreFromFile(context, ref);
                 case 'sizes':
-                  _showSizes(context, ref);
+                  await _showSizes(context, ref);
               }
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'accounts',
-                child: Text(l10n.backups_accounts),
-              ),
-              PopupMenuItem(
-                value: 'restore',
-                child: Text(l10n.backups_restoreFromFile),
-              ),
-              PopupMenuItem(
-                value: 'sizes',
-                child: Text(l10n.backups_calculateSizes),
-              ),
-            ],
           ),
           AppIconButton(
             icon: TablerIcons.plus,
@@ -133,20 +139,19 @@ Future<void> _restoreFromFile(BuildContext context, WidgetRef ref) async {
   final detail = TextEditingController();
   final secret = TextEditingController();
   String type = 'mysql';
-  final saved = await showAppSheet<bool>(
-    context: context,
-    maxHeightFactor: 0.92,
-    builder: (sheetContext) => StatefulBuilder(
-      builder: (context, setState) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+  final saved = await pushFormPage<bool>(
+    context,
+    StatefulBuilder(
+      builder: (pageContext, setState) => SimpleFormPage(
+        title: l10n.backups_restoreFromFile,
+        saveLabel: l10n.backups_confirmRestore,
+        danger: true,
+        onSave: () async => Navigator.of(pageContext).pop(true),
         children: [
-          Text(l10n.backups_restoreFromFile, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s8),
           Text(
             l10n.backups_restoreFromFileHint,
             style: AppTextStyles.bodyS.copyWith(
-              color: sheetContext.scheme.onSurfaceVariant,
+              color: pageContext.scheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: AppTokens.s16),
@@ -181,11 +186,6 @@ Future<void> _restoreFromFile(BuildContext context, WidgetRef ref) async {
             controller: secret,
             label: l10n.backups_restoreSecret,
             obscure: true,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.backups_confirmRestore,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
           ),
         ],
       ),
@@ -284,15 +284,14 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
   final description = TextEditingController();
   String type = 'mysql';
   bool stopBefore = false;
-  final confirmed = await showAppSheet<bool>(
-    context: context,
-    builder: (sheetContext) => StatefulBuilder(
-      builder: (context, setState) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+  final confirmed = await pushFormPage<bool>(
+    context,
+    StatefulBuilder(
+      builder: (pageContext, setState) => SimpleFormPage(
+        title: l10n.backups_create,
+        saveLabel: l10n.backups_startBackup,
+        onSave: () async => Navigator.of(pageContext).pop(true),
         children: [
-          Text(l10n.backups_create, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
           DropdownButtonFormField<String>(
             initialValue: type,
             decoration: InputDecoration(labelText: l10n.backups_type),
@@ -357,11 +356,6 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
               value: stopBefore,
               onChanged: (value) => setState(() => stopBefore = value),
             ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.backups_startBackup,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
         ],
       ),
     ),
@@ -462,13 +456,14 @@ class _BackupTab extends ConsumerWidget {
         onAction: () => _create(context, ref),
       ),
       builder: (data) => ListView.builder(
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         itemCount: data.items.length,
         itemBuilder: (context, index) {
           final record = data.items[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: AppTokens.s12),
             child: TonalCard(
+              onTap: () => _showActions(context, ref, record),
               onLongPress: () => _showActions(context, ref, record),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -491,14 +486,10 @@ class _BackupTab extends ConsumerWidget {
                         formatBytes(record.size),
                         style: AppTextStyles.caption,
                       ),
-                      IconButton(
-                        tooltip: l10n.action_more,
-                        visualDensity: VisualDensity.compact,
-                        icon: const Icon(
-                          TablerIcons.dots,
-                          size: AppTokens.iconList,
-                        ),
-                        onPressed: () => _showActions(context, ref, record),
+                      Icon(
+                        TablerIcons.chevron_right,
+                        size: AppTokens.iconList,
+                        color: context.scheme.onSurfaceVariant,
                       ),
                     ],
                   ),
@@ -647,58 +638,49 @@ class _BackupTab extends ConsumerWidget {
     final dbTypeController = TextEditingController(text: 'mysql');
     final isApp = type == 'app';
     final isContainer = type == 'container';
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SectionHeader(title: l10n.backups_restoreTitle),
-          Text(
-            record.fileName,
-            style: AppTextStyles.bodyS.copyWith(
-              color: context.scheme.onSurfaceVariant,
-              fontFamily: 'monospace',
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.backups_restoreTitle,
+          subtitle: record.fileName,
+          saveLabel: l10n.backups_confirmRestore,
+          danger: true,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: nameController,
+              label: l10n.backups_resourceName,
+              hint: isApp
+                  ? l10n.backups_appNameHint
+                  : isContainer
+                  ? l10n.backups_containerHint
+                  : l10n.backups_databaseInstanceHint,
             ),
-          ),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: nameController,
-            label: l10n.backups_resourceName,
-            hint: isApp
-                ? l10n.backups_appNameHint
-                : isContainer
-                ? l10n.backups_containerHint
-                : l10n.backups_databaseInstanceHint,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: detailController,
-            label: l10n.backups_detailName,
-            hint: isApp
-                ? l10n.backups_appDetailHint
-                : l10n.backups_databaseNameHint,
-          ),
-          if (!isApp) ...[
             const SizedBox(height: AppTokens.s12),
             AppTextField(
-              controller: dbTypeController,
-              label: l10n.backups_databaseType,
-              hint: 'mysql / postgresql',
+              controller: detailController,
+              label: l10n.backups_detailName,
+              hint: isApp
+                  ? l10n.backups_appDetailHint
+                  : l10n.backups_databaseNameHint,
+            ),
+            if (!isApp) ...[
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: dbTypeController,
+                label: l10n.backups_databaseType,
+                hint: 'mysql / postgresql',
+              ),
+            ],
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: secretController,
+              label: l10n.backups_restoreSecret,
+              obscure: true,
             ),
           ],
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: secretController,
-            label: l10n.backups_restoreSecret,
-            obscure: true,
-          ),
-          const SizedBox(height: AppTokens.s24),
-          DangerButton(
-            label: l10n.backups_confirmRestore,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+        ),
       ),
     );
     if (confirmed != true) {

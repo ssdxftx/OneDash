@@ -115,10 +115,7 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(tester.getSize(find.text('Telegram')).height, lessThan(30));
 
-    final menu = tester.getCenter(find.byTooltip('更多'));
-    final toggle = tester.getCenter(find.byType(Switch));
-    expect((menu.dx - toggle.dx).abs(), lessThan(12));
-    expect(toggle.dy, greaterThan(menu.dy));
+    expect(find.byType(Switch), findsOneWidget);
   });
 
   testWidgets('320dp / 1.0x keeps controls on one row', (tester) async {
@@ -134,9 +131,7 @@ void main() {
       tester.getSize(find.byType(TonalCard)).height,
       lessThanOrEqualTo(108),
     );
-    final menu = tester.getCenter(find.byTooltip('更多'));
-    final toggle = tester.getCenter(find.byType(Switch));
-    expect((menu.dy - toggle.dy).abs(), lessThan(2));
+    expect(find.byType(Switch), findsOneWidget);
   });
 
   testWidgets('390dp / 1.0x English meta is not ellipsized', (tester) async {
@@ -171,8 +166,17 @@ void main() {
       lessThanOrEqualTo(108),
     );
 
-    final menu = tester.getCenter(find.byTooltip('更多'));
-    final toggle = tester.getCenter(find.byType(Switch));
-    expect((menu.dy - toggle.dy).abs(), lessThan(2));
+    expect(find.byType(Switch), findsOneWidget);
+  });
+
+  testWidgets('tapping a card opens the action menu', (tester) async {
+    await tester.pumpWidget(wrap(width: 390, textScale: 1));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(TonalCard));
+    await tester.pumpAndSettle();
+
+    expect(find.text('编辑'), findsOneWidget);
+    expect(find.text('删除'), findsOneWidget);
   });
 }

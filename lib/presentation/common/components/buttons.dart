@@ -134,7 +134,9 @@ class _ButtonContent extends StatelessWidget {
       children: [
         Icon(icon, size: AppTokens.iconList),
         const SizedBox(width: AppTokens.s8),
-        Text(label),
+        Flexible(
+          child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
       ],
     );
   }

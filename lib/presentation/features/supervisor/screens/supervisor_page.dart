@@ -8,6 +8,7 @@ import '../../../../data/dto/host_tool/supervisor_dto.dart';
 import '../../../../data/repositories_impl/host_tool_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -19,6 +20,7 @@ import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../../log/screens/log_preview_page.dart';
 
 class SupervisorViewData {
   const SupervisorViewData({required this.status, required this.processes});
@@ -117,7 +119,7 @@ class SupervisorPage extends ConsumerWidget {
       onRefresh: () async => ref.invalidate(_supervisorProvider),
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(AppTokens.pagePadding),
+        padding: EdgeInsets.all(context.pagePadding),
         children: [
           TonalCard(
             child: Column(
@@ -317,22 +319,14 @@ class SupervisorPage extends ConsumerWidget {
       final content = await repository.supervisorConfig(operate: 'get');
       if (!context.mounted) return;
       final controller = TextEditingController(text: content);
-      final saved = await showAppSheet<bool>(
-        context: context,
-        maxHeightFactor: 0.92,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.supervisor_configFile, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
-            AppTextField(controller: controller, maxLines: 16),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
-          ],
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.supervisor_configFile,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [AppTextField(controller: controller, maxLines: 16)],
+          ),
         ),
       );
       final value = controller.text;
@@ -342,6 +336,47 @@ class SupervisorPage extends ConsumerWidget {
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_saved);
       ref.invalidate(_supervisorProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showLog(
+    BuildContext context,
+    WidgetRef ref,
+    SupervisorProcessConfig process,
+    String file,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final label = file == 'out.log'
+        ? l10n.supervisor_viewOutLog
+        : l10n.supervisor_viewErrLog;
+    try {
+      final repository = await ref.read(hostToolRepositoryProvider.future);
+      final content = await repository.supervisorProcessFile(
+        name: process.name,
+        file: file,
+        operate: 'get',
+      );
+      if (!context.mounted) return;
+      await Navigator.of(context, rootNavigator: true).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => LogPreviewPage(
+            title: label,
+            subtitle: process.name,
+            sources: [
+              LogSourceOption(
+                label: label,
+                load: () async => content
+                    .split('\n')
+                    .where((line) => line.trim().isNotEmpty)
+                    .toList(growable: false),
+              ),
+            ],
+          ),
+        ),
+      );
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);
@@ -365,47 +400,25 @@ class SupervisorPage extends ConsumerWidget {
       );
       if (!context.mounted) return;
       final controller = TextEditingController(text: content);
-      final saved = await showAppSheet<bool>(
-        context: context,
-        maxHeightFactor: 0.92,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              isConfig ? l10n.supervisor_editConfig : file,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s4),
-            Text(
-              process.name,
-              style: AppTextStyles.caption.copyWith(
-                color: sheetContext.scheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            if (isConfig)
-              AppTextField(controller: controller, maxLines: 16)
-            else
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 320),
-                child: SingleChildScrollView(
-                  child: SelectableText(
-                    content.isEmpty ? l10n.state_empty : content,
-                    style: AppTextStyles.caption.copyWith(
-                      fontFamily: 'monospace',
-                    ),
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: isConfig ? l10n.supervisor_editConfig : file,
+            subtitle: process.name,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              if (isConfig)
+                AppTextField(controller: controller, maxLines: 16)
+              else
+                SelectableText(
+                  content.isEmpty ? l10n.state_empty : content,
+                  style: AppTextStyles.caption.copyWith(
+                    fontFamily: 'monospace',
                   ),
                 ),
-              ),
-            if (isConfig) ...[
-              const SizedBox(height: AppTokens.s16),
-              PrimaryButton(
-                label: l10n.action_save,
-                onPressed: () => Navigator.of(sheetContext).pop(true),
-              ),
             ],
-          ],
+          ),
         ),
       );
       final value = controller.text;
@@ -535,8 +548,10 @@ class SupervisorPage extends ConsumerWidget {
     if (action == null || !context.mounted) return;
     if (action == 'edit') {
       await _openForm(context, ref, process: process);
-    } else if (action == 'config' || action.endsWith('.log')) {
+    } else if (action == 'config') {
       await _showProcessFile(context, ref, process, action);
+    } else if (action.endsWith('.log')) {
+      await _showLog(context, ref, process, action);
     } else {
       await _operateProcess(context, ref, l10n, process, action);
     }

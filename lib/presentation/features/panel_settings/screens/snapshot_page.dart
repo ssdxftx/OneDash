@@ -11,9 +11,9 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/setting_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
@@ -73,7 +73,7 @@ class SnapshotPage extends ConsumerWidget {
           message: l10n.panelSettings_noSnapshotsHint,
         ),
         builder: (items) => ListView.separated(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           itemCount: items.length,
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {
@@ -104,35 +104,6 @@ class SnapshotPage extends ConsumerWidget {
                       Text(
                         formatBytes(item['size']),
                         style: AppTextStyles.caption,
-                      ),
-                      PopupMenuButton<String>(
-                        tooltip: l10n.action_more,
-                        icon: Icon(
-                          TablerIcons.dots,
-                          size: AppTokens.iconList,
-                          color: context.scheme.onSurfaceVariant,
-                        ),
-                        onSelected: (value) {
-                          switch (value) {
-                            case 'edit':
-                              _editDescription(context, ref, id, description);
-                            case 'delete':
-                              _delete(context, ref, id);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Text(l10n.action_edit),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Text(
-                              l10n.action_delete,
-                              style: TextStyle(color: context.appColors.danger),
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
@@ -184,6 +155,18 @@ class SnapshotPage extends ConsumerWidget {
                         onPressed: () => _rollback(context, ref, id),
                         child: Text(l10n.panelSettings_rollbackSnapshot),
                       ),
+                      TextButton(
+                        onPressed: () =>
+                            _editDescription(context, ref, id, description),
+                        child: Text(l10n.action_edit),
+                      ),
+                      TextButton(
+                        onPressed: () => _delete(context, ref, id),
+                        child: Text(
+                          l10n.action_delete,
+                          style: TextStyle(color: context.appColors.danger),
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -198,26 +181,21 @@ class SnapshotPage extends ConsumerWidget {
   Future<void> _import(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final saved = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.92,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.panelSettings_importSnapshot, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: controller,
-            label: l10n.panelSettings_snapshotJson,
-            maxLines: 12,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_import,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.panelSettings_importSnapshot,
+          saveLabel: l10n.action_import,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.panelSettings_snapshotJson,
+              maxLines: 12,
+            ),
+          ],
+        ),
       ),
     );
     final raw = controller.text.trim();
@@ -252,22 +230,16 @@ class SnapshotPage extends ConsumerWidget {
     AppLocalizations l10n,
   ) async {
     final controller = TextEditingController();
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.panelSettings_snapshotSecret, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, obscure: true),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_continue,
-            onPressed: () =>
-                Navigator.of(sheetContext).pop(controller.text.trim()),
-          ),
-        ],
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.panelSettings_snapshotSecret,
+          saveLabel: l10n.action_continue,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [AppTextField(controller: controller, obscure: true)],
+        ),
       ),
     );
     controller.dispose();
@@ -326,18 +298,14 @@ class SnapshotPage extends ConsumerWidget {
       'withSystemLog': false,
       'withTaskLog': false,
     };
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.panelSettings_createSnapshot,
+          saveLabel: l10n.panelSettings_createSnapshot,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(
-              l10n.panelSettings_createSnapshot,
-              style: AppTextStyles.titleL,
-            ),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(
               controller: name,
               label: l10n.panelSettings_snapshotName,
@@ -354,11 +322,6 @@ class SnapshotPage extends ConsumerWidget {
                 value: entry.value,
                 onChanged: (value) => setState(() => flags[entry.key] = value),
               ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.panelSettings_createSnapshot,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
           ],
         ),
       ),
@@ -408,25 +371,15 @@ class SnapshotPage extends ConsumerWidget {
   ) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: current);
-    final value = await showAppSheet<String>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.panelSettings_snapshotDescription,
-            style: AppTextStyles.titleL,
-          ),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_save,
-            onPressed: () =>
-                Navigator.of(sheetContext).pop(controller.text.trim()),
-          ),
-        ],
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.panelSettings_snapshotDescription,
+          onSave: () async =>
+              Navigator.of(pageContext).pop(controller.text.trim()),
+          children: [AppTextField(controller: controller)],
+        ),
       ),
     );
     controller.dispose();

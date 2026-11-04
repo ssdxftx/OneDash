@@ -9,12 +9,13 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/container/container_compose_dto.dart';
 import '../../../../data/repositories_impl/container_repository_impl.dart';
+import '../widgets/container_log_page.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/status_dot.dart';
@@ -73,7 +74,7 @@ class ComposePage extends ConsumerWidget {
           message: l10n.containers_empty_message,
         ),
         builder: (data) => ListView.builder(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           itemCount: data.items.length,
           itemBuilder: (context, index) {
             final item = data.items[index];
@@ -171,22 +172,15 @@ class ComposePage extends ConsumerWidget {
   Future<void> _importTemplates(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final saved = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.92,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.containers_importTemplates, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(controller: controller, maxLines: 14),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_import,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.containers_importTemplates,
+          saveLabel: l10n.action_import,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [AppTextField(controller: controller, maxLines: 14)],
+        ),
       ),
     );
     final raw = controller.text.trim();
@@ -390,40 +384,13 @@ class ComposePage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     ContainerComposeDto item,
-  ) async {
-    try {
-      final repository = await ref.read(containerRepositoryProvider.future);
-      final log = await repository.getComposeLog(
-        composePath: item.path,
-        since: '1h',
-        tail: '300',
-        follow: false,
-        timestamp: true,
-      );
-      if (!context.mounted) return;
-      await showAppSheet<void>(
-        context: context,
-        maxHeightFactor: 0.85,
-        builder: (sheetContext) {
-          final l10n = AppLocalizations.of(sheetContext);
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.containers_composeLogs, style: AppTextStyles.titleL),
-              const SizedBox(height: AppTokens.s12),
-              SelectableText(
-                log.isEmpty ? l10n.containers_logsEmpty : log,
-                style: AppTextStyles.caption.copyWith(fontFamily: 'monospace'),
-              ),
-            ],
-          );
-        },
-      );
-    } catch (error) {
-      if (!context.mounted) return;
-      showErrorToast(context, error);
-    }
+  ) {
+    return openComposeLogs(
+      context,
+      ref,
+      composePath: item.path,
+      subtitle: item.name,
+    );
   }
 }
 

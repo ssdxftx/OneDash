@@ -84,7 +84,7 @@ class _FileHistoryPageState extends ConsumerState<FileHistoryPage> {
             );
           }
           return ListView.builder(
-            padding: const EdgeInsets.all(AppTokens.pagePadding),
+            padding: EdgeInsets.all(context.pagePadding),
             itemCount: items.length,
             itemBuilder: (context, index) {
               final item = items[index];

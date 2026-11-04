@@ -64,15 +64,22 @@ class _TaskProgressSheetState extends State<TaskProgressSheet> {
   final TaskProgressController _controller = TaskProgressController();
   bool _running = true;
   String? _line;
+  String? _pendingLine;
   Object? _error;
   Timer? _closeTimer;
+  Timer? _lineTimer;
 
   @override
   void initState() {
     super.initState();
     _controller._onLine = (line) {
       if (!mounted) return;
-      setState(() => _line = line);
+      _pendingLine = line;
+      if (_lineTimer?.isActive ?? false) return;
+      _lineTimer = Timer(const Duration(milliseconds: 150), () {
+        if (!mounted || _pendingLine == null) return;
+        setState(() => _line = _pendingLine);
+      });
     };
     _run();
   }
@@ -80,12 +87,15 @@ class _TaskProgressSheetState extends State<TaskProgressSheet> {
   @override
   void dispose() {
     _closeTimer?.cancel();
+    _lineTimer?.cancel();
     _controller._onLine = null;
     super.dispose();
   }
 
   Future<void> _run() async {
     _closeTimer?.cancel();
+    _lineTimer?.cancel();
+    _pendingLine = null;
     setState(() {
       _running = true;
       _error = null;

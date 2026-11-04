@@ -60,6 +60,23 @@ String alertLogStatusLabel(String raw, AppLocalizations l10n) =>
       _ => raw,
     };
 
+String websiteTypeLabel(String raw, AppLocalizations l10n) =>
+    switch (raw.toLowerCase()) {
+      'static' => l10n.websites_static,
+      'proxy' || 'reverse_proxy' => l10n.websites_proxy,
+      'php' => l10n.websites_php,
+      _ => raw,
+    };
+
+String sslStatusLabel(String raw, AppLocalizations l10n) =>
+    switch (raw.toLowerCase()) {
+      'ready' || 'issued' => l10n.websites_sslStatusReady,
+      'applied' || 'deployed' => l10n.websites_sslStatusApplied,
+      'init' || 'pending' || 'processing' => l10n.websites_sslStatusPending,
+      'error' || 'failed' => l10n.websites_sslStatusError,
+      _ => raw,
+    };
+
 String sslProviderLabel(String raw, AppLocalizations l10n) =>
     switch (raw.toLowerCase()) {
       'dnsaccount' => l10n.websites_sslProviderDnsAccount,

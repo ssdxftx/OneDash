@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/localization/generated/app_localizations.dart';
 import '../../../core/theme/tokens.dart';
 import 'buttons.dart';
+import 'split_list_group.dart';
 
 class BottomSheetSurface extends StatelessWidget {
   const BottomSheetSurface({
@@ -101,6 +102,73 @@ Future<T?> showAppSheet<T>({
   );
 }
 
+/// One option in a selection menu.
+class SelectionOption<T> {
+  const SelectionOption({
+    required this.label,
+    required this.value,
+    this.icon,
+    this.subtitle,
+    this.danger = false,
+    this.enabled = true,
+  });
+
+  final String label;
+  final T value;
+  final IconData? icon;
+  final String? subtitle;
+  final bool danger;
+  final bool enabled;
+}
+
+/// Bottom selection menu for a fixed list of options.
+Future<T?> showSelectionMenu<T>(
+  BuildContext context, {
+  required List<SelectionOption<T>> options,
+  String? title,
+  String? subtitle,
+  double maxHeightFactor = 0.9,
+}) {
+  return showAppSheet<T>(
+    context: context,
+    maxHeightFactor: maxHeightFactor,
+    builder: (sheetContext) => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (title != null) ...[
+          Text(title, style: AppTextStyles.titleL),
+          if (subtitle != null) ...[
+            const SizedBox(height: AppTokens.s4),
+            Text(
+              subtitle,
+              style: AppTextStyles.bodyS.copyWith(
+                color: sheetContext.scheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+          const SizedBox(height: AppTokens.s16),
+        ],
+        SplitListGroup(
+          children: [
+            for (final option in options)
+              SplitListTile(
+                leading: Icon(option.icon ?? Icons.chevron_right),
+                title: option.label,
+                subtitle: option.subtitle,
+                danger: option.danger,
+                enabled: option.enabled,
+                onTap: option.enabled
+                    ? () => Navigator.of(sheetContext).pop(option.value)
+                    : null,
+              ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
 /// 危险操作确认。传入 [requireText] 时必须精确输入资源名才可提交。
 Future<bool> showConfirmSheet(
   BuildContext context, {
@@ -112,15 +180,27 @@ Future<bool> showConfirmSheet(
   bool danger = true,
 }) async {
   final l10n = AppLocalizations.of(context);
-  final result = await showAppSheet<bool>(
+  final result = await showDialog<bool>(
     context: context,
-    builder: (context) => _ConfirmSheetBody(
-      title: title,
-      message: message,
-      confirmLabel: confirmLabel ?? l10n.action_confirm,
-      cancelLabel: cancelLabel ?? l10n.action_cancel,
-      requireText: requireText,
-      danger: danger,
+    builder: (dialogContext) => Dialog(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTokens.rLg),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppTokens.s24),
+          child: _ConfirmSheetBody(
+            title: title,
+            message: message,
+            confirmLabel: confirmLabel ?? l10n.action_confirm,
+            cancelLabel: cancelLabel ?? l10n.action_cancel,
+            requireText: requireText,
+            danger: danger,
+          ),
+        ),
+      ),
     ),
   );
   return result ?? false;

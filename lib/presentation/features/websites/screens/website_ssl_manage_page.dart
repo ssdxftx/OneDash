@@ -11,9 +11,9 @@ import '../../../../data/dto/website/ssl_manage_dtos.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/status_dot.dart';
@@ -81,13 +81,14 @@ class WebsiteSslManagePage extends ConsumerWidget {
           onAction: () => _upload(context, ref),
         ),
         builder: (items) => ListView.separated(
-          padding: const EdgeInsets.all(AppTokens.pagePadding),
+          padding: EdgeInsets.all(context.pagePadding),
           itemCount: items.length,
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
           itemBuilder: (context, index) {
             final cert = items[index];
             final expiry = _expiryState(context, cert, l10n);
             return TonalCard(
+              onTap: () => _showActions(context, ref, cert),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -105,51 +106,16 @@ class WebsiteSslManagePage extends ConsumerWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      PopupMenuButton<String>(
-                        tooltip: l10n.action_more,
-                        icon: Icon(
-                          TablerIcons.dots,
-                          size: AppTokens.iconList,
-                          color: context.scheme.onSurfaceVariant,
-                        ),
-                        onSelected: (value) {
-                          switch (value) {
-                            case 'download':
-                              _download(context, ref, cert);
-                            case 'dns':
-                              _checkDns(context, ref, cert);
-                            case 'edit':
-                              _edit(context, ref, cert);
-                            case 'delete':
-                              _delete(context, ref, cert);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'download',
-                            child: Text(l10n.websites_downloadSsl),
-                          ),
-                          PopupMenuItem(
-                            value: 'dns',
-                            child: Text(l10n.websites_checkDns),
-                          ),
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Text(l10n.action_edit),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Text(
-                              l10n.action_delete,
-                              style: TextStyle(color: context.appColors.danger),
-                            ),
-                          ),
-                        ],
+                      Icon(
+                        TablerIcons.chevron_right,
+                        size: AppTokens.iconList,
+                        color: context.scheme.onSurfaceVariant,
                       ),
                     ],
                   ),
                   const SizedBox(height: AppTokens.s8),
                   SplitListGroup(
+                    flat: true,
                     children: [
                       SplitListTile(
                         title: l10n.websites_sslProvider,
@@ -206,34 +172,29 @@ class WebsiteSslManagePage extends ConsumerWidget {
     final cert = TextEditingController();
     final key = TextEditingController();
     final description = TextEditingController();
-    final saved = await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.92,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.websites_uploadSsl, style: AppTextStyles.titleL),
-          const SizedBox(height: AppTokens.s16),
-          AppTextField(
-            controller: cert,
-            label: l10n.websites_certificatePem,
-            maxLines: 8,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(
-            controller: key,
-            label: l10n.websites_privateKeyPem,
-            maxLines: 8,
-          ),
-          const SizedBox(height: AppTokens.s12),
-          AppTextField(controller: description, label: l10n.websites_remark),
-          const SizedBox(height: AppTokens.s16),
-          PrimaryButton(
-            label: l10n.action_upload,
-            onPressed: () => Navigator.of(sheetContext).pop(true),
-          ),
-        ],
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_uploadSsl,
+          saveLabel: l10n.action_upload,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: cert,
+              label: l10n.websites_certificatePem,
+              maxLines: 8,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: key,
+              label: l10n.websites_privateKeyPem,
+              maxLines: 8,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: description, label: l10n.websites_remark),
+          ],
+        ),
       ),
     );
     final certificate = cert.text.trim();
@@ -279,15 +240,14 @@ class WebsiteSslManagePage extends ConsumerWidget {
       final description = TextEditingController();
       int accountId = accounts.first.id;
       bool autoRenew = true;
-      final saved = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      final saved = await pushFormPage<bool>(
+        context,
+        StatefulBuilder(
+          builder: (pageContext, setState) => SimpleFormPage(
+            title: l10n.websites_applySsl,
+            saveLabel: l10n.websites_applySsl,
+            onSave: () async => Navigator.of(pageContext).pop(true),
             children: [
-              Text(l10n.websites_applySsl, style: AppTextStyles.titleL),
-              const SizedBox(height: AppTokens.s16),
               AppTextField(
                 controller: domainController,
                 label: l10n.websites_domain,
@@ -319,11 +279,6 @@ class WebsiteSslManagePage extends ConsumerWidget {
                 title: Text(l10n.websites_autoRenew),
                 value: autoRenew,
                 onChanged: (value) => setState(() => autoRenew = value),
-              ),
-              const SizedBox(height: AppTokens.s16),
-              PrimaryButton(
-                label: l10n.websites_applySsl,
-                onPressed: () => Navigator.of(sheetContext).pop(true),
               ),
             ],
           ),
@@ -372,6 +327,65 @@ class WebsiteSslManagePage extends ConsumerWidget {
       if (!context.mounted) return;
       showErrorToast(context, error);
     }
+  }
+
+  Future<void> _showActions(
+    BuildContext context,
+    WidgetRef ref,
+    SslManageDto cert,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    await showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            cert.primaryDomain.isEmpty ? 'SSL #${cert.id}' : cert.primaryDomain,
+            style: AppTextStyles.titleL,
+          ),
+          const SizedBox(height: AppTokens.s16),
+          SplitListGroup(
+            children: [
+              SplitListTile(
+                leading: const Icon(TablerIcons.download),
+                title: l10n.websites_downloadSsl,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _download(context, ref, cert);
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.world_check),
+                title: l10n.websites_checkDns,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _checkDns(context, ref, cert);
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.edit),
+                title: l10n.action_edit,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _edit(context, ref, cert);
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.trash),
+                title: l10n.action_delete,
+                danger: true,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _delete(context, ref, cert);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _download(
@@ -454,26 +468,19 @@ class WebsiteSslManagePage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final description = TextEditingController(text: cert.description);
     bool autoRenew = cert.autoRenew;
-    final saved = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.websites_editSsl,
+          onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            Text(l10n.websites_editSsl, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
             AppTextField(controller: description, label: l10n.websites_remark),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.websites_autoRenew),
               value: autoRenew,
               onChanged: (value) => setState(() => autoRenew = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            PrimaryButton(
-              label: l10n.action_save,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),
