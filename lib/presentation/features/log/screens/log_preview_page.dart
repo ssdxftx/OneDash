@@ -654,27 +654,24 @@ class _StructuredLineState extends State<_StructuredLine> {
     final path = parsed.path ?? parsed.message;
     final method = parsed.method ?? '';
     final duration = parsed.duration;
+    final statusStyle = AppTextStyles.caption.copyWith(
+      color: statusColor,
+      fontWeight: FontWeight.w600,
+    );
+    final statusText = status?.toString() ?? '-';
     final statusBadge = Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       decoration: BoxDecoration(
         color: statusColor.withValues(alpha: 0.16),
         borderRadius: BorderRadius.circular(AppTokens.rXs),
       ),
-      child: Text(
-        status?.toString() ?? '-',
-        style: AppTextStyles.caption.copyWith(
-          color: statusColor,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      child: Text(statusText, style: statusStyle),
     );
-    final methodText = Text(
-      method,
-      style: AppTextStyles.caption.copyWith(
-        color: context.scheme.onSurfaceVariant,
-        fontWeight: FontWeight.w600,
-      ),
+    final methodStyle = AppTextStyles.caption.copyWith(
+      color: context.scheme.onSurfaceVariant,
+      fontWeight: FontWeight.w600,
     );
+    final methodText = Text(method, style: methodStyle);
     final pathText = Text(
       path,
       maxLines: 1,
@@ -684,35 +681,57 @@ class _StructuredLineState extends State<_StructuredLine> {
         color: AppTokens.consoleForeground,
       ),
     );
+    final durationStyle = AppTextStyles.caption.copyWith(
+      color: AppTokens.consoleMuted,
+    );
     final durationText = duration == null
         ? null
-        : Text(
-            duration,
-            style: AppTextStyles.caption.copyWith(
-              color: AppTokens.consoleMuted,
-            ),
-          );
+        : Text(duration, style: durationStyle);
     final chevron = Icon(
       _expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
       size: 16,
       color: AppTokens.consoleMuted,
     );
+    final scaler = MediaQuery.textScalerOf(context);
+    double textWidth(String text, TextStyle style) {
+      final painter = TextPainter(
+        text: TextSpan(text: text, style: style),
+        textDirection: Directionality.of(context),
+        textScaler: scaler,
+      )..layout();
+      return painter.width;
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact =
-            constraints.maxWidth < 340 ||
-            MediaQuery.textScalerOf(context).scale(1) > 1.2;
+        final badgeWidth = textWidth(statusText, statusStyle) + 10;
+        final methodWidth = method.isEmpty
+            ? 0.0
+            : textWidth(method, methodStyle) + AppTokens.s8;
+        final durationWidth = duration == null
+            ? 0.0
+            : textWidth(duration, durationStyle) + AppTokens.s8;
+        final pathWithoutMethod =
+            constraints.maxWidth -
+            44 -
+            AppTokens.s8 -
+            badgeWidth -
+            AppTokens.s8 -
+            durationWidth -
+            16;
+        final pathWithMethod = pathWithoutMethod - methodWidth;
+        final compact = scaler.scale(1) > 1.2 || pathWithoutMethod < 150;
         if (!compact) {
           return Row(
             children: [
               _number(),
               const SizedBox(width: AppTokens.s8),
               statusBadge,
-              if (method.isNotEmpty) ...[
+              if (method.isNotEmpty && pathWithMethod >= 150) ...[
                 const SizedBox(width: AppTokens.s8),
                 methodText,
               ],
-              const SizedBox(width: AppTokens.s8),
+              const SizedBox(width: AppTokens.s4),
               Expanded(child: pathText),
               if (durationText != null) ...[
                 const SizedBox(width: AppTokens.s8),

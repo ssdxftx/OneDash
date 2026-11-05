@@ -167,6 +167,60 @@ void main() {
     expect(tester.getSize(path).width, greaterThanOrEqualTo(96));
   });
 
+  testWidgets('keeps a consistent access path width across 390dp and 412dp', (
+    tester,
+  ) async {
+    addTearDown(tester.view.reset);
+    for (final width in [390.0, 412.0]) {
+      tester.view.physicalSize = Size(width, 844);
+      tester.view.devicePixelRatio = 1;
+      await tester.pumpWidget(
+        wrap(
+          LogPreviewPage(
+            title: 'access.log',
+            sources: [
+              LogSourceOption(
+                label: 'main',
+                load: () async => [
+                  '1.2.3.4 - - [05/Nov/2026:09:12:03 +0800] '
+                      '"GET /api/v1/very/long/endpoint HTTP/1.1" 200 123 '
+                      '"-" "UA" 0.012',
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Structured'));
+      await tester.pump();
+
+      final badge = tester.getRect(find.text('200').first);
+      final path = tester.getRect(
+        find.text('/api/v1/very/long/endpoint').first,
+      );
+      if (width == 390) {
+        expect(
+          path.width,
+          greaterThanOrEqualTo(240),
+          reason: '390dp should use the two-line layout',
+        );
+        expect(path.top, greaterThan(badge.bottom));
+      } else {
+        expect(
+          (path.center.dy - badge.center.dy).abs(),
+          lessThan(6),
+          reason: '412dp should keep the status and path on one line',
+        );
+        expect(
+          path.width,
+          greaterThanOrEqualTo(150),
+          reason: '412dp path width ${path.width}',
+        );
+      }
+    }
+  });
+
   testWidgets('follow polling appends newly loaded lines', (tester) async {
     final lines = ['first line'];
     await tester.pumpWidget(

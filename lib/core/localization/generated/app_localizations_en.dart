@@ -1402,10 +1402,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get websites_logsFileHint =>
-      'Logs open as files with search and download support.';
-
-  @override
   String get common_running => 'Running';
 
   @override

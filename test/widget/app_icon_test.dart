@@ -91,6 +91,38 @@ void main() {
     expect(calls, 2);
   });
 
+  testWidgets('stops retrying after two failures during cooldown', (
+    tester,
+  ) async {
+    var calls = 0;
+    late StateSetter rebuild;
+    await tester.pumpWidget(
+      wrap(
+        StatefulBuilder(
+          builder: (context, setState) {
+            rebuild = setState;
+            return AppIcon(
+              name: 'redis',
+              cacheKey: 'cooldown-redis-test',
+              iconLoader: () async {
+                calls += 1;
+                throw Exception('offline');
+              },
+            );
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    rebuild(() {});
+    await tester.pumpAndSettle();
+    rebuild(() {});
+    await tester.pumpAndSettle();
+
+    expect(calls, 2);
+    expect(find.byType(Image), findsNothing);
+  });
+
   testWidgets('falls back for malformed base64 payloads', (tester) async {
     await tester.pumpWidget(
       wrap(const AppIcon(name: 'redis', icon: 'not-base64')),

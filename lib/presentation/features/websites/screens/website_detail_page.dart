@@ -1082,7 +1082,6 @@ class _LogsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final scheme = context.scheme;
     return ListView(
       padding: EdgeInsets.all(context.pagePadding),
       children: [
@@ -1122,11 +1121,6 @@ class _LogsTab extends ConsumerWidget {
               ),
             ],
           ),
-        ),
-        const SizedBox(height: AppTokens.s16),
-        Text(
-          l10n.websites_logsFileHint,
-          style: AppTextStyles.bodyS.copyWith(color: scheme.onSurfaceVariant),
         ),
       ],
     );

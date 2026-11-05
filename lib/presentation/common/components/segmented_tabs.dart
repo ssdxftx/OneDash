@@ -168,7 +168,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
                   else
                     scheme.surface,
                 ],
-                stops: const [0, 0.12, 0.88, 1],
+                stops: const [0, 0.16, 0.84, 1],
               ).createShader(bounds),
               child: SingleChildScrollView(
                 controller: _controller,

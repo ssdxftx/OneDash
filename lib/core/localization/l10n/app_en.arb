@@ -1912,10 +1912,6 @@
       }
     }
   },
-  "websites_logsFileHint": "Logs open as files with search and download support.",
-  "@websites_logsFileHint": {
-    "description": "Website logs tab hint."
-  },
   "common_running": "Running",
   "@common_running": {
     "description": "Generic running status."

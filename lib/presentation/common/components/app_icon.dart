@@ -31,7 +31,11 @@ class AppIcon extends StatelessWidget {
   static final Map<String, Uint8List?> _decoded = <String, Uint8List?>{};
   static final Map<String, Future<Uint8List?>> _remote =
       <String, Future<Uint8List?>>{};
+  static final Map<String, int> _failures = <String, int>{};
+  static final Map<String, DateTime> _cooldownUntil = <String, DateTime>{};
   static const int _decodeCacheLimit = 64;
+  static const int _maxRetries = 2;
+  static const Duration _retryCooldown = Duration(seconds: 30);
 
   String get _initial =>
       name.isEmpty ? '?' : String.fromCharCode(name.runes.first).toUpperCase();
@@ -71,16 +75,31 @@ class AppIcon extends StatelessWidget {
     final key = cacheKey ?? name;
     final existing = _remote[key];
     if (existing != null) return existing;
+    final blockedUntil = _cooldownUntil[key];
+    if (blockedUntil != null) {
+      if (DateTime.now().isBefore(blockedUntil)) {
+        return Future<Uint8List?>.value(null);
+      }
+      _cooldownUntil.remove(key);
+      _failures.remove(key);
+    }
     final completer = Completer<Uint8List?>();
     final future = completer.future;
     if (_remote.length >= _decodeCacheLimit) _remote.clear();
     _remote[key] = future;
     Future<Uint8List>.sync(iconLoader!)
         .then((bytes) {
+          _failures.remove(key);
+          _cooldownUntil.remove(key);
           completer.complete(bytes.isEmpty ? null : bytes);
         })
         .catchError((Object _) {
           if (identical(_remote[key], future)) _remote.remove(key);
+          final failures = (_failures[key] ?? 0) + 1;
+          _failures[key] = failures;
+          if (failures >= _maxRetries) {
+            _cooldownUntil[key] = DateTime.now().add(_retryCooldown);
+          }
           completer.complete(null);
         });
     return future;

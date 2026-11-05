@@ -2678,12 +2678,6 @@ abstract class AppLocalizations {
   /// **'{count} linked resources found. Deleting the database will affect them.'**
   String databases_deleteRelatedMessage(int count);
 
-  /// Website logs tab hint.
-  ///
-  /// In en, this message translates to:
-  /// **'Logs open as files with search and download support.'**
-  String get websites_logsFileHint;
-
   /// Generic running status.
   ///
   /// In en, this message translates to:

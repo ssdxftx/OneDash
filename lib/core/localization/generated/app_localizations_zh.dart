@@ -1368,9 +1368,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get websites_logsFileHint => '日志将以文件形式打开，支持搜索与下载。';
-
-  @override
   String get common_running => '运行中';
 
   @override

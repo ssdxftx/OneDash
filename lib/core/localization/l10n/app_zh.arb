@@ -430,7 +430,6 @@
   "files_itemCount": "{count} 项",
   "databases_deleteMessage": "该数据库将被永久删除。",
   "databases_deleteRelatedMessage": "检测到 {count} 个关联资源。删除数据库会同时影响它们。",
-  "websites_logsFileHint": "日志将以文件形式打开，支持搜索与下载。",
   "common_running": "运行中",
   "common_stopped": "已停止",
   "common_typeToContinue": "输入「{value}」以继续",
