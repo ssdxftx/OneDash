@@ -41,3 +41,32 @@ class WebsiteHttpsDto {
     );
   }
 }
+
+/// 构造绑定证书时提交给面板的 HTTPS 配置请求体。
+Map<String, dynamic> buildWebsiteHttpsPayload({
+  required int websiteId,
+  required int sslId,
+  required int acmeAccountId,
+  required String type,
+  required WebsiteHttpsDto https,
+}) {
+  return {
+    'acmeAccountID': acmeAccountId,
+    'enable': true,
+    'websiteId': websiteId,
+    'websiteSSLId': sslId,
+    'type': type,
+    'importType': 'local',
+    'privateKey': '',
+    'certificate': '',
+    'privateKeyPath': '',
+    'certificatePath': '',
+    'httpConfig': https.httpConfig,
+    'hsts': https.hsts,
+    'hstsIncludeSubDomains': https.hstsIncludeSubDomains,
+    'algorithm': https.algorithm,
+    'SSLProtocol': https.sslProtocol ?? const ['TLSv1.2', 'TLSv1.3'],
+    'httpsPort': https.httpsPort.isEmpty ? '443' : https.httpsPort,
+    'http3': https.http3,
+  };
+}

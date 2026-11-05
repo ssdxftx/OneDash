@@ -201,7 +201,9 @@ abstract final class AppTheme {
         backgroundColor: scheme.surfaceContainerLow,
         selectedColor: scheme.primaryContainer,
         side: BorderSide(color: scheme.outlineVariant),
-        labelStyle: AppTextStyles.label,
+        labelStyle: AppTextStyles.label.copyWith(
+          color: scheme.onSurfaceVariant,
+        ),
         shape: const StadiumBorder(),
         padding: const EdgeInsets.symmetric(horizontal: AppTokens.s12),
       ),

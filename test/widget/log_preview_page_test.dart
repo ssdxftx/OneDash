@@ -99,6 +99,32 @@ void main() {
     expect(find.textContaining('newest'), findsOneWidget);
   });
 
+  testWidgets('deduplicates a repeated page and stops paging', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        LogPreviewPage(
+          title: 'demo.log',
+          sources: [
+            LogSourceOption(
+              label: 'main',
+              load: () async => ['newest'],
+              loadPage: (page, size) async =>
+                  const LogBatch(lines: ['newest'], end: false),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Load earlier lines'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('newest'), findsOneWidget);
+    expect(find.text('Start of file reached'), findsOneWidget);
+    expect(find.text('Load earlier lines'), findsNothing);
+  });
+
   testWidgets('follow polling appends newly loaded lines', (tester) async {
     final lines = ['first line'];
     await tester.pumpWidget(

@@ -13,13 +13,23 @@ class AppIcon extends StatelessWidget {
     required this.name,
     this.icon,
     this.size = AppTokens.iconBadge,
+    this.cacheKey,
+    this.iconLoader,
   });
 
   final String name;
   final String? icon;
   final double size;
 
+  /// Stable key used to deduplicate remote icon requests.
+  final String? cacheKey;
+
+  /// Loads binary icon data when [icon] is empty or a relative path.
+  final Future<Uint8List> Function()? iconLoader;
+
   static final Map<String, Uint8List?> _decoded = <String, Uint8List?>{};
+  static final Map<String, Future<Uint8List?>> _remote =
+      <String, Future<Uint8List?>>{};
   static const int _decodeCacheLimit = 64;
 
   String get _initial =>
@@ -27,26 +37,45 @@ class AppIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = context.scheme;
     final pixelSize = (size * MediaQuery.devicePixelRatioOf(context)).round();
+    final resolved = _resolve(context, pixelSize);
+    final Widget content;
+    if (resolved != null) {
+      content = resolved;
+    } else if (iconLoader != null) {
+      content = FutureBuilder<Uint8List?>(
+        future: _remoteIcon(),
+        builder: (context, snapshot) {
+          final bytes = snapshot.data;
+          if (bytes == null || bytes.isEmpty) return _fallback(context);
+          return Image.memory(
+            bytes,
+            fit: BoxFit.cover,
+            cacheWidth: pixelSize,
+            filterQuality: FilterQuality.medium,
+            errorBuilder: (_, _, _) => _fallback(context),
+          );
+        },
+      );
+    } else {
+      content = _fallback(context);
+    }
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppTokens.rSm),
-      child: SizedBox.square(
-        dimension: size,
-        child:
-            _resolve(context, pixelSize) ??
-            Container(
-              color: scheme.primaryContainer,
-              alignment: Alignment.center,
-              child: Text(
-                _initial,
-                style: AppTextStyles.titleS.copyWith(
-                  color: scheme.onPrimaryContainer,
-                ),
-              ),
-            ),
-      ),
+      child: SizedBox.square(dimension: size, child: content),
     );
+  }
+
+  Future<Uint8List?> _remoteIcon() {
+    final key = cacheKey ?? name;
+    final existing = _remote[key];
+    if (existing != null) return existing;
+    final future = iconLoader!()
+        .then<Uint8List?>((bytes) => bytes.isEmpty ? null : bytes)
+        .catchError((Object _) => null);
+    if (_remote.length >= _decodeCacheLimit) _remote.clear();
+    _remote[key] = future;
+    return future;
   }
 
   Widget? _resolve(BuildContext context, int pixelSize) {

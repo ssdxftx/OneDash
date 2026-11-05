@@ -81,25 +81,16 @@ class _WebsiteSslSheetState extends ConsumerState<WebsiteSslSheet> {
     try {
       final cert = _certs.firstWhere((item) => item.id == _certId);
       final repository = await ref.read(websiteRepositoryProvider.future);
-      await repository.updateWebsiteHttps(widget.websiteId, {
-        'acmeAccountID': cert.acmeAccountId,
-        'enable': true,
-        'websiteId': widget.websiteId,
-        'websiteSSLId': _certId,
-        'type': cert.type,
-        'importType': 'local',
-        'privateKey': '',
-        'certificate': '',
-        'privateKeyPath': '',
-        'certificatePath': '',
-        'httpConfig': https.httpConfig,
-        'hsts': https.hsts,
-        'hstsIncludeSubDomains': https.hstsIncludeSubDomains,
-        'algorithm': https.algorithm,
-        'SSLProtocol': https.sslProtocol ?? const ['TLSv1.2', 'TLSv1.3'],
-        'httpsPort': https.httpsPort.isEmpty ? '443' : https.httpsPort,
-        'http3': https.http3,
-      });
+      await repository.updateWebsiteHttps(
+        widget.websiteId,
+        buildWebsiteHttpsPayload(
+          websiteId: widget.websiteId,
+          sslId: _certId,
+          acmeAccountId: cert.acmeAccountId,
+          type: cert.type,
+          https: https,
+        ),
+      );
       if (!mounted) return;
       AppToast.success(context, l10n.action_save);
       ref.invalidate(websiteDetailProvider(widget.websiteId));

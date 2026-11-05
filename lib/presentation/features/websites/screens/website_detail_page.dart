@@ -731,7 +731,10 @@ class _SslTab extends StatelessWidget {
       color: context.appColors.warning,
     );
   }
-  return null;
+  return (
+    label: l10n.websites_expire_days(days),
+    color: context.scheme.onSurfaceVariant,
+  );
 }
 
 class _ProxyTab extends ConsumerWidget {

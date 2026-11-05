@@ -105,11 +105,11 @@ String octalModeToString(List<List<bool>> perms) {
 }
 
 /// 格式化为 YYYY-MM-DD，解析失败时返回 [fallback]。
-String formatDateOnly(String value, {String fallback = '-', String? locale}) {
+String formatDateOnly(String value, {String fallback = '-'}) {
   if (value.trim().isEmpty) return fallback;
   final parsed = DateTime.tryParse(value);
   if (parsed == null) return fallback;
-  return DateFormat('yyyy-MM-dd', locale).format(parsed.toLocal());
+  return DateFormat('yyyy-MM-dd').format(parsed.toLocal());
 }
 
 /// 格式化 ISO 8601 时间字符串，自动转换为设备本地时区。

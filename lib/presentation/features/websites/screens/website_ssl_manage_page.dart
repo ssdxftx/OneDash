@@ -8,6 +8,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/website/ssl_manage_dtos.dart';
+import '../../../../data/dto/website/website_https_dto.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
@@ -408,25 +409,16 @@ class WebsiteSslManagePage extends ConsumerWidget {
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
       final https = await repository.getWebsiteHttps(websiteId);
-      await repository.updateWebsiteHttps(websiteId, {
-        'acmeAccountID': cert.acmeAccountId,
-        'enable': true,
-        'websiteId': websiteId,
-        'websiteSSLId': cert.id,
-        'type': cert.type,
-        'importType': 'local',
-        'privateKey': '',
-        'certificate': '',
-        'privateKeyPath': '',
-        'certificatePath': '',
-        'httpConfig': https.httpConfig,
-        'hsts': https.hsts,
-        'hstsIncludeSubDomains': https.hstsIncludeSubDomains,
-        'algorithm': https.algorithm,
-        'SSLProtocol': https.sslProtocol ?? const ['TLSv1.2', 'TLSv1.3'],
-        'httpsPort': https.httpsPort.isEmpty ? '443' : https.httpsPort,
-        'http3': https.http3,
-      });
+      await repository.updateWebsiteHttps(
+        websiteId,
+        buildWebsiteHttpsPayload(
+          websiteId: websiteId,
+          sslId: cert.id,
+          acmeAccountId: cert.acmeAccountId,
+          type: cert.type,
+          https: https,
+        ),
+      );
       ref.invalidate(websiteDetailProvider(websiteId));
       ref.invalidate(_sslListProvider);
       if (!context.mounted) return;

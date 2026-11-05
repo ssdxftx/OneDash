@@ -2,22 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/app/app_installed_dto.dart';
-import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
-import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
-import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
-import '../../../common/components/app_toast.dart';
 import '../../../common/states/async_state_view.dart';
+import '../../containers/widgets/container_log_page.dart';
 import '../providers/app_store_provider.dart';
 import '../widgets/installed_app_actions.dart';
 
@@ -61,6 +56,18 @@ class InstalledAppPage extends ConsumerWidget {
                 ? null
                 : () => context.push(
                     '/s/$serverId/terminal?container=${Uri.encodeComponent(container)}',
+                  ),
+          ),
+          AppIconButton(
+            icon: TablerIcons.file_text,
+            tooltip: l10n.containers_viewLogs,
+            onPressed: container == null || container.isEmpty
+                ? null
+                : () => openContainerLogs(
+                    context,
+                    ref,
+                    containerName: container,
+                    subtitle: appName,
                   ),
           ),
         ],
@@ -208,7 +215,13 @@ class InstalledAppPage extends ConsumerWidget {
                     leading: const Icon(TablerIcons.trash),
                     title: l10n.apps_uninstall,
                     danger: true,
-                    onTap: () => _uninstall(context, ref, app!),
+                    onTap: () => InstalledAppActions.uninstall(
+                      context,
+                      ref,
+                      app!,
+                      detailId: detailId,
+                      popOnDone: true,
+                    ),
                   ),
                 ],
               ),
@@ -217,94 +230,5 @@ class InstalledAppPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _uninstall(
-    BuildContext context,
-    WidgetRef ref,
-    AppInstalledDto app,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    final targetDetailId = detailId ?? app.appDetailId;
-    if (targetDetailId <= 0) {
-      AppToast.warning(context, l10n.apps_detailMissing);
-      return;
-    }
-    bool deleteDB = false;
-    bool deleteBackup = false;
-    bool deleteImage = false;
-    bool force = false;
-    final confirmed = await showAppSheet<bool>(
-      context: context,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.apps_uninstall, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s4),
-            Text(
-              l10n.apps_uninstallHint(app.displayName),
-              style: AppTextStyles.bodyS.copyWith(
-                color: context.scheme.onSurfaceVariant,
-              ),
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.apps_deleteDatabase),
-              value: deleteDB,
-              onChanged: (value) => setState(() => deleteDB = value),
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.apps_deleteBackup),
-              value: deleteBackup,
-              onChanged: (value) => setState(() => deleteBackup = value),
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.apps_deleteImage),
-              value: deleteImage,
-              onChanged: (value) => setState(() => deleteImage = value),
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.apps_forceDelete),
-              value: force,
-              onChanged: (value) => setState(() => force = value),
-            ),
-            const SizedBox(height: AppTokens.s16),
-            DangerButton(
-              label: l10n.apps_uninstall,
-              onPressed: () => Navigator.of(sheetContext).pop(true),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-    final repository = await ref.read(appRepositoryProvider.future);
-    if (!context.mounted) return;
-    final taskID = const Uuid().v4();
-    final success = await TaskProgressSheet.run(
-      context,
-      title: l10n.apps_uninstall,
-      task: (controller) async {
-        await repository.uninstallApp(
-          installId: app.id,
-          detailId: targetDetailId,
-          taskID: taskID,
-          forceDelete: force,
-          deleteBackup: deleteBackup,
-          deleteImage: deleteImage,
-          deleteDB: deleteDB,
-        );
-        await InstalledAppActions.waitTask(controller, repository, taskID);
-      },
-    );
-    if (!success || !context.mounted) return;
-    ref.invalidate(installedAppsProvider);
-    AppToast.success(context, l10n.action_done);
-    context.pop();
   }
 }

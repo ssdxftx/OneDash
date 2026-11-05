@@ -32,6 +32,26 @@ import '../../containers/widgets/container_log_page.dart';
 import '../widgets/installed_app_actions.dart';
 import '../providers/app_store_provider.dart';
 
+Future<bool> _isIgnored(WidgetRef ref, int installId) async {
+  try {
+    final ignored = await ref.read(installedIgnoredProvider(installId).future);
+    return ignored != null;
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<String?> _newVersion(WidgetRef ref, AppInstalledDto app) async {
+  if (!app.canUpdate) return null;
+  try {
+    final repository = await ref.read(appRepositoryProvider.future);
+    final versions = await repository.getUpdateVersions(app.id);
+    return versions.isEmpty ? null : versions.first.version;
+  } catch (_) {
+    return null;
+  }
+}
+
 class AppStorePage extends ConsumerStatefulWidget {
   const AppStorePage({super.key, required this.serverId, this.initialTab = 0});
 
@@ -287,6 +307,7 @@ class _CatalogTab extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: AppTokens.s12),
               child: _AppRow(
                 app: app,
+                cacheKey: '$serverId:${app.key}',
                 onTap: () => context.push(
                   '/s/$serverId/more/apps/${Uri.encodeComponent(app.key)}',
                 ),
@@ -319,24 +340,22 @@ class _InstalledTab extends ConsumerWidget {
     final colors = context.appColors;
     final running = app.status.toLowerCase() == 'running';
     final hasContainer = app.container.trim().isNotEmpty;
-    final ignored = await ref.read(installedIgnoredProvider(app.id).future);
-    String? newVersion;
-    if (app.canUpdate) {
-      try {
-        final repository = await ref.read(appRepositoryProvider.future);
-        final versions = await repository.getUpdateVersions(app.id);
-        if (versions.isNotEmpty) newVersion = versions.first.version;
-      } catch (_) {
-        // The action remains available; the upgrade flow fetches versions again.
-      }
-    }
-    if (!context.mounted) return;
+    final ignoredFuture = _isIgnored(ref, app.id);
+    final versionFuture = _newVersion(ref, app);
     await showAppSheet<void>(
       context: context,
       maxHeightFactor: 0.9,
       builder: (sheetContext) => ActionSheetScaffold(
         infoCard: ActionSheetInfoCard(
-          leading: AppIcon(name: app.displayName, icon: app.icon, size: 56),
+          leading: AppIcon(
+            name: app.displayName,
+            icon: app.icon,
+            size: 56,
+            cacheKey: '$serverId:${app.appKey}',
+            iconLoader: () => ref
+                .read(appRepositoryProvider.future)
+                .then((repository) => repository.getAppIcon(app.appKey)),
+          ),
           title: app.displayName,
           subtitle: '${app.version} · ${app.httpPort}',
           trailing: ActionSheetStatusPill(
@@ -405,7 +424,7 @@ class _InstalledTab extends ConsumerWidget {
                   enabled: !running,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
-                    _operate(context, ref, app, 'start');
+                    InstalledAppActions.operate(context, ref, app, 'start');
                   },
                 ),
                 ActionSheetRow(
@@ -415,7 +434,7 @@ class _InstalledTab extends ConsumerWidget {
                   enabled: running,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
-                    _operate(context, ref, app, 'stop');
+                    InstalledAppActions.operate(context, ref, app, 'stop');
                   },
                 ),
                 ActionSheetRow(
@@ -425,70 +444,80 @@ class _InstalledTab extends ConsumerWidget {
                   enabled: running,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
-                    _operate(context, ref, app, 'restart');
+                    InstalledAppActions.operate(context, ref, app, 'restart');
                   },
                 ),
               ],
             ),
-            ActionSheetSection(
-              title: l10n.containers_groupMaintenance,
-              icon: TablerIcons.tool,
-              children: [
-                if (app.canUpdate)
-                  ActionSheetRow(
-                    icon: TablerIcons.arrow_up_circle,
-                    iconColor: colors.success,
-                    title: l10n.apps_upgrade,
-                    subtitle: newVersion == null
-                        ? app.version
-                        : '${app.version} → $newVersion',
-                    onTap: () {
-                      Navigator.of(sheetContext).pop();
-                      InstalledAppActions.upgrade(context, ref, app);
-                    },
-                  ),
-                ActionSheetRow(
-                  icon: TablerIcons.adjustments,
-                  iconColor: colors.info,
-                  title: l10n.apps_editParams,
-                  subtitle: app.version,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    InstalledAppActions.editParams(context, ref, app);
-                  },
-                ),
-                ActionSheetRow(
-                  icon: TablerIcons.plug,
-                  iconColor: colors.info,
-                  title: l10n.apps_changePort,
-                  subtitle: '${app.httpPort}',
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    InstalledAppActions.changePort(context, ref, app);
-                  },
-                ),
-                ActionSheetRow(
-                  icon: TablerIcons.info_circle,
-                  iconColor: colors.info,
-                  title: l10n.apps_connInfo,
-                  subtitle: app.container,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    InstalledAppActions.showConnInfo(context, ref, app);
-                  },
-                ),
-                ActionSheetRow(
-                  icon: TablerIcons.bell_off,
-                  iconColor: colors.info,
-                  title: ignored == null
-                      ? l10n.apps_ignoreUpdate
-                      : l10n.apps_cancelIgnoreUpdate,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    InstalledAppActions.toggleIgnore(context, ref, app);
-                  },
-                ),
-              ],
+            FutureBuilder<bool>(
+              future: ignoredFuture,
+              builder: (context, ignoredSnapshot) => FutureBuilder<String?>(
+                future: versionFuture,
+                builder: (context, versionSnapshot) {
+                  final ignored = ignoredSnapshot.data ?? false;
+                  final newVersion = versionSnapshot.data;
+                  return ActionSheetSection(
+                    title: l10n.containers_groupMaintenance,
+                    icon: TablerIcons.tool,
+                    children: [
+                      if (app.canUpdate)
+                        ActionSheetRow(
+                          icon: TablerIcons.arrow_up_circle,
+                          iconColor: colors.success,
+                          title: l10n.apps_upgrade,
+                          subtitle: newVersion == null
+                              ? app.version
+                              : '${app.version} → $newVersion',
+                          onTap: () {
+                            Navigator.of(sheetContext).pop();
+                            InstalledAppActions.upgrade(context, ref, app);
+                          },
+                        ),
+                      ActionSheetRow(
+                        icon: TablerIcons.adjustments,
+                        iconColor: colors.info,
+                        title: l10n.apps_editParams,
+                        subtitle: app.version,
+                        onTap: () {
+                          Navigator.of(sheetContext).pop();
+                          InstalledAppActions.editParams(context, ref, app);
+                        },
+                      ),
+                      ActionSheetRow(
+                        icon: TablerIcons.plug,
+                        iconColor: colors.info,
+                        title: l10n.apps_changePort,
+                        subtitle: '${app.httpPort}',
+                        onTap: () {
+                          Navigator.of(sheetContext).pop();
+                          InstalledAppActions.changePort(context, ref, app);
+                        },
+                      ),
+                      ActionSheetRow(
+                        icon: TablerIcons.info_circle,
+                        iconColor: colors.info,
+                        title: l10n.apps_connInfo,
+                        subtitle: app.container,
+                        onTap: () {
+                          Navigator.of(sheetContext).pop();
+                          InstalledAppActions.showConnInfo(context, ref, app);
+                        },
+                      ),
+                      ActionSheetRow(
+                        icon: TablerIcons.bell_off,
+                        iconColor: colors.info,
+                        title: ignored
+                            ? l10n.apps_cancelIgnoreUpdate
+                            : l10n.apps_ignoreUpdate,
+                        onTap: () {
+                          Navigator.of(sheetContext).pop();
+                          InstalledAppActions.toggleIgnore(context, ref, app);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
             if (app.appDetailId > 0)
               ActionSheetSection(
@@ -502,7 +531,7 @@ class _InstalledTab extends ConsumerWidget {
                     danger: true,
                     onTap: () async {
                       Navigator.of(sheetContext).pop();
-                      await _uninstall(context, ref, app);
+                      await InstalledAppActions.uninstall(context, ref, app);
                     },
                   ),
                 ],
@@ -511,88 +540,6 @@ class _InstalledTab extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _operate(
-    BuildContext context,
-    WidgetRef ref,
-    AppInstalledDto app,
-    String operation,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    if (app.appDetailId <= 0) {
-      AppToast.warning(context, l10n.apps_detailMissing);
-      return;
-    }
-    try {
-      final repository = await ref.read(appRepositoryProvider.future);
-      switch (operation) {
-        case 'start':
-          await repository.startInstalled(
-            installId: app.id,
-            detailId: app.appDetailId,
-          );
-        case 'stop':
-          await repository.stopInstalled(
-            installId: app.id,
-            detailId: app.appDetailId,
-          );
-        case 'restart':
-          await repository.restartInstalled(
-            installId: app.id,
-            detailId: app.appDetailId,
-          );
-      }
-      if (!context.mounted) return;
-      AppToast.success(context, l10n.action_done);
-      ref.invalidate(installedAppsProvider);
-    } catch (error) {
-      if (!context.mounted) return;
-      showErrorToast(context, error);
-    }
-  }
-
-  Future<void> _uninstall(
-    BuildContext context,
-    WidgetRef ref,
-    AppInstalledDto app,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    final confirmed = await showConfirmSheet(
-      context,
-      title: l10n.apps_uninstall,
-      message: l10n.apps_uninstallHint(app.displayName),
-      confirmLabel: l10n.apps_uninstall,
-      requireText: app.displayName,
-    );
-    if (!confirmed || !context.mounted) return;
-    final repository = await ref.read(appRepositoryProvider.future);
-    if (!context.mounted) return;
-    final taskID = const Uuid().v4();
-    final success = await TaskProgressSheet.run(
-      context,
-      title: l10n.apps_uninstall,
-      task: (controller) async {
-        await repository.uninstallApp(
-          installId: app.id,
-          detailId: app.appDetailId,
-          taskID: taskID,
-        );
-        for (var attempt = 0; attempt < 120; attempt++) {
-          final log = await repository.readTaskLog(taskID);
-          if (log.lines.isNotEmpty) controller.log(log.lines.last);
-          final status = log.taskStatus.toLowerCase();
-          if (status == 'success') return;
-          if (status == 'failed' || status == 'error' || status == 'canceled') {
-            throw Exception(log.lines.isEmpty ? 'Task failed' : log.lines.last);
-          }
-          await Future<void>.delayed(const Duration(milliseconds: 500));
-        }
-      },
-    );
-    if (!success || !context.mounted) return;
-    AppToast.success(context, l10n.action_done);
-    ref.invalidate(installedAppsProvider);
   }
 
   String _statusLabel(String status, AppLocalizations l10n) {
@@ -640,7 +587,17 @@ class _InstalledTab extends ConsumerWidget {
                   onTap: () => _showActions(context, ref, app),
                   child: Row(
                     children: [
-                      AppIcon(name: app.displayName, icon: app.icon, size: 36),
+                      AppIcon(
+                        name: app.displayName,
+                        icon: app.icon,
+                        size: 36,
+                        cacheKey: '$serverId:${app.appKey}',
+                        iconLoader: () => ref
+                            .read(appRepositoryProvider.future)
+                            .then(
+                              (repository) => repository.getAppIcon(app.appKey),
+                            ),
+                      ),
                       const SizedBox(width: AppTokens.s12),
                       StatusDot(status: app.status.toLowerCase()),
                       const SizedBox(width: AppTokens.s8),
@@ -694,20 +651,33 @@ class _InstalledTab extends ConsumerWidget {
   }
 }
 
-class _AppRow extends StatelessWidget {
-  const _AppRow({required this.app, required this.onTap});
+class _AppRow extends ConsumerWidget {
+  const _AppRow({
+    required this.app,
+    required this.cacheKey,
+    required this.onTap,
+  });
 
   final AppCatalogDto app;
+  final String cacheKey;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = context.scheme;
     return TonalCard(
       onTap: onTap,
       child: Row(
         children: [
-          AppIcon(name: app.name, icon: app.icon, size: 44),
+          AppIcon(
+            name: app.name,
+            icon: app.icon,
+            size: 44,
+            cacheKey: cacheKey,
+            iconLoader: () => ref
+                .read(appRepositoryProvider.future)
+                .then((repository) => repository.getAppIcon(app.key)),
+          ),
           const SizedBox(width: AppTokens.s12),
           Expanded(
             child: Column(

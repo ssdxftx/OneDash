@@ -10,6 +10,7 @@ import '../../../../data/dto/app/app_installed_params_dto.dart';
 import '../../../../data/dto/app/app_update_version_dto.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../../../data/repositories_impl/database_repository_impl.dart';
+import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -89,15 +90,15 @@ class InstalledAppActions {
       AppUpdateVersionDto selected = versions.first;
       bool backup = true;
       bool pullImage = true;
-      final confirmed = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      final confirmed = await pushFormPage<bool>(
+        context,
+        StatefulBuilder(
+          builder: (pageContext, setState) => SimpleFormPage(
+            title: l10n.apps_upgrade,
+            subtitle: app.displayName,
+            saveLabel: l10n.apps_upgrade,
+            onSave: () async => Navigator.of(pageContext).pop(true),
             children: [
-              Text(l10n.apps_upgrade, style: AppTextStyles.titleL),
-              const SizedBox(height: AppTokens.s16),
               DropdownButtonFormField<String>(
                 initialValue: selected.version,
                 decoration: InputDecoration(labelText: l10n.apps_version),
@@ -117,6 +118,7 @@ class InstalledAppActions {
                   );
                 },
               ),
+              const SizedBox(height: AppTokens.s12),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.apps_backupBeforeUpgrade),
@@ -128,11 +130,6 @@ class InstalledAppActions {
                 title: Text(l10n.apps_pullImage),
                 value: pullImage,
                 onChanged: (value) => setState(() => pullImage = value),
-              ),
-              const SizedBox(height: AppTokens.s16),
-              PrimaryButton(
-                label: l10n.apps_upgrade,
-                onPressed: () => Navigator.of(sheetContext).pop(true),
               ),
             ],
           ),
@@ -343,23 +340,123 @@ class InstalledAppActions {
         name: app.name,
       );
       if (!context.mounted) return;
-      await showAppSheet<void>(
-        context: context,
-        builder: (sheetContext) => Column(
+      await pushFormPage<void>(
+        context,
+        Scaffold(
+          appBar: AppBarLarge(
+            title: l10n.apps_connInfo,
+            subtitle: app.displayName,
+          ),
+          body: ListView(
+            padding: EdgeInsets.all(context.pagePadding),
+            children: [
+              SplitListGroup(
+                children: [
+                  for (final entry in info.entries)
+                    SplitListTile(title: entry.key, subtitle: '${entry.value}'),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  static Future<void> uninstall(
+    BuildContext context,
+    WidgetRef ref,
+    AppInstalledDto app, {
+    int? detailId,
+    bool popOnDone = false,
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final targetDetailId = detailId ?? app.appDetailId;
+    if (targetDetailId <= 0) {
+      AppToast.warning(context, l10n.apps_detailMissing);
+      return;
+    }
+    bool deleteDB = false;
+    bool deleteBackup = false;
+    bool deleteImage = false;
+    bool force = false;
+    final confirmed = await showAppSheet<bool>(
+      context: context,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setState) => Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.apps_connInfo, style: AppTextStyles.titleL),
+            Text(l10n.apps_uninstall, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s4),
+            Text(
+              l10n.apps_uninstallHint(app.displayName),
+              style: AppTextStyles.bodyS.copyWith(
+                color: context.scheme.onSurfaceVariant,
+              ),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.apps_deleteDatabase),
+              value: deleteDB,
+              onChanged: (value) => setState(() => deleteDB = value),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.apps_deleteBackup),
+              value: deleteBackup,
+              onChanged: (value) => setState(() => deleteBackup = value),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.apps_deleteImage),
+              value: deleteImage,
+              onChanged: (value) => setState(() => deleteImage = value),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.apps_forceDelete),
+              value: force,
+              onChanged: (value) => setState(() => force = value),
+            ),
             const SizedBox(height: AppTokens.s16),
-            SplitListGroup(
-              children: [
-                for (final entry in info.entries)
-                  SplitListTile(title: entry.key, subtitle: '${entry.value}'),
-              ],
+            DangerButton(
+              label: l10n.apps_uninstall,
+              onPressed: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
         ),
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      if (!context.mounted) return;
+      final taskID = const Uuid().v4();
+      final success = await TaskProgressSheet.run(
+        context,
+        title: l10n.apps_uninstall,
+        task: (controller) async {
+          await repository.uninstallApp(
+            installId: app.id,
+            detailId: targetDetailId,
+            taskID: taskID,
+            forceDelete: force,
+            deleteBackup: deleteBackup,
+            deleteImage: deleteImage,
+            deleteDB: deleteDB,
+          );
+          await waitTask(controller, repository, taskID);
+        },
       );
+      if (!success || !context.mounted) return;
+      ref.invalidate(installedInfoProvider(app.id));
+      ref.invalidate(installedAppsProvider);
+      AppToast.success(context, l10n.action_done);
+      if (popOnDone && context.mounted) Navigator.of(context).maybePop();
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);

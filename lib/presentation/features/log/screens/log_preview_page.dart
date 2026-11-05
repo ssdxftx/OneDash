@@ -192,10 +192,28 @@ class _LogPreviewPageState extends State<LogPreviewPage>
     try {
       final batch = await loadPage(_page + 1, widget.pageSize);
       if (!mounted) return;
+      final incoming = batch.lines;
+      final existing = _lines;
+      final maxOverlap = incoming.length < existing.length
+          ? incoming.length
+          : existing.length;
+      var overlap = 0;
+      for (var size = 1; size <= maxOverlap; size++) {
+        if (listEquals(
+          incoming.sublist(incoming.length - size),
+          existing.sublist(0, size),
+        )) {
+          overlap = size;
+        }
+      }
+      final prepend = overlap == incoming.length
+          ? const <String>[]
+          : incoming.sublist(0, incoming.length - overlap);
+      final repeated = listEquals(incoming, existing) || prepend.isEmpty;
       setState(() {
-        _lines = [...batch.lines, ..._lines];
+        if (prepend.isNotEmpty) _lines = [...prepend, ..._lines];
         _page += 1;
-        _end = batch.end;
+        _end = batch.end || repeated;
         _window = _lines.length;
         _loadingEarlier = false;
       });
@@ -358,6 +376,46 @@ class _LogPreviewPageState extends State<LogPreviewPage>
             ),
           ),
           const SizedBox(height: AppTokens.s8),
+          if (_showEarlier(start))
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppTokens.s16,
+                0,
+                AppTokens.s16,
+                AppTokens.s8,
+              ),
+              child: _loadingEarlier
+                  ? const SizedBox.square(
+                      dimension: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: _loadEarlier,
+                        icon: const Icon(TablerIcons.chevron_up, size: 18),
+                        label: Text(l10n.logs_loadEarlier),
+                      ),
+                    ),
+            )
+          else if (_source.loadPage != null && _end && _lines.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppTokens.s16,
+                0,
+                AppTokens.s16,
+                AppTokens.s8,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l10n.logs_startOfFile,
+                  style: AppTextStyles.caption.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
           Expanded(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
@@ -369,59 +427,25 @@ class _LogPreviewPageState extends State<LogPreviewPage>
               child: _buildBody(l10n, visible, start),
             ),
           ),
-          if (_showEarlier(start))
-            Padding(
-              padding: const EdgeInsets.all(AppTokens.s8),
-              child: _loadingEarlier
-                  ? const SizedBox.square(
-                      dimension: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : TextButton.icon(
-                      onPressed: _loadEarlier,
-                      icon: const Icon(TablerIcons.chevron_up, size: 18),
-                      label: Text(l10n.logs_loadEarlier),
-                    ),
-            )
-          else if (_source.loadPage != null && _end && _lines.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.all(AppTokens.s8),
-              child: Text(
-                l10n.logs_startOfFile,
-                style: AppTextStyles.caption.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-            ),
           SafeArea(
             top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppTokens.s16,
-                vertical: AppTokens.s8,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _query.trim().isEmpty
-                          ? l10n.logs_lineCount(_lines.length)
-                          : l10n.logs_matchCount(filtered.length),
-                      style: AppTextStyles.caption.copyWith(
-                        color: scheme.onSurfaceVariant,
+            child: _follow
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTokens.s16,
+                      vertical: AppTokens.s8,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        l10n.logs_following,
+                        style: AppTextStyles.caption.copyWith(
+                          color: context.appColors.success,
+                        ),
                       ),
                     ),
-                  ),
-                  if (_follow)
-                    Text(
-                      l10n.logs_following,
-                      style: AppTextStyles.caption.copyWith(
-                        color: context.appColors.success,
-                      ),
-                    ),
-                ],
-              ),
-            ),
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),
