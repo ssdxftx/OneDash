@@ -16,6 +16,9 @@ import '../../../common/components/search_field.dart';
 import '../../../common/states/error_toast.dart';
 import '../log_parser.dart';
 
+const double _logNumberWidth = 44;
+const double _logChevronSize = 16;
+
 /// A page of a loadable log source. [end] is true when there are no older lines.
 class LogBatch {
   const LogBatch({required this.lines, required this.end});
@@ -533,7 +536,7 @@ class _RawLine extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 44,
+            width: _logNumberWidth,
             child: Text(
               '$number',
               textAlign: TextAlign.right,
@@ -689,7 +692,7 @@ class _StructuredLineState extends State<_StructuredLine> {
         : Text(duration, style: durationStyle);
     final chevron = Icon(
       _expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
-      size: 16,
+      size: _logChevronSize,
       color: AppTokens.consoleMuted,
     );
     final scaler = MediaQuery.textScalerOf(context);
@@ -698,8 +701,13 @@ class _StructuredLineState extends State<_StructuredLine> {
         text: TextSpan(text: text, style: style),
         textDirection: Directionality.of(context),
         textScaler: scaler,
-      )..layout();
-      return painter.width;
+      );
+      try {
+        painter.layout();
+        return painter.width;
+      } finally {
+        painter.dispose();
+      }
     }
 
     return LayoutBuilder(
@@ -713,27 +721,32 @@ class _StructuredLineState extends State<_StructuredLine> {
             : textWidth(duration, durationStyle) + AppTokens.s8;
         final pathWithoutMethod =
             constraints.maxWidth -
-            44 -
+            _logNumberWidth -
             AppTokens.s8 -
             badgeWidth -
             AppTokens.s8 -
             durationWidth -
-            16;
-        final pathWithMethod = pathWithoutMethod - methodWidth;
-        final compact = scaler.scale(1) > 1.2 || pathWithoutMethod < 150;
+            _logChevronSize;
+        final hideDuration = durationText != null && pathWithoutMethod < 150;
+        final effectivePath =
+            pathWithoutMethod + (hideDuration ? durationWidth : 0);
+        final pathWithMethod = effectivePath - methodWidth;
+        final compact = scaler.scale(1) > 1.2 || effectivePath < 150;
         if (!compact) {
           return Row(
             children: [
               _number(),
               const SizedBox(width: AppTokens.s8),
               statusBadge,
-              if (method.isNotEmpty && pathWithMethod >= 150) ...[
+              if (method.isNotEmpty &&
+                  !hideDuration &&
+                  pathWithMethod >= 150) ...[
                 const SizedBox(width: AppTokens.s8),
                 methodText,
               ],
               const SizedBox(width: AppTokens.s4),
               Expanded(child: pathText),
-              if (durationText != null) ...[
+              if (durationText != null && !hideDuration) ...[
                 const SizedBox(width: AppTokens.s8),
                 durationText,
               ],
@@ -832,7 +845,7 @@ class _StructuredLineState extends State<_StructuredLine> {
 
   Widget _number() {
     return SizedBox(
-      width: 44,
+      width: _logNumberWidth,
       child: Text(
         '${widget.number}',
         textAlign: TextAlign.right,

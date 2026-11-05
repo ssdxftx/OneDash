@@ -162,16 +162,16 @@ void main() {
     await tester.tap(find.text('Structured'));
     await tester.pump();
 
+    final badge = tester.getRect(find.text('200').first);
     final path = find.text('/api/v1/very/long/endpoint');
     expect(path, findsOneWidget);
     expect(tester.getSize(path).width, greaterThanOrEqualTo(96));
+    expect(tester.getRect(path).top, greaterThan(badge.bottom));
   });
 
-  testWidgets('keeps a consistent access path width across 390dp and 412dp', (
-    tester,
-  ) async {
+  testWidgets('keeps access rows on one line from 360dp', (tester) async {
     addTearDown(tester.view.reset);
-    for (final width in [390.0, 412.0]) {
+    for (final width in [360.0, 390.0, 412.0]) {
       tester.view.physicalSize = Size(width, 844);
       tester.view.devicePixelRatio = 1;
       await tester.pumpWidget(
@@ -199,24 +199,24 @@ void main() {
       final path = tester.getRect(
         find.text('/api/v1/very/long/endpoint').first,
       );
-      if (width == 390) {
+      expect(
+        (path.center.dy - badge.center.dy).abs(),
+        lessThan(6),
+        reason: '${width}dp should keep the status and path on one line',
+      );
+      expect(
+        path.width,
+        greaterThanOrEqualTo(150),
+        reason: '${width}dp path width ${path.width}',
+      );
+      if (width == 360) {
         expect(
-          path.width,
-          greaterThanOrEqualTo(240),
-          reason: '390dp should use the two-line layout',
+          find.text('0.012s'),
+          findsNothing,
+          reason: '360dp should drop the duration before wrapping',
         );
-        expect(path.top, greaterThan(badge.bottom));
-      } else {
-        expect(
-          (path.center.dy - badge.center.dy).abs(),
-          lessThan(6),
-          reason: '412dp should keep the status and path on one line',
-        );
-        expect(
-          path.width,
-          greaterThanOrEqualTo(150),
-          reason: '412dp path width ${path.width}',
-        );
+      } else if (width == 412) {
+        expect(find.text('0.012s'), findsOneWidget);
       }
     }
   });

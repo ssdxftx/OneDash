@@ -155,21 +155,24 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
       child: widget.scrollable
           ? ShaderMask(
               blendMode: BlendMode.dstIn,
-              shaderCallback: (bounds) => LinearGradient(
-                colors: [
-                  if (_canScrollLeft)
-                    scheme.surface.withValues(alpha: 0)
-                  else
+              shaderCallback: (bounds) {
+                final fade = (28 / bounds.width).clamp(0.0, 0.5).toDouble();
+                return LinearGradient(
+                  colors: [
+                    if (_canScrollLeft)
+                      scheme.surface.withValues(alpha: 0)
+                    else
+                      scheme.surface,
                     scheme.surface,
-                  scheme.surface,
-                  scheme.surface,
-                  if (_canScrollRight)
-                    scheme.surface.withValues(alpha: 0)
-                  else
                     scheme.surface,
-                ],
-                stops: const [0, 0.16, 0.84, 1],
-              ).createShader(bounds),
+                    if (_canScrollRight)
+                      scheme.surface.withValues(alpha: 0)
+                    else
+                      scheme.surface,
+                  ],
+                  stops: [0, fade, 1 - fade, 1],
+                ).createShader(bounds);
+              },
               child: SingleChildScrollView(
                 controller: _controller,
                 scrollDirection: Axis.horizontal,
