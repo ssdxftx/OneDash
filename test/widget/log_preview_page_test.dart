@@ -1,10 +1,22 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onedash/core/localization/generated/app_localizations.dart';
 import 'package:onedash/core/theme/app_theme.dart';
 import 'package:onedash/presentation/features/log/screens/log_preview_page.dart';
 
+Future<void> _loadFont() async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  final bytes = await File('assets/fonts/MiSans-Regular.ttf').readAsBytes();
+  await ui.loadFontFromList(Uint8List.fromList(bytes), fontFamily: 'MiSans');
+}
+
 void main() {
+  setUpAll(_loadFont);
+
   Widget wrap(Widget child) {
     return MaterialApp(
       theme: AppTheme.build(Brightness.light),
@@ -215,8 +227,22 @@ void main() {
           findsNothing,
           reason: '360dp should drop the duration before wrapping',
         );
-      } else if (width == 412) {
-        expect(find.text('0.012s'), findsOneWidget);
+        expect(
+          find.text('GET'),
+          findsOneWidget,
+          reason: '360dp keeps the method after dropping the duration',
+        );
+      } else {
+        expect(
+          find.text('0.012s'),
+          findsOneWidget,
+          reason: '${width}dp has room for the duration',
+        );
+        expect(
+          find.text('GET'),
+          findsOneWidget,
+          reason: '${width}dp has room for the method',
+        );
       }
     }
   });

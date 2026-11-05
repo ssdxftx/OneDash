@@ -18,6 +18,9 @@ import '../log_parser.dart';
 
 const double _logNumberWidth = 44;
 const double _logChevronSize = 16;
+const double _logIndent = _logNumberWidth + AppTokens.s8;
+const double _logPathMinWidth = 150;
+const double _logDurationYieldWidth = 170;
 
 /// A page of a loadable log source. [end] is true when there are no older lines.
 class LogBatch {
@@ -633,7 +636,10 @@ class _StructuredLineState extends State<_StructuredLine> {
           ),
           if (_expanded)
             Padding(
-              padding: const EdgeInsets.only(left: 52, top: AppTokens.s4),
+              padding: const EdgeInsets.only(
+                left: _logIndent,
+                top: AppTokens.s4,
+              ),
               child: _details(context, l10n, parsed, color),
             ),
         ],
@@ -727,20 +733,20 @@ class _StructuredLineState extends State<_StructuredLine> {
             AppTokens.s8 -
             durationWidth -
             _logChevronSize;
-        final hideDuration = durationText != null && pathWithoutMethod < 150;
+        final hideDuration =
+            durationText != null && pathWithoutMethod < _logDurationYieldWidth;
         final effectivePath =
             pathWithoutMethod + (hideDuration ? durationWidth : 0);
         final pathWithMethod = effectivePath - methodWidth;
-        final compact = scaler.scale(1) > 1.2 || effectivePath < 150;
+        final compact =
+            scaler.scale(1) > 1.2 || effectivePath < _logPathMinWidth;
         if (!compact) {
           return Row(
             children: [
               _number(),
               const SizedBox(width: AppTokens.s8),
               statusBadge,
-              if (method.isNotEmpty &&
-                  !hideDuration &&
-                  pathWithMethod >= 150) ...[
+              if (method.isNotEmpty && pathWithMethod >= _logPathMinWidth) ...[
                 const SizedBox(width: AppTokens.s8),
                 methodText,
               ],
@@ -771,7 +777,7 @@ class _StructuredLineState extends State<_StructuredLine> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 52, top: 2),
+              padding: const EdgeInsets.only(left: _logIndent, top: 2),
               child: SizedBox(width: double.infinity, child: pathText),
             ),
           ],
@@ -836,7 +842,7 @@ class _StructuredLineState extends State<_StructuredLine> {
         ),
         Icon(
           _expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
-          size: 16,
+          size: _logChevronSize,
           color: AppTokens.consoleMuted,
         ),
       ],
