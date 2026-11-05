@@ -20,7 +20,6 @@ const double _logNumberWidth = 44;
 const double _logChevronSize = 16;
 const double _logIndent = _logNumberWidth + AppTokens.s8;
 const double _logPathMinWidth = 150;
-const double _logDurationYieldWidth = 170;
 
 /// A page of a loadable log source. [end] is true when there are no older lines.
 class LogBatch {
@@ -734,7 +733,9 @@ class _StructuredLineState extends State<_StructuredLine> {
             durationWidth -
             _logChevronSize;
         final hideDuration =
-            durationText != null && pathWithoutMethod < _logDurationYieldWidth;
+            durationText != null &&
+            method.isNotEmpty &&
+            pathWithoutMethod - methodWidth < _logPathMinWidth;
         final effectivePath =
             pathWithoutMethod + (hideDuration ? durationWidth : 0);
         final pathWithMethod = effectivePath - methodWidth;

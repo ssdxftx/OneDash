@@ -12,6 +12,7 @@ Future<void> _loadFont() async {
   TestWidgetsFlutterBinding.ensureInitialized();
   final bytes = await File('assets/fonts/MiSans-Regular.ttf').readAsBytes();
   await ui.loadFontFromList(Uint8List.fromList(bytes), fontFamily: 'MiSans');
+  await ui.loadFontFromList(Uint8List.fromList(bytes), fontFamily: 'monospace');
 }
 
 void main() {
@@ -181,9 +182,11 @@ void main() {
     expect(tester.getRect(path).top, greaterThan(badge.bottom));
   });
 
-  testWidgets('keeps access rows on one line from 360dp', (tester) async {
+  testWidgets('keeps access rows on one line from 320dp through 412dp', (
+    tester,
+  ) async {
     addTearDown(tester.view.reset);
-    for (final width in [360.0, 390.0, 412.0]) {
+    for (var width = 320.0; width <= 412; width += 5) {
       tester.view.physicalSize = Size(width, 844);
       tester.view.devicePixelRatio = 1;
       await tester.pumpWidget(
@@ -216,33 +219,28 @@ void main() {
         lessThan(6),
         reason: '${width}dp should keep the status and path on one line',
       );
-      expect(
-        path.width,
-        greaterThanOrEqualTo(150),
-        reason: '${width}dp path width ${path.width}',
-      );
+      final hasMethod = find.text('GET').evaluate().isNotEmpty;
+      final hasDuration = find.text('0.012s').evaluate().isNotEmpty;
+      if (hasMethod) {
+        expect(
+          path.width,
+          greaterThanOrEqualTo(150),
+          reason: '${width}dp shows the method but leaves ${path.width}dp',
+        );
+      }
+      if (hasDuration) {
+        expect(
+          hasMethod,
+          isTrue,
+          reason: '${width}dp must drop the duration before the method',
+        );
+      }
       if (width == 360) {
-        expect(
-          find.text('0.012s'),
-          findsNothing,
-          reason: '360dp should drop the duration before wrapping',
-        );
-        expect(
-          find.text('GET'),
-          findsOneWidget,
-          reason: '360dp keeps the method after dropping the duration',
-        );
-      } else {
-        expect(
-          find.text('0.012s'),
-          findsOneWidget,
-          reason: '${width}dp has room for the duration',
-        );
-        expect(
-          find.text('GET'),
-          findsOneWidget,
-          reason: '${width}dp has room for the method',
-        );
+        expect(hasMethod, isTrue);
+        expect(hasDuration, isFalse);
+      } else if (width == 412) {
+        expect(hasMethod, isTrue);
+        expect(hasDuration, isTrue);
       }
     }
   });
