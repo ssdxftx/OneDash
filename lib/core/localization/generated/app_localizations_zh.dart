@@ -1442,7 +1442,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ssl_certificate => '证书';
 
   @override
-  String get ssl_noCertificates => '该账户下暂无证书，请先在面板中申请';
+  String get ssl_noCertificates => '暂无可用证书，请先申请或上传';
 
   @override
   String apps_requiredMissing(String fields) {
@@ -1496,6 +1496,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_sslExpire => '到期时间';
+
+  @override
+  String get websites_sslValidity => '有效期';
+
+  @override
+  String websites_sslDomainsMore(int count) {
+    return '等 $count 个';
+  }
 
   @override
   String get websites_sslExpired => '已过期';
@@ -5126,9 +5134,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get server_edit_portHelper => '默认 9999';
-
-  @override
   String get log_emptyMessage => '该分类暂时没有日志记录。';
 
   @override
@@ -5145,6 +5150,53 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get logs_structured => '结构化';
+
+  @override
+  String get logs_time => '时间';
+
+  @override
+  String get logs_startOfFile => '已到文件开头';
+
+  @override
+  String logs_exportLoadedCount(int count) {
+    return '导出当前已加载 $count 行';
+  }
+
+  @override
+  String get logs_copyRaw => '复制原始行';
+
+  @override
+  String get logs_copied => '已复制';
+
+  @override
+  String get logs_status => '状态码';
+
+  @override
+  String get logs_method => '方法';
+
+  @override
+  String get logs_path => '路径';
+
+  @override
+  String get logs_ip => '客户端 IP';
+
+  @override
+  String get logs_userAgent => 'User-Agent';
+
+  @override
+  String get logs_referer => 'Referer';
+
+  @override
+  String get logs_bytes => '响应字节';
+
+  @override
+  String get logs_upstream => '上游';
+
+  @override
+  String get logs_duration => '耗时';
+
+  @override
+  String get logs_request => '请求';
 
   @override
   String get logs_follow => '跟随';

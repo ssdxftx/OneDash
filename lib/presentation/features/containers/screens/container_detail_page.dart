@@ -95,10 +95,20 @@ class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage>
         timestamp: true,
       );
       if (!mounted) return;
-      final lines = log.split('\n');
-      if (listEquals(_logBuffer.lines, lines)) return;
-      _logBuffer.clear();
-      _logBuffer.addAll(lines);
+      final incoming = log
+          .split('\n')
+          .where((line) => line.trim().isNotEmpty)
+          .toList(growable: false);
+      if (listEquals(_logBuffer.lines, incoming)) return;
+      final current = _logBuffer.lines;
+      final isAppend =
+          incoming.length >= current.length &&
+          listEquals(incoming.sublist(0, current.length), current);
+      if (isAppend) {
+        _logBuffer.addAll(incoming.sublist(current.length));
+      } else {
+        _logBuffer.replaceAll(incoming);
+      }
       setState(() {});
     } catch (_) {
       // 日志轮询失败静默，等待下一次。

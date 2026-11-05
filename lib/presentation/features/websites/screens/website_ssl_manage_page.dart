@@ -22,6 +22,7 @@ import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../providers/websites_provider.dart';
 
 final _sslListProvider = FutureProvider.autoDispose<List<SslManageDto>>((
   ref,
@@ -348,6 +349,16 @@ class WebsiteSslManagePage extends ConsumerWidget {
           const SizedBox(height: AppTokens.s16),
           SplitListGroup(
             children: [
+              if (domain.trim().isNotEmpty)
+                SplitListTile(
+                  leading: const Icon(TablerIcons.shield_check),
+                  title: l10n.websites_bindExistingCertificate,
+                  subtitle: domain,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _bind(context, ref, cert);
+                  },
+                ),
               SplitListTile(
                 leading: const Icon(TablerIcons.download),
                 title: l10n.websites_downloadSsl,
@@ -386,6 +397,44 @@ class WebsiteSslManagePage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _bind(
+    BuildContext context,
+    WidgetRef ref,
+    SslManageDto cert,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final https = await repository.getWebsiteHttps(websiteId);
+      await repository.updateWebsiteHttps(websiteId, {
+        'acmeAccountID': cert.acmeAccountId,
+        'enable': true,
+        'websiteId': websiteId,
+        'websiteSSLId': cert.id,
+        'type': cert.type,
+        'importType': 'local',
+        'privateKey': '',
+        'certificate': '',
+        'privateKeyPath': '',
+        'certificatePath': '',
+        'httpConfig': https.httpConfig,
+        'hsts': https.hsts,
+        'hstsIncludeSubDomains': https.hstsIncludeSubDomains,
+        'algorithm': https.algorithm,
+        'SSLProtocol': https.sslProtocol ?? const ['TLSv1.2', 'TLSv1.3'],
+        'httpsPort': https.httpsPort.isEmpty ? '443' : https.httpsPort,
+        'http3': https.http3,
+      });
+      ref.invalidate(websiteDetailProvider(websiteId));
+      ref.invalidate(_sslListProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _download(

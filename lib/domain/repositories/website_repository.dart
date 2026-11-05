@@ -19,7 +19,6 @@ import '../../data/dto/website/website_domain_req.dart';
 import '../../data/dto/website/website_dto.dart';
 import '../../data/dto/website/website_group_dto.dart';
 import '../../data/dto/website/website_search_req.dart';
-import '../../data/dto/website/website_ssl_dto.dart';
 import '../../data/dto/website/website_template_dto.dart';
 import '../../data/dto/website/website_leech_dto.dart';
 import '../../data/dto/website/website_real_ip_dto.dart';
@@ -73,9 +72,6 @@ abstract interface class WebsiteRepository {
 
   /// 查询 ACME 账号
   Future<List<WebsiteAcmeAccountDto>> searchAcmeAccounts();
-
-  /// 查询指定 ACME 账号下的 SSL 证书
-  Future<List<WebsiteSslDto>> listWebsiteSsl(int acmeAccountId);
 
   /// 创建网站
   Future<void> createWebsite(WebsiteCreateReq req);
@@ -235,7 +231,12 @@ abstract interface class WebsiteRepository {
   Future<void> updateWebsite(WebsiteUpdateReq req);
 
   /// 读取网站访问/错误日志
-  Future<WebsiteLogFileDto> readWebsiteLog(int websiteId, WebsiteLogType type);
+  Future<WebsiteLogFileDto> readWebsiteLog(
+    int websiteId,
+    WebsiteLogType type, {
+    int page = 1,
+    int pageSize = 500,
+  });
 
   /// 启用、禁用或清空网站日志
   Future<void> operateWebsiteLog(

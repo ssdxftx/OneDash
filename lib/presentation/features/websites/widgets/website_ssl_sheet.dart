@@ -4,9 +4,8 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../data/dto/website/website_acme_account_dto.dart';
 import '../../../../data/dto/website/website_https_dto.dart';
-import '../../../../data/dto/website/website_ssl_dto.dart';
+import '../../../../data/dto/website/ssl_manage_dtos.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
@@ -29,9 +28,7 @@ class WebsiteSslSheet extends ConsumerStatefulWidget {
 
 class _WebsiteSslSheetState extends ConsumerState<WebsiteSslSheet> {
   WebsiteHttpsDto? _https;
-  List<WebsiteAcmeAccountDto> _accounts = const [];
-  List<WebsiteSslDto> _certs = const [];
-  int _accountId = 0;
+  List<SslManageDto> _certs = const [];
   int _certId = 0;
   bool _loading = true;
   bool _saving = false;
@@ -51,57 +48,16 @@ class _WebsiteSslSheetState extends ConsumerState<WebsiteSslSheet> {
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
       final https = await repository.getWebsiteHttps(widget.websiteId);
-      final accounts = await repository.searchAcmeAccounts();
-      if (accounts.isEmpty) {
-        setState(() {
-          _https = https;
-          _accounts = accounts;
-          _loading = false;
-        });
-        return;
-      }
-      final accountId = accounts
-          .firstWhere(
-            (account) => account.id == https.ssl?.acmeAccountId,
-            orElse: () => accounts.first,
-          )
-          .id;
-      final certs = await repository.listWebsiteSsl(accountId);
+      final page = await repository.searchSsl({'page': 1, 'pageSize': 100});
+      final certs = page.items;
       final currentId = https.ssl?.id ?? 0;
       if (!mounted) return;
       setState(() {
         _https = https;
-        _accounts = accounts;
-        _accountId = accountId;
         _certs = certs;
         _certId = certs.any((cert) => cert.id == currentId)
             ? currentId
             : (certs.isEmpty ? 0 : certs.first.id);
-        _loading = false;
-      });
-    } catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _error = describeError(error, AppLocalizations.of(context));
-        _loading = false;
-      });
-    }
-  }
-
-  Future<void> _loadCerts(int accountId) async {
-    setState(() {
-      _accountId = accountId;
-      _certs = const [];
-      _certId = 0;
-      _loading = true;
-    });
-    try {
-      final repository = await ref.read(websiteRepositoryProvider.future);
-      final certs = await repository.listWebsiteSsl(accountId);
-      if (!mounted) return;
-      setState(() {
-        _certs = certs;
-        _certId = certs.isEmpty ? 0 : certs.first.id;
         _loading = false;
       });
     } catch (error) {
@@ -126,7 +82,7 @@ class _WebsiteSslSheetState extends ConsumerState<WebsiteSslSheet> {
       final cert = _certs.firstWhere((item) => item.id == _certId);
       final repository = await ref.read(websiteRepositoryProvider.future);
       await repository.updateWebsiteHttps(widget.websiteId, {
-        'acmeAccountID': _accountId,
+        'acmeAccountID': cert.acmeAccountId,
         'enable': true,
         'websiteId': widget.websiteId,
         'websiteSSLId': _certId,
@@ -202,23 +158,6 @@ class _WebsiteSslSheetState extends ConsumerState<WebsiteSslSheet> {
             ],
           )
         else ...[
-          Text(l10n.ssl_acmeAccount, style: AppTextStyles.bodyS),
-          const SizedBox(height: AppTokens.s8),
-          DropdownButtonFormField<int>(
-            initialValue: _accountId,
-            items: [
-              for (final account in _accounts)
-                DropdownMenuItem(
-                  value: account.id,
-                  child: Text(account.displayName),
-                ),
-            ],
-            onChanged: (value) {
-              if (value == null) return;
-              _loadCerts(value);
-            },
-          ),
-          const SizedBox(height: AppTokens.s16),
           Text(l10n.ssl_certificate, style: AppTextStyles.bodyS),
           const SizedBox(height: AppTokens.s8),
           if (_certs.isEmpty)
@@ -236,7 +175,9 @@ class _WebsiteSslSheetState extends ConsumerState<WebsiteSslSheet> {
                   DropdownMenuItem(
                     value: cert.id,
                     child: Text(
-                      '${cert.primaryDomain} · ${cert.expireDate}',
+                      cert.primaryDomain.isEmpty
+                          ? 'SSL #${cert.id}'
+                          : '${cert.primaryDomain} · ${cert.expireDate}',
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),

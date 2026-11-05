@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../data/dto/website/website_log_dto.dart';
+import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../log/screens/log_preview_page.dart';
 import '../providers/websites_provider.dart';
@@ -10,8 +11,9 @@ import '../providers/websites_provider.dart';
 List<LogSourceOption> websiteLogSources(
   WidgetRef ref,
   int websiteId,
-  AppLocalizations l10n,
-) {
+  AppLocalizations l10n, {
+  int pageSize = 500,
+}) {
   return WebsiteLogType.values
       .map(
         (type) => LogSourceOption(
@@ -20,8 +22,33 @@ List<LogSourceOption> websiteLogSources(
               : l10n.websites_errorLog,
           load: () async {
             final repository = await ref.read(websiteRepositoryProvider.future);
-            final log = await repository.readWebsiteLog(websiteId, type);
+            final log = await repository.readWebsiteLog(
+              websiteId,
+              type,
+              pageSize: pageSize,
+            );
             return log.lines;
+          },
+          loadPage: (page, size) async {
+            final repository = await ref.read(websiteRepositoryProvider.future);
+            final log = await repository.readWebsiteLog(
+              websiteId,
+              type,
+              page: page,
+              pageSize: size,
+            );
+            return LogBatch(lines: log.lines, end: log.end);
+          },
+          exportBytes: () async {
+            final repository = await ref.read(websiteRepositoryProvider.future);
+            final log = await repository.readWebsiteLog(
+              websiteId,
+              type,
+              pageSize: 1,
+            );
+            if (log.path.trim().isEmpty) return null;
+            final files = await ref.read(fileRepositoryProvider.future);
+            return files.downloadBytes(log.path);
           },
         ),
       )
@@ -34,9 +61,10 @@ Future<void> openWebsiteLogs(
   required int websiteId,
   String? subtitle,
   WebsiteLogType initialType = WebsiteLogType.access,
+  int pageSize = 500,
 }) {
   final l10n = AppLocalizations.of(context);
-  final sources = websiteLogSources(ref, websiteId, l10n);
+  final sources = websiteLogSources(ref, websiteId, l10n, pageSize: pageSize);
   final initialIndex = WebsiteLogType.values.indexOf(initialType);
   final ordered = [
     sources[initialIndex],
@@ -48,6 +76,7 @@ Future<void> openWebsiteLogs(
       builder: (_) => LogPreviewPage(
         title: l10n.websites_logs,
         subtitle: subtitle,
+        pageSize: pageSize,
         sources: ordered,
       ),
     ),

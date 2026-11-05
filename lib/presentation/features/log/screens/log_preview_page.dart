@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
@@ -13,13 +14,31 @@ import '../../../common/components/app_toast.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/search_field.dart';
 import '../../../common/states/error_toast.dart';
+import '../log_parser.dart';
+
+/// A page of a loadable log source. [end] is true when there are no older lines.
+class LogBatch {
+  const LogBatch({required this.lines, required this.end});
+
+  final List<String> lines;
+  final bool end;
+}
 
 /// A loadable log source shown as a chip above the log body.
 class LogSourceOption {
-  const LogSourceOption({required this.label, required this.load});
+  const LogSourceOption({
+    required this.label,
+    required this.load,
+    this.loadPage,
+    this.exportBytes,
+    this.exportNote,
+  });
 
   final String label;
   final Future<List<String>> Function() load;
+  final Future<LogBatch> Function(int page, int pageSize)? loadPage;
+  final Future<List<int>?> Function()? exportBytes;
+  final String Function(int count)? exportNote;
 }
 
 enum LogDisplayMode { raw, structured }
@@ -27,8 +46,8 @@ enum LogDisplayMode { raw, structured }
 /// Fullscreen in-app log preview shared by every module.
 ///
 /// The page keeps the loaded buffer in memory, supports search, level colouring,
-/// a structured parsing mode, follow polling, local paging and export. Parsing
-/// failures always fall back to the original line.
+/// nginx/JSON structured parsing, follow polling, server-side paging and export.
+/// Parsing failures always fall back to the original line.
 class LogPreviewPage extends StatefulWidget {
   const LogPreviewPage({
     super.key,
@@ -62,6 +81,9 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   int _sourceIndex = 0;
   LogDisplayMode _mode = LogDisplayMode.raw;
   int _window = 500;
+  int _page = 1;
+  bool _end = true;
+  bool _loadingEarlier = false;
   bool _atBottom = true;
   String _query = '';
   bool _loadInFlight = false;
@@ -124,7 +146,17 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       });
     }
     try {
-      final lines = await _source.load();
+      final List<String> lines;
+      final bool end;
+      final loadPage = _source.loadPage;
+      if (loadPage != null) {
+        final batch = await loadPage(1, widget.pageSize);
+        lines = batch.lines;
+        end = batch.end;
+      } else {
+        lines = await _source.load();
+        end = true;
+      }
       if (!mounted) return;
       final unchanged = listEquals(_lines, lines);
       if (silent && unchanged && _error == null) return;
@@ -132,6 +164,9 @@ class _LogPreviewPageState extends State<LogPreviewPage>
         _lines = lines;
         _loading = false;
         _error = null;
+        _page = 1;
+        _end = end;
+        _window = widget.pageSize;
       });
       if (silent && _follow && _atBottom) _scrollToBottom();
     } catch (error) {
@@ -142,6 +177,32 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       });
     } finally {
       _loadInFlight = false;
+    }
+  }
+
+  Future<void> _loadEarlier() async {
+    if (_loadingEarlier) return;
+    final loadPage = _source.loadPage;
+    if (loadPage == null) {
+      setState(() => _window += widget.pageSize);
+      return;
+    }
+    if (_end) return;
+    setState(() => _loadingEarlier = true);
+    try {
+      final batch = await loadPage(_page + 1, widget.pageSize);
+      if (!mounted) return;
+      setState(() {
+        _lines = [...batch.lines, ..._lines];
+        _page += 1;
+        _end = batch.end;
+        _window = _lines.length;
+        _loadingEarlier = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _loadingEarlier = false);
+      showErrorToast(context, error);
     }
   }
 
@@ -167,6 +228,8 @@ class _LogPreviewPageState extends State<LogPreviewPage>
     setState(() {
       _sourceIndex = index;
       _window = widget.pageSize;
+      _page = 1;
+      _end = true;
       _lines = const [];
     });
     _load();
@@ -175,9 +238,17 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   Future<void> _export() async {
     final l10n = AppLocalizations.of(context);
     try {
+      final note = _source.exportNote;
+      if (note != null) {
+        AppToast.show(context, note(_lines.length), type: AppToastType.info);
+      }
+      final exported = await _source.exportBytes?.call();
+      final bytes = exported == null
+          ? Uint8List.fromList(utf8.encode(_lines.join('\n')))
+          : Uint8List.fromList(exported);
       final path = await FilePicker.saveFile(
         fileName: '${widget.title.replaceAll(RegExp(r'[^\w\-]+'), '_')}.log',
-        bytes: utf8.encode(_lines.join('\n')),
+        bytes: bytes,
       );
       if (!mounted || path == null) return;
       AppToast.success(context, l10n.logs_exported(path));
@@ -295,16 +366,31 @@ class _LogPreviewPageState extends State<LogPreviewPage>
                 borderRadius: BorderRadius.circular(AppTokens.rMd),
                 border: Border.all(color: scheme.outlineVariant),
               ),
-              child: _buildBody(l10n, filtered, visible, start),
+              child: _buildBody(l10n, visible, start),
             ),
           ),
-          if (start > 0)
+          if (_showEarlier(start))
             Padding(
               padding: const EdgeInsets.all(AppTokens.s8),
-              child: TextButton.icon(
-                onPressed: () => setState(() => _window += widget.pageSize),
-                icon: const Icon(TablerIcons.chevron_up, size: 18),
-                label: Text(l10n.logs_loadEarlier),
+              child: _loadingEarlier
+                  ? const SizedBox.square(
+                      dimension: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : TextButton.icon(
+                      onPressed: _loadEarlier,
+                      icon: const Icon(TablerIcons.chevron_up, size: 18),
+                      label: Text(l10n.logs_loadEarlier),
+                    ),
+            )
+          else if (_source.loadPage != null && _end && _lines.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(AppTokens.s8),
+              child: Text(
+                l10n.logs_startOfFile,
+                style: AppTextStyles.caption.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
             ),
           SafeArea(
@@ -342,12 +428,12 @@ class _LogPreviewPageState extends State<LogPreviewPage>
     );
   }
 
-  Widget _buildBody(
-    AppLocalizations l10n,
-    List<String> filtered,
-    List<String> visible,
-    int start,
-  ) {
+  bool _showEarlier(int start) {
+    if (_source.loadPage != null) return !_end;
+    return start > 0;
+  }
+
+  Widget _buildBody(AppLocalizations l10n, List<String> visible, int start) {
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -406,103 +492,16 @@ class _RawLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1),
-      child: Text(
-        '$number  $raw',
-        style: AppTextStyles.bodyS.copyWith(
-          fontFamily: 'monospace',
-          color: AppTokens.consoleForeground,
-          height: 1.5,
-        ),
-      ),
-    );
-  }
-}
-
-enum _LogLevel { trace, debug, info, warn, error, fatal, plain }
-
-class _ParsedLine {
-  const _ParsedLine({required this.level, required this.message, this.time});
-
-  final _LogLevel level;
-  final String message;
-  final String? time;
-}
-
-_ParsedLine _parseLine(String raw) {
-  final trimmed = raw.trim();
-  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-    try {
-      final json = jsonDecode(trimmed);
-      if (json is Map) {
-        final level = _levelOf(
-          (json['level'] ?? json['severity'] ?? '').toString(),
-        );
-        final message =
-            (json['message'] ?? json['msg'] ?? json['log'] ?? trimmed)
-                .toString();
-        final time = (json['time'] ?? json['timestamp'] ?? '').toString();
-        return _ParsedLine(
-          level: level,
-          message: message,
-          time: time.isEmpty ? null : time,
-        );
-      }
-    } on FormatException {
-      // Fall through to the plain line, never drop content.
-    }
-  }
-  final match = RegExp(
-    r'^(?:\[|\()?(\d{4}[-/]\d{2}[-/]\d{2}[ T]\d{2}:\d{2}:\d{2}(?:[.,]\d+)?(?:Z|[+-]\d{2}:?\d{2})?)(?:\]|\))?\s*(?:\[(TRACE|DEBUG|INFO|NOTICE|WARN|WARNING|ERROR|ERR|FATAL|CRITICAL)\]|(TRACE|DEBUG|INFO|NOTICE|WARN|WARNING|ERROR|ERR|FATAL|CRITICAL)\b)?\s*(.*)$',
-    caseSensitive: false,
-  ).firstMatch(trimmed);
-  if (match == null) {
-    return _ParsedLine(level: _levelOf(trimmed), message: raw);
-  }
-  return _ParsedLine(
-    level: _levelOf(match.group(2) ?? match.group(3) ?? ''),
-    message: match.group(4) ?? raw,
-    time: match.group(1),
-  );
-}
-
-_LogLevel _levelOf(String value) {
-  final normalized = value.toLowerCase();
-  if (normalized.contains('fatal') || normalized.contains('critical')) {
-    return _LogLevel.fatal;
-  }
-  if (normalized.contains('error') || normalized.contains('err')) {
-    return _LogLevel.error;
-  }
-  if (normalized.contains('warn')) return _LogLevel.warn;
-  if (normalized.contains('debug')) return _LogLevel.debug;
-  if (normalized.contains('trace')) return _LogLevel.trace;
-  if (normalized.contains('info') || normalized.contains('notice')) {
-    return _LogLevel.info;
-  }
-  return _LogLevel.plain;
-}
-
-class _StructuredLine extends StatelessWidget {
-  const _StructuredLine({required this.number, required this.raw});
-
-  final int number;
-  final String raw;
-
-  @override
-  Widget build(BuildContext context) {
-    final parsed = _parseLine(raw);
-    final colors = context.appColors;
+    final parsed = parseLogLine(raw);
     final color = switch (parsed.level) {
-      _LogLevel.fatal || _LogLevel.error => colors.danger,
-      _LogLevel.warn => colors.warning,
-      _LogLevel.info => colors.success,
-      _LogLevel.debug || _LogLevel.trace => AppTokens.consoleMuted,
-      _LogLevel.plain => AppTokens.consoleForeground,
+      LogLevel.fatal || LogLevel.error => context.appColors.danger,
+      LogLevel.warn => context.appColors.warning,
+      LogLevel.info => context.appColors.success,
+      LogLevel.debug || LogLevel.trace => AppTokens.consoleMuted,
+      LogLevel.plain => AppTokens.consoleForeground,
     };
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 1),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -518,46 +517,306 @@ class _StructuredLine extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppTokens.s8),
-          if (parsed.time != null) ...[
-            Text(
-              parsed.time!,
-              style: AppTextStyles.caption.copyWith(
-                fontFamily: 'monospace',
-                color: AppTokens.consoleMuted,
-              ),
-            ),
-            const SizedBox(width: AppTokens.s8),
-          ],
-          Container(
-            margin: const EdgeInsets.only(top: 2),
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(AppTokens.rXs),
-            ),
-            child: Text(
-              parsed.level == _LogLevel.plain
-                  ? 'LOG'
-                  : parsed.level.name.toUpperCase(),
-              style: AppTextStyles.caption.copyWith(
-                color: color,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppTokens.s8),
           Expanded(
-            child: SelectableText(
-              parsed.message,
-              style: AppTextStyles.bodyS.copyWith(
-                fontFamily: 'monospace',
-                color: AppTokens.consoleForeground,
-                height: 1.45,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Text(
+                raw,
+                softWrap: false,
+                style: AppTextStyles.bodyS.copyWith(
+                  fontFamily: 'monospace',
+                  color: color,
+                  height: 1.5,
+                ),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+class _StructuredLine extends StatefulWidget {
+  const _StructuredLine({required this.number, required this.raw});
+
+  final int number;
+  final String raw;
+
+  @override
+  State<_StructuredLine> createState() => _StructuredLineState();
+}
+
+class _StructuredLineState extends State<_StructuredLine> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final parsed = parseLogLine(widget.raw);
+    final colors = context.appColors;
+    final color = switch (parsed.level) {
+      LogLevel.fatal || LogLevel.error => colors.danger,
+      LogLevel.warn => colors.warning,
+      LogLevel.info => colors.success,
+      LogLevel.debug || LogLevel.trace => AppTokens.consoleMuted,
+      LogLevel.plain => AppTokens.consoleForeground,
+    };
+    final summary = parsed.isAccess
+        ? _accessSummary(context, l10n, parsed, color)
+        : _genericSummary(context, l10n, parsed, color);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: summary,
+          ),
+          if (_expanded)
+            Padding(
+              padding: const EdgeInsets.only(left: 52, top: AppTokens.s4),
+              child: _details(context, l10n, parsed, color),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _accessSummary(
+    BuildContext context,
+    AppLocalizations l10n,
+    ParsedLogLine parsed,
+    Color levelColor,
+  ) {
+    final status = parsed.status;
+    final statusColor = switch (status) {
+      int s when s >= 500 => context.appColors.danger,
+      int s when s >= 400 => context.appColors.warning,
+      int s when s >= 300 => context.appColors.info,
+      _ => levelColor,
+    };
+    return Row(
+      children: [
+        _number(),
+        const SizedBox(width: AppTokens.s8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+          decoration: BoxDecoration(
+            color: statusColor.withValues(alpha: 0.16),
+            borderRadius: BorderRadius.circular(AppTokens.rXs),
+          ),
+          child: Text(
+            status?.toString() ?? '-',
+            style: AppTextStyles.caption.copyWith(
+              color: statusColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppTokens.s8),
+        Text(
+          parsed.method ?? '',
+          style: AppTextStyles.caption.copyWith(
+            color: context.scheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(width: AppTokens.s8),
+        Expanded(
+          child: Text(
+            parsed.path ?? parsed.message,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodyS.copyWith(
+              fontFamily: 'monospace',
+              color: AppTokens.consoleForeground,
+            ),
+          ),
+        ),
+        if (parsed.duration != null) ...[
+          const SizedBox(width: AppTokens.s8),
+          Text(
+            parsed.duration!,
+            style: AppTextStyles.caption.copyWith(
+              color: AppTokens.consoleMuted,
+            ),
+          ),
+        ],
+        Icon(
+          _expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
+          size: 16,
+          color: AppTokens.consoleMuted,
+        ),
+      ],
+    );
+  }
+
+  Widget _genericSummary(
+    BuildContext context,
+    AppLocalizations l10n,
+    ParsedLogLine parsed,
+    Color color,
+  ) {
+    return Row(
+      children: [
+        _number(),
+        const SizedBox(width: AppTokens.s8),
+        if (parsed.time != null) ...[
+          SizedBox(
+            width: 76,
+            child: Text(
+              _shortTime(parsed.time!),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.caption.copyWith(
+                fontFamily: 'monospace',
+                color: AppTokens.consoleMuted,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppTokens.s8),
+        ],
+        Container(
+          margin: const EdgeInsets.only(top: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.16),
+            borderRadius: BorderRadius.circular(AppTokens.rXs),
+          ),
+          child: Text(
+            parsed.level == LogLevel.plain
+                ? 'LOG'
+                : parsed.level.name.toUpperCase(),
+            style: AppTextStyles.caption.copyWith(
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppTokens.s8),
+        Expanded(
+          child: Text(
+            parsed.message,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodyS.copyWith(
+              fontFamily: 'monospace',
+              color: AppTokens.consoleForeground,
+            ),
+          ),
+        ),
+        Icon(
+          _expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
+          size: 16,
+          color: AppTokens.consoleMuted,
+        ),
+      ],
+    );
+  }
+
+  Widget _number() {
+    return SizedBox(
+      width: 44,
+      child: Text(
+        '${widget.number}',
+        textAlign: TextAlign.right,
+        style: AppTextStyles.caption.copyWith(
+          fontFamily: 'monospace',
+          color: AppTokens.consoleMuted,
+        ),
+      ),
+    );
+  }
+
+  Widget _details(
+    BuildContext context,
+    AppLocalizations l10n,
+    ParsedLogLine parsed,
+    Color color,
+  ) {
+    final rows = <Widget>[
+      if (parsed.time != null) _field(l10n.logs_time, parsed.time!),
+      if (parsed.status != null) _field(l10n.logs_status, '${parsed.status}'),
+      if (parsed.method != null) _field(l10n.logs_method, parsed.method!),
+      if (parsed.path != null) _field(l10n.logs_path, parsed.path!),
+      if (parsed.ip != null) _field(l10n.logs_ip, parsed.ip!),
+      if (parsed.bytes != null) _field(l10n.logs_bytes, '${parsed.bytes}'),
+      if (parsed.upstream != null) _field(l10n.logs_upstream, parsed.upstream!),
+      if (parsed.referer != null) _field(l10n.logs_referer, parsed.referer!),
+      if (parsed.userAgent != null)
+        _field(l10n.logs_userAgent, parsed.userAgent!),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (rows.isNotEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppTokens.s8),
+            decoration: BoxDecoration(
+              color: AppTokens.consoleForeground.withValues(alpha: 0.04),
+              borderRadius: BorderRadius.circular(AppTokens.rXs),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: rows,
+            ),
+          ),
+        SelectableText(
+          widget.raw,
+          style: AppTextStyles.bodyS.copyWith(
+            fontFamily: 'monospace',
+            color: color,
+            height: 1.45,
+          ),
+        ),
+        const SizedBox(height: AppTokens.s4),
+        TextButton.icon(
+          onPressed: () async {
+            await Clipboard.setData(ClipboardData(text: widget.raw));
+            if (!context.mounted) return;
+            AppToast.success(context, l10n.logs_copied);
+          },
+          icon: const Icon(TablerIcons.copy, size: 16),
+          label: Text(l10n.logs_copyRaw),
+        ),
+      ],
+    );
+  }
+
+  Widget _field(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 96,
+            child: Text(
+              label,
+              style: AppTextStyles.caption.copyWith(
+                color: AppTokens.consoleMuted,
+              ),
+            ),
+          ),
+          Expanded(
+            child: SelectableText(
+              value,
+              style: AppTextStyles.caption.copyWith(
+                fontFamily: 'monospace',
+                color: AppTokens.consoleForeground,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _shortTime(String value) {
+    final match = RegExp(r'(\d{2}:\d{2}:\d{2})').firstMatch(value);
+    return match?.group(1) ?? value;
   }
 }

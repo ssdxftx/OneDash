@@ -27,7 +27,6 @@ import '../dto/website/website_domain_req.dart';
 import '../dto/website/website_dto.dart';
 import '../dto/website/website_group_dto.dart';
 import '../dto/website/website_search_req.dart';
-import '../dto/website/website_ssl_dto.dart';
 import '../dto/website/website_template_dto.dart';
 import '../dto/website/website_leech_dto.dart';
 import '../dto/website/website_real_ip_dto.dart';
@@ -108,10 +107,6 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
     final accounts = await _websiteApi.searchAcmeAccounts();
     return [const WebsiteAcmeAccountDto.manual(), ...accounts];
   }
-
-  @override
-  Future<List<WebsiteSslDto>> listWebsiteSsl(int acmeAccountId) =>
-      _websiteApi.listWebsiteSsl(acmeAccountId);
 
   @override
   Future<void> createWebsite(WebsiteCreateReq req) =>
@@ -331,11 +326,15 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
   @override
   Future<WebsiteLogFileDto> readWebsiteLog(
     int websiteId,
-    WebsiteLogType type,
-  ) => _fileApi.readFile<WebsiteLogFileDto>(
+    WebsiteLogType type, {
+    int page = 1,
+    int pageSize = 500,
+  }) => _fileApi.readFile<WebsiteLogFileDto>(
     id: websiteId,
     type: 'website',
     name: type.fileName,
+    page: page,
+    pageSize: pageSize,
     fromJson: WebsiteLogFileDto.fromJson,
   );
 

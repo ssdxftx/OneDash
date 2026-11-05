@@ -22,7 +22,6 @@ import '../dto/website/website_redirect_dto.dart';
 import '../dto/website/openresty_performance_dto.dart';
 import '../dto/website/website_https_dto.dart';
 import '../dto/website/website_search_req.dart';
-import '../dto/website/website_ssl_dto.dart';
 import '../dto/website/website_template_dto.dart';
 import '../dto/website/website_leech_dto.dart';
 import '../dto/website/website_real_ip_dto.dart';
@@ -118,16 +117,6 @@ class WebsiteApi {
       WebsiteAcmeAccountDto.fromJson,
     );
     return result.items;
-  }
-
-  /// 按 ACME 账号查询可用证书。
-  Future<List<WebsiteSslDto>> listWebsiteSsl(int acmeAccountId) async {
-    final resp = await _client.post<Map<String, dynamic>>(
-      '/api/v2/websites/ssl/list',
-      data: {'acmeAccountID': '$acmeAccountId'},
-    );
-    if (resp.data?['data'] == null) return const [];
-    return ApiResponseParser.list(resp, WebsiteSslDto.fromJson);
   }
 
   /// 查询网站域名列表。

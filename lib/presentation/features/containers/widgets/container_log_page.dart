@@ -20,6 +20,7 @@ Future<void> openContainerLogs(
         sources: [
           LogSourceOption(
             label: l10n.containers_logs,
+            exportNote: l10n.logs_exportLoadedCount,
             load: () async {
               final repository = await ref.read(
                 containerRepositoryProvider.future,
@@ -58,6 +59,7 @@ Future<void> openComposeLogs(
         sources: [
           LogSourceOption(
             label: l10n.containers_composeLogs,
+            exportNote: l10n.logs_exportLoadedCount,
             load: () async {
               final repository = await ref.read(
                 containerRepositoryProvider.future,

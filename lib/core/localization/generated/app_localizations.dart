@@ -2825,7 +2825,7 @@ abstract class AppLocalizations {
   /// SSL empty hint.
   ///
   /// In en, this message translates to:
-  /// **'No certificates under this account. Apply in the panel first.'**
+  /// **'No certificates available. Apply for or upload one first.'**
   String get ssl_noCertificates;
 
   /// Install form validation.
@@ -2929,6 +2929,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expires'**
   String get websites_sslExpire;
+
+  /// No description provided for @websites_sslValidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Validity'**
+  String get websites_sslValidity;
+
+  /// No description provided for @websites_sslDomainsMore.
+  ///
+  /// In en, this message translates to:
+  /// **'and {count} more'**
+  String websites_sslDomainsMore(int count);
 
   /// Badge for an expired SSL certificate.
   ///
@@ -10010,12 +10022,6 @@ abstract class AppLocalizations {
   /// **'{count} variables'**
   String websites_templateVariableCount(int count);
 
-  /// Helper for the panel port field.
-  ///
-  /// In en, this message translates to:
-  /// **'Default 9999'**
-  String get server_edit_portHelper;
-
   /// No log entries in this category yet.
   ///
   /// In en, this message translates to:
@@ -10051,6 +10057,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Structured'**
   String get logs_structured;
+
+  /// No description provided for @logs_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get logs_time;
+
+  /// No description provided for @logs_startOfFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Start of file reached'**
+  String get logs_startOfFile;
+
+  /// No description provided for @logs_exportLoadedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Export the {count} loaded lines'**
+  String logs_exportLoadedCount(int count);
+
+  /// No description provided for @logs_copyRaw.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy raw line'**
+  String get logs_copyRaw;
+
+  /// No description provided for @logs_copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get logs_copied;
+
+  /// No description provided for @logs_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get logs_status;
+
+  /// No description provided for @logs_method.
+  ///
+  /// In en, this message translates to:
+  /// **'Method'**
+  String get logs_method;
+
+  /// No description provided for @logs_path.
+  ///
+  /// In en, this message translates to:
+  /// **'Path'**
+  String get logs_path;
+
+  /// No description provided for @logs_ip.
+  ///
+  /// In en, this message translates to:
+  /// **'Client IP'**
+  String get logs_ip;
+
+  /// No description provided for @logs_userAgent.
+  ///
+  /// In en, this message translates to:
+  /// **'User-Agent'**
+  String get logs_userAgent;
+
+  /// No description provided for @logs_referer.
+  ///
+  /// In en, this message translates to:
+  /// **'Referer'**
+  String get logs_referer;
+
+  /// No description provided for @logs_bytes.
+  ///
+  /// In en, this message translates to:
+  /// **'Bytes'**
+  String get logs_bytes;
+
+  /// No description provided for @logs_upstream.
+  ///
+  /// In en, this message translates to:
+  /// **'Upstream'**
+  String get logs_upstream;
+
+  /// No description provided for @logs_duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get logs_duration;
+
+  /// No description provided for @logs_request.
+  ///
+  /// In en, this message translates to:
+  /// **'Request'**
+  String get logs_request;
 
   /// Keep refreshing the log while open.
   ///

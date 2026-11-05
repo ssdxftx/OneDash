@@ -601,8 +601,7 @@ class _SslTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final ssl = detail.ssl;
-    if (ssl == null) {
+    if (!detail.isSslBound) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -639,6 +638,14 @@ class _SslTab extends StatelessWidget {
         ),
       );
     }
+    final ssl = detail.ssl!;
+    final expiry = _sslExpiry(context, ssl.expireDate, l10n);
+    final domains = ssl.domains.isEmpty
+        ? (ssl.primaryDomain.isEmpty ? const <String>[] : [ssl.primaryDomain])
+        : ssl.domains;
+    final domainText = domains.length <= 2
+        ? domains.join(', ')
+        : '${domains.take(2).join(', ')} ${l10n.websites_sslDomainsMore(domains.length - 2)}';
     return ListView(
       padding: EdgeInsets.all(context.pagePadding),
       children: [
@@ -666,8 +673,19 @@ class _SslTab extends StatelessWidget {
           children: [
             _Row(label: l10n.websites_sslProvider, value: ssl.provider),
             _Row(label: l10n.websites_type, value: ssl.type),
-            _Row(label: l10n.websites_sslExpire, value: ssl.expireDate),
-            _Row(label: l10n.websites_domain, value: ssl.primaryDomain),
+            _Row(
+              label: l10n.websites_sslExpire,
+              value: formatDateOnly(ssl.expireDate),
+              valueColor: expiry?.color,
+            ),
+            if (domainText.isNotEmpty)
+              _Row(label: l10n.websites_domain, value: domainText),
+            if (expiry != null)
+              _Row(
+                label: l10n.websites_sslValidity,
+                value: expiry.label,
+                valueColor: expiry.color,
+              ),
           ],
         ),
         const SizedBox(height: AppTokens.s24),
@@ -694,6 +712,26 @@ class _SslTab extends StatelessWidget {
       ],
     );
   }
+}
+
+({String label, Color color})? _sslExpiry(
+  BuildContext context,
+  String value,
+  AppLocalizations l10n,
+) {
+  final date = DateTime.tryParse(value);
+  if (date == null) return null;
+  final days = date.difference(DateTime.now()).inDays;
+  if (days < 0) {
+    return (label: l10n.websites_sslExpired, color: context.appColors.danger);
+  }
+  if (days <= 30) {
+    return (
+      label: l10n.websites_expire_days(days),
+      color: context.appColors.warning,
+    );
+  }
+  return null;
 }
 
 class _ProxyTab extends ConsumerWidget {
@@ -1093,10 +1131,11 @@ class _LogsTab extends ConsumerWidget {
 }
 
 class _Row extends StatelessWidget {
-  const _Row({required this.label, required this.value});
+  const _Row({required this.label, required this.value, this.valueColor});
 
   final String label;
   final String value;
+  final Color? valueColor;
 
   @override
   Widget build(BuildContext context) {
@@ -1121,7 +1160,7 @@ class _Row extends StatelessWidget {
             child: Text(
               displayValue(context, value),
               textAlign: TextAlign.end,
-              style: AppTextStyles.bodyM,
+              style: AppTextStyles.bodyM.copyWith(color: valueColor),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),

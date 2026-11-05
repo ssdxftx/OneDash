@@ -29,6 +29,7 @@ import '../../servers/providers/servers_provider.dart';
 import '../../../common/states/error_toast.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../containers/widgets/container_log_page.dart';
+import '../widgets/installed_app_actions.dart';
 import '../providers/app_store_provider.dart';
 
 class AppStorePage extends ConsumerStatefulWidget {
@@ -318,6 +319,18 @@ class _InstalledTab extends ConsumerWidget {
     final colors = context.appColors;
     final running = app.status.toLowerCase() == 'running';
     final hasContainer = app.container.trim().isNotEmpty;
+    final ignored = await ref.read(installedIgnoredProvider(app.id).future);
+    String? newVersion;
+    if (app.canUpdate) {
+      try {
+        final repository = await ref.read(appRepositoryProvider.future);
+        final versions = await repository.getUpdateVersions(app.id);
+        if (versions.isNotEmpty) newVersion = versions.first.version;
+      } catch (_) {
+        // The action remains available; the upgrade flow fetches versions again.
+      }
+    }
+    if (!context.mounted) return;
     await showAppSheet<void>(
       context: context,
       maxHeightFactor: 0.9,
@@ -413,6 +426,66 @@ class _InstalledTab extends ConsumerWidget {
                   onTap: () {
                     Navigator.of(sheetContext).pop();
                     _operate(context, ref, app, 'restart');
+                  },
+                ),
+              ],
+            ),
+            ActionSheetSection(
+              title: l10n.containers_groupMaintenance,
+              icon: TablerIcons.tool,
+              children: [
+                if (app.canUpdate)
+                  ActionSheetRow(
+                    icon: TablerIcons.arrow_up_circle,
+                    iconColor: colors.success,
+                    title: l10n.apps_upgrade,
+                    subtitle: newVersion == null
+                        ? app.version
+                        : '${app.version} → $newVersion',
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      InstalledAppActions.upgrade(context, ref, app);
+                    },
+                  ),
+                ActionSheetRow(
+                  icon: TablerIcons.adjustments,
+                  iconColor: colors.info,
+                  title: l10n.apps_editParams,
+                  subtitle: app.version,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    InstalledAppActions.editParams(context, ref, app);
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.plug,
+                  iconColor: colors.info,
+                  title: l10n.apps_changePort,
+                  subtitle: '${app.httpPort}',
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    InstalledAppActions.changePort(context, ref, app);
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.info_circle,
+                  iconColor: colors.info,
+                  title: l10n.apps_connInfo,
+                  subtitle: app.container,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    InstalledAppActions.showConnInfo(context, ref, app);
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.bell_off,
+                  iconColor: colors.info,
+                  title: ignored == null
+                      ? l10n.apps_ignoreUpdate
+                      : l10n.apps_cancelIgnoreUpdate,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    InstalledAppActions.toggleIgnore(context, ref, app);
                   },
                 ),
               ],

@@ -31,6 +31,11 @@ class LogBuffer {
   }
 
   void clear() => _lines.clear();
+
+  void replaceAll(Iterable<String> lines) {
+    _lines.clear();
+    addAll(lines);
+  }
 }
 
 class LogView extends StatefulWidget {

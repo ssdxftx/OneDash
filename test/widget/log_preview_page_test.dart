@@ -68,6 +68,37 @@ void main() {
     expect(find.textContaining('database failed'), findsOneWidget);
   });
 
+  testWidgets('loads earlier lines from the server page', (tester) async {
+    final pages = <int>[];
+    await tester.pumpWidget(
+      wrap(
+        LogPreviewPage(
+          title: 'demo.log',
+          sources: [
+            LogSourceOption(
+              label: 'main',
+              load: () async => ['newest'],
+              loadPage: (page, size) async {
+                pages.add(page);
+                return page == 1
+                    ? const LogBatch(lines: ['newest'], end: false)
+                    : const LogBatch(lines: ['older'], end: true);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.textContaining('older'), findsNothing);
+
+    await tester.tap(find.text('Load earlier lines'));
+    await tester.pumpAndSettle();
+    expect(pages, [1, 2]);
+    expect(find.textContaining('older'), findsOneWidget);
+    expect(find.textContaining('newest'), findsOneWidget);
+  });
+
   testWidgets('follow polling appends newly loaded lines', (tester) async {
     final lines = ['first line'];
     await tester.pumpWidget(

@@ -5,6 +5,7 @@ import '../../../../data/dto/app/app_catalog_search_req.dart';
 import '../../../../data/dto/app/app_detail_dto.dart';
 import '../../../../data/dto/app/app_installed_dto.dart';
 import '../../../../data/dto/app/app_installed_info_dto.dart';
+import '../../../../data/dto/app/app_ignored_dto.dart';
 import '../../../../data/dto/app/app_installed_search_req.dart';
 import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
@@ -44,3 +45,13 @@ final installedInfoProvider = FutureProvider.autoDispose
           .watch(appRepositoryProvider.future)
           .then((repository) => repository.getInstalledInfo(id));
     }, name: 'installedInfoProvider');
+
+final installedIgnoredProvider = FutureProvider.autoDispose
+    .family<AppIgnoredDto?, int>((ref, installId) async {
+      final repository = await ref.watch(appRepositoryProvider.future);
+      final ignored = await repository.getIgnoredApps();
+      for (final item in ignored) {
+        if (item.appId == installId) return item;
+      }
+      return null;
+    }, name: 'installedIgnoredProvider');

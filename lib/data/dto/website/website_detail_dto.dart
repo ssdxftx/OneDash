@@ -61,6 +61,9 @@ class WebsiteDetailDto {
   final List<WebsiteDomainDto> domains;
   final WebsiteSslDto? ssl;
 
+  bool get isSslBound =>
+      webSiteSSLId > 0 && ssl != null && (ssl?.isBound ?? false);
+
   factory WebsiteDetailDto.fromJson(Map<String, dynamic> json) {
     final domainsJson = json['domains'] as List?;
     final sslJson = json['webSiteSSL'];

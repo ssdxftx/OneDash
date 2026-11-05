@@ -33,6 +33,15 @@ void main() {
     expect(find.textContaining('systemctl status 1panel'), findsOneWidget);
   });
 
+  testWidgets('renders markdown images without leaving a bang prefix', (
+    tester,
+  ) async {
+    await tester.pumpWidget(wrap('![logo](https://example.com/logo.png)\n'));
+    await tester.pump();
+    expect(find.byType(Image), findsOneWidget);
+    expect(find.textContaining('!logo'), findsNothing);
+  });
+
   testWidgets('unknown syntax stays visible as plain text', (tester) async {
     await tester.pumpWidget(wrap('| a | b |\n| - | - |\n'));
     expect(find.textContaining('| a | b |'), findsOneWidget);

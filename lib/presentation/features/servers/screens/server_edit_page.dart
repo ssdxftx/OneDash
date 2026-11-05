@@ -426,6 +426,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
                     },
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         flex: 3,
@@ -443,7 +444,6 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
                         child: AppTextField(
                           controller: _portController,
                           label: l10n.server_edit_port,
-                          helper: l10n.server_edit_portHelper,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,

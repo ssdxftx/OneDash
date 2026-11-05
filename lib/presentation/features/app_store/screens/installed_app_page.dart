@@ -5,37 +5,21 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
-import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../data/dto/app/app_installed_dto.dart';
+import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
-import '../../../common/components/app_text_field.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
-import '../../../common/components/simple_form_page.dart';
+import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/components/app_toast.dart';
-import '../../../../data/dto/app/app_installed_params_dto.dart';
-import '../../../../data/dto/app/app_ignored_dto.dart';
-import '../../../../data/dto/app/app_update_version_dto.dart';
-import '../../../../data/dto/common/task_log_dto.dart';
-import '../../../../data/repositories_impl/app_repository_impl.dart';
-import '../../../../data/repositories_impl/database_repository_impl.dart';
 import '../../../common/states/async_state_view.dart';
 import '../providers/app_store_provider.dart';
-import '../../../common/states/error_toast.dart';
-
-final _installedIgnoredProvider = FutureProvider.autoDispose
-    .family<AppIgnoredDto?, int>((ref, installId) async {
-      final repository = await ref.watch(appRepositoryProvider.future);
-      final ignored = await repository.getIgnoredApps();
-      for (final item in ignored) {
-        if (item.appId == installId) return item;
-      }
-      return null;
-    }, name: 'installedIgnoredProvider');
+import '../widgets/installed_app_actions.dart';
 
 class InstalledAppPage extends ConsumerWidget {
   const InstalledAppPage({
@@ -54,9 +38,18 @@ class InstalledAppPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final id = int.tryParse(installId) ?? 0;
     final info = ref.watch(installedInfoProvider(id));
-    final ignored = ref.watch(_installedIgnoredProvider(id)).valueOrNull;
-    final container = info.valueOrNull?.container;
-    final appName = info.valueOrNull?.name ?? '';
+    final ignored = ref.watch(installedIgnoredProvider(id)).valueOrNull;
+    final installed = ref.watch(installedAppsProvider).valueOrNull;
+    AppInstalledDto? app;
+    for (final item in installed?.items ?? const <AppInstalledDto>[]) {
+      if (item.id == id) {
+        app = item;
+        break;
+      }
+    }
+    final current = info.valueOrNull;
+    final container = current?.container;
+    final appName = current?.name ?? app?.displayName ?? '';
     return Scaffold(
       appBar: AppBarLarge(
         title: appName.trim().isEmpty ? l10n.apps_installed : appName,
@@ -70,94 +63,31 @@ class InstalledAppPage extends ConsumerWidget {
                     '/s/$serverId/terminal?container=${Uri.encodeComponent(container)}',
                   ),
           ),
-          AppIconButton(
-            icon: TablerIcons.dots,
-            tooltip: l10n.action_more,
-            onPressed: () async {
-              final app = info.valueOrNull;
-              if (app == null) return;
-              final value = await showSelectionMenu<String>(
-                context,
-                options: [
-                  SelectionOption(
-                    label: l10n.apps_upgrade,
-                    value: 'upgrade',
-                    icon: TablerIcons.arrow_up_circle,
-                  ),
-                  SelectionOption(
-                    label: l10n.apps_editParams,
-                    value: 'params',
-                    icon: TablerIcons.adjustments,
-                  ),
-                  SelectionOption(
-                    label: l10n.apps_changePort,
-                    value: 'port',
-                    icon: TablerIcons.plug,
-                  ),
-                  SelectionOption(
-                    label: l10n.apps_connInfo,
-                    value: 'conn',
-                    icon: TablerIcons.info_circle,
-                  ),
-                  SelectionOption(
-                    label: ignored == null
-                        ? l10n.apps_ignoreUpdate
-                        : l10n.apps_cancelIgnoreUpdate,
-                    value: ignored == null ? 'ignore' : 'cancelIgnore',
-                    icon: TablerIcons.bell_off,
-                  ),
-                  SelectionOption(
-                    label: l10n.apps_uninstall,
-                    value: 'uninstall',
-                    icon: TablerIcons.trash,
-                    danger: true,
-                  ),
-                ],
-              );
-              if (!context.mounted) return;
-              switch (value) {
-                case 'upgrade':
-                  await _upgrade(context, ref, id, app);
-                case 'params':
-                  await _editParams(context, ref, id);
-                case 'port':
-                  await _changePort(context, ref, app);
-                case 'conn':
-                  await _showConnInfo(context, ref, app);
-                case 'ignore':
-                  await _ignoreUpdate(context, ref, id, app);
-                case 'cancelIgnore':
-                  await _cancelIgnore(context, ref, id);
-                case 'uninstall':
-                  await _uninstall(context, ref, id, app);
-              }
-            },
-          ),
         ],
       ),
       body: AsyncStateView(
         value: info,
         onRetry: () => ref.invalidate(installedInfoProvider(id)),
-        builder: (app) => ListView(
+        builder: (data) => ListView(
           padding: EdgeInsets.all(context.pagePadding),
           children: [
             TonalCard(
               child: Row(
                 children: [
-                  StatusDot(status: app.status.toLowerCase()),
+                  StatusDot(status: data.status.toLowerCase()),
                   const SizedBox(width: AppTokens.s12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          app.name,
+                          data.name,
                           style: AppTextStyles.titleM,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          '${app.version} · ${app.httpPort}',
+                          '${data.version} · ${data.httpPort}',
                           style: AppTextStyles.bodyS.copyWith(
                             color: context.scheme.onSurfaceVariant,
                           ),
@@ -171,86 +101,132 @@ class InstalledAppPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppTokens.s24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _operate(context, ref, id, 'start'),
-                    icon: const Icon(TablerIcons.player_play),
-                    label: Text(l10n.containers_start),
-                  ),
-                ),
-                const SizedBox(width: AppTokens.s8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _operate(context, ref, id, 'stop'),
-                    icon: const Icon(TablerIcons.player_stop),
-                    label: Text(l10n.containers_stop),
-                  ),
-                ),
-                const SizedBox(width: AppTokens.s8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _operate(context, ref, id, 'restart'),
-                    icon: const Icon(TablerIcons.refresh),
-                    label: Text(l10n.containers_restart),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppTokens.s24),
+            SectionHeader(title: l10n.error_details),
             SplitListGroup(
               children: [
-                SplitListTile(title: l10n.app_detail_key, value: app.appKey),
+                SplitListTile(title: l10n.app_detail_key, value: data.appKey),
                 SplitListTile(
                   title: l10n.app_detail_container,
-                  value: app.container,
+                  value: data.container,
                 ),
-                if (app.composePath.trim().isNotEmpty)
+                if (data.composePath.trim().isNotEmpty)
                   SplitListTile(
                     title: l10n.app_detail_compose,
-                    value: app.composePath,
+                    value: data.composePath,
                   ),
-                if (app.message.isNotEmpty)
+                if (data.message.isNotEmpty)
                   SplitListTile(
                     title: l10n.app_detail_message,
-                    value: app.message,
+                    value: data.message,
                   ),
               ],
             ),
+            if (app != null) ...[
+              const SizedBox(height: AppTokens.s24),
+              SectionHeader(title: l10n.containers_groupMaintenance),
+              SplitListGroup(
+                children: [
+                  if (app.canUpdate)
+                    SplitListTile(
+                      leading: const Icon(TablerIcons.arrow_up_circle),
+                      title: l10n.apps_upgrade,
+                      subtitle: app.version,
+                      onTap: () =>
+                          InstalledAppActions.upgrade(context, ref, app!),
+                    ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.adjustments),
+                    title: l10n.apps_editParams,
+                    subtitle: app.version,
+                    onTap: () =>
+                        InstalledAppActions.editParams(context, ref, app!),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.plug),
+                    title: l10n.apps_changePort,
+                    subtitle: '${app.httpPort}',
+                    onTap: () =>
+                        InstalledAppActions.changePort(context, ref, app!),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.info_circle),
+                    title: l10n.apps_connInfo,
+                    subtitle: app.container,
+                    onTap: () =>
+                        InstalledAppActions.showConnInfo(context, ref, app!),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.bell_off),
+                    title: ignored == null
+                        ? l10n.apps_ignoreUpdate
+                        : l10n.apps_cancelIgnoreUpdate,
+                    onTap: () =>
+                        InstalledAppActions.toggleIgnore(context, ref, app!),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTokens.s24),
+              SectionHeader(title: l10n.containers_groupLifecycle),
+              SplitListGroup(
+                children: [
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.player_play),
+                    title: l10n.containers_start,
+                    enabled: app.status.toLowerCase() != 'running',
+                    onTap: () => InstalledAppActions.operate(
+                      context,
+                      ref,
+                      app!,
+                      'start',
+                    ),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.player_stop),
+                    title: l10n.containers_stop,
+                    enabled: app.status.toLowerCase() == 'running',
+                    onTap: () =>
+                        InstalledAppActions.operate(context, ref, app!, 'stop'),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.refresh),
+                    title: l10n.containers_restart,
+                    enabled: app.status.toLowerCase() == 'running',
+                    onTap: () => InstalledAppActions.operate(
+                      context,
+                      ref,
+                      app!,
+                      'restart',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTokens.s24),
+              SectionHeader(title: l10n.containers_groupDanger),
+              SplitListGroup(
+                children: [
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.trash),
+                    title: l10n.apps_uninstall,
+                    danger: true,
+                    onTap: () => _uninstall(context, ref, app!),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Future<void> _waitTask(
-    TaskProgressController controller,
-    dynamic repository,
-    String taskID,
-  ) async {
-    for (var attempt = 0; attempt < 120; attempt++) {
-      final log = await repository.readTaskLog(taskID) as TaskLogDto;
-      if (log.lines.isNotEmpty) controller.log(log.lines.last);
-      final status = log.taskStatus.toLowerCase();
-      if (status == 'success') return;
-      if (status == 'failed' || status == 'error' || status == 'canceled') {
-        throw Exception(log.lines.isEmpty ? 'Task failed' : log.lines.last);
-      }
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-    }
-    throw const TaskFailedException(subject: 'Task', timedOut: true);
-  }
-
   Future<void> _uninstall(
     BuildContext context,
     WidgetRef ref,
-    int installId,
-    dynamic app,
+    AppInstalledDto app,
   ) async {
     final l10n = AppLocalizations.of(context);
-    final detailId = this.detailId ?? 0;
-    if (detailId <= 0) {
+    final targetDetailId = detailId ?? app.appDetailId;
+    if (targetDetailId <= 0) {
       AppToast.warning(context, l10n.apps_detailMissing);
       return;
     }
@@ -268,7 +244,7 @@ class InstalledAppPage extends ConsumerWidget {
             Text(l10n.apps_uninstall, style: AppTextStyles.titleL),
             const SizedBox(height: AppTokens.s4),
             Text(
-              l10n.apps_uninstallHint(app.name),
+              l10n.apps_uninstallHint(app.displayName),
               style: AppTextStyles.bodyS.copyWith(
                 color: context.scheme.onSurfaceVariant,
               ),
@@ -315,430 +291,20 @@ class InstalledAppPage extends ConsumerWidget {
       title: l10n.apps_uninstall,
       task: (controller) async {
         await repository.uninstallApp(
-          installId: installId,
-          detailId: detailId,
+          installId: app.id,
+          detailId: targetDetailId,
           taskID: taskID,
           forceDelete: force,
           deleteBackup: deleteBackup,
           deleteImage: deleteImage,
           deleteDB: deleteDB,
         );
-        await _waitTask(controller, repository, taskID);
+        await InstalledAppActions.waitTask(controller, repository, taskID);
       },
     );
     if (!success || !context.mounted) return;
     ref.invalidate(installedAppsProvider);
     AppToast.success(context, l10n.action_done);
     context.pop();
-  }
-
-  Future<void> _upgrade(
-    BuildContext context,
-    WidgetRef ref,
-    int installId,
-    dynamic app,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    final detailId = this.detailId ?? 0;
-    if (detailId <= 0) {
-      AppToast.warning(context, l10n.apps_detailMissing);
-      return;
-    }
-    try {
-      final repository = await ref.read(appRepositoryProvider.future);
-      final versions = await repository.getUpdateVersions(installId);
-      if (!context.mounted) return;
-      if (versions.isEmpty) {
-        AppToast.show(
-          context,
-          l10n.apps_latestVersion,
-          type: AppToastType.info,
-        );
-        return;
-      }
-      AppUpdateVersionDto selected = versions.first;
-      bool backup = true;
-      bool pullImage = true;
-      final confirmed = await showAppSheet<bool>(
-        context: context,
-        builder: (sheetContext) => StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.apps_upgrade, style: AppTextStyles.titleL),
-              const SizedBox(height: AppTokens.s16),
-              DropdownButtonFormField<String>(
-                initialValue: selected.version,
-                decoration: InputDecoration(labelText: l10n.apps_version),
-                items: [
-                  for (final version in versions)
-                    DropdownMenuItem(
-                      value: version.version,
-                      child: Text(version.version),
-                    ),
-                ],
-                onChanged: (value) {
-                  if (value == null) return;
-                  setState(
-                    () => selected = versions.firstWhere(
-                      (item) => item.version == value,
-                    ),
-                  );
-                },
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.apps_backupBeforeUpgrade),
-                value: backup,
-                onChanged: (value) => setState(() => backup = value),
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.apps_pullImage),
-                value: pullImage,
-                onChanged: (value) => setState(() => pullImage = value),
-              ),
-              const SizedBox(height: AppTokens.s16),
-              PrimaryButton(
-                label: l10n.apps_upgrade,
-                onPressed: () => Navigator.of(sheetContext).pop(true),
-              ),
-            ],
-          ),
-        ),
-      );
-      if (confirmed != true || !context.mounted) return;
-      final taskID = const Uuid().v4();
-      final success = await TaskProgressSheet.run(
-        context,
-        title: l10n.apps_upgrade,
-        task: (controller) async {
-          await repository.upgradeApp(
-            installId: installId,
-            detailId: detailId,
-            version: selected.version,
-            dockerCompose: selected.dockerCompose,
-            taskID: taskID,
-            backup: backup,
-            pullImage: pullImage,
-          );
-          await _waitTask(controller, repository, taskID);
-        },
-      );
-      if (!success || !context.mounted) return;
-      ref.invalidate(installedInfoProvider(installId));
-      ref.invalidate(installedAppsProvider);
-      AppToast.success(context, l10n.action_done);
-    } catch (error) {
-      if (!context.mounted) return;
-      showErrorToast(context, error);
-    }
-  }
-
-  Future<void> _editParams(
-    BuildContext context,
-    WidgetRef ref,
-    int installId,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    try {
-      final repository = await ref.read(appRepositoryProvider.future);
-      final data = await repository.getInstalledParams(installId);
-      if (!context.mounted) return;
-      final controllers = <String, TextEditingController>{
-        for (final field in data.params)
-          field.key: TextEditingController(text: '${field.value ?? ''}'),
-      };
-      final containerName = TextEditingController(text: data.containerName);
-      final restartPolicy = TextEditingController(text: data.restartPolicy);
-      final cpu = TextEditingController(text: '${data.cpuQuota}');
-      final memory = TextEditingController(text: '${data.memoryLimit}');
-      final dockerCompose = TextEditingController(text: data.dockerCompose);
-      bool advanced = false;
-      final saved = await pushFormPage<bool>(
-        context,
-        StatefulBuilder(
-          builder: (pageContext, setState) => SimpleFormPage(
-            title: l10n.apps_editParams,
-            onSave: () async => Navigator.of(pageContext).pop(true),
-            children: [
-              for (final field in data.params)
-                if (field.edit) ...[
-                  AppTextField(
-                    controller: controllers[field.key],
-                    label:
-                        Localizations.localeOf(pageContext).languageCode == 'zh'
-                        ? field.labelZh
-                        : field.labelEn,
-                  ),
-                  const SizedBox(height: AppTokens.s12),
-                ],
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.apps_advancedParams),
-                value: advanced,
-                onChanged: (value) => setState(() => advanced = value),
-              ),
-              if (advanced) ...[
-                AppTextField(
-                  controller: containerName,
-                  label: l10n.apps_containerName,
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: restartPolicy,
-                  label: l10n.containers_restartPolicy,
-                ),
-                const SizedBox(height: AppTokens.s12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppTextField(
-                        controller: cpu,
-                        label: l10n.containers_cpuLimit,
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                    const SizedBox(width: AppTokens.s12),
-                    Expanded(
-                      child: AppTextField(
-                        controller: memory,
-                        label: l10n.containers_memoryLimit,
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: dockerCompose,
-                  label: 'docker-compose.yml',
-                  maxLines: 8,
-                ),
-              ],
-            ],
-          ),
-        ),
-      );
-      final params = <String, dynamic>{
-        for (final field in data.params)
-          if (field.edit) field.key: controllers[field.key]?.text.trim(),
-      };
-      final request = AppInstalledParamsUpdateReq(
-        installId: installId,
-        params: params,
-        advanced: advanced,
-        containerName: containerName.text.trim(),
-        allowPort: data.allowPort,
-        restartPolicy: restartPolicy.text.trim(),
-        cpuQuota: double.tryParse(cpu.text.trim()) ?? data.cpuQuota,
-        memoryLimit: double.tryParse(memory.text.trim()) ?? data.memoryLimit,
-        memoryUnit: data.memoryUnit,
-        editCompose: data.editCompose,
-        dockerCompose: dockerCompose.text,
-        specifyIP: data.specifyIP,
-      );
-      for (final controller in controllers.values) {
-        controller.dispose();
-      }
-      containerName.dispose();
-      restartPolicy.dispose();
-      cpu.dispose();
-      memory.dispose();
-      dockerCompose.dispose();
-      if (saved != true || !context.mounted) return;
-      await repository.updateInstalledParams(request);
-      ref.invalidate(installedInfoProvider(installId));
-      if (!context.mounted) return;
-      AppToast.success(context, l10n.action_saved);
-    } catch (error) {
-      if (!context.mounted) return;
-      showErrorToast(context, error);
-    }
-  }
-
-  Future<void> _changePort(
-    BuildContext context,
-    WidgetRef ref,
-    dynamic app,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    final port = TextEditingController(text: '${app.httpPort}');
-    final value = await pushFormPage<int>(
-      context,
-      Builder(
-        builder: (pageContext) => SimpleFormPage(
-          title: l10n.apps_changePort,
-          onSave: () async {
-            final parsed = int.tryParse(port.text.trim());
-            if (parsed == null) return;
-            Navigator.of(pageContext).pop(parsed);
-          },
-          children: [
-            AppTextField(
-              controller: port,
-              label: l10n.apps_port,
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-      ),
-    );
-    port.dispose();
-    if (value == null || !context.mounted) return;
-    try {
-      final repository = await ref.read(appRepositoryProvider.future);
-      await repository.changePort(key: app.appKey, name: app.name, port: value);
-      ref.invalidate(installedInfoProvider(app.id));
-      if (!context.mounted) return;
-      AppToast.success(context, l10n.action_saved);
-    } catch (error) {
-      if (!context.mounted) return;
-      showErrorToast(context, error);
-    }
-  }
-
-  Future<void> _showConnInfo(
-    BuildContext context,
-    WidgetRef ref,
-    dynamic app,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    try {
-      final repository = await ref.read(databaseRepositoryProvider.future);
-      final info = await repository.getConnInfo(
-        type: app.appKey,
-        name: app.name,
-      );
-      if (!context.mounted) return;
-      await showAppSheet<void>(
-        context: context,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.apps_connInfo, style: AppTextStyles.titleL),
-            const SizedBox(height: AppTokens.s16),
-            SplitListGroup(
-              children: [
-                for (final entry in info.entries)
-                  SplitListTile(title: entry.key, subtitle: '${entry.value}'),
-              ],
-            ),
-          ],
-        ),
-      );
-    } catch (error) {
-      if (!context.mounted) return;
-      showErrorToast(context, error);
-    }
-  }
-
-  Future<void> _ignoreUpdate(
-    BuildContext context,
-    WidgetRef ref,
-    int installId,
-    dynamic app,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    final detailId = this.detailId ?? 0;
-    if (detailId <= 0) {
-      AppToast.warning(context, l10n.apps_detailMissing);
-      return;
-    }
-    try {
-      final repository = await ref.read(appRepositoryProvider.future);
-      await repository.ignoreUpdate(
-        appId: installId,
-        appDetailId: detailId,
-        scope: 'app',
-      );
-      ref.invalidate(installedInfoProvider(installId));
-      ref.invalidate(_installedIgnoredProvider(installId));
-      if (!context.mounted) return;
-      AppToast.success(context, l10n.action_done);
-    } catch (error) {
-      if (!context.mounted) return;
-      showErrorToast(context, error);
-    }
-  }
-
-  Future<void> _cancelIgnore(
-    BuildContext context,
-    WidgetRef ref,
-    int installId,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    try {
-      final repository = await ref.read(appRepositoryProvider.future);
-      final ignored = await repository.getIgnoredApps();
-      AppIgnoredDto? target;
-      for (final item in ignored) {
-        if (item.appId == installId) {
-          target = item;
-          break;
-        }
-      }
-      if (target == null) {
-        if (!context.mounted) return;
-        AppToast.warning(context, l10n.apps_notIgnored);
-        return;
-      }
-      await repository.cancelIgnore(target.id);
-      ref.invalidate(installedInfoProvider(installId));
-      if (!context.mounted) return;
-      AppToast.success(context, l10n.action_done);
-    } catch (error) {
-      if (!context.mounted) return;
-      showErrorToast(context, error);
-    }
-  }
-
-  Future<void> _operate(
-    BuildContext context,
-    WidgetRef ref,
-    int installId,
-    String operation,
-  ) async {
-    final detailId = this.detailId ?? 0;
-    final l10n = AppLocalizations.of(context);
-    if (detailId <= 0) {
-      AppToast.warning(
-        context,
-        AppLocalizations.of(context).apps_detailMissing,
-      );
-      return;
-    }
-    try {
-      final repository = await ref.read(appRepositoryProvider.future);
-      switch (operation) {
-        case 'start':
-          await repository.startInstalled(
-            installId: installId,
-            detailId: detailId,
-          );
-          break;
-        case 'stop':
-          await repository.stopInstalled(
-            installId: installId,
-            detailId: detailId,
-          );
-          break;
-        case 'restart':
-          await repository.restartInstalled(
-            installId: installId,
-            detailId: detailId,
-          );
-          break;
-      }
-      if (!context.mounted) return;
-      AppToast.success(context, l10n.action_done);
-      ref.invalidate(installedInfoProvider(installId));
-      ref.invalidate(installedAppsProvider);
-    } catch (error) {
-      if (!context.mounted) return;
-      showErrorToast(context, error);
-    }
   }
 }

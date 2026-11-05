@@ -184,7 +184,9 @@ class SimpleMarkdown extends StatelessWidget {
 
   Widget _inline(BuildContext context, String text, TextStyle style) {
     final spans = <InlineSpan>[];
-    final pattern = RegExp(r'(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\))');
+    final pattern = RegExp(
+      r'(\*\*[^*]+\*\*|`[^`]+`|!\[[^\]]*\]\([^)]+\)|\[[^\]]+\]\([^)]+\))',
+    );
     var cursor = 0;
     for (final match in pattern.allMatches(text)) {
       if (match.start > cursor) {
@@ -203,6 +205,32 @@ class SimpleMarkdown extends StatelessWidget {
           TextSpan(
             text: token.substring(1, token.length - 1),
             style: const TextStyle(fontFamily: 'monospace'),
+          ),
+        );
+      } else if (token.startsWith('![')) {
+        final image = RegExp(r'!\[([^\]]*)\]\(([^)]+)\)').firstMatch(token)!;
+        final alt = image.group(1) ?? '';
+        final url = image.group(2) ?? '';
+        spans.add(
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppTokens.rSm),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 120),
+                  child: Image.network(
+                    url,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, _, _) => Text(
+                      alt.isEmpty ? url : alt,
+                      style: style.copyWith(color: context.scheme.primary),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         );
       } else {

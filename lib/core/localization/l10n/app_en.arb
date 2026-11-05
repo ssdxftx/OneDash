@@ -2013,7 +2013,7 @@
   "@ssl_certificate": {
     "description": "SSL form label."
   },
-  "ssl_noCertificates": "No certificates under this account. Apply in the panel first.",
+  "ssl_noCertificates": "No certificates available. Apply for or upload one first.",
   "@ssl_noCertificates": {
     "description": "SSL empty hint."
   },
@@ -2078,6 +2078,16 @@
   "websites_createdAt": "Created",
   "websites_sslProvider": "Provider",
   "websites_sslExpire": "Expires",
+  "websites_sslValidity": "Validity",
+  "@websites_sslValidity": {},
+  "websites_sslDomainsMore": "and {count} more",
+  "@websites_sslDomainsMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "@containers_unlimited": {
     "description": "Value shown when the container has no memory limit."
   },
@@ -7021,10 +7031,6 @@
       }
     }
   },
-  "server_edit_portHelper": "Default 9999",
-  "@server_edit_portHelper": {
-    "description": "Helper for the panel port field."
-  },
   "log_emptyMessage": "No log entries in this category yet.",
   "@log_emptyMessage": {
     "description": "No log entries in this category yet."
@@ -7049,6 +7055,42 @@
   "@logs_structured": {
     "description": "Parse time and level from log lines."
   },
+  "logs_time": "Time",
+  "@logs_time": {},
+  "logs_startOfFile": "Start of file reached",
+  "@logs_startOfFile": {},
+  "logs_exportLoadedCount": "Export the {count} loaded lines",
+  "@logs_exportLoadedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "logs_copyRaw": "Copy raw line",
+  "@logs_copyRaw": {},
+  "logs_copied": "Copied",
+  "@logs_copied": {},
+  "logs_status": "Status",
+  "@logs_status": {},
+  "logs_method": "Method",
+  "@logs_method": {},
+  "logs_path": "Path",
+  "@logs_path": {},
+  "logs_ip": "Client IP",
+  "@logs_ip": {},
+  "logs_userAgent": "User-Agent",
+  "@logs_userAgent": {},
+  "logs_referer": "Referer",
+  "@logs_referer": {},
+  "logs_bytes": "Bytes",
+  "@logs_bytes": {},
+  "logs_upstream": "Upstream",
+  "@logs_upstream": {},
+  "logs_duration": "Duration",
+  "@logs_duration": {},
+  "logs_request": "Request",
+  "@logs_request": {},
   "logs_follow": "Follow",
   "@logs_follow": {
     "description": "Keep refreshing the log while open."

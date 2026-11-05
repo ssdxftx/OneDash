@@ -1479,7 +1479,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ssl_noCertificates =>
-      'No certificates under this account. Apply in the panel first.';
+      'No certificates available. Apply for or upload one first.';
 
   @override
   String apps_requiredMissing(String fields) {
@@ -1535,6 +1535,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_sslExpire => 'Expires';
+
+  @override
+  String get websites_sslValidity => 'Validity';
+
+  @override
+  String websites_sslDomainsMore(int count) {
+    return 'and $count more';
+  }
 
   @override
   String get websites_sslExpired => 'Expired';
@@ -5248,9 +5256,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get server_edit_portHelper => 'Default 9999';
-
-  @override
   String get log_emptyMessage => 'No log entries in this category yet.';
 
   @override
@@ -5269,6 +5274,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logs_structured => 'Structured';
+
+  @override
+  String get logs_time => 'Time';
+
+  @override
+  String get logs_startOfFile => 'Start of file reached';
+
+  @override
+  String logs_exportLoadedCount(int count) {
+    return 'Export the $count loaded lines';
+  }
+
+  @override
+  String get logs_copyRaw => 'Copy raw line';
+
+  @override
+  String get logs_copied => 'Copied';
+
+  @override
+  String get logs_status => 'Status';
+
+  @override
+  String get logs_method => 'Method';
+
+  @override
+  String get logs_path => 'Path';
+
+  @override
+  String get logs_ip => 'Client IP';
+
+  @override
+  String get logs_userAgent => 'User-Agent';
+
+  @override
+  String get logs_referer => 'Referer';
+
+  @override
+  String get logs_bytes => 'Bytes';
+
+  @override
+  String get logs_upstream => 'Upstream';
+
+  @override
+  String get logs_duration => 'Duration';
+
+  @override
+  String get logs_request => 'Request';
 
   @override
   String get logs_follow => 'Follow';
