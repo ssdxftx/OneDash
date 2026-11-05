@@ -1498,7 +1498,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_sslExpire => '到期时间';
 
   @override
-  String get websites_sslValidity => '有效期';
+  String get websites_sslValidity => '剩余有效期';
+
+  @override
+  String websites_sslDaysCount(int days) {
+    return '$days 天';
+  }
 
   @override
   String websites_sslDomainsMore(int count) {

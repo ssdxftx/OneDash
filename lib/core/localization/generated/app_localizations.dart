@@ -2933,8 +2933,14 @@ abstract class AppLocalizations {
   /// No description provided for @websites_sslValidity.
   ///
   /// In en, this message translates to:
-  /// **'Validity'**
+  /// **'Remaining validity'**
   String get websites_sslValidity;
+
+  /// OneDash UI string
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String websites_sslDaysCount(int days);
 
   /// No description provided for @websites_sslDomainsMore.
   ///

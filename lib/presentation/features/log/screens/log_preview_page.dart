@@ -367,6 +367,9 @@ class _LogPreviewPageState extends State<LogPreviewPage>
                 FilterChip(
                   selected: _follow,
                   showCheckmark: false,
+                  labelStyle: AppTextStyles.label.copyWith(
+                    color: scheme.onSurface,
+                  ),
                   label: Text(
                     _follow ? l10n.logs_stopFollow : l10n.logs_follow,
                   ),
@@ -542,16 +545,43 @@ class _RawLine extends StatelessWidget {
           ),
           const SizedBox(width: AppTokens.s8),
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Text(
-                raw,
-                softWrap: false,
-                style: AppTextStyles.bodyS.copyWith(
-                  fontFamily: 'monospace',
-                  color: color,
-                  height: 1.5,
-                ),
+            child: SizedBox(
+              width: double.infinity,
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Text(
+                      raw,
+                      softWrap: false,
+                      style: AppTextStyles.bodyS.copyWith(
+                        fontFamily: 'monospace',
+                        color: color,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    width: 24,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              AppTokens.consoleBackground.withValues(alpha: 0),
+                              AppTokens.consoleBackground,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -621,59 +651,100 @@ class _StructuredLineState extends State<_StructuredLine> {
       int s when s >= 300 => context.appColors.info,
       _ => levelColor,
     };
-    return Row(
-      children: [
-        _number(),
-        const SizedBox(width: AppTokens.s8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-          decoration: BoxDecoration(
-            color: statusColor.withValues(alpha: 0.16),
-            borderRadius: BorderRadius.circular(AppTokens.rXs),
-          ),
-          child: Text(
-            status?.toString() ?? '-',
-            style: AppTextStyles.caption.copyWith(
-              color: statusColor,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+    final path = parsed.path ?? parsed.message;
+    final method = parsed.method ?? '';
+    final duration = parsed.duration;
+    final statusBadge = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: statusColor.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(AppTokens.rXs),
+      ),
+      child: Text(
+        status?.toString() ?? '-',
+        style: AppTextStyles.caption.copyWith(
+          color: statusColor,
+          fontWeight: FontWeight.w600,
         ),
-        const SizedBox(width: AppTokens.s8),
-        Text(
-          parsed.method ?? '',
-          style: AppTextStyles.caption.copyWith(
-            color: context.scheme.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(width: AppTokens.s8),
-        Expanded(
-          child: Text(
-            parsed.path ?? parsed.message,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.bodyS.copyWith(
-              fontFamily: 'monospace',
-              color: AppTokens.consoleForeground,
-            ),
-          ),
-        ),
-        if (parsed.duration != null) ...[
-          const SizedBox(width: AppTokens.s8),
-          Text(
-            parsed.duration!,
+      ),
+    );
+    final methodText = Text(
+      method,
+      style: AppTextStyles.caption.copyWith(
+        color: context.scheme.onSurfaceVariant,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+    final pathText = Text(
+      path,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: AppTextStyles.bodyS.copyWith(
+        fontFamily: 'monospace',
+        color: AppTokens.consoleForeground,
+      ),
+    );
+    final durationText = duration == null
+        ? null
+        : Text(
+            duration,
             style: AppTextStyles.caption.copyWith(
               color: AppTokens.consoleMuted,
             ),
-          ),
-        ],
-        Icon(
-          _expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
-          size: 16,
-          color: AppTokens.consoleMuted,
-        ),
-      ],
+          );
+    final chevron = Icon(
+      _expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
+      size: 16,
+      color: AppTokens.consoleMuted,
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact =
+            constraints.maxWidth < 340 ||
+            MediaQuery.textScalerOf(context).scale(1) > 1.2;
+        if (!compact) {
+          return Row(
+            children: [
+              _number(),
+              const SizedBox(width: AppTokens.s8),
+              statusBadge,
+              if (method.isNotEmpty) ...[
+                const SizedBox(width: AppTokens.s8),
+                methodText,
+              ],
+              const SizedBox(width: AppTokens.s8),
+              Expanded(child: pathText),
+              if (durationText != null) ...[
+                const SizedBox(width: AppTokens.s8),
+                durationText,
+              ],
+              chevron,
+            ],
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _number(),
+                const SizedBox(width: AppTokens.s8),
+                statusBadge,
+                const Spacer(),
+                if (durationText != null) ...[
+                  durationText,
+                  const SizedBox(width: AppTokens.s8),
+                ],
+                chevron,
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 52, top: 2),
+              child: SizedBox(width: double.infinity, child: pathText),
+            ),
+          ],
+        );
+      },
     );
   }
 

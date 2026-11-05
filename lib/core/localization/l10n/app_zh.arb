@@ -472,7 +472,16 @@
   "websites_createdAt": "创建时间",
   "websites_sslProvider": "服务商",
   "websites_sslExpire": "到期时间",
-  "websites_sslValidity": "有效期",
+  "websites_sslValidity": "剩余有效期",
+  "websites_sslDaysCount": "{days} 天",
+  "@websites_sslDaysCount": {
+    "description": "OneDash UI string",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "websites_sslDomainsMore": "等 {count} 个",
   "websites_sslExpired": "已过期",
   "websites_sslProviderDnsAccount": "DNS 账号",

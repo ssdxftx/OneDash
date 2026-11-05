@@ -125,6 +125,48 @@ void main() {
     expect(find.text('Load earlier lines'), findsNothing);
   });
 
+  testWidgets('keeps structured access paths readable at 320dp and 1.3x', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(1.3)),
+          child: child!,
+        ),
+        home: LogPreviewPage(
+          title: 'access.log',
+          sources: [
+            LogSourceOption(
+              label: 'main',
+              load: () async => [
+                '1.2.3.4 - - [05/Nov/2026:09:12:03 +0800] '
+                    '"GET /api/v1/very/long/endpoint HTTP/1.1" 200 123 '
+                    '"-" "UA" 0.012',
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Structured'));
+    await tester.pump();
+
+    final path = find.text('/api/v1/very/long/endpoint');
+    expect(path, findsOneWidget);
+    expect(tester.getSize(path).width, greaterThanOrEqualTo(96));
+  });
+
   testWidgets('follow polling appends newly loaded lines', (tester) async {
     final lines = ['first line'];
     await tester.pumpWidget(

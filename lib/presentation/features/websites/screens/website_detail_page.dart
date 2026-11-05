@@ -727,12 +727,12 @@ class _SslTab extends StatelessWidget {
   }
   if (days <= 30) {
     return (
-      label: l10n.websites_expire_days(days),
+      label: l10n.websites_sslDaysCount(days),
       color: context.appColors.warning,
     );
   }
   return (
-    label: l10n.websites_expire_days(days),
+    label: l10n.websites_sslDaysCount(days),
     color: context.scheme.onSurfaceVariant,
   );
 }

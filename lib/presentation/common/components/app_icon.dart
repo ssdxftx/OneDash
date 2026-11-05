@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -70,11 +71,18 @@ class AppIcon extends StatelessWidget {
     final key = cacheKey ?? name;
     final existing = _remote[key];
     if (existing != null) return existing;
-    final future = iconLoader!()
-        .then<Uint8List?>((bytes) => bytes.isEmpty ? null : bytes)
-        .catchError((Object _) => null);
+    final completer = Completer<Uint8List?>();
+    final future = completer.future;
     if (_remote.length >= _decodeCacheLimit) _remote.clear();
     _remote[key] = future;
+    Future<Uint8List>.sync(iconLoader!)
+        .then((bytes) {
+          completer.complete(bytes.isEmpty ? null : bytes);
+        })
+        .catchError((Object _) {
+          if (identical(_remote[key], future)) _remote.remove(key);
+          completer.complete(null);
+        });
     return future;
   }
 

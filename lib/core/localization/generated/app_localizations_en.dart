@@ -1537,7 +1537,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_sslExpire => 'Expires';
 
   @override
-  String get websites_sslValidity => 'Validity';
+  String get websites_sslValidity => 'Remaining validity';
+
+  @override
+  String websites_sslDaysCount(int days) {
+    return '$days days';
+  }
 
   @override
   String websites_sslDomainsMore(int count) {

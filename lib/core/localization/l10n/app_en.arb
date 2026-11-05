@@ -2078,8 +2078,17 @@
   "websites_createdAt": "Created",
   "websites_sslProvider": "Provider",
   "websites_sslExpire": "Expires",
-  "websites_sslValidity": "Validity",
+  "websites_sslValidity": "Remaining validity",
   "@websites_sslValidity": {},
+  "websites_sslDaysCount": "{days} days",
+  "@websites_sslDaysCount": {
+    "description": "OneDash UI string",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "websites_sslDomainsMore": "and {count} more",
   "@websites_sslDomainsMore": {
     "placeholders": {
