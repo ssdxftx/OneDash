@@ -31,6 +31,7 @@ import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../containers/widgets/container_log_page.dart';
 import '../widgets/installed_app_actions.dart';
 import '../providers/app_store_provider.dart';
+import 'app_detail_page.dart';
 
 Future<bool> _isIgnored(WidgetRef ref, int installId) async {
   try {
@@ -308,8 +309,10 @@ class _CatalogTab extends ConsumerWidget {
               child: _AppRow(
                 app: app,
                 cacheKey: '$serverId:${app.key}',
-                onTap: () => context.push(
-                  '/s/$serverId/more/apps/${Uri.encodeComponent(app.key)}',
+                onTap: () => showAppDetailSheet(
+                  context,
+                  serverId: serverId,
+                  appId: app.key,
                 ),
               ),
             );

@@ -13,7 +13,9 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/search_field.dart';
+import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
+import '../../../../core/utils/format_utils.dart';
 import '../log_parser.dart';
 
 const double _logNumberWidth = 44;
@@ -46,7 +48,7 @@ class LogSourceOption {
   final String Function(int count)? exportNote;
 }
 
-enum LogDisplayMode { raw, structured }
+enum LogDisplayMode { cards, raw, structured }
 
 /// Fullscreen in-app log preview shared by every module.
 ///
@@ -61,6 +63,7 @@ class LogPreviewPage extends StatefulWidget {
     this.subtitle,
     this.pageSize = 500,
     this.followInterval = const Duration(seconds: 5),
+    this.embedded = false,
   });
 
   final String title;
@@ -68,6 +71,9 @@ class LogPreviewPage extends StatefulWidget {
   final List<LogSourceOption> sources;
   final int pageSize;
   final Duration followInterval;
+
+  /// When true the page renders without a Scaffold, for use inside a sheet.
+  final bool embedded;
 
   @override
   State<LogPreviewPage> createState() => _LogPreviewPageState();
@@ -85,6 +91,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   Timer? _timer;
   int _sourceIndex = 0;
   LogDisplayMode _mode = LogDisplayMode.raw;
+  bool _modePinned = false;
   int _window = 500;
   int _page = 1;
   bool _end = true;
@@ -97,6 +104,8 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   List<String>? _filteredCache;
 
   LogSourceOption get _source => widget.sources[_sourceIndex];
+
+  bool get _hasAccess => _lines.any((line) => parseLogLine(line).isAccess);
 
   @override
   void initState() {
@@ -165,6 +174,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       if (!mounted) return;
       final unchanged = listEquals(_lines, lines);
       if (silent && unchanged && _error == null) return;
+      final hasAccess = lines.any((line) => parseLogLine(line).isAccess);
       setState(() {
         _lines = lines;
         _loading = false;
@@ -172,6 +182,9 @@ class _LogPreviewPageState extends State<LogPreviewPage>
         _page = 1;
         _end = end;
         _window = widget.pageSize;
+        if (!_modePinned) {
+          _mode = hasAccess ? LogDisplayMode.cards : LogDisplayMode.raw;
+        }
       });
       if (silent && _follow && _atBottom) _scrollToBottom();
     } catch (error) {
@@ -254,6 +267,8 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       _page = 1;
       _end = true;
       _lines = const [];
+      _modePinned = false;
+      _mode = LogDisplayMode.raw;
     });
     _load();
   }
@@ -305,6 +320,198 @@ class _LogPreviewPageState extends State<LogPreviewPage>
     final start = filtered.length > _window ? filtered.length - _window : 0;
     final visible = filtered.sublist(start);
 
+    final content = Column(
+      children: [
+        if (widget.embedded)
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              context.pagePadding,
+              AppTokens.s4,
+              0,
+              AppTokens.s4,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(widget.title, style: AppTextStyles.titleM),
+                      if (widget.subtitle != null &&
+                          widget.subtitle!.trim().isNotEmpty)
+                        Text(
+                          widget.subtitle!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.bodyS.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  tooltip: l10n.action_refresh,
+                  onPressed: _load,
+                  icon: const Icon(TablerIcons.refresh),
+                ),
+                IconButton(
+                  tooltip: l10n.log_export,
+                  onPressed: _lines.isEmpty ? null : _export,
+                  icon: const Icon(TablerIcons.download),
+                ),
+                IconButton(
+                  tooltip: l10n.action_close,
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(TablerIcons.x),
+                ),
+              ],
+            ),
+          ),
+        if (widget.sources.length > 1)
+          AppFilterChips<int>(
+            options: List<int>.generate(widget.sources.length, (i) => i),
+            labelOf: (index) => widget.sources[index].label,
+            selected: {_sourceIndex},
+            onChanged: (selection) {
+              if (selection.isEmpty) return;
+              _selectSource(selection.first);
+            },
+          ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: context.pagePadding),
+          child: SearchField(
+            controller: _searchController,
+            hint: l10n.logs_searchHint,
+            onChanged: (value) => setState(() {
+              _query = value;
+              _window = widget.pageSize;
+            }),
+          ),
+        ),
+        const SizedBox(height: AppTokens.s8),
+        AppFilterChips<LogDisplayMode>(
+          options: [
+            if (_hasAccess) LogDisplayMode.cards,
+            LogDisplayMode.raw,
+            LogDisplayMode.structured,
+          ],
+          labelOf: (mode) => switch (mode) {
+            LogDisplayMode.cards => l10n.logs_cards,
+            LogDisplayMode.raw => l10n.logs_raw,
+            LogDisplayMode.structured => l10n.logs_structured,
+          },
+          selected: {_mode},
+          onChanged: (selection) {
+            if (selection.isEmpty) return;
+            setState(() {
+              _modePinned = true;
+              _mode = selection.first;
+            });
+          },
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: context.pagePadding),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.logs_lineCount(filtered.length),
+                  style: AppTextStyles.caption.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              FilterChip(
+                selected: _follow,
+                showCheckmark: false,
+                labelStyle: AppTextStyles.label.copyWith(
+                  color: scheme.onSurface,
+                ),
+                label: Text(_follow ? l10n.logs_stopFollow : l10n.logs_follow),
+                onSelected: (_) => _toggleFollow(),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppTokens.s8),
+        if (_showEarlier(start))
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppTokens.s16,
+              0,
+              AppTokens.s16,
+              AppTokens.s8,
+            ),
+            child: _loadingEarlier
+                ? const SizedBox.square(
+                    dimension: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: _loadEarlier,
+                      icon: const Icon(TablerIcons.chevron_up, size: 18),
+                      label: Text(l10n.logs_loadEarlier),
+                    ),
+                  ),
+          )
+        else if (_source.loadPage != null && _end && _lines.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppTokens.s16,
+              0,
+              AppTokens.s16,
+              AppTokens.s8,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                l10n.logs_startOfFile,
+                style: AppTextStyles.caption.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ),
+        Expanded(
+          child: _mode == LogDisplayMode.cards
+              ? _buildBody(l10n, visible, start)
+              : Container(
+                  margin: EdgeInsets.symmetric(horizontal: context.pagePadding),
+                  decoration: BoxDecoration(
+                    color: AppTokens.consoleBackground,
+                    borderRadius: BorderRadius.circular(AppTokens.rMd),
+                    border: Border.all(color: scheme.outlineVariant),
+                  ),
+                  child: _buildBody(l10n, visible, start),
+                ),
+        ),
+        SafeArea(
+          top: false,
+          child: _follow
+              ? Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.pagePadding,
+                    vertical: AppTokens.s8,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      l10n.logs_following,
+                      style: AppTextStyles.caption.copyWith(
+                        color: context.appColors.success,
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
+    );
+
+    if (widget.embedded) return content;
     return Scaffold(
       appBar: AppBarLarge(
         title: widget.title,
@@ -322,141 +529,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
           ),
         ],
       ),
-      body: Column(
-        children: [
-          if (widget.sources.length > 1)
-            AppFilterChips<int>(
-              options: List<int>.generate(widget.sources.length, (i) => i),
-              labelOf: (index) => widget.sources[index].label,
-              selected: {_sourceIndex},
-              onChanged: (selection) {
-                if (selection.isEmpty) return;
-                _selectSource(selection.first);
-              },
-            ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: context.pagePadding),
-            child: SearchField(
-              controller: _searchController,
-              hint: l10n.logs_searchHint,
-              onChanged: (value) => setState(() {
-                _query = value;
-                _window = widget.pageSize;
-              }),
-            ),
-          ),
-          const SizedBox(height: AppTokens.s8),
-          AppFilterChips<LogDisplayMode>(
-            options: const [LogDisplayMode.raw, LogDisplayMode.structured],
-            labelOf: (mode) => mode == LogDisplayMode.raw
-                ? l10n.logs_raw
-                : l10n.logs_structured,
-            selected: {_mode},
-            onChanged: (selection) {
-              if (selection.isEmpty) return;
-              setState(() => _mode = selection.first);
-            },
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: context.pagePadding),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.logs_lineCount(filtered.length),
-                    style: AppTextStyles.caption.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-                FilterChip(
-                  selected: _follow,
-                  showCheckmark: false,
-                  labelStyle: AppTextStyles.label.copyWith(
-                    color: scheme.onSurface,
-                  ),
-                  label: Text(
-                    _follow ? l10n.logs_stopFollow : l10n.logs_follow,
-                  ),
-                  onSelected: (_) => _toggleFollow(),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppTokens.s8),
-          if (_showEarlier(start))
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppTokens.s16,
-                0,
-                AppTokens.s16,
-                AppTokens.s8,
-              ),
-              child: _loadingEarlier
-                  ? const SizedBox.square(
-                      dimension: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton.icon(
-                        onPressed: _loadEarlier,
-                        icon: const Icon(TablerIcons.chevron_up, size: 18),
-                        label: Text(l10n.logs_loadEarlier),
-                      ),
-                    ),
-            )
-          else if (_source.loadPage != null && _end && _lines.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppTokens.s16,
-                0,
-                AppTokens.s16,
-                AppTokens.s8,
-              ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  l10n.logs_startOfFile,
-                  style: AppTextStyles.caption.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ),
-          Expanded(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: context.pagePadding),
-              decoration: BoxDecoration(
-                color: AppTokens.consoleBackground,
-                borderRadius: BorderRadius.circular(AppTokens.rMd),
-                border: Border.all(color: scheme.outlineVariant),
-              ),
-              child: _buildBody(l10n, visible, start),
-            ),
-          ),
-          SafeArea(
-            top: false,
-            child: _follow
-                ? Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.pagePadding,
-                      vertical: AppTokens.s8,
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        l10n.logs_following,
-                        style: AppTextStyles.caption.copyWith(
-                          color: context.appColors.success,
-                        ),
-                      ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-          ),
-        ],
-      ),
+      body: content,
     );
   }
 
@@ -480,7 +553,9 @@ class _LogPreviewPageState extends State<LogPreviewPage>
                 describeError(_error!, l10n),
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodyS.copyWith(
-                  color: AppTokens.consoleForeground,
+                  color: _mode == LogDisplayMode.cards
+                      ? context.scheme.onSurfaceVariant
+                      : AppTokens.consoleForeground,
                 ),
               ),
               const SizedBox(height: AppTokens.s12),
@@ -498,6 +573,29 @@ class _LogPreviewPageState extends State<LogPreviewPage>
         ),
       );
     }
+    if (_mode == LogDisplayMode.cards) {
+      return Scrollbar(
+        controller: _scrollController,
+        child: ListView.separated(
+          controller: _scrollController,
+          padding: EdgeInsets.fromLTRB(
+            context.pagePadding,
+            AppTokens.s8,
+            context.pagePadding,
+            AppTokens.s16,
+          ),
+          itemCount: visible.length,
+          separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
+          itemBuilder: (context, index) {
+            final raw = visible[index];
+            final parsed = parseLogLine(raw);
+            return parsed.isAccess
+                ? _AccessLogCard(parsed: parsed)
+                : _PlainLogCard(raw: raw);
+          },
+        ),
+      );
+    }
     return Scrollbar(
       controller: _scrollController,
       child: ListView.builder(
@@ -511,6 +609,158 @@ class _LogPreviewPageState extends State<LogPreviewPage>
               ? _StructuredLine(number: number, raw: raw)
               : _RawLine(number: number, raw: raw);
         },
+      ),
+    );
+  }
+}
+
+DateTime? _parseAccessTime(String? raw) {
+  if (raw == null) return null;
+  final match = RegExp(
+    r'^(\d{2})/([A-Za-z]{3})/(\d{4}):(\d{2}):(\d{2}):(\d{2})(?:\s+([+-]\d{4}))?$',
+  ).firstMatch(raw.trim());
+  if (match == null) return null;
+  const months = {
+    'jan': 1,
+    'feb': 2,
+    'mar': 3,
+    'apr': 4,
+    'may': 5,
+    'jun': 6,
+    'jul': 7,
+    'aug': 8,
+    'sep': 9,
+    'oct': 10,
+    'nov': 11,
+    'dec': 12,
+  };
+  final month = months[(match.group(2) ?? '').toLowerCase()];
+  if (month == null) return null;
+  final utc = DateTime.utc(
+    int.parse(match.group(3)!),
+    month,
+    int.parse(match.group(1)!),
+    int.parse(match.group(4)!),
+    int.parse(match.group(5)!),
+    int.parse(match.group(6)!),
+  );
+  final offset = match.group(7);
+  if (offset == null) return utc.toLocal();
+  final sign = offset.startsWith('-') ? -1 : 1;
+  final hours = int.parse(offset.substring(1, 3));
+  final minutes = int.parse(offset.substring(3, 5));
+  return utc
+      .subtract(Duration(hours: sign * hours, minutes: sign * minutes))
+      .toLocal();
+}
+
+class _AccessLogCard extends StatelessWidget {
+  const _AccessLogCard({required this.parsed});
+
+  final ParsedLogLine parsed;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = context.scheme;
+    final colors = context.appColors;
+    final status = parsed.status;
+    final statusColor = status == null
+        ? scheme.onSurfaceVariant
+        : status >= 500
+        ? colors.danger
+        : status >= 400
+        ? colors.warning
+        : colors.success;
+    final time = _parseAccessTime(parsed.time);
+    return TonalCard(
+      padding: const EdgeInsets.all(AppTokens.s12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: statusColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: AppTokens.s8),
+              Text(
+                status?.toString() ?? '-',
+                style: AppTextStyles.bodyS.copyWith(
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.w600,
+                  color: statusColor,
+                ),
+              ),
+              const SizedBox(width: AppTokens.s8),
+              Text(
+                parsed.method ?? '-',
+                style: AppTextStyles.caption.copyWith(
+                  fontFamily: 'monospace',
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: AppTokens.s8),
+              Expanded(
+                child: Text(
+                  parsed.ip ?? l10n.format_relativeUnknown,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bodyS.copyWith(
+                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppTokens.s8),
+              Flexible(
+                child: Text(
+                  formatRelativeTime(time, l10n),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: AppTextStyles.caption.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTokens.s8),
+          Text(
+            parsed.path ?? parsed.message,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodyS.copyWith(
+              fontFamily: 'monospace',
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PlainLogCard extends StatelessWidget {
+  const _PlainLogCard({required this.raw});
+
+  final String raw;
+
+  @override
+  Widget build(BuildContext context) {
+    return TonalCard(
+      padding: const EdgeInsets.all(AppTokens.s12),
+      child: Text(
+        raw,
+        maxLines: 4,
+        overflow: TextOverflow.ellipsis,
+        style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
       ),
     );
   }

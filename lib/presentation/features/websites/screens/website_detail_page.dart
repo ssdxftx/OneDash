@@ -1168,7 +1168,18 @@ class _Row extends StatelessWidget {
   }
 }
 
-/// Fullscreen host for one website tab, used by the action menu and deep links.
+String _websiteTabTitle(int tab, AppLocalizations l10n) {
+  return switch (tab) {
+    0 => l10n.websites_basicConfig,
+    1 => l10n.websites_domains,
+    3 => l10n.websites_proxySettings,
+    4 => l10n.websites_loadBalance,
+    5 => l10n.websites_logs,
+    _ => l10n.websites_title,
+  };
+}
+
+/// Fullscreen host for one website tab, used by deep links.
 class WebsiteTabPage extends ConsumerWidget {
   const WebsiteTabPage({
     super.key,
@@ -1181,17 +1192,6 @@ class WebsiteTabPage extends ConsumerWidget {
   final int websiteId;
   final int tab;
 
-  String _title(AppLocalizations l10n) {
-    return switch (tab) {
-      0 => l10n.websites_basicConfig,
-      1 => l10n.websites_domains,
-      3 => l10n.websites_proxySettings,
-      4 => l10n.websites_loadBalance,
-      5 => l10n.websites_logs,
-      _ => l10n.websites_title,
-    };
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -1199,23 +1199,131 @@ class WebsiteTabPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBarLarge(
         title: detail.valueOrNull?.website.primaryDomain ?? l10n.websites_title,
-        subtitle: _title(l10n),
+        subtitle: _websiteTabTitle(tab, l10n),
       ),
-      body: detail.when(
-        loading: () => const SkeletonList(itemCount: 6),
-        error: (error, stack) => ErrorState(
-          data: mapError(error, l10n),
-          onRetry: () => ref.invalidate(websiteDetailProvider(websiteId)),
-        ),
-        data: (data) => switch (tab) {
-          0 => _ConfigTab(detail: data),
-          1 => _DomainsTab(detail: data),
-          3 => _ProxyTab(detail: data),
-          4 => WebsiteLoadBalanceTab(websiteId: data.website.id),
-          5 => _LogsTab(serverId: serverId, detail: data),
-          _ => _ConfigTab(detail: data),
-        },
+      body: _WebsiteTabBody(serverId: serverId, websiteId: websiteId, tab: tab),
+    );
+  }
+}
+
+/// Opens one website tab as a sheet above the current action sheet.
+Future<void> showWebsiteTabSheet(
+  BuildContext context, {
+  required int serverId,
+  required int websiteId,
+  required int tab,
+}) {
+  final l10n = AppLocalizations.of(context);
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.92,
+    builder: (sheetContext) => _WebsiteTabSheet(
+      serverId: serverId,
+      websiteId: websiteId,
+      tab: tab,
+      title: _websiteTabTitle(tab, l10n),
+    ),
+  );
+}
+
+class _WebsiteTabSheet extends ConsumerWidget {
+  const _WebsiteTabSheet({
+    required this.serverId,
+    required this.websiteId,
+    required this.tab,
+    required this.title,
+  });
+
+  final int serverId;
+  final int websiteId;
+  final int tab;
+  final String title;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final domain = ref
+        .watch(websiteDetailProvider(websiteId))
+        .valueOrNull
+        ?.website
+        .primaryDomain;
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.76,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      domain ?? l10n.websites_title,
+                      style: AppTextStyles.titleM,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppTokens.s4),
+                    Text(
+                      title,
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: context.scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                tooltip: l10n.action_close,
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(TablerIcons.x),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTokens.s8),
+          Expanded(
+            child: _WebsiteTabBody(
+              serverId: serverId,
+              websiteId: websiteId,
+              tab: tab,
+            ),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _WebsiteTabBody extends ConsumerWidget {
+  const _WebsiteTabBody({
+    required this.serverId,
+    required this.websiteId,
+    required this.tab,
+  });
+
+  final int serverId;
+  final int websiteId;
+  final int tab;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final detail = ref.watch(websiteDetailProvider(websiteId));
+    return detail.when(
+      loading: () => const SkeletonList(itemCount: 6),
+      error: (error, stack) => ErrorState(
+        data: mapError(error, l10n),
+        onRetry: () => ref.invalidate(websiteDetailProvider(websiteId)),
+      ),
+      data: (data) => switch (tab) {
+        0 => _ConfigTab(detail: data),
+        1 => _DomainsTab(detail: data),
+        3 => _ProxyTab(detail: data),
+        4 => WebsiteLoadBalanceTab(websiteId: data.website.id),
+        5 => _LogsTab(serverId: serverId, detail: data),
+        _ => _ConfigTab(detail: data),
+      },
     );
   }
 }

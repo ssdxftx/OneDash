@@ -5375,4 +5375,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_sslStatusError => 'Error';
+
+  @override
+  String get app_detail_arch => 'Architecture';
+
+  @override
+  String get app_detail_gpu => 'GPU support';
+
+  @override
+  String get app_detail_latestVersion => 'Latest version';
+
+  @override
+  String get app_detail_website => 'Website';
+
+  @override
+  String get app_detail_github => 'GitHub';
+
+  @override
+  String get app_detail_docs => 'Docs';
+
+  @override
+  String get app_detail_intro => 'About this app';
+
+  @override
+  String get logs_cards => 'Cards';
+
+  @override
+  String get containers_overview_resources => 'Resources';
+
+  @override
+  String get containers_overview_disk => 'Disk usage';
+
+  @override
+  String containers_overview_reclaimable(String size) {
+    return 'Reclaimable $size';
+  }
+
+  @override
+  String containers_overview_runningCount(int count) {
+    return 'Running $count';
+  }
 }

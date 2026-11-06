@@ -5251,4 +5251,44 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_sslStatusError => '异常';
+
+  @override
+  String get app_detail_arch => '架构';
+
+  @override
+  String get app_detail_gpu => '显卡支持';
+
+  @override
+  String get app_detail_latestVersion => '最新版本';
+
+  @override
+  String get app_detail_website => '官网';
+
+  @override
+  String get app_detail_github => 'GitHub';
+
+  @override
+  String get app_detail_docs => '文档';
+
+  @override
+  String get app_detail_intro => '应用介绍';
+
+  @override
+  String get logs_cards => '卡片';
+
+  @override
+  String get containers_overview_resources => '资源';
+
+  @override
+  String get containers_overview_disk => '磁盘占用';
+
+  @override
+  String containers_overview_reclaimable(String size) {
+    return '可释放 $size';
+  }
+
+  @override
+  String containers_overview_runningCount(int count) {
+    return '运行 $count';
+  }
 }

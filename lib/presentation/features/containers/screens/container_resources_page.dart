@@ -8,7 +8,6 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/container/image_dtos.dart';
 import '../../../../data/dto/container/network_dtos.dart';
-import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
@@ -25,36 +24,19 @@ import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
-
-final _imagesProvider = FutureProvider.autoDispose<List<DockerImageInfo>>((
-  ref,
-) async {
-  final repository = await ref.watch(containerRepositoryProvider.future);
-  final page = await repository.searchImages(
-    const PageImageReq(page: 1, pageSize: 100),
-  );
-  return page.items;
-}, name: 'containerImagesProvider');
-
-final _reposProvider = FutureProvider.autoDispose<List<ImageRepoDto>>((
-  ref,
-) async {
-  final repository = await ref.watch(containerRepositoryProvider.future);
-  return repository.listImageRepos();
-}, name: 'containerImageReposProvider');
-
-final _networksProvider = FutureProvider.autoDispose<List<NetworkDto>>((
-  ref,
-) async {
-  final repository = await ref.watch(containerRepositoryProvider.future);
-  final page = await repository.searchNetworks(pageSize: 100);
-  return page.items;
-}, name: 'containerNetworksProvider');
+import '../providers/container_resources_provider.dart';
 
 class ContainerResourcesPage extends ConsumerStatefulWidget {
-  const ContainerResourcesPage({super.key, required this.serverId});
+  const ContainerResourcesPage({
+    super.key,
+    required this.serverId,
+    this.initialTab = 0,
+    this.singleTab = false,
+  });
 
   final int serverId;
+  final int initialTab;
+  final bool singleTab;
 
   @override
   ConsumerState<ContainerResourcesPage> createState() =>
@@ -63,22 +45,31 @@ class ContainerResourcesPage extends ConsumerStatefulWidget {
 
 class _ContainerResourcesPageState
     extends ConsumerState<ContainerResourcesPage> {
-  int _tab = 0;
+  late int _tab = widget.initialTab;
+
+  String _title(AppLocalizations l10n) {
+    if (!widget.singleTab) return l10n.containers_resources;
+    return switch (_tab) {
+      1 => l10n.nav_network,
+      2 => l10n.containers_imageRepos,
+      _ => l10n.containers_images,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBarLarge(
-        title: l10n.containers_resources,
+        title: _title(l10n),
         actions: [
           AppIconButton(
             icon: TablerIcons.refresh,
             tooltip: l10n.action_refresh,
             onPressed: () {
-              ref.invalidate(_imagesProvider);
-              ref.invalidate(_networksProvider);
-              ref.invalidate(_reposProvider);
+              ref.invalidate(containerImagesProvider);
+              ref.invalidate(containerNetworksProvider);
+              ref.invalidate(containerReposProvider);
             },
           ),
           AppIconButton(
@@ -96,15 +87,21 @@ class _ContainerResourcesPageState
           ),
         ],
       ),
-      body: SegmentedTabsView(
-        labels: [
-          l10n.containers_images,
-          l10n.nav_network,
-          l10n.containers_imageRepos,
-        ],
-        onChanged: (value) => setState(() => _tab = value),
-        children: const [_ImagesTab(), _NetworksTab(), _ReposTab()],
-      ),
+      body: widget.singleTab
+          ? switch (_tab) {
+              1 => const _NetworksTab(),
+              2 => const _ReposTab(),
+              _ => const _ImagesTab(),
+            }
+          : SegmentedTabsView(
+              labels: [
+                l10n.containers_images,
+                l10n.nav_network,
+                l10n.containers_imageRepos,
+              ],
+              onChanged: (value) => setState(() => _tab = value),
+              children: const [_ImagesTab(), _NetworksTab(), _ReposTab()],
+            ),
     );
   }
 
@@ -135,7 +132,7 @@ class _ContainerResourcesPageState
     );
     if (!success || !mounted) return;
     AppToast.success(context, l10n.action_done);
-    ref.invalidate(_imagesProvider);
+    ref.invalidate(containerImagesProvider);
   }
 
   Future<void> _createRepo() async {
@@ -155,7 +152,7 @@ class _ContainerResourcesPageState
         username: '${request['username'] ?? ''}',
         password: '${request['password'] ?? ''}',
       );
-      ref.invalidate(_reposProvider);
+      ref.invalidate(containerReposProvider);
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
     } catch (error) {
@@ -176,7 +173,7 @@ class _ContainerResourcesPageState
       await repository.createNetwork(request);
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
-      ref.invalidate(_networksProvider);
+      ref.invalidate(containerNetworksProvider);
     } catch (error) {
       if (!mounted) return;
       showErrorToast(context, error);
@@ -242,7 +239,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
       _selected.clear();
     });
     AppToast.success(context, l10n.action_done);
-    ref.invalidate(_imagesProvider);
+    ref.invalidate(containerImagesProvider);
   }
 
   Future<void> _showActions(
@@ -426,7 +423,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
       await repository.tagImage(ImageTagReq(sourceID: image.id, tags: [tag]));
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);
-      ref.invalidate(_imagesProvider);
+      ref.invalidate(containerImagesProvider);
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);
@@ -468,7 +465,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
     );
     if (!success || !context.mounted) return;
     AppToast.success(context, l10n.action_done);
-    ref.invalidate(_imagesProvider);
+    ref.invalidate(containerImagesProvider);
   }
 
   Future<void> _imageOperation(
@@ -588,7 +585,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
     );
     if (!success || !context.mounted) return;
     AppToast.success(context, l10n.action_done);
-    ref.invalidate(_imagesProvider);
+    ref.invalidate(containerImagesProvider);
   }
 
   String _operationLabel(String operation, AppLocalizations l10n) {
@@ -603,7 +600,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final images = ref.watch(_imagesProvider);
+    final images = ref.watch(containerImagesProvider);
     return Column(
       children: [
         if (_selectionMode)
@@ -647,7 +644,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
         Expanded(
           child: AsyncStateView(
             value: images,
-            onRetry: () => ref.invalidate(_imagesProvider),
+            onRetry: () => ref.invalidate(containerImagesProvider),
             loading: const SkeletonList(itemCount: 6),
             isEmpty: (items) => items.isEmpty,
             empty: EmptyState(
@@ -773,7 +770,7 @@ class _NetworksTabState extends ConsumerState<_NetworksTab> {
         _selected.clear();
       });
       AppToast.success(context, l10n.action_done);
-      ref.invalidate(_networksProvider);
+      ref.invalidate(containerNetworksProvider);
     } catch (error) {
       if (!mounted) return;
       showErrorToast(context, error);
@@ -799,7 +796,7 @@ class _NetworksTabState extends ConsumerState<_NetworksTab> {
       await repository.deleteNetworks([network.name]);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);
-      ref.invalidate(_networksProvider);
+      ref.invalidate(containerNetworksProvider);
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);
@@ -809,7 +806,7 @@ class _NetworksTabState extends ConsumerState<_NetworksTab> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final networks = ref.watch(_networksProvider);
+    final networks = ref.watch(containerNetworksProvider);
     return Column(
       children: [
         if (_selectionMode)
@@ -855,7 +852,7 @@ class _NetworksTabState extends ConsumerState<_NetworksTab> {
         Expanded(
           child: AsyncStateView(
             value: networks,
-            onRetry: () => ref.invalidate(_networksProvider),
+            onRetry: () => ref.invalidate(containerNetworksProvider),
             loading: const SkeletonList(itemCount: 5),
             isEmpty: (items) => items.isEmpty,
             empty: EmptyState(
@@ -983,7 +980,7 @@ class _ReposTab extends ConsumerWidget {
           password: '${request['password'] ?? ''}',
         );
       }
-      ref.invalidate(_reposProvider);
+      ref.invalidate(containerReposProvider);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);
     } catch (error) {
@@ -1000,7 +997,7 @@ class _ReposTab extends ConsumerWidget {
     try {
       final repository = await ref.read(containerRepositoryProvider.future);
       await repository.syncImageRepo(repo.id);
-      ref.invalidate(_reposProvider);
+      ref.invalidate(containerReposProvider);
       if (!context.mounted) return;
       AppToast.success(context, AppLocalizations.of(context).action_done);
     } catch (error) {
@@ -1025,7 +1022,7 @@ class _ReposTab extends ConsumerWidget {
     try {
       final repository = await ref.read(containerRepositoryProvider.future);
       await repository.deleteImageRepo(repo.id);
-      ref.invalidate(_reposProvider);
+      ref.invalidate(containerReposProvider);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);
     } catch (error) {
@@ -1037,7 +1034,7 @@ class _ReposTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final repos = ref.watch(_reposProvider);
+    final repos = ref.watch(containerReposProvider);
     return Column(
       children: [
         Padding(
@@ -1059,7 +1056,7 @@ class _ReposTab extends ConsumerWidget {
         Expanded(
           child: AsyncStateView(
             value: repos,
-            onRetry: () => ref.invalidate(_reposProvider),
+            onRetry: () => ref.invalidate(containerReposProvider),
             loading: const SkeletonList(itemCount: 4),
             isEmpty: (items) => items.isEmpty,
             empty: EmptyState(

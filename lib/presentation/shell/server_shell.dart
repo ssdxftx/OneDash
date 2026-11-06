@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -51,13 +49,11 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
     with RouteAware {
   bool _visible = true;
   double _accum = 0;
-  Timer? _showTimer;
-  PageRoute<dynamic>? _route;
+  ModalRoute<dynamic>? _route;
 
   bool _onScroll(ScrollNotification notification) {
     if (notification.metrics.axis != Axis.vertical) return false;
     if (notification is ScrollStartNotification) {
-      _showTimer?.cancel();
       _accum = 0;
     } else if (notification is ScrollUpdateNotification) {
       final delta = notification.scrollDelta ?? 0;
@@ -71,9 +67,6 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
       if (notification.metrics.pixels <= 0) _show();
     } else if (notification is OverscrollNotification) {
       _show();
-    } else if (notification is ScrollEndNotification) {
-      _showTimer?.cancel();
-      _showTimer = Timer(AppTokens.navIdleRestore, _show);
     }
     return false;
   }
@@ -87,10 +80,20 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
   }
 
   @override
+  void initState() {
+    super.initState();
+    appRouteObserver.popupDepth.addListener(_onPopupDepth);
+  }
+
+  void _onPopupDepth() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final route = ModalRoute.of(context);
-    if (route is PageRoute<dynamic> && route != _route) {
+    if (route != null && route != _route) {
       if (_route != null) appRouteObserver.unsubscribe(this);
       _route = route;
       appRouteObserver.subscribe(this, route);
@@ -113,7 +116,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
   @override
   void dispose() {
     appRouteObserver.unsubscribe(this);
-    _showTimer?.cancel();
+    appRouteObserver.popupDepth.removeListener(_onPopupDepth);
     super.dispose();
   }
 
@@ -134,7 +137,9 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = context.scheme;
-    final shown = _visible && !ref.watch(bottomNavSuppressedProvider);
+    final modalOpen = appRouteObserver.popupDepth.value > 0;
+    final shown =
+        _visible && !modalOpen && !ref.watch(bottomNavSuppressedProvider);
     final hideDuration = context.motion(const Duration(milliseconds: 240));
     final showDuration = context.motion(const Duration(milliseconds: 200));
     return Scaffold(
@@ -155,28 +160,29 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
               ),
             ),
           ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: IgnorePointer(
-              ignoring: !shown,
-              child: ExcludeSemantics(
-                excluding: !shown,
-                child: AnimatedSlide(
-                  offset: shown ? Offset.zero : const Offset(0, 1.2),
-                  duration: shown ? showDuration : hideDuration,
-                  curve: AppTokens.curveBase,
-                  child: AnimatedOpacity(
-                    opacity: shown ? 1 : 0,
+          if (!modalOpen)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: IgnorePointer(
+                ignoring: !shown,
+                child: ExcludeSemantics(
+                  excluding: !shown,
+                  child: AnimatedSlide(
+                    offset: shown ? Offset.zero : const Offset(0, 1.2),
                     duration: shown ? showDuration : hideDuration,
                     curve: AppTokens.curveBase,
-                    child: _floatingNav(context, l10n, scheme),
+                    child: AnimatedOpacity(
+                      opacity: shown ? 1 : 0,
+                      duration: shown ? showDuration : hideDuration,
+                      curve: AppTokens.curveBase,
+                      child: _floatingNav(context, l10n, scheme),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

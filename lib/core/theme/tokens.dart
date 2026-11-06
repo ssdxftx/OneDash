@@ -55,7 +55,6 @@ abstract final class AppTokens {
   static const Duration dEmphasis = Duration(milliseconds: 280);
   static const Duration dPage = Duration(milliseconds: 320);
   static const Duration dLoop = Duration(milliseconds: 1200);
-  static const Duration navIdleRestore = Duration(milliseconds: 1200);
   static const Duration numberRoll = Duration(milliseconds: 400);
   static const Duration ringFill = Duration(milliseconds: 600);
   static const Duration chartReveal = Duration(milliseconds: 500);

@@ -10243,6 +10243,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error'**
   String get websites_sslStatusError;
+
+  /// OneDash UI string.
+  ///
+  /// In en, this message translates to:
+  /// **'Architecture'**
+  String get app_detail_arch;
+
+  /// OneDash UI string.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU support'**
+  String get app_detail_gpu;
+
+  /// OneDash UI string.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest version'**
+  String get app_detail_latestVersion;
+
+  /// OneDash UI string.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get app_detail_website;
+
+  /// OneDash UI string.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub'**
+  String get app_detail_github;
+
+  /// OneDash UI string.
+  ///
+  /// In en, this message translates to:
+  /// **'Docs'**
+  String get app_detail_docs;
+
+  /// OneDash UI string.
+  ///
+  /// In en, this message translates to:
+  /// **'About this app'**
+  String get app_detail_intro;
+
+  /// OneDash UI string.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards'**
+  String get logs_cards;
+
+  /// OneDash UI string.
+  ///
+  /// In en, this message translates to:
+  /// **'Resources'**
+  String get containers_overview_resources;
+
+  /// OneDash UI string.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk usage'**
+  String get containers_overview_disk;
+
+  /// Reclaimable disk space.
+  ///
+  /// In en, this message translates to:
+  /// **'Reclaimable {size}'**
+  String containers_overview_reclaimable(String size);
+
+  /// Running container count.
+  ///
+  /// In en, this message translates to:
+  /// **'Running {count}'**
+  String containers_overview_runningCount(int count);
 }
 
 class _AppLocalizationsDelegate

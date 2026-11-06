@@ -96,6 +96,7 @@ Future<T?> showAppSheet<T>({
 }) {
   return showModalBottomSheet<T>(
     context: context,
+    useRootNavigator: true,
     isScrollControlled: true,
     useSafeArea: true,
     isDismissible: isDismissible,

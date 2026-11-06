@@ -1,15 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:onedash/core/localization/generated/app_localizations.dart';
 import 'package:onedash/core/theme/app_theme.dart';
+import 'package:onedash/core/router/route_observer.dart';
 import 'package:onedash/core/theme/tokens.dart';
+import 'package:onedash/presentation/common/components/bottom_sheet_surface.dart';
 import 'package:onedash/presentation/shell/server_shell.dart';
 
 GoRouter _router() {
   return GoRouter(
     initialLocation: '/a',
+    observers: [appRouteObserver],
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -64,7 +69,7 @@ Widget _app(
 }
 
 void main() {
-  testWidgets('floating nav hides on scroll up and returns after idle', (
+  testWidgets('floating nav hides on scroll up and stays hidden', (
     tester,
   ) async {
     await tester.pumpWidget(_app(_router()));
@@ -78,9 +83,9 @@ void main() {
     var slide = tester.widget<AnimatedSlide>(find.byType(AnimatedSlide));
     expect(slide.offset, isNot(Offset.zero));
 
-    await tester.pump(const Duration(milliseconds: 1300));
+    await tester.pump(const Duration(seconds: 5));
     slide = tester.widget<AnimatedSlide>(find.byType(AnimatedSlide));
-    expect(slide.offset, Offset.zero);
+    expect(slide.offset, isNot(Offset.zero));
   });
 
   testWidgets('scroll down shows the nav again', (tester) async {
@@ -103,6 +108,44 @@ void main() {
       tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).offset,
       Offset.zero,
     );
+  });
+
+  testWidgets('bottom sheets hide the nav until the last one closes', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_app(_router()));
+    await tester.pumpAndSettle();
+    expect(find.byType(NavigationBar), findsOneWidget);
+
+    BuildContext context() => tester.element(find.byType(Scaffold).first);
+
+    unawaited(
+      showAppSheet<void>(
+        context: context(),
+        builder: (_) => const Text('first'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.text('first'), findsOneWidget);
+
+    unawaited(
+      showAppSheet<void>(
+        context: context(),
+        builder: (_) => const Text('second'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('second'), findsOneWidget);
+
+    Navigator.of(context(), rootNavigator: true).pop();
+    await tester.pumpAndSettle();
+    expect(find.text('first'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+
+    Navigator.of(context(), rootNavigator: true).pop();
+    await tester.pumpAndSettle();
+    expect(find.byType(NavigationBar), findsOneWidget);
   });
 
   testWidgets('reduce motion uses zero duration', (tester) async {

@@ -18,6 +18,7 @@ import '../../presentation/features/containers/screens/container_detail_page.dar
 import '../../presentation/features/containers/screens/container_resources_page.dart';
 import '../../presentation/features/containers/screens/docker_settings_page.dart';
 import '../../presentation/features/containers/screens/containers_page.dart';
+import '../../presentation/features/containers/screens/docker_overview_page.dart';
 import '../../presentation/features/cronjobs/screens/cronjob_form_page.dart';
 import '../../presentation/features/cronjobs/screens/cronjobs_page.dart';
 import '../../presentation/features/dashboard/screens/overview_page.dart';
@@ -385,15 +386,57 @@ final appRouter = GoRouter(
                   path: 'containers',
                   pageBuilder: (context, state) => noTransitionPage(
                     state,
-                    ContainersPage(serverId: _serverId(state)),
+                    DockerOverviewPage(serverId: _serverId(state)),
                   ),
                   routes: [
+                    GoRoute(
+                      path: 'list',
+                      pageBuilder: (context, state) => slidePage(
+                        state,
+                        ContainersPage(serverId: _serverId(state)),
+                      ),
+                    ),
                     GoRoute(
                       path: 'resources',
                       parentNavigatorKey: _rootNavigatorKey,
                       pageBuilder: (context, state) => slidePage(
                         state,
                         ContainerResourcesPage(serverId: _serverId(state)),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'images',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      pageBuilder: (context, state) => slidePage(
+                        state,
+                        ContainerResourcesPage(
+                          serverId: _serverId(state),
+                          singleTab: true,
+                        ),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'networks',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      pageBuilder: (context, state) => slidePage(
+                        state,
+                        ContainerResourcesPage(
+                          serverId: _serverId(state),
+                          initialTab: 1,
+                          singleTab: true,
+                        ),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'repos',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      pageBuilder: (context, state) => slidePage(
+                        state,
+                        ContainerResourcesPage(
+                          serverId: _serverId(state),
+                          initialTab: 2,
+                          singleTab: true,
+                        ),
                       ),
                     ),
                     GoRoute(
@@ -577,7 +620,11 @@ final appRouter = GoRouter(
                       path: 'compose',
                       pageBuilder: (context, state) => slidePage(
                         state,
-                        ComposePage(serverId: _serverId(state)),
+                        ComposePage(
+                          serverId: _serverId(state),
+                          openTemplates:
+                              state.uri.queryParameters['templates'] == '1',
+                        ),
                       ),
                       routes: [
                         GoRoute(

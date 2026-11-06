@@ -7169,5 +7169,63 @@
   },
   "@websites_sslStatusError": {
     "description": "Certificate issuance or deployment failed."
+  },
+  "app_detail_arch": "Architecture",
+  "@app_detail_arch": {
+    "description": "OneDash UI string."
+  },
+  "app_detail_gpu": "GPU support",
+  "@app_detail_gpu": {
+    "description": "OneDash UI string."
+  },
+  "app_detail_latestVersion": "Latest version",
+  "@app_detail_latestVersion": {
+    "description": "OneDash UI string."
+  },
+  "app_detail_website": "Website",
+  "@app_detail_website": {
+    "description": "OneDash UI string."
+  },
+  "app_detail_github": "GitHub",
+  "@app_detail_github": {
+    "description": "OneDash UI string."
+  },
+  "app_detail_docs": "Docs",
+  "@app_detail_docs": {
+    "description": "OneDash UI string."
+  },
+  "app_detail_intro": "About this app",
+  "@app_detail_intro": {
+    "description": "OneDash UI string."
+  },
+  "logs_cards": "Cards",
+  "@logs_cards": {
+    "description": "OneDash UI string."
+  },
+  "containers_overview_resources": "Resources",
+  "@containers_overview_resources": {
+    "description": "OneDash UI string."
+  },
+  "containers_overview_disk": "Disk usage",
+  "@containers_overview_disk": {
+    "description": "OneDash UI string."
+  },
+  "containers_overview_reclaimable": "Reclaimable {size}",
+  "@containers_overview_reclaimable": {
+    "description": "Reclaimable disk space.",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "containers_overview_runningCount": "Running {count}",
+  "@containers_overview_runningCount": {
+    "description": "Running container count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

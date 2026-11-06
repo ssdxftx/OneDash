@@ -5,6 +5,7 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../data/dto/website/website_log_dto.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
 import '../../log/screens/log_preview_page.dart';
 import '../providers/websites_provider.dart';
 
@@ -78,6 +79,39 @@ Future<void> openWebsiteLogs(
         subtitle: subtitle,
         pageSize: pageSize,
         sources: ordered,
+      ),
+    ),
+  );
+}
+
+/// Opens website logs as a sheet above the website action sheet.
+Future<void> showWebsiteLogsSheet(
+  BuildContext context,
+  WidgetRef ref, {
+  required int websiteId,
+  String? subtitle,
+  WebsiteLogType initialType = WebsiteLogType.access,
+  int pageSize = 500,
+}) {
+  final l10n = AppLocalizations.of(context);
+  final sources = websiteLogSources(ref, websiteId, l10n, pageSize: pageSize);
+  final initialIndex = WebsiteLogType.values.indexOf(initialType);
+  final ordered = [
+    sources[initialIndex],
+    for (var index = 0; index < sources.length; index++)
+      if (index != initialIndex) sources[index],
+  ];
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.94,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.86,
+      child: LogPreviewPage(
+        title: l10n.websites_logs,
+        subtitle: subtitle,
+        pageSize: pageSize,
+        sources: ordered,
+        embedded: true,
       ),
     ),
   );

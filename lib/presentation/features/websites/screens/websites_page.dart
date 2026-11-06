@@ -32,6 +32,9 @@ import '../../../common/states/refreshable_empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../providers/websites_provider.dart';
+import 'website_accounts_page.dart';
+import 'website_detail_page.dart';
+import '../widgets/website_log_page.dart';
 
 class WebsitesPage extends ConsumerStatefulWidget {
   const WebsitesPage({super.key, required this.serverId});
@@ -459,23 +462,23 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                   icon: TablerIcons.info_circle,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.error_details,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/${widget.serverId}/websites/${site.id}/config',
-                    );
-                  },
+                  onTap: () => showWebsiteTabSheet(
+                    sheetContext,
+                    serverId: widget.serverId,
+                    websiteId: site.id,
+                    tab: 0,
+                  ),
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.world_www,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_domains,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/${widget.serverId}/websites/${site.id}/domains',
-                    );
-                  },
+                  onTap: () => showWebsiteTabSheet(
+                    sheetContext,
+                    serverId: widget.serverId,
+                    websiteId: site.id,
+                    tab: 1,
+                  ),
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.lock,
@@ -493,23 +496,23 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                   icon: TablerIcons.arrows_exchange,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_proxySettings,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/${widget.serverId}/websites/${site.id}/proxy',
-                    );
-                  },
+                  onTap: () => showWebsiteTabSheet(
+                    sheetContext,
+                    serverId: widget.serverId,
+                    websiteId: site.id,
+                    tab: 3,
+                  ),
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.sitemap,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_loadBalance,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/${widget.serverId}/websites/${site.id}/load-balance',
-                    );
-                  },
+                  onTap: () => showWebsiteTabSheet(
+                    sheetContext,
+                    serverId: widget.serverId,
+                    websiteId: site.id,
+                    tab: 4,
+                  ),
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.adjustments,
@@ -526,10 +529,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                   icon: TablerIcons.certificate,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_certificateAccounts,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push('/s/${widget.serverId}/websites/accounts');
-                  },
+                  onTap: () => showWebsiteAccountsSheet(sheetContext),
                 ),
               ],
             ),
@@ -542,12 +542,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_logs,
                   subtitle: l10n.websites_liveLogHint,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/${widget.serverId}/websites/${site.id}/logs',
-                    );
-                  },
+                  onTap: () => showWebsiteLogsSheet(
+                    sheetContext,
+                    ref,
+                    websiteId: site.id,
+                    subtitle: site.primaryDomain,
+                  ),
                 ),
               ],
             ),

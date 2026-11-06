@@ -81,6 +81,45 @@ class WebsiteAccountsPage extends ConsumerWidget {
   }
 }
 
+/// Opens certificate accounts as a sheet above the website action sheet.
+Future<void> showWebsiteAccountsSheet(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.92,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.76,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.websites_certificateAccounts,
+                  style: AppTextStyles.titleM,
+                ),
+              ),
+              IconButton(
+                tooltip: l10n.action_close,
+                onPressed: () => Navigator.of(sheetContext).pop(),
+                icon: const Icon(TablerIcons.x),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTokens.s8),
+          const Expanded(
+            child: SegmentedTabsView(
+              labels: ['ACME', 'DNS', 'CA'],
+              children: [_AcmeTab(), _DnsTab(), _CaTab()],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 class _AcmeTab extends ConsumerWidget {
   const _AcmeTab();
 

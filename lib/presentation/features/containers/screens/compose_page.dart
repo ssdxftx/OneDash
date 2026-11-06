@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/container/container_compose_dto.dart';
-import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../widgets/container_log_page.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
@@ -24,24 +23,39 @@ import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../providers/container_resources_provider.dart';
 
-final _composeProvider = FutureProvider.autoDispose<ContainerComposeSearchDto>((
-  ref,
-) {
-  return ref
-      .watch(containerRepositoryProvider.future)
-      .then((repository) => repository.searchCompose());
-}, name: 'composeProvider');
-
-class ComposePage extends ConsumerWidget {
-  const ComposePage({super.key, required this.serverId});
+class ComposePage extends ConsumerStatefulWidget {
+  const ComposePage({
+    super.key,
+    required this.serverId,
+    this.openTemplates = false,
+  });
 
   final int serverId;
+  final bool openTemplates;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ComposePage> createState() => _ComposePageState();
+}
+
+class _ComposePageState extends ConsumerState<ComposePage> {
+  int get serverId => widget.serverId;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.openTemplates) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showTemplates(context, ref);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final compose = ref.watch(_composeProvider);
+    final compose = ref.watch(containerComposeProvider);
     return Scaffold(
       appBar: AppBarLarge(
         title: l10n.containers_compose,
@@ -49,7 +63,7 @@ class ComposePage extends ConsumerWidget {
           AppIconButton(
             icon: TablerIcons.refresh,
             tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_composeProvider),
+            onPressed: () => ref.invalidate(containerComposeProvider),
           ),
           AppIconButton(
             icon: TablerIcons.folder,
@@ -65,7 +79,7 @@ class ComposePage extends ConsumerWidget {
       ),
       body: AsyncStateView(
         value: compose,
-        onRetry: () => ref.invalidate(_composeProvider),
+        onRetry: () => ref.invalidate(containerComposeProvider),
         loading: const SkeletonList(itemCount: 6),
         isEmpty: (data) => data.items.isEmpty,
         empty: EmptyState(
@@ -377,7 +391,7 @@ class ComposePage extends ConsumerWidget {
     );
     if (!success || !context.mounted) return;
     AppToast.success(context, l10n.action_done);
-    ref.invalidate(_composeProvider);
+    ref.invalidate(containerComposeProvider);
   }
 
   Future<void> _showLogs(

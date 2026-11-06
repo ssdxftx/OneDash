@@ -1698,5 +1698,33 @@
   "websites_sslStatusReady": "已签发",
   "websites_sslStatusApplied": "已部署",
   "websites_sslStatusPending": "处理中",
-  "websites_sslStatusError": "异常"
+  "websites_sslStatusError": "异常",
+  "app_detail_arch": "架构",
+  "app_detail_gpu": "显卡支持",
+  "app_detail_latestVersion": "最新版本",
+  "app_detail_website": "官网",
+  "app_detail_github": "GitHub",
+  "app_detail_docs": "文档",
+  "app_detail_intro": "应用介绍",
+  "logs_cards": "卡片",
+  "containers_overview_resources": "资源",
+  "containers_overview_disk": "磁盘占用",
+  "containers_overview_reclaimable": "可释放 {size}",
+  "containers_overview_runningCount": "运行 {count}",
+  "@containers_overview_reclaimable": {
+    "description": "Reclaimable disk space.",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "@containers_overview_runningCount": {
+    "description": "Running container count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
