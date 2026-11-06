@@ -104,4 +104,71 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Collecting…'), findsNothing);
   });
+
+  testWidgets('area chart morphs between same-length series', (tester) async {
+    var series = <double>[1, 2, 3];
+    late StateSetter setHost;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: Scaffold(
+          body: StatefulBuilder(
+            builder: (context, setState) {
+              setHost = setState;
+              return Center(
+                child: SizedBox(
+                  width: 300,
+                  height: 160,
+                  child: AreaChart(seriesA: series),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final before =
+        tester
+                .widget<CustomPaint>(
+                  find.descendant(
+                    of: find.byType(AreaChart),
+                    matching: find.byType(CustomPaint),
+                  ),
+                )
+                .painter
+            as dynamic;
+    final beforeSeries = List<double>.from(before.seriesA as List<double>);
+
+    setHost(() => series = [3, 2, 1]);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 150));
+    final middle =
+        tester
+                .widget<CustomPaint>(
+                  find.descendant(
+                    of: find.byType(AreaChart),
+                    matching: find.byType(CustomPaint),
+                  ),
+                )
+                .painter
+            as dynamic;
+    final middleSeries = List<double>.from(middle.seriesA as List<double>);
+    expect(middleSeries, isNot(equals(beforeSeries)));
+    expect(middleSeries, isNot(equals([3.0, 2.0, 1.0])));
+
+    await tester.pumpAndSettle();
+    final after =
+        tester
+                .widget<CustomPaint>(
+                  find.descendant(
+                    of: find.byType(AreaChart),
+                    matching: find.byType(CustomPaint),
+                  ),
+                )
+                .painter
+            as dynamic;
+    expect(after.seriesA, [3.0, 2.0, 1.0]);
+  });
 }

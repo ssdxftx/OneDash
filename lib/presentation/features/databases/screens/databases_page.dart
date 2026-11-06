@@ -15,6 +15,7 @@ import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/filter_chips.dart';
+import '../../../common/components/removable_list_item.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
@@ -102,6 +103,7 @@ class DatabasesPage extends ConsumerStatefulWidget {
 
 class _DatabasesPageState extends ConsumerState<DatabasesPage> {
   String _type = '';
+  final Set<int> _removing = {};
 
   @override
   Widget build(BuildContext context) {
@@ -164,12 +166,17 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                 itemCount: filtered.length,
                 itemBuilder: (context, index) {
                   final item = filtered[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppTokens.s12),
-                    child: _DatabaseCard(
-                      item: item,
-                      onTap: () => _showActions(item),
-                      onLongPress: () => _showActions(item),
+                  return RemovableListItem(
+                    key: ValueKey('database-${item.id}'),
+                    removing: _removing.contains(item.id),
+                    animateIn: true,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                      child: _DatabaseCard(
+                        item: item,
+                        onTap: () => _showActions(item),
+                        onLongPress: () => _showActions(item),
+                      ),
                     ),
                   );
                 },
@@ -283,7 +290,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
               children: [
                 ActionSheetRow(
                   icon: TablerIcons.info_circle,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.error_details,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -292,7 +299,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.users,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.databases_usersGrants,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -301,7 +308,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.adjustments,
-                  iconColor: colors.chart3,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.databases_advanced,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -316,7 +323,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
               children: [
                 ActionSheetRow(
                   icon: TablerIcons.copy,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.action_copy,
                   subtitle: item.name,
                   onTap: () async {
@@ -359,11 +366,21 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                         deleteBackup: false,
                       );
                       if (!mounted) return;
+                      setState(() => _removing.add(item.id));
+                      await Future<void>.delayed(
+                        context.motion(AppTokens.dBase),
+                      );
+                      if (!mounted) return;
                       AppToast.success(context, l10n.action_done);
                       ref.invalidate(_databasesProvider);
+                      await ref.read(_databasesProvider.future);
                     } catch (error) {
                       if (!mounted) return;
                       showErrorToast(context, error);
+                    } finally {
+                      if (mounted) {
+                        setState(() => _removing.remove(item.id));
+                      }
                     }
                   },
                 ),

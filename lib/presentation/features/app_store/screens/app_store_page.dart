@@ -183,7 +183,7 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
       appBar: AppBarLarge(
         title: l10n.apps_title,
         subtitle: server?.displayName,
-        onTitleLongPress: () =>
+        onTitleTap: () =>
             showServerSwitcher(context, ref, currentServerId: widget.serverId),
         actions: [
           AppIconButton(
@@ -237,8 +237,8 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppTokens.s16,
+            padding: EdgeInsets.symmetric(
+              horizontal: context.pagePadding,
               vertical: AppTokens.s8,
             ),
             child: SearchField(
@@ -373,7 +373,7 @@ class _InstalledTab extends ConsumerWidget {
               children: [
                 ActionSheetRow(
                   icon: TablerIcons.info_circle,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.error_details,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -386,7 +386,7 @@ class _InstalledTab extends ConsumerWidget {
                 if (hasContainer)
                   ActionSheetRow(
                     icon: TablerIcons.terminal_2,
-                    iconColor: colors.info,
+                    iconColor: context.scheme.onSurfaceVariant,
                     title: l10n.containers_terminal,
                     onTap: () {
                       Navigator.of(sheetContext).pop();
@@ -399,7 +399,7 @@ class _InstalledTab extends ConsumerWidget {
                 if (hasContainer)
                   ActionSheetRow(
                     icon: TablerIcons.file_text,
-                    iconColor: colors.info,
+                    iconColor: context.scheme.onSurfaceVariant,
                     title: l10n.containers_viewLogs,
                     onTap: () {
                       Navigator.of(sheetContext).pop();
@@ -439,7 +439,7 @@ class _InstalledTab extends ConsumerWidget {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.refresh,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.containers_restart,
                   enabled: running,
                   onTap: () {
@@ -475,7 +475,7 @@ class _InstalledTab extends ConsumerWidget {
                         ),
                       ActionSheetRow(
                         icon: TablerIcons.adjustments,
-                        iconColor: colors.info,
+                        iconColor: context.scheme.onSurfaceVariant,
                         title: l10n.apps_editParams,
                         subtitle: app.version,
                         onTap: () {
@@ -485,7 +485,7 @@ class _InstalledTab extends ConsumerWidget {
                       ),
                       ActionSheetRow(
                         icon: TablerIcons.plug,
-                        iconColor: colors.info,
+                        iconColor: context.scheme.onSurfaceVariant,
                         title: l10n.apps_changePort,
                         subtitle: '${app.httpPort}',
                         onTap: () {
@@ -495,7 +495,7 @@ class _InstalledTab extends ConsumerWidget {
                       ),
                       ActionSheetRow(
                         icon: TablerIcons.info_circle,
-                        iconColor: colors.info,
+                        iconColor: context.scheme.onSurfaceVariant,
                         title: l10n.apps_connInfo,
                         subtitle: app.container,
                         onTap: () {
@@ -505,7 +505,7 @@ class _InstalledTab extends ConsumerWidget {
                       ),
                       ActionSheetRow(
                         icon: TablerIcons.bell_off,
-                        iconColor: colors.info,
+                        iconColor: context.scheme.onSurfaceVariant,
                         title: ignored
                             ? l10n.apps_cancelIgnoreUpdate
                             : l10n.apps_ignoreUpdate,

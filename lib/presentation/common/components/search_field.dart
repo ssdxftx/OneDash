@@ -45,8 +45,8 @@ class _SearchFieldState extends State<SearchField> {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final hint = widget.hint ?? AppLocalizations.of(context).common_search;
-    return SizedBox(
-      height: AppTokens.minTapTarget,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: AppTokens.minTapTarget),
       child: TextField(
         controller: _controller,
         autofocus: widget.autofocus,

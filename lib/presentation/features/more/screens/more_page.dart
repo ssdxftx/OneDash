@@ -44,14 +44,14 @@ class MorePage extends ConsumerWidget {
             SliverAppBarLarge(
               title: l10n.more_title,
               subtitle: server?.displayName,
-              onTitleLongPress: () =>
+              onTitleTap: () =>
                   showServerSwitcher(context, ref, currentServerId: serverId),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(
-                AppTokens.pagePadding,
+              padding: EdgeInsets.fromLTRB(
+                context.pagePadding,
                 0,
-                AppTokens.pagePadding,
+                context.pagePadding,
                 AppTokens.s32,
               ),
               sliver: SliverToBoxAdapter(

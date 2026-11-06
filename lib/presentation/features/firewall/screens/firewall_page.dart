@@ -204,8 +204,8 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
               if (_tab == 0) ...[
                 if (_searching)
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTokens.s16,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.pagePadding,
                       vertical: AppTokens.s8,
                     ),
                     child: SearchField(

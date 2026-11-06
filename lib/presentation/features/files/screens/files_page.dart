@@ -1174,7 +1174,7 @@ class _Breadcrumb extends StatelessWidget {
       height: AppTokens.minTapTarget,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
+        padding: EdgeInsets.symmetric(horizontal: context.pagePadding),
         children: [
           InkWell(
             onTap: () => onTap('/'),

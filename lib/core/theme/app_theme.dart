@@ -37,10 +37,10 @@ abstract final class AppTheme {
     return base.copyWith(
       surface: const Color(0xFF101512),
       surfaceContainerLowest: const Color(0xFF0B0F0C),
-      surfaceContainerLow: const Color(0xFF151B17),
-      surfaceContainer: const Color(0xFF19211C),
-      surfaceContainerHigh: const Color(0xFF1F2923),
-      surfaceContainerHighest: const Color(0xFF26312A),
+      surfaceContainerLow: const Color(0xFF1A211C),
+      surfaceContainer: const Color(0xFF1D2520),
+      surfaceContainerHigh: const Color(0xFF222C27),
+      surfaceContainerHighest: const Color(0xFF29342E),
     );
   }
 
@@ -211,16 +211,6 @@ abstract final class AppTheme {
         color: scheme.outlineVariant,
         thickness: 1,
         space: 1,
-      ),
-      snackBarTheme: SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: scheme.inverseSurface,
-        contentTextStyle: AppTextStyles.bodyM.copyWith(
-          color: scheme.onInverseSurface,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTokens.rMd),
-        ),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: scheme.primary,

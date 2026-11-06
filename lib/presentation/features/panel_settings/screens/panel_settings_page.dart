@@ -137,7 +137,7 @@ class _PanelSettingsBody extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: AppTokens.s32),
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
+          padding: EdgeInsets.symmetric(horizontal: context.pagePadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

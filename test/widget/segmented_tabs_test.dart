@@ -29,4 +29,37 @@ void main() {
     expect(scrollable.position.pixels, greaterThan(0));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('非滚动页签共享指示器跟随选中项移动', (tester) async {
+    var selected = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: Scaffold(
+          body: StatefulBuilder(
+            builder: (context, setState) => SegmentedTabs(
+              labels: const ['概览', '网站', '文件'],
+              selectedIndex: selected,
+              scrollable: false,
+              onChanged: (index) => setState(() => selected = index),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final before = tester.widget<AnimatedPositioned>(
+      find.byType(AnimatedPositioned),
+    );
+    await tester.tap(find.text('文件'));
+    await tester.pumpAndSettle();
+    final after = tester.widget<AnimatedPositioned>(
+      find.byType(AnimatedPositioned),
+    );
+
+    expect(before.left, isNotNull);
+    expect(after.left, greaterThan(before.left!));
+    expect(tester.takeException(), isNull);
+  });
 }

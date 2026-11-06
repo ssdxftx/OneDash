@@ -8,11 +8,7 @@ class SectionHeader extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.trailing,
-    this.padding = const EdgeInsets.only(
-      left: AppTokens.s4,
-      right: AppTokens.s4,
-      bottom: AppTokens.s8,
-    ),
+    this.padding = const EdgeInsets.only(bottom: AppTokens.s8),
   });
 
   final String title;

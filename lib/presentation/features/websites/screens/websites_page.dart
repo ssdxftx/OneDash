@@ -14,6 +14,7 @@ import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
+import '../../../common/components/removable_list_item.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/filter_chips.dart';
@@ -46,6 +47,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
   String _selectedFilter = '';
   bool _selecting = false;
   final Set<int> _selected = {};
+  final Set<int> _removing = {};
 
   bool get _selectionMode => _selecting;
 
@@ -79,6 +81,9 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
         await repository.deleteWebsite(id);
       }
       if (!mounted) return;
+      setState(() => _removing.addAll(ids));
+      await Future<void>.delayed(context.motion(AppTokens.dBase));
+      if (!mounted) return;
       _clearSelection();
       AppToast.success(context, l10n.websites_deleted);
     } catch (error) {
@@ -86,6 +91,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
       showErrorToast(context, error);
     } finally {
       await ref.read(websitesProvider.notifier).refresh();
+      if (mounted) setState(() => _removing.removeAll(ids));
     }
   }
 
@@ -127,7 +133,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 if (server != null) server.displayName,
                 if (total != null) l10n.websites_count(total),
               ].join(' · '),
-              onTitleLongPress: () => showServerSwitcher(
+              onTitleTap: () => showServerSwitcher(
                 context,
                 ref,
                 currentServerId: widget.serverId,
@@ -208,24 +214,30 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 ),
               ],
             ),
-            if (_searching)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppTokens.s16,
-                  vertical: AppTokens.s8,
-                ),
-                child: SearchField(
-                  controller: _searchController,
-                  hint: l10n.action_search,
-                  autofocus: true,
-                  onChanged: (value) {
-                    _clearSelection();
-                    _debouncer(() {
-                      ref.read(websitesProvider.notifier).search(value);
-                    }, delay: const Duration(milliseconds: 300));
-                  },
-                ),
-              ),
+            AnimatedSize(
+              duration: context.motion(AppTokens.dBase),
+              curve: AppTokens.curveBase,
+              alignment: Alignment.topCenter,
+              child: _searching
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.pagePadding,
+                        vertical: AppTokens.s8,
+                      ),
+                      child: SearchField(
+                        controller: _searchController,
+                        hint: l10n.action_search,
+                        autofocus: true,
+                        onChanged: (value) {
+                          _clearSelection();
+                          _debouncer(() {
+                            ref.read(websitesProvider.notifier).search(value);
+                          }, delay: const Duration(milliseconds: 300));
+                        },
+                      ),
+                    )
+                  : const SizedBox(width: double.infinity),
+            ),
             AppFilterChips<String>(
               options: _filters,
               labelOf: (value) => _filterLabel(value, l10n),
@@ -242,6 +254,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
             Expanded(
               child: AsyncStateView(
                 value: websites,
+                contentKey: (_selectedFilter, _searchController.text),
                 onRetry: () => ref.read(websitesProvider.notifier).refresh(),
                 loading: const SkeletonList(itemCount: 8),
                 isEmpty: (result) => result.items.isEmpty,
@@ -269,25 +282,32 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                     },
                     child: ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(
-                        AppTokens.pagePadding,
+                      padding: EdgeInsets.fromLTRB(
+                        context.pagePadding,
                         AppTokens.s8,
-                        AppTokens.pagePadding,
+                        context.pagePadding,
                         AppTokens.s32,
                       ),
                       itemCount: result.items.length,
                       itemBuilder: (context, index) {
                         final site = result.items[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: AppTokens.s12),
-                          child: _WebsiteCard(
-                            site: site,
-                            selected: _selected.contains(site.id),
-                            selectionMode: _selectionMode,
-                            onTap: _selectionMode
-                                ? () => _toggle(site)
-                                : () => _showSiteActions(site),
-                            onLongPress: () => _toggle(site),
+                        return RemovableListItem(
+                          key: ValueKey('website-${site.id}'),
+                          removing: _removing.contains(site.id),
+                          animateIn: true,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppTokens.s12,
+                            ),
+                            child: _WebsiteCard(
+                              site: site,
+                              selected: _selected.contains(site.id),
+                              selectionMode: _selectionMode,
+                              onTap: _selectionMode
+                                  ? () => _toggle(site)
+                                  : () => _showSiteActions(site),
+                              onLongPress: () => _toggle(site),
+                            ),
                           ),
                         );
                       },
@@ -299,30 +319,35 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
           ],
         ),
       ),
-      bottomNavigationBar: _selectionMode
-          ? SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.all(AppTokens.s16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        l10n.files_selectCount(_selected.length),
-                        style: AppTextStyles.bodyM,
+      bottomNavigationBar: AnimatedSize(
+        duration: context.motion(AppTokens.dBase),
+        curve: AppTokens.curveBase,
+        alignment: Alignment.bottomCenter,
+        child: _selectionMode
+            ? SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTokens.s16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.files_selectCount(_selected.length),
+                          style: AppTextStyles.bodyM,
+                        ),
                       ),
-                    ),
-                    DangerButton(
-                      expanded: false,
-                      icon: TablerIcons.trash,
-                      label: l10n.action_delete,
-                      onPressed: _batchDelete,
-                    ),
-                  ],
+                      DangerButton(
+                        expanded: false,
+                        icon: TablerIcons.trash,
+                        label: l10n.action_delete,
+                        onPressed: _batchDelete,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            )
-          : null,
+              )
+            : const SizedBox(width: double.infinity),
+      ),
     );
   }
 
@@ -382,7 +407,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.eye,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_open,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -391,7 +416,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.copy,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_copyDomain,
                   onTap: () async {
                     await Clipboard.setData(
@@ -414,7 +439,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
               children: [
                 ActionSheetRow(
                   icon: TablerIcons.info_circle,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.error_details,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -425,7 +450,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.world_www,
-                  iconColor: colors.chart2,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_domains,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -436,7 +461,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.lock,
-                  iconColor: colors.success,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_sslCertificate,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -448,7 +473,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.arrows_exchange,
-                  iconColor: colors.chart2,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_proxySettings,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -459,7 +484,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.sitemap,
-                  iconColor: colors.chart2,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_loadBalance,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -470,7 +495,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.adjustments,
-                  iconColor: colors.chart3,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_advanced,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -481,7 +506,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.certificate,
-                  iconColor: colors.chart3,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_certificateAccounts,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -496,7 +521,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
               children: [
                 ActionSheetRow(
                   icon: TablerIcons.file_text,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_logs,
                   subtitle: l10n.websites_liveLogHint,
                   onTap: () {
@@ -586,11 +611,16 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
         deleteDB: options.deleteDB,
       );
       if (!mounted) return;
+      setState(() => _removing.add(site.id));
+      await Future<void>.delayed(context.motion(AppTokens.dBase));
+      if (!mounted) return;
       AppToast.success(context, l10n.websites_deleted);
       await ref.read(websitesProvider.notifier).refresh();
     } catch (error) {
       if (!mounted) return;
       showErrorToast(context, error);
+    } finally {
+      if (mounted) setState(() => _removing.remove(site.id));
     }
   }
 }

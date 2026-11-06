@@ -1,6 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens.dart';
+import 'edge_fade.dart';
 
 class AppFilterChips<T> extends StatefulWidget {
   const AppFilterChips({
@@ -73,8 +76,11 @@ class _AppFilterChipsState<T> extends State<AppFilterChips<T>> {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final resolvedPadding = widget.padding.resolve(Directionality.of(context));
+    final labelHeight =
+        MediaQuery.textScalerOf(context).scale(AppTextStyles.label.fontSize!) *
+        (AppTextStyles.label.height ?? 1.3);
     return SizedBox(
-      height: 48,
+      height: math.max(AppTokens.minTapTarget, labelHeight + AppTokens.s24),
       child: ShaderMask(
         blendMode: BlendMode.dstIn,
         shaderCallback: (bounds) => LinearGradient(
@@ -90,7 +96,7 @@ class _AppFilterChipsState<T> extends State<AppFilterChips<T>> {
             else
               scheme.surface,
           ],
-          stops: const [0, 0.12, 0.88, 1],
+          stops: appEdgeFadeStops(bounds.width),
         ).createShader(bounds),
         child: ListView.separated(
           controller: _controller,
@@ -120,7 +126,6 @@ class _AppFilterChipsState<T> extends State<AppFilterChips<T>> {
                       ? scheme.onPrimaryContainer
                       : scheme.onSurfaceVariant,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: AppTokens.s8),
               ),
             );
           },

@@ -17,7 +17,7 @@ import '../../../common/states/error_toast.dart';
 import '../log_parser.dart';
 
 const double _logNumberWidth = 44;
-const double _logChevronSize = 16;
+const double _logChevronSize = AppTokens.iconList;
 const double _logIndent = _logNumberWidth + AppTokens.s8;
 const double _logPathMinWidth = 150;
 
@@ -335,7 +335,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
               },
             ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
+            padding: EdgeInsets.symmetric(horizontal: context.pagePadding),
             child: SearchField(
               controller: _searchController,
               hint: l10n.logs_searchHint,
@@ -358,7 +358,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
             },
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
+            padding: EdgeInsets.symmetric(horizontal: context.pagePadding),
             child: Row(
               children: [
                 Expanded(
@@ -426,7 +426,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
             ),
           Expanded(
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
+              margin: EdgeInsets.symmetric(horizontal: context.pagePadding),
               decoration: BoxDecoration(
                 color: AppTokens.consoleBackground,
                 borderRadius: BorderRadius.circular(AppTokens.rMd),
@@ -439,8 +439,8 @@ class _LogPreviewPageState extends State<LogPreviewPage>
             top: false,
             child: _follow
                 ? Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTokens.s16,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.pagePadding,
                       vertical: AppTokens.s8,
                     ),
                     child: Align(
@@ -633,14 +633,20 @@ class _StructuredLineState extends State<_StructuredLine> {
             onTap: () => setState(() => _expanded = !_expanded),
             child: summary,
           ),
-          if (_expanded)
-            Padding(
-              padding: const EdgeInsets.only(
-                left: _logIndent,
-                top: AppTokens.s4,
-              ),
-              child: _details(context, l10n, parsed, color),
-            ),
+          AnimatedSize(
+            duration: context.motion(AppTokens.dBase),
+            curve: AppTokens.curveBase,
+            alignment: Alignment.topCenter,
+            child: _expanded
+                ? Padding(
+                    padding: const EdgeInsets.only(
+                      left: _logIndent,
+                      top: AppTokens.s4,
+                    ),
+                    child: _details(context, l10n, parsed, color),
+                  )
+                : const SizedBox(width: double.infinity),
+          ),
         ],
       ),
     );
@@ -695,10 +701,15 @@ class _StructuredLineState extends State<_StructuredLine> {
     final durationText = duration == null
         ? null
         : Text(duration, style: durationStyle);
-    final chevron = Icon(
-      _expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
-      size: _logChevronSize,
-      color: AppTokens.consoleMuted,
+    final chevron = AnimatedRotation(
+      turns: _expanded ? 0.5 : 0,
+      duration: context.motion(AppTokens.dFast),
+      curve: AppTokens.curveBase,
+      child: const Icon(
+        TablerIcons.chevron_down,
+        size: _logChevronSize,
+        color: AppTokens.consoleMuted,
+      ),
     );
     final scaler = MediaQuery.textScalerOf(context);
     double textWidth(String text, TextStyle style) {
@@ -841,10 +852,15 @@ class _StructuredLineState extends State<_StructuredLine> {
             ),
           ),
         ),
-        Icon(
-          _expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
-          size: _logChevronSize,
-          color: AppTokens.consoleMuted,
+        AnimatedRotation(
+          turns: _expanded ? 0.5 : 0,
+          duration: context.motion(AppTokens.dFast),
+          curve: AppTokens.curveBase,
+          child: const Icon(
+            TablerIcons.chevron_down,
+            size: _logChevronSize,
+            color: AppTokens.consoleMuted,
+          ),
         ),
       ],
     );

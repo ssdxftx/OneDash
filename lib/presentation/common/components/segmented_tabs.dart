@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens.dart';
+import 'edge_fade.dart';
 
 class SegmentedTabs extends StatefulWidget {
   const SegmentedTabs({
@@ -27,9 +28,11 @@ class SegmentedTabs extends StatefulWidget {
 
 class _SegmentedTabsState extends State<SegmentedTabs> {
   final ScrollController _controller = ScrollController();
+  final GlobalKey _rowKey = GlobalKey();
   late List<GlobalKey> _keys = _buildKeys();
   bool _canScrollLeft = false;
   bool _canScrollRight = false;
+  double? _indicatorLeft;
 
   List<GlobalKey> _buildKeys() =>
       List.generate(widget.labels.length, (_) => GlobalKey());
@@ -40,6 +43,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
     _controller.addListener(_updateEdges);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateEdges();
+      _updateIndicator();
       _ensureSelectedVisible();
     });
   }
@@ -50,10 +54,12 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
     if (oldWidget.labels.length != widget.labels.length) {
       _keys = _buildKeys();
     }
-    if (oldWidget.selectedIndex != widget.selectedIndex) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => _ensureSelectedVisible(),
-      );
+    if (oldWidget.selectedIndex != widget.selectedIndex ||
+        oldWidget.labels.length != widget.labels.length) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _updateIndicator();
+        _ensureSelectedVisible();
+      });
     }
   }
 
@@ -75,6 +81,19 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
       _canScrollLeft = canLeft;
       _canScrollRight = canRight;
     });
+  }
+
+  void _updateIndicator() {
+    if (!mounted || widget.labels.isEmpty) return;
+    final row = _rowKey.currentContext?.findRenderObject();
+    final index = widget.selectedIndex.clamp(0, _keys.length - 1);
+    final tab = _keys[index].currentContext?.findRenderObject();
+    if (row is! RenderBox || tab is! RenderBox || !row.hasSize) return;
+    final left =
+        tab.localToGlobal(Offset.zero, ancestor: row).dx +
+        (tab.size.width - 20) / 2;
+    if (_indicatorLeft != null && (_indicatorLeft! - left).abs() < 0.5) return;
+    setState(() => _indicatorLeft = left);
   }
 
   void _ensureSelectedVisible() {
@@ -126,17 +145,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
                       fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  AnimatedContainer(
-                    duration: context.motion(AppTokens.dBase),
-                    curve: AppTokens.curveBase,
-                    height: 3,
-                    width: selected ? 20 : 0,
-                    decoration: BoxDecoration(
-                      color: scheme.primary,
-                      borderRadius: BorderRadius.circular(AppTokens.rFull),
-                    ),
-                  ),
+                  const SizedBox(height: 9),
                 ],
               ),
             ),
@@ -145,7 +154,33 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
       );
     }
 
-    final row = Row(mainAxisSize: MainAxisSize.min, children: tabs);
+    final row = Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Row(
+          key: _rowKey,
+          mainAxisSize: widget.scrollable ? MainAxisSize.min : MainAxisSize.max,
+          children: widget.scrollable
+              ? tabs
+              : [for (final tab in tabs) Expanded(child: Center(child: tab))],
+        ),
+        if (_indicatorLeft != null)
+          AnimatedPositioned(
+            duration: context.motion(AppTokens.dBase),
+            curve: AppTokens.curveBase,
+            left: _indicatorLeft,
+            bottom: 0,
+            width: 20,
+            height: 3,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: scheme.primary,
+                borderRadius: BorderRadius.circular(AppTokens.rFull),
+              ),
+            ),
+          ),
+      ],
+    );
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -155,24 +190,21 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
       child: widget.scrollable
           ? ShaderMask(
               blendMode: BlendMode.dstIn,
-              shaderCallback: (bounds) {
-                final fade = (28 / bounds.width).clamp(0.0, 0.5).toDouble();
-                return LinearGradient(
-                  colors: [
-                    if (_canScrollLeft)
-                      scheme.surface.withValues(alpha: 0)
-                    else
-                      scheme.surface,
+              shaderCallback: (bounds) => LinearGradient(
+                colors: [
+                  if (_canScrollLeft)
+                    scheme.surface.withValues(alpha: 0)
+                  else
                     scheme.surface,
+                  scheme.surface,
+                  scheme.surface,
+                  if (_canScrollRight)
+                    scheme.surface.withValues(alpha: 0)
+                  else
                     scheme.surface,
-                    if (_canScrollRight)
-                      scheme.surface.withValues(alpha: 0)
-                    else
-                      scheme.surface,
-                  ],
-                  stops: [0, fade, 1 - fade, 1],
-                ).createShader(bounds);
-              },
+                ],
+                stops: appEdgeFadeStops(bounds.width),
+              ).createShader(bounds),
               child: SingleChildScrollView(
                 controller: _controller,
                 scrollDirection: Axis.horizontal,
@@ -180,14 +212,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
                 child: row,
               ),
             )
-          : Padding(
-              padding: widget.padding,
-              child: Row(
-                children: [
-                  for (final tab in tabs) Expanded(child: Center(child: tab)),
-                ],
-              ),
-            ),
+          : Padding(padding: widget.padding, child: row),
     );
   }
 }
@@ -215,12 +240,19 @@ class SegmentedTabsView extends StatefulWidget {
   State<SegmentedTabsView> createState() => _SegmentedTabsViewState();
 }
 
-class _SegmentedTabsViewState extends State<SegmentedTabsView> {
+class _SegmentedTabsViewState extends State<SegmentedTabsView>
+    with SingleTickerProviderStateMixin {
   late int _index = widget.initialIndex.clamp(
     0,
     widget.children.isEmpty ? 0 : widget.children.length - 1,
   );
   late final Set<int> _visited = {_index};
+  late final AnimationController _fade = AnimationController(
+    vsync: this,
+    duration: AppTokens.dBase,
+    value: 1,
+  );
+  int? _previous;
 
   @override
   void didUpdateWidget(covariant SegmentedTabsView oldWidget) {
@@ -228,6 +260,12 @@ class _SegmentedTabsViewState extends State<SegmentedTabsView> {
     if (_index >= widget.children.length && widget.children.isNotEmpty) {
       _index = widget.children.length - 1;
     }
+  }
+
+  @override
+  void dispose() {
+    _fade.dispose();
+    super.dispose();
   }
 
   @override
@@ -241,23 +279,63 @@ class _SegmentedTabsViewState extends State<SegmentedTabsView> {
           selectedIndex: _index,
           scrollable: widget.scrollable,
           onChanged: (index) {
+            if (index == _index) return;
             setState(() {
+              _previous = _index;
               _index = index;
               _visited.add(index);
             });
+            if (widget.keepAlive) {
+              _fade.duration = context.motion(AppTokens.dBase);
+              _fade.forward(from: 0);
+            }
             widget.onChanged?.call(index);
           },
         ),
         Expanded(
           child: widget.keepAlive
-              ? IndexedStack(
-                  index: _index,
-                  children: [
-                    for (var i = 0; i < widget.children.length; i++)
-                      _visited.contains(i)
-                          ? widget.children[i]
-                          : const SizedBox.shrink(),
-                  ],
+              ? AnimatedBuilder(
+                  animation: _fade,
+                  builder: (context, _) {
+                    final previous = _previous;
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        for (var i = 0; i < widget.children.length; i++)
+                          if (_visited.contains(i) &&
+                              i != _index &&
+                              i != previous)
+                            Offstage(
+                              offstage: true,
+                              child: TickerMode(
+                                enabled: false,
+                                child: widget.children[i],
+                              ),
+                            ),
+                        if (previous != null && previous != _index)
+                          Positioned.fill(
+                            child: IgnorePointer(
+                              child: TickerMode(
+                                enabled: false,
+                                child: Opacity(
+                                  opacity: 1 - _fade.value,
+                                  child: widget.children[previous],
+                                ),
+                              ),
+                            ),
+                          ),
+                        Positioned.fill(
+                          child: TickerMode(
+                            enabled: true,
+                            child: Opacity(
+                              opacity: _fade.value,
+                              child: widget.children[_index],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 )
               : AnimatedSwitcher(
                   duration: context.motion(AppTokens.dBase),

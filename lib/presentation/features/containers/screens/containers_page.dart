@@ -12,6 +12,7 @@ import '../../../../data/dto/container/container_search_dto.dart';
 import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
+import '../../../common/components/removable_list_item.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/filter_chips.dart';
@@ -44,6 +45,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
   bool _selecting = false;
   String _filter = 'all';
   final Set<String> _selected = {};
+  final Set<String> _removing = {};
 
   bool get _selectionMode => _selecting;
 
@@ -92,9 +94,16 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
       },
     );
     if (!success || !mounted) return;
+    setState(() => _removing.addAll(names));
+    await Future<void>.delayed(context.motion(AppTokens.dBase));
+    if (!mounted) return;
     _clearSelection();
     AppToast.success(context, l10n.action_done);
-    await ref.read(containersProvider.notifier).refresh();
+    try {
+      await ref.read(containersProvider.notifier).refresh();
+    } finally {
+      if (mounted) setState(() => _removing.removeAll(names));
+    }
   }
 
   static const _filters = ['all', 'running', 'stopped', 'abnormal'];
@@ -134,7 +143,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                 if (server != null) server.displayName,
                 if (total != null) l10n.containers_count(total),
               ].join(' · '),
-              onTitleLongPress: () => showServerSwitcher(
+              onTitleTap: () => showServerSwitcher(
                 context,
                 ref,
                 currentServerId: widget.serverId,
@@ -232,27 +241,33 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                 ),
               ],
             ),
-            if (_searching)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppTokens.s16,
-                  vertical: AppTokens.s8,
-                ),
-                child: SearchField(
-                  controller: _searchController,
-                  autofocus: true,
-                  onChanged: (value) {
-                    _clearSelection();
-                    _searchDebouncer(() {
-                      ref.read(containersProvider.notifier).search(value);
-                    }, delay: const Duration(milliseconds: 300));
-                  },
-                ),
-              ),
+            AnimatedSize(
+              duration: context.motion(AppTokens.dBase),
+              curve: AppTokens.curveBase,
+              alignment: Alignment.topCenter,
+              child: _searching
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.pagePadding,
+                        vertical: AppTokens.s8,
+                      ),
+                      child: SearchField(
+                        controller: _searchController,
+                        autofocus: true,
+                        onChanged: (value) {
+                          _clearSelection();
+                          _searchDebouncer(() {
+                            ref.read(containersProvider.notifier).search(value);
+                          }, delay: const Duration(milliseconds: 300));
+                        },
+                      ),
+                    )
+                  : const SizedBox(width: double.infinity),
+            ),
             if (docker.valueOrNull != null && !docker.value!.isAvailable)
               Container(
                 width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
+                margin: EdgeInsets.symmetric(horizontal: context.pagePadding),
                 padding: const EdgeInsets.all(AppTokens.s12),
                 decoration: BoxDecoration(
                   color: context.appColors.warning.withValues(alpha: 0.12),
@@ -293,6 +308,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
             Expanded(
               child: AsyncStateView(
                 value: containers,
+                contentKey: (_filter, _searchController.text),
                 onRetry: () => ref.read(containersProvider.notifier).refresh(),
                 loading: const SkeletonList(itemCount: 8, itemHeight: 60),
                 isEmpty: (state) => state.items.isEmpty,
@@ -313,40 +329,45 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                       ref.read(containersProvider.notifier).refresh(),
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(
-                      AppTokens.pagePadding,
+                    padding: EdgeInsets.fromLTRB(
+                      context.pagePadding,
                       AppTokens.s8,
-                      AppTokens.pagePadding,
+                      context.pagePadding,
                       AppTokens.s32,
                     ),
                     itemCount: state.items.length,
                     itemBuilder: (context, index) {
                       final item = state.items[index];
                       final stats = state.stats[item.containerID];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: AppTokens.s12),
-                        child: _ContainerCard(
-                          item: item,
-                          cpu: stats?.cpuPercent,
-                          memory: stats == null
-                              ? null
-                              : formatBytes(stats.memoryUsage.toInt()),
-                          selected: _selected.contains(item.name),
-                          selectable: !item.isFromCompose,
-                          selectionMode: _selectionMode,
-                          onTap: _selectionMode
-                              ? () {
-                                  if (!item.isFromCompose) _toggle(item.name);
-                                }
-                              : () => _showActions(item),
-                          onLongPress: () {
-                            if (!item.isFromCompose) _toggle(item.name);
-                          },
-                          onToggle: () => _operateQuick(
-                            item,
-                            item.state.toLowerCase() == 'running'
-                                ? 'stop'
-                                : 'start',
+                      return RemovableListItem(
+                        key: ValueKey('container-${item.name}'),
+                        removing: _removing.contains(item.name),
+                        animateIn: true,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                          child: _ContainerCard(
+                            item: item,
+                            cpu: stats?.cpuPercent,
+                            memory: stats == null
+                                ? null
+                                : formatBytes(stats.memoryUsage.toInt()),
+                            selected: _selected.contains(item.name),
+                            selectable: !item.isFromCompose,
+                            selectionMode: _selectionMode,
+                            onTap: _selectionMode
+                                ? () {
+                                    if (!item.isFromCompose) _toggle(item.name);
+                                  }
+                                : () => _showActions(item),
+                            onLongPress: () {
+                              if (!item.isFromCompose) _toggle(item.name);
+                            },
+                            onToggle: () => _operateQuick(
+                              item,
+                              item.state.toLowerCase() == 'running'
+                                  ? 'stop'
+                                  : 'start',
+                            ),
                           ),
                         ),
                       );
@@ -358,30 +379,35 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
           ],
         ),
       ),
-      bottomNavigationBar: _selectionMode
-          ? SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.all(AppTokens.s16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        l10n.files_selectCount(_selected.length),
-                        style: AppTextStyles.bodyM,
+      bottomNavigationBar: AnimatedSize(
+        duration: context.motion(AppTokens.dBase),
+        curve: AppTokens.curveBase,
+        alignment: Alignment.bottomCenter,
+        child: _selectionMode
+            ? SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTokens.s16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.files_selectCount(_selected.length),
+                          style: AppTextStyles.bodyM,
+                        ),
                       ),
-                    ),
-                    DangerButton(
-                      expanded: false,
-                      icon: TablerIcons.trash,
-                      label: l10n.action_delete,
-                      onPressed: _batchDelete,
-                    ),
-                  ],
+                      DangerButton(
+                        expanded: false,
+                        icon: TablerIcons.trash,
+                        label: l10n.action_delete,
+                        onPressed: _batchDelete,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            )
-          : null,
+              )
+            : const SizedBox(width: double.infinity),
+      ),
     );
   }
 

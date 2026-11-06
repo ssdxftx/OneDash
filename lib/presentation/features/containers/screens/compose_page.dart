@@ -250,7 +250,7 @@ class ComposePage extends ConsumerWidget {
               children: [
                 ActionSheetRow(
                   icon: TablerIcons.edit,
-                  iconColor: colors.chart2,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.action_edit,
                   subtitle: l10n.containers_updateCompose,
                   onTap: () {
@@ -260,7 +260,7 @@ class ComposePage extends ConsumerWidget {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.file_text,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.containers_composeLogs,
                   onTap: () {
                     Navigator.of(sheetContext).pop();

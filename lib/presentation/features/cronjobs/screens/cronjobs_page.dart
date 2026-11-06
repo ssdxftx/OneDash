@@ -12,6 +12,7 @@ import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/removable_list_item.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
@@ -23,13 +24,20 @@ import '../providers/cronjobs_provider.dart';
 import '../widgets/cronjob_records_sheet.dart';
 import '../../../common/formatters/value_labels.dart';
 
-class CronjobsPage extends ConsumerWidget {
+class CronjobsPage extends ConsumerStatefulWidget {
   const CronjobsPage({super.key, required this.serverId});
 
   final int serverId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CronjobsPage> createState() => _CronjobsPageState();
+}
+
+class _CronjobsPageState extends ConsumerState<CronjobsPage> {
+  final Set<int> _removing = {};
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cronjobs = ref.watch(cronjobsProvider);
     return Scaffold(
@@ -44,7 +52,8 @@ class CronjobsPage extends ConsumerWidget {
           AppIconButton(
             icon: TablerIcons.plus,
             tooltip: l10n.cronjobs_create,
-            onPressed: () => context.push('/s/$serverId/more/cronjobs/form'),
+            onPressed: () =>
+                context.push('/s/${widget.serverId}/more/cronjobs/form'),
           ),
         ],
       ),
@@ -58,19 +67,25 @@ class CronjobsPage extends ConsumerWidget {
           title: l10n.cronjobs_empty_title,
           message: l10n.cronjobs_empty_message,
           actionLabel: l10n.cronjobs_create,
-          onAction: () => context.push('/s/$serverId/more/cronjobs/form'),
+          onAction: () =>
+              context.push('/s/${widget.serverId}/more/cronjobs/form'),
         ),
         builder: (data) => ListView.builder(
           padding: EdgeInsets.all(context.pagePadding),
           itemCount: data.items.length,
           itemBuilder: (context, index) {
             final item = data.items[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppTokens.s12),
-              child: _CronjobCard(
-                item: item,
-                onTap: () => _showActions(context, ref, item),
-                onLongPress: () => _showActions(context, ref, item),
+            return RemovableListItem(
+              key: ValueKey('cronjob-${item.id}'),
+              removing: _removing.contains(item.id),
+              animateIn: true,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                child: _CronjobCard(
+                  item: item,
+                  onTap: () => _showActions(context, ref, item),
+                  onLongPress: () => _showActions(context, ref, item),
+                ),
               ),
             );
           },
@@ -175,18 +190,18 @@ class CronjobsPage extends ConsumerWidget {
               children: [
                 ActionSheetRow(
                   icon: TablerIcons.edit,
-                  iconColor: colors.chart2,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.cronjobs_edit,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
                     context.push(
-                      '/s/$serverId/more/cronjobs/form?id=${item.id}',
+                      '/s/${widget.serverId}/more/cronjobs/form?id=${item.id}',
                     );
                   },
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.history,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.cronjobs_records,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -224,7 +239,7 @@ class CronjobsPage extends ConsumerWidget {
                         cronjobRepositoryProvider.future,
                       );
                       await repository.deleteCronjob([item.id]);
-                    });
+                    }, removeId: item.id);
                   },
                 ),
               ],
@@ -239,17 +254,30 @@ class CronjobsPage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     CronjobDto item,
-    Future<void> Function() action,
-  ) async {
+    Future<void> Function() action, {
+    int? removeId,
+  }) async {
     final l10n = AppLocalizations.of(context);
     try {
       await action();
       if (!context.mounted) return;
+      if (removeId != null) {
+        setState(() => _removing.add(removeId));
+        await Future<void>.delayed(context.motion(AppTokens.dBase));
+        if (!context.mounted) return;
+      }
       AppToast.success(context, l10n.action_done);
       ref.invalidate(cronjobsProvider);
+      if (removeId != null) {
+        await ref.read(cronjobsProvider.future);
+      }
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);
+    } finally {
+      if (removeId != null && mounted) {
+        setState(() => _removing.remove(removeId));
+      }
     }
   }
 }

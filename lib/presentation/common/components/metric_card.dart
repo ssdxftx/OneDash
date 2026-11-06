@@ -74,34 +74,7 @@ class MetricCard extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: value,
-                          style: AppTextStyles.numericLarge.copyWith(
-                            color: valueColor,
-                            fontSize: switch (value.length) {
-                              <= 4 => 28,
-                              <= 6 => 26,
-                              _ => 23,
-                            },
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                          ),
-                        ),
-                        if (unit != null)
-                          TextSpan(
-                            text: ' $unit',
-                            style: AppTextStyles.bodyS.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                          ),
-                      ],
-                    ),
-                    maxLines: 1,
-                    softWrap: false,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  child: _animatedValue(context, valueColor, scheme),
                 ),
               ),
               if (caption != null) ...[
@@ -123,6 +96,58 @@ class MetricCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _animatedValue(
+    BuildContext context,
+    Color valueColor,
+    ColorScheme scheme,
+  ) {
+    final style = AppTextStyles.numericLarge.copyWith(
+      color: valueColor,
+      fontSize: switch (value.length) {
+        <= 4 => 28,
+        <= 6 => 26,
+        _ => 23,
+      },
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+    final unitStyle = AppTextStyles.bodyS.copyWith(
+      color: scheme.onSurfaceVariant,
+    );
+    final match = RegExp(r'^(\d+(?:\.\d+)?)(.*)$').firstMatch(value);
+    final number = match == null ? null : double.tryParse(match.group(1)!);
+    if (number == null) {
+      return _valueText(value, style, unitStyle);
+    }
+    final decimals = match!.group(1)!.contains('.')
+        ? match.group(1)!.split('.').last.length
+        : 0;
+    final suffix = match.group(2)!;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: number),
+      duration: context.motion(AppTokens.numberRoll),
+      curve: AppTokens.curveBase,
+      builder: (context, animated, _) => _valueText(
+        '${animated.toStringAsFixed(decimals)}$suffix',
+        style,
+        unitStyle,
+      ),
+    );
+  }
+
+  Widget _valueText(String text, TextStyle style, TextStyle unitStyle) {
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(text: text, style: style),
+          if (unit != null) TextSpan(text: unit, style: unitStyle),
+        ],
+      ),
+      maxLines: 1,
+      softWrap: false,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }
@@ -156,29 +181,34 @@ class MetricRing extends StatelessWidget {
         child: SizedBox(
           width: size,
           height: size,
-          child: CustomPaint(
-            painter: _RingPainter(
-              progress: normalized,
-              color: ringColor,
-              trackColor: scheme.surfaceContainerHighest,
-              strokeWidth: strokeWidth,
-            ),
-            child: Center(
-              child: SizedBox(
-                width: math.max(0, size - strokeWidth * 2 - 6),
-                height: math.max(0, size - strokeWidth * 2 - 6),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child:
-                      center ??
-                      Text(
-                        '${value.toStringAsFixed(0)}%',
-                        style: AppTextStyles.bodyS.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: scheme.onSurface,
-                          fontFeatures: const [FontFeature.tabularFigures()],
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: normalized),
+            duration: context.motion(AppTokens.ringFill),
+            curve: AppTokens.curveEmphasis,
+            builder: (context, progress, _) => CustomPaint(
+              painter: _RingPainter(
+                progress: progress,
+                color: ringColor,
+                trackColor: scheme.surfaceContainerHighest,
+                strokeWidth: strokeWidth,
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: math.max(0, size - strokeWidth * 2 - 6),
+                  height: math.max(0, size - strokeWidth * 2 - 6),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child:
+                        center ??
+                        Text(
+                          '${(progress * 100).toStringAsFixed(0)}%',
+                          style: AppTextStyles.bodyS.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: scheme.onSurface,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
                         ),
-                      ),
+                  ),
                 ),
               ),
             ),

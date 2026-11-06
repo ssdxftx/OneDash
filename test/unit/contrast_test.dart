@@ -20,6 +20,7 @@ void main() {
       'warning': colors.warning,
       'danger': scheme.error,
       'info': colors.info,
+      'neutral': colors.neutral,
     };
     for (final entry in pairs.entries) {
       final ratio = contrastRatio(entry.value, scheme.surface);
@@ -39,6 +40,7 @@ void main() {
       'warning': colors.warning,
       'danger': scheme.error,
       'info': colors.info,
+      'neutral': colors.neutral,
     };
     for (final entry in pairs.entries) {
       final ratio = contrastRatio(entry.value, scheme.surface);

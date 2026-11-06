@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 
 import '../../../core/localization/generated/app_localizations.dart';
 import '../../../core/theme/tokens.dart';
@@ -73,6 +74,19 @@ class BottomSheetSurface extends StatelessWidget {
   }
 }
 
+class _SheetSpringCurve extends Curve {
+  const _SheetSpringCurve();
+
+  static const double _seconds = 0.45;
+
+  @override
+  double transformInternal(double t) {
+    final simulation = SpringSimulation(AppTokens.sheetSpring, 0, 1, 0);
+    final end = simulation.x(_seconds);
+    return simulation.x(t * _seconds) / end;
+  }
+}
+
 Future<T?> showAppSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -88,6 +102,14 @@ Future<T?> showAppSheet<T>({
     enableDrag: enableDrag,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(alpha: 0.4),
+    sheetAnimationStyle: context.reduceMotion
+        ? AnimationStyle.noAnimation
+        : const AnimationStyle(
+            curve: _SheetSpringCurve(),
+            reverseCurve: Curves.easeInCubic,
+            duration: AppTokens.dPage,
+            reverseDuration: AppTokens.dFast,
+          ),
     builder: (context) {
       return Padding(
         padding: EdgeInsets.only(

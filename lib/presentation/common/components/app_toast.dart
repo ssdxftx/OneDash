@@ -6,11 +6,13 @@ import '../../../core/theme/tokens.dart';
 enum AppToastType { success, error, warning, info }
 
 abstract final class AppToast {
+  static ToastificationItem? _active;
+
   static void show(
     BuildContext context,
     String message, {
     AppToastType type = AppToastType.info,
-    Duration duration = const Duration(milliseconds: 2400),
+    Duration duration = AppTokens.toastDuration,
   }) {
     final toastType = switch (type) {
       AppToastType.success => ToastificationType.success,
@@ -18,7 +20,11 @@ abstract final class AppToast {
       AppToastType.warning => ToastificationType.warning,
       AppToastType.info => ToastificationType.info,
     };
-    toastification.show(
+    final active = _active;
+    if (active != null) {
+      toastification.dismiss(active, showRemoveAnimation: false);
+    }
+    _active = toastification.show(
       context: context,
       type: toastType,
       style: ToastificationStyle.flat,
@@ -26,7 +32,7 @@ abstract final class AppToast {
       autoCloseDuration: duration,
       showProgressBar: false,
       margin: EdgeInsets.only(
-        top: MediaQuery.paddingOf(context).top + AppTokens.toastMargin,
+        top: MediaQuery.paddingOf(context).top + 84 + AppTokens.s8,
         left: AppTokens.s16,
         right: AppTokens.s16,
       ),

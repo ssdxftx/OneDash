@@ -11,6 +11,7 @@ import 'core/localization/locale_controller.dart';
 import 'core/platform/secure_screen.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/tokens.dart';
 import 'core/theme/theme_controller.dart';
 import 'presentation/features/settings/providers/app_settings_provider.dart';
 
@@ -67,14 +68,19 @@ class OneDashApp extends ConsumerWidget {
             builder: (context, child) {
               final systemScale = MediaQuery.textScalerOf(context).scale(1);
               final scale = (systemScale * theme.textScale).clamp(0.85, 1.5);
+              final reduceMotion =
+                  MediaQuery.disableAnimationsOf(context) || !listAnimations;
               return MediaQuery(
                 data: MediaQuery.of(context).copyWith(
                   textScaler: TextScaler.linear(scale),
-                  disableAnimations:
-                      MediaQuery.disableAnimationsOf(context) ||
-                      !listAnimations,
+                  disableAnimations: reduceMotion,
                 ),
-                child: child ?? const SizedBox.shrink(),
+                child: AnimatedTheme(
+                  data: Theme.of(context),
+                  duration: reduceMotion ? Duration.zero : AppTokens.dPage,
+                  curve: AppTokens.curveBase,
+                  child: child ?? const SizedBox.shrink(),
+                ),
               );
             },
           ),

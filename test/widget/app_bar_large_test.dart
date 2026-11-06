@@ -13,7 +13,7 @@ void main() {
           appBar: AppBarLarge(
             title: 'Panel A',
             subtitle: '10.0.0.1:9999',
-            onTitleLongPress: () => taps++,
+            onTitleTap: () => taps++,
           ),
         ),
       ),

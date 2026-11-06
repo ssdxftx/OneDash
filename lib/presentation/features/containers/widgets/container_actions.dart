@@ -57,10 +57,10 @@ Future<void> showContainerActionsPage(
       builder: (_) => Scaffold(
         appBar: AppBarLarge(title: item.name, subtitle: item.imageName),
         body: ListView(
-          padding: const EdgeInsets.fromLTRB(
-            AppTokens.pagePadding,
+          padding: EdgeInsets.fromLTRB(
+            context.pagePadding,
             AppTokens.s8,
-            AppTokens.pagePadding,
+            context.pagePadding,
             AppTokens.s32,
           ),
           children: [
@@ -124,7 +124,7 @@ class _ContainerActionsBody extends StatelessWidget {
           children: [
             ActionSheetRow(
               icon: TablerIcons.terminal_2,
-              iconColor: colors.info,
+              iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_terminal,
               onTap: () {
                 Navigator.of(context).pop();
@@ -135,7 +135,7 @@ class _ContainerActionsBody extends StatelessWidget {
             ),
             ActionSheetRow(
               icon: TablerIcons.file_text,
-              iconColor: colors.info,
+              iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_viewLogs,
               onTap: () {
                 Navigator.of(context).pop();
@@ -153,7 +153,7 @@ class _ContainerActionsBody extends StatelessWidget {
             ),
             ActionSheetRow(
               icon: TablerIcons.users,
-              iconColor: colors.info,
+              iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_users,
               onTap: () async {
                 Navigator.of(context).pop();
@@ -162,7 +162,7 @@ class _ContainerActionsBody extends StatelessWidget {
             ),
             ActionSheetRow(
               icon: TablerIcons.activity,
-              iconColor: colors.info,
+              iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_liveMonitor,
               onTap: () {
                 Navigator.of(context).pop();
@@ -177,7 +177,7 @@ class _ContainerActionsBody extends StatelessWidget {
           children: [
             ActionSheetRow(
               icon: TablerIcons.info_circle,
-              iconColor: colors.info,
+              iconColor: context.scheme.onSurfaceVariant,
               title: l10n.error_details,
               onTap: () {
                 Navigator.of(context).pop();
@@ -208,7 +208,7 @@ class _ContainerActionsBody extends StatelessWidget {
             ),
             ActionSheetRow(
               icon: TablerIcons.refresh,
-              iconColor: colors.info,
+              iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_restart,
               enabled: running,
               onTap: () {
@@ -254,7 +254,7 @@ class _ContainerActionsBody extends StatelessWidget {
           children: [
             ActionSheetRow(
               icon: TablerIcons.edit,
-              iconColor: colors.info,
+              iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_edit,
               subtitle: l10n.containers_editSubtitle,
               onTap: () {
@@ -266,7 +266,7 @@ class _ContainerActionsBody extends StatelessWidget {
             ),
             ActionSheetRow(
               icon: TablerIcons.arrow_up_circle,
-              iconColor: colors.info,
+              iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_upgrade,
               subtitle: l10n.containers_upgradeSubtitle,
               onTap: () {
@@ -276,7 +276,7 @@ class _ContainerActionsBody extends StatelessWidget {
             ),
             ActionSheetRow(
               icon: TablerIcons.camera,
-              iconColor: colors.info,
+              iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_commit,
               subtitle: l10n.containers_commitSubtitle,
               onTap: () {

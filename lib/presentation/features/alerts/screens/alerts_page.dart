@@ -193,7 +193,7 @@ class _AlertListTab extends ConsumerWidget {
               children: [
                 ActionSheetRow(
                   icon: TablerIcons.edit,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.action_edit,
                   onTap: () async {
                     Navigator.of(sheetContext).pop();

@@ -49,6 +49,9 @@ abstract final class AppTokens {
   static const Duration dPage = Duration(milliseconds: 320);
   static const Duration dLoop = Duration(milliseconds: 1200);
   static const Duration numberRoll = Duration(milliseconds: 400);
+  static const Duration ringFill = Duration(milliseconds: 600);
+  static const Duration chartReveal = Duration(milliseconds: 500);
+  static const Duration chartMorph = Duration(milliseconds: 300);
 
   static const Curve curveFast = Curves.easeOutCubic;
   static const Curve curveBase = Curves.easeOutCubic;
@@ -70,6 +73,7 @@ abstract final class AppTokens {
   static const double chipPaddingY = 2;
   static const double logPanelMaxHeight = 260;
   static const double toastMargin = 12;
+  static const Duration toastDuration = Duration(milliseconds: 2400);
   static const int logBufferLines = 5000;
   static const int pageSizePhone = 20;
   static const int pageSizeTablet = 30;
@@ -84,6 +88,7 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
     required this.warning,
     required this.danger,
     required this.info,
+    required this.neutral,
     required this.chart1,
     required this.chart2,
     required this.chart3,
@@ -96,6 +101,7 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
   final Color warning;
   final Color danger;
   final Color info;
+  final Color neutral;
   final Color chart1;
   final Color chart2;
   final Color chart3;
@@ -108,6 +114,7 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
     warning: Color(0xFFA35F00),
     danger: Color(0xFFB3261E),
     info: Color(0xFF2F6F8F),
+    neutral: Color(0xFF4A5A50),
     chart1: Color(0xFF3F7F5F),
     chart2: Color(0xFF4A7BA7),
     chart3: Color(0xFFB07A3C),
@@ -121,6 +128,7 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
     warning: Color(0xFFF2B25C),
     danger: Color(0xFFFFB4AB),
     info: Color(0xFF8FCBE0),
+    neutral: Color(0xFFB7C5BB),
     chart1: Color(0xFF7FD3A0),
     chart2: Color(0xFF8FB8DC),
     chart3: Color(0xFFE0B07A),
@@ -132,7 +140,7 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
   Color status(String status) {
     return switch (status.toLowerCase()) {
       'running' || 'running ' || 'active' || 'healthy' || 'success' => success,
-      'stopped' || 'inactive' || 'exited' || 'paused' => info,
+      'stopped' || 'inactive' || 'exited' || 'paused' => neutral,
       'offline' || 'disconnected' || 'unreachable' => danger,
       'error' || 'failed' || 'failure' || 'dead' => danger,
       'pending' || 'starting' || 'waiting' || 'restarting' => warning,
@@ -146,6 +154,7 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
     Color? warning,
     Color? danger,
     Color? info,
+    Color? neutral,
     Color? chart1,
     Color? chart2,
     Color? chart3,
@@ -158,6 +167,7 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
       warning: warning ?? this.warning,
       danger: danger ?? this.danger,
       info: info ?? this.info,
+      neutral: neutral ?? this.neutral,
       chart1: chart1 ?? this.chart1,
       chart2: chart2 ?? this.chart2,
       chart3: chart3 ?? this.chart3,
@@ -175,6 +185,7 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
       warning: Color.lerp(warning, other.warning, t)!,
       danger: Color.lerp(danger, other.danger, t)!,
       info: Color.lerp(info, other.info, t)!,
+      neutral: Color.lerp(neutral, other.neutral, t)!,
       chart1: Color.lerp(chart1, other.chart1, t)!,
       chart2: Color.lerp(chart2, other.chart2, t)!,
       chart3: Color.lerp(chart3, other.chart3, t)!,

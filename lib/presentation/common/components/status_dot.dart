@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens.dart';
+import 'status_pulse.dart';
 
 class StatusDot extends StatefulWidget {
   const StatusDot({
@@ -18,26 +19,25 @@ class StatusDot extends StatefulWidget {
   State<StatusDot> createState() => _StatusDotState();
 }
 
-class _StatusDotState extends State<StatusDot>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: AppTokens.dLoop,
-  );
+class _StatusDotState extends State<StatusDot> {
+  bool _attached = false;
 
   bool get _shouldPulse {
     final status = widget.status.toLowerCase();
     return status == 'error' || status == 'failed' || status == 'dead';
   }
 
+  bool get _pulsing => _shouldPulse && !context.reduceMotion;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_shouldPulse && !context.reduceMotion) {
-      if (!_controller.isAnimating) _controller.repeat(reverse: true);
-    } else {
-      _controller.stop();
-      _controller.value = 1;
+    if (_pulsing && !_attached) {
+      StatusPulse.attach();
+      _attached = true;
+    } else if (!_pulsing && _attached) {
+      StatusPulse.detach();
+      _attached = false;
     }
   }
 
@@ -49,27 +49,30 @@ class _StatusDotState extends State<StatusDot>
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (_attached) StatusPulse.detach();
     super.dispose();
+  }
+
+  Widget _dot(Color color, double opacity) {
+    return Container(
+      width: widget.size,
+      height: widget.size,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: opacity),
+        shape: BoxShape.circle,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final color = context.appColors.status(widget.status);
-    final dot = AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final opacity = _shouldPulse ? 0.55 + 0.45 * _controller.value : 1.0;
-        return Container(
-          width: widget.size,
-          height: widget.size,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: opacity),
-            shape: BoxShape.circle,
-          ),
-        );
-      },
-    );
+    final dot = _pulsing
+        ? ValueListenableBuilder<double>(
+            valueListenable: StatusPulse.value,
+            builder: (context, pulse, _) => _dot(color, 0.55 + 0.45 * pulse),
+          )
+        : _dot(color, 1);
     return Semantics(
       label: widget.semanticLabel ?? widget.status,
       child: ExcludeSemantics(child: dot),

@@ -288,7 +288,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
               children: [
                 ActionSheetRow(
                   icon: TablerIcons.tag,
-                  iconColor: colors.chart2,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.containers_tagImage,
                   onTap: () async {
                     Navigator.of(sheetContext).pop();
@@ -297,7 +297,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.box_multiple,
-                  iconColor: colors.chart1,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.containers_containersUsingImage,
                   onTap: () async {
                     Navigator.of(sheetContext).pop();
@@ -306,7 +306,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.hammer,
-                  iconColor: colors.chart3,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.containers_buildImage,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -315,7 +315,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.file_export,
-                  iconColor: colors.chart4,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.containers_exportImage,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -324,7 +324,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.file_import,
-                  iconColor: colors.chart5,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.containers_importImage,
                   onTap: () {
                     Navigator.of(sheetContext).pop();
@@ -333,7 +333,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.upload,
-                  iconColor: colors.info,
+                  iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.containers_pushImage,
                   onTap: () {
                     Navigator.of(sheetContext).pop();

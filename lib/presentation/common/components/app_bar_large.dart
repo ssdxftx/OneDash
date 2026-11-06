@@ -11,14 +11,14 @@ class AppBarLarge extends StatelessWidget implements PreferredSizeWidget {
     this.subtitle,
     this.actions,
     this.leading,
-    this.onTitleLongPress,
+    this.onTitleTap,
   });
 
   final String title;
   final String? subtitle;
   final List<Widget>? actions;
   final Widget? leading;
-  final VoidCallback? onTitleLongPress;
+  final VoidCallback? onTitleTap;
 
   @override
   Size get preferredSize => Size.fromHeight(subtitle == null ? 64 : 84);
@@ -29,11 +29,7 @@ class AppBarLarge extends StatelessWidget implements PreferredSizeWidget {
       toolbarHeight: preferredSize.height,
       leading: leading,
       actions: actions,
-      title: _TitleBlock(
-        title: title,
-        subtitle: subtitle,
-        onTap: onTitleLongPress,
-      ),
+      title: _TitleBlock(title: title, subtitle: subtitle, onTap: onTitleTap),
     );
   }
 }
@@ -46,7 +42,7 @@ class SliverAppBarLarge extends StatelessWidget {
     this.actions,
     this.leading,
     this.pinned = true,
-    this.onTitleLongPress,
+    this.onTitleTap,
     this.flexibleSpace,
   });
 
@@ -55,7 +51,7 @@ class SliverAppBarLarge extends StatelessWidget {
   final List<Widget>? actions;
   final Widget? leading;
   final bool pinned;
-  final VoidCallback? onTitleLongPress;
+  final VoidCallback? onTitleTap;
   final Widget? flexibleSpace;
 
   @override
@@ -66,15 +62,12 @@ class SliverAppBarLarge extends StatelessWidget {
       toolbarHeight: subtitle == null ? 64 : 84,
       backgroundColor: scheme.surface,
       surfaceTintColor: Colors.transparent,
-      scrolledUnderElevation: 0,
+      shadowColor: scheme.outlineVariant,
+      scrolledUnderElevation: 2,
       actions: actions,
       leading: leading,
       flexibleSpace: flexibleSpace,
-      title: _TitleBlock(
-        title: title,
-        subtitle: subtitle,
-        onTap: onTitleLongPress,
-      ),
+      title: _TitleBlock(title: title, subtitle: subtitle, onTap: onTitleTap),
     );
   }
 }
@@ -92,7 +85,6 @@ class _TitleBlock extends StatelessWidget {
     final interactive = onTap != null;
     final block = GestureDetector(
       onTap: onTap,
-      onLongPress: onTap,
       behavior: HitTestBehavior.opaque,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

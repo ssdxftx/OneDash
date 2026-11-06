@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens.dart';
-import 'pressable_scale.dart';
 
 /// 全应用唯一的卡片容器：surfaceContainerLow + 18dp 圆角 + 无阴影。
 class TonalCard extends StatelessWidget {
@@ -27,7 +26,7 @@ class TonalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
-    final content = Material(
+    return Material(
       color: color ?? scheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
@@ -40,13 +39,6 @@ class TonalCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         child: Padding(padding: padding, child: child),
       ),
-    );
-
-    if (onTap == null && onLongPress == null) return content;
-    return PressableScale(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      child: content,
     );
   }
 }

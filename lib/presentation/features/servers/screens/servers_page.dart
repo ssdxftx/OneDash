@@ -93,8 +93,8 @@ class ServersPage extends ConsumerWidget {
                           ),
                         ),
                         SliverPadding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppTokens.s16,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.pagePadding,
                           ),
                           sliver: SliverList.builder(
                             itemCount: items.length,

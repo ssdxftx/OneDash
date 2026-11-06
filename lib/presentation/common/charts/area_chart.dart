@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens.dart';
 
-class AreaChart extends StatelessWidget {
+class AreaChart extends StatefulWidget {
   const AreaChart({
     super.key,
     required this.seriesA,
@@ -33,15 +33,71 @@ class AreaChart extends StatelessWidget {
   final String? placeholder;
 
   @override
+  State<AreaChart> createState() => _AreaChartState();
+}
+
+class _AreaChartState extends State<AreaChart>
+    with SingleTickerProviderStateMixin {
+  late _ChartData _from;
+  late _ChartData _to;
+  late final AnimationController _morph = AnimationController(
+    vsync: this,
+    duration: AppTokens.chartMorph,
+    value: 1,
+  );
+
+  _ChartData _dataOf(AreaChart chart) =>
+      _ChartData(a: chart.seriesA, b: chart.seriesB);
+
+  _ChartData get _current =>
+      _ChartData.lerp(_from, _to, AppTokens.curveBase.transform(_morph.value));
+
+  @override
+  void initState() {
+    super.initState();
+    _from = _dataOf(widget);
+    _to = _from;
+  }
+
+  @override
+  void didUpdateWidget(covariant AreaChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final next = _dataOf(widget);
+    if (listEquals(next.a, _to.a) && listEquals(next.b, _to.b)) return;
+    final sameShape =
+        next.a.length == _to.a.length &&
+        (next.b?.length ?? 0) == (_to.b?.length ?? 0);
+    if (!sameShape) {
+      _from = next;
+      _to = next;
+      _morph.value = 1;
+      return;
+    }
+    _from = _current;
+    _to = next;
+    _morph.duration = context.motion(AppTokens.chartMorph);
+    _morph.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _morph.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final colors = context.appColors;
-    final sampleCount = math.max(seriesA.length, seriesB?.length ?? 0);
-    if (sampleCount < 3 && placeholder != null) {
+    final sampleCount = math.max(
+      widget.seriesA.length,
+      widget.seriesB?.length ?? 0,
+    );
+    if (sampleCount < 3 && widget.placeholder != null) {
       return RepaintBoundary(
         child: Center(
           child: Text(
-            placeholder!,
+            widget.placeholder!,
             style: AppTextStyles.caption.copyWith(
               color: scheme.onSurfaceVariant,
             ),
@@ -52,25 +108,79 @@ class AreaChart extends StatelessWidget {
     return RepaintBoundary(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return CustomPaint(
-            size: Size(constraints.maxWidth, constraints.maxHeight),
-            painter: _AreaChartPainter(
-              seriesA: seriesA,
-              seriesB: seriesB,
-              colorA: colorA ?? colors.chart1,
-              colorB: colorB ?? colors.chart2,
-              maxY: maxY,
-              minY: minY,
-              gridColor: scheme.outlineVariant.withValues(alpha: 0.35),
-              showGrid: showGrid,
-              strokeWidth: strokeWidth,
-              fill: fill,
+          return TweenAnimationBuilder<double>(
+            key: ValueKey(
+              '${widget.seriesA.length}:${widget.seriesB?.length ?? -1}',
+            ),
+            tween: Tween<double>(begin: 0, end: 1),
+            duration: context.motion(AppTokens.chartReveal),
+            curve: AppTokens.curveEmphasis,
+            builder: (context, progress, child) => Opacity(
+              opacity: progress.clamp(0, 1),
+              child: ClipRect(clipper: _RevealClipper(progress), child: child),
+            ),
+            child: AnimatedBuilder(
+              animation: _morph,
+              builder: (context, _) {
+                final data = _current;
+                return CustomPaint(
+                  size: Size(constraints.maxWidth, constraints.maxHeight),
+                  painter: _AreaChartPainter(
+                    seriesA: data.a,
+                    seriesB: data.b,
+                    colorA: widget.colorA ?? colors.chart1,
+                    colorB: widget.colorB ?? colors.chart2,
+                    maxY: widget.maxY,
+                    minY: widget.minY,
+                    gridColor: scheme.outlineVariant.withValues(alpha: 0.35),
+                    showGrid: widget.showGrid,
+                    strokeWidth: widget.strokeWidth,
+                    fill: widget.fill,
+                  ),
+                );
+              },
             ),
           );
         },
       ),
     );
   }
+}
+
+class _ChartData {
+  const _ChartData({required this.a, this.b});
+
+  final List<double> a;
+  final List<double>? b;
+
+  static _ChartData lerp(_ChartData a, _ChartData b, double t) {
+    List<double> mix(List<double> from, List<double> to) {
+      final count = math.min(from.length, to.length);
+      return List.generate(
+        count,
+        (index) => from[index] + (to[index] - from[index]) * t,
+      );
+    }
+
+    return _ChartData(
+      a: mix(a.a, b.a),
+      b: a.b == null || b.b == null ? b.b : mix(a.b!, b.b!),
+    );
+  }
+}
+
+class _RevealClipper extends CustomClipper<Rect> {
+  _RevealClipper(this.progress);
+
+  final double progress;
+
+  @override
+  Rect getClip(Size size) =>
+      Rect.fromLTWH(0, 0, size.width * progress, size.height);
+
+  @override
+  bool shouldReclip(covariant _RevealClipper oldClipper) =>
+      oldClipper.progress != progress;
 }
 
 class _AreaChartPainter extends CustomPainter {

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../core/localization/generated/app_localizations.dart';
 import '../../../core/theme/tokens.dart';
 
+const double _dividerIndentWithLeading =
+    AppTokens.s16 + AppTokens.iconLeading + AppTokens.s12;
+
 /// 一组列表项共用一张圆角卡，内部 1px 分隔线，首尾无分隔线。
 class SplitListGroup extends StatelessWidget {
   const SplitListGroup({
@@ -22,11 +25,14 @@ class SplitListGroup extends StatelessWidget {
     final rows = <Widget>[];
     for (var i = 0; i < children.length; i++) {
       if (i > 0) {
+        final previous = children[i - 1];
+        final hasLeading =
+            previous is SplitListTile && previous.leading != null;
         rows.add(
           Divider(
             height: 1,
             thickness: 1,
-            indent: AppTokens.s16,
+            indent: hasLeading ? _dividerIndentWithLeading : AppTokens.s16,
             endIndent: AppTokens.s16,
             color: scheme.outlineVariant,
           ),
@@ -319,7 +325,7 @@ class SplitListTile extends StatelessWidget {
       textDirection: direction,
       textScaler: textScaler,
       maxLines: 1,
-    )..layout();
+    );
     final valueText = value as Text;
     final valuePainter = TextPainter(
       text: TextSpan(
@@ -329,20 +335,27 @@ class SplitListTile extends StatelessWidget {
       textDirection: direction,
       textScaler: textScaler,
       maxLines: 1,
-    )..layout();
-    final leadingWidth = leading == null
-        ? 0.0
-        : AppTokens.iconLeading + AppTokens.s12;
-    final rowWidth = availableWidth - leadingWidth;
-    final combined =
-        titlePainter.width +
-        AppTokens.s12 +
-        valuePainter.width +
-        AppTokens.s8 +
-        _trailingWidth(context, trailing);
-    final valueOverLimit =
-        valueLimit != null && valuePainter.width > valueLimit;
-    return combined > rowWidth || valueOverLimit;
+    );
+    try {
+      titlePainter.layout();
+      valuePainter.layout();
+      final leadingWidth = leading == null
+          ? 0.0
+          : AppTokens.iconLeading + AppTokens.s12;
+      final rowWidth = availableWidth - leadingWidth;
+      final combined =
+          titlePainter.width +
+          AppTokens.s12 +
+          valuePainter.width +
+          AppTokens.s8 +
+          _trailingWidth(context, trailing);
+      final valueOverLimit =
+          valueLimit != null && valuePainter.width > valueLimit;
+      return combined > rowWidth || valueOverLimit;
+    } finally {
+      titlePainter.dispose();
+      valuePainter.dispose();
+    }
   }
 
   double _trailingWidth(BuildContext context, Widget trailing) {
@@ -356,8 +369,13 @@ class SplitListTile extends StatelessWidget {
         textDirection: Directionality.of(context),
         textScaler: MediaQuery.textScalerOf(context),
         maxLines: 1,
-      )..layout();
-      return painter.width;
+      );
+      try {
+        painter.layout();
+        return painter.width;
+      } finally {
+        painter.dispose();
+      }
     }
     if (trailing is SizedBox && trailing.width != null) {
       return trailing.width!;
@@ -384,7 +402,7 @@ class SplitListTile extends StatelessWidget {
       textDirection: direction,
       textScaler: textScaler,
       maxLines: 1,
-    )..layout();
+    );
     final trailingText = trailing as Text;
     final trailingPainter = TextPainter(
       text: TextSpan(
@@ -394,13 +412,20 @@ class SplitListTile extends StatelessWidget {
       textDirection: direction,
       textScaler: textScaler,
       maxLines: 1,
-    )..layout();
-    final leadingWidth = leading == null
-        ? 0.0
-        : AppTokens.iconLeading + AppTokens.s12;
-    final rowWidth = availableWidth - leadingWidth;
-    return titlePainter.width + AppTokens.s12 + trailingPainter.width >
-        rowWidth;
+    );
+    try {
+      titlePainter.layout();
+      trailingPainter.layout();
+      final leadingWidth = leading == null
+          ? 0.0
+          : AppTokens.iconLeading + AppTokens.s12;
+      final rowWidth = availableWidth - leadingWidth;
+      return titlePainter.width + AppTokens.s12 + trailingPainter.width >
+          rowWidth;
+    } finally {
+      titlePainter.dispose();
+      trailingPainter.dispose();
+    }
   }
 
   Widget _buildTrailing(
@@ -428,10 +453,16 @@ class SplitListTile extends StatelessWidget {
             textHeightBehavior: child.textHeightBehavior,
           )
         : child;
-    if (maxWidth == null) return text;
+    final widget = text is Icon
+        ? IconTheme(
+            data: const IconThemeData(size: AppTokens.iconList),
+            child: text,
+          )
+        : text;
+    if (maxWidth == null) return widget;
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth),
-      child: text,
+      child: widget,
     );
   }
 }

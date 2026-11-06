@@ -88,7 +88,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                 subtitle: server == null
                     ? null
                     : '${server.host}:${server.port}',
-                onTitleLongPress: () => showServerSwitcher(
+                onTitleTap: () => showServerSwitcher(
                   context,
                   ref,
                   currentServerId: widget.serverId,
@@ -118,17 +118,17 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                         padding: EdgeInsets.all(AppTokens.s16),
                         child: Column(
                           children: [
-                            SkeletonCard(height: 148),
+                            SkeletonCard(height: 136),
                             SizedBox(height: AppTokens.s12),
                             Row(
                               children: [
-                                Expanded(child: SkeletonCard(height: 124)),
+                                Expanded(child: SkeletonCard(height: 136)),
                                 SizedBox(width: AppTokens.s12),
-                                Expanded(child: SkeletonCard(height: 124)),
+                                Expanded(child: SkeletonCard(height: 136)),
                               ],
                             ),
                             SizedBox(height: AppTokens.s12),
-                            SkeletonCard(height: 180),
+                            SkeletonCard(height: 232),
                           ],
                         ),
                       ),
@@ -189,14 +189,14 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
         : current.disks.reduce(
             (a, b) => a.usedPercent >= b.usedPercent ? a : b,
           );
-    final textScale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.5);
+    final textScale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 2.0);
 
     return [
       SliverPadding(
-        padding: const EdgeInsets.fromLTRB(
-          AppTokens.s16,
+        padding: EdgeInsets.fromLTRB(
+          context.pagePadding,
           AppTokens.s8,
-          AppTokens.s16,
+          context.pagePadding,
           0,
         ),
         sliver: SliverToBoxAdapter(
@@ -356,7 +356,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
         ),
       ),
       SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
+        padding: EdgeInsets.symmetric(horizontal: context.pagePadding),
         sliver: SliverToBoxAdapter(
           child: TonalCard(
             child: Column(
@@ -776,7 +776,7 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               displayValue(context, value),
-              style: AppTextStyles.bodyM.copyWith(
+              style: AppTextStyles.bodyL.copyWith(
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
               textAlign: TextAlign.end,
