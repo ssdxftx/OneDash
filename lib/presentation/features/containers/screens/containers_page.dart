@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../shell/nav_visibility.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/container/container_search_dto.dart';
@@ -56,12 +57,16 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
       _selecting = true;
       if (!_selected.remove(name)) _selected.add(name);
     });
+    ref.read(bottomNavSuppressedProvider.notifier).state = true;
   }
 
-  void _clearSelection() => setState(() {
-    _selecting = false;
-    _selected.clear();
-  });
+  void _clearSelection() {
+    setState(() {
+      _selecting = false;
+      _selected.clear();
+    });
+    ref.read(bottomNavSuppressedProvider.notifier).state = false;
+  }
 
   Future<void> _batchDelete() async {
     final l10n = AppLocalizations.of(context);
@@ -109,6 +114,12 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
   }
 
   static const _filters = ['all', 'running', 'stopped', 'abnormal'];
+
+  @override
+  void deactivate() {
+    ref.read(bottomNavSuppressedProvider.notifier).state = false;
+    super.deactivate();
+  }
 
   @override
   void dispose() {
@@ -222,6 +233,8 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
                           );
                         }
                       });
+                      ref.read(bottomNavSuppressedProvider.notifier).state =
+                          _selectionMode;
                     } else if (value == 'docker') {
                       await context.push(
                         '/s/${widget.serverId}/containers/docker',
@@ -337,7 +350,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
                         context.pagePadding,
                         AppTokens.s8,
                         context.pagePadding,
-                        AppTokens.s32,
+                        AppTokens.bottomNavClearance,
                       ),
                       itemCount: state.items.length,
                       itemBuilder: (context, index) {
@@ -451,7 +464,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
 
   Future<void> _showActions(ContainerItemDto item) async {
     String? removedName;
-    await showContainerActionsPage(
+    await showContainerActions(
       context,
       ref,
       serverId: widget.serverId,

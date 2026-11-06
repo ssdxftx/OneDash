@@ -59,6 +59,7 @@ import '../../presentation/features/websites/screens/website_detail_page.dart';
 import '../../presentation/features/websites/widgets/website_log_page.dart';
 import '../../presentation/features/websites/screens/websites_page.dart';
 import '../../presentation/shell/server_shell.dart';
+import 'route_observer.dart';
 import 'transitions.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -73,6 +74,7 @@ final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/',
   debugLogDiagnostics: false,
+  observers: [appRouteObserver],
   redirect: (context, state) {
     final id = int.tryParse(state.pathParameters['id'] ?? '');
     if (id != null) {

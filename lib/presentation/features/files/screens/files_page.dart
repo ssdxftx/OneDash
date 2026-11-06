@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../shell/nav_visibility.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../core/utils/file_type_utils.dart';
 import '../../../../core/utils/format_utils.dart';
@@ -59,6 +60,12 @@ class _FilesPageState extends ConsumerState<FilesPage> {
   bool get _selectionMode => _selecting;
 
   String get _path => widget.initialPath.isEmpty ? '/' : widget.initialPath;
+
+  @override
+  void deactivate() {
+    ref.read(bottomNavSuppressedProvider.notifier).state = false;
+    super.deactivate();
+  }
 
   @override
   void dispose() {
@@ -425,12 +432,16 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       _selecting = true;
       if (!_selected.remove(item.path)) _selected.add(item.path);
     });
+    ref.read(bottomNavSuppressedProvider.notifier).state = true;
   }
 
-  void _clearSelection() => setState(() {
-    _selecting = false;
-    _selected.clear();
-  });
+  void _clearSelection() {
+    setState(() {
+      _selecting = false;
+      _selected.clear();
+    });
+    ref.read(bottomNavSuppressedProvider.notifier).state = false;
+  }
 
   void _selectAll(List<FileItemDto> items) {
     setState(() {
@@ -439,6 +450,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
         ..clear()
         ..addAll(items.map((item) => item.path));
     });
+    ref.read(bottomNavSuppressedProvider.notifier).state = true;
   }
 
   Future<void> _permission(FileItemDto item) async {
@@ -913,6 +925,9 @@ class _FilesPageState extends ConsumerState<FilesPage> {
             },
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(
+                bottom: AppTokens.bottomNavClearance,
+              ),
               itemExtent:
                   72 *
                   MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.8),

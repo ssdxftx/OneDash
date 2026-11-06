@@ -52,7 +52,7 @@ class MorePage extends ConsumerWidget {
                 context.pagePadding,
                 0,
                 context.pagePadding,
-                AppTokens.s32,
+                AppTokens.bottomNavClearance,
               ),
               sliver: SliverToBoxAdapter(
                 child: Column(

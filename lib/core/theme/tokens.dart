@@ -35,6 +35,10 @@ abstract final class AppTokens {
   static const double appBarHeight = 64;
   static const double appBarLargeHeight = 84;
 
+  static const double bottomNavHeight = 72;
+  static const double bottomNavMaxWidth = 480;
+  static const double bottomNavClearance = 96;
+
   static const double rowOneLine = 56;
   static const double rowTwoLine = 72;
   static const double rowThreeLine = 88;

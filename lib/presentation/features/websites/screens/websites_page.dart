@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../shell/nav_visibility.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../data/dto/website/website_dto.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
@@ -58,12 +59,16 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
       _selecting = true;
       if (!_selected.remove(site.id)) _selected.add(site.id);
     });
+    ref.read(bottomNavSuppressedProvider.notifier).state = true;
   }
 
-  void _clearSelection() => setState(() {
-    _selecting = false;
-    _selected.clear();
-  });
+  void _clearSelection() {
+    setState(() {
+      _selecting = false;
+      _selected.clear();
+    });
+    ref.read(bottomNavSuppressedProvider.notifier).state = false;
+  }
 
   Future<void> _batchDelete() async {
     final l10n = AppLocalizations.of(context);
@@ -98,6 +103,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
   }
 
   static const _filters = ['', 'running', 'stopped', 'static', 'proxy', 'php'];
+
+  @override
+  void deactivate() {
+    ref.read(bottomNavSuppressedProvider.notifier).state = false;
+    super.deactivate();
+  }
 
   @override
   void dispose() {
@@ -200,6 +211,8 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                           );
                         }
                       });
+                      ref.read(bottomNavSuppressedProvider.notifier).state =
+                          _selectionMode;
                     } else if (value == 'templates') {
                       if (!context.mounted) return;
                       await context.push(
@@ -290,7 +303,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                           context.pagePadding,
                           AppTokens.s8,
                           context.pagePadding,
-                          AppTokens.s32,
+                          AppTokens.bottomNavClearance,
                         ),
                         itemCount: result.items.length,
                         itemBuilder: (context, index) {

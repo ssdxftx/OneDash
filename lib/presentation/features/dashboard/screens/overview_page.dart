@@ -148,7 +148,9 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                 ],
                 data: (state) => _content(context, l10n, state),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: AppTokens.s40)),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: AppTokens.bottomNavClearance),
+              ),
             ],
           ),
         ),

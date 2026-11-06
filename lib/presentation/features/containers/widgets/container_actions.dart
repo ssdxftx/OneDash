@@ -13,7 +13,6 @@ import '../../../../data/dto/container/container_search_dto.dart';
 import '../../../../data/dto/container/container_stats_dto.dart';
 import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/action_sheet.dart';
-import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -30,6 +29,7 @@ Future<void> showContainerActions(
   required int serverId,
   required ContainerItemDto item,
   required Future<void> Function() onChanged,
+  Future<void> Function(String name)? onRemoving,
 }) {
   return showAppSheet<void>(
     context: context,
@@ -40,43 +40,7 @@ Future<void> showContainerActions(
       serverId: serverId,
       item: item,
       onChanged: onChanged,
-      fullPage: false,
-    ),
-  );
-}
-
-Future<void> showContainerActionsPage(
-  BuildContext context,
-  WidgetRef ref, {
-  required int serverId,
-  required ContainerItemDto item,
-  required Future<void> Function() onChanged,
-  Future<void> Function(String name)? onRemoving,
-}) {
-  return Navigator.of(context, rootNavigator: true).push<void>(
-    MaterialPageRoute<void>(
-      builder: (_) => Scaffold(
-        appBar: AppBarLarge(title: item.name, subtitle: item.imageName),
-        body: ListView(
-          padding: EdgeInsets.fromLTRB(
-            context.pagePadding,
-            AppTokens.s8,
-            context.pagePadding,
-            AppTokens.s32,
-          ),
-          children: [
-            _ContainerActionsBody(
-              hostContext: context,
-              ref: ref,
-              serverId: serverId,
-              item: item,
-              onChanged: onChanged,
-              onRemoving: onRemoving,
-              fullPage: true,
-            ),
-          ],
-        ),
-      ),
+      onRemoving: onRemoving,
     ),
   );
 }
@@ -88,7 +52,6 @@ class _ContainerActionsBody extends StatelessWidget {
     required this.serverId,
     required this.item,
     required this.onChanged,
-    required this.fullPage,
     this.onRemoving,
   });
 
@@ -98,7 +61,6 @@ class _ContainerActionsBody extends StatelessWidget {
   final ContainerItemDto item;
   final Future<void> Function() onChanged;
   final Future<void> Function(String name)? onRemoving;
-  final bool fullPage;
 
   @override
   Widget build(BuildContext context) {
@@ -309,17 +271,7 @@ class _ContainerActionsBody extends StatelessWidget {
         ),
       ],
     );
-    if (!fullPage) {
-      return ActionSheetScaffold(infoCard: infoCard, child: content);
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        infoCard,
-        const SizedBox(height: AppTokens.s20),
-        content,
-      ],
-    );
+    return ActionSheetScaffold(infoCard: infoCard, child: content);
   }
 }
 
