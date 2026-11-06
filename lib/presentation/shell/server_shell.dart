@@ -73,7 +73,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
       _show();
     } else if (notification is ScrollEndNotification) {
       _showTimer?.cancel();
-      _showTimer = Timer(AppTokens.dLoop, _show);
+      _showTimer = Timer(AppTokens.navIdleRestore, _show);
     }
     return false;
   }
@@ -216,42 +216,46 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
             ),
             child: ClipRRect(
               borderRadius: radius,
-              child: NavigationBar(
-                height: AppTokens.bottomNavHeight,
-                backgroundColor: scheme.surfaceContainer,
-                elevation: 0,
-                selectedIndex: widget.navigationShell.currentIndex,
-                labelBehavior: MediaQuery.textScalerOf(context).scale(1) > 1.2
-                    ? NavigationDestinationLabelBehavior.onlyShowSelected
-                    : NavigationDestinationLabelBehavior.alwaysShow,
-                onDestinationSelected: _selectDestination,
-                destinations: [
-                  NavigationDestination(
-                    icon: const Icon(TablerIcons.dashboard),
-                    selectedIcon: const Icon(TablerIcons.dashboard_filled),
-                    label: l10n.nav_overview,
-                  ),
-                  NavigationDestination(
-                    icon: const Icon(TablerIcons.world),
-                    selectedIcon: const Icon(TablerIcons.world),
-                    label: l10n.nav_websites,
-                  ),
-                  NavigationDestination(
-                    icon: const Icon(TablerIcons.folder),
-                    selectedIcon: const Icon(TablerIcons.folder_filled),
-                    label: l10n.nav_files,
-                  ),
-                  NavigationDestination(
-                    icon: const Icon(TablerIcons.box),
-                    selectedIcon: const Icon(TablerIcons.box),
-                    label: l10n.nav_containers,
-                  ),
-                  NavigationDestination(
-                    icon: const Icon(TablerIcons.dots),
-                    selectedIcon: const Icon(TablerIcons.dots),
-                    label: l10n.nav_more,
-                  ),
-                ],
+              child: MediaQuery.removePadding(
+                context: context,
+                removeBottom: true,
+                child: NavigationBar(
+                  height: AppTokens.bottomNavHeight,
+                  backgroundColor: scheme.surfaceContainer,
+                  elevation: 0,
+                  selectedIndex: widget.navigationShell.currentIndex,
+                  labelBehavior: MediaQuery.textScalerOf(context).scale(1) > 1.2
+                      ? NavigationDestinationLabelBehavior.onlyShowSelected
+                      : NavigationDestinationLabelBehavior.alwaysShow,
+                  onDestinationSelected: _selectDestination,
+                  destinations: [
+                    NavigationDestination(
+                      icon: const Icon(TablerIcons.dashboard),
+                      selectedIcon: const Icon(TablerIcons.dashboard_filled),
+                      label: l10n.nav_overview,
+                    ),
+                    NavigationDestination(
+                      icon: const Icon(TablerIcons.world),
+                      selectedIcon: const Icon(TablerIcons.world),
+                      label: l10n.nav_websites,
+                    ),
+                    NavigationDestination(
+                      icon: const Icon(TablerIcons.folder),
+                      selectedIcon: const Icon(TablerIcons.folder_filled),
+                      label: l10n.nav_files,
+                    ),
+                    NavigationDestination(
+                      icon: const Icon(TablerIcons.box),
+                      selectedIcon: const Icon(TablerIcons.box),
+                      label: l10n.nav_containers,
+                    ),
+                    NavigationDestination(
+                      icon: const Icon(TablerIcons.dots),
+                      selectedIcon: const Icon(TablerIcons.dots),
+                      label: l10n.nav_more,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -925,8 +925,10 @@ class _FilesPageState extends ConsumerState<FilesPage> {
             },
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(
-                bottom: AppTokens.bottomNavClearance,
+              padding: EdgeInsets.only(
+                bottom:
+                    AppTokens.bottomNavClearance +
+                    MediaQuery.paddingOf(context).bottom,
               ),
               itemExtent:
                   72 *

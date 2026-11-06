@@ -37,17 +37,28 @@ GoRouter _router() {
   );
 }
 
-Widget _app(GoRouter router, {bool reduceMotion = false}) {
+Widget _app(
+  GoRouter router, {
+  bool reduceMotion = false,
+  double bottomInset = 0,
+}) {
   return ProviderScope(
     child: MaterialApp.router(
       theme: AppTheme.build(Brightness.light),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(disableAnimations: reduceMotion),
-        child: child ?? const SizedBox.shrink(),
-      ),
+      builder: (context, child) {
+        final media = MediaQuery.of(context);
+        return MediaQuery(
+          data: media.copyWith(
+            disableAnimations: reduceMotion,
+            padding: media.padding.copyWith(bottom: bottomInset),
+            viewPadding: media.viewPadding.copyWith(bottom: bottomInset),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     ),
   );
 }
@@ -104,6 +115,18 @@ void main() {
     final slide = tester.widget<AnimatedSlide>(find.byType(AnimatedSlide));
     expect(slide.duration, Duration.zero);
     expect(slide.offset, isNot(Offset.zero));
+  });
+
+  testWidgets('nav keeps design height with bottom inset', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(_app(_router(), bottomInset: 34));
+    await tester.pumpAndSettle();
+
+    final nav = tester.getRect(find.byType(NavigationBar));
+    expect(nav.height, AppTokens.bottomNavHeight);
+    expect(nav.bottom, closeTo(844 - 34 - AppTokens.s12, 0.5));
   });
 
   testWidgets('nav stays within max width and above safe area', (tester) async {

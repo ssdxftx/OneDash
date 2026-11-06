@@ -148,8 +148,12 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                 ],
                 data: (state) => _content(context, l10n, state),
               ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: AppTokens.bottomNavClearance),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height:
+                      AppTokens.bottomNavClearance +
+                      MediaQuery.paddingOf(context).bottom,
+                ),
               ),
             ],
           ),
