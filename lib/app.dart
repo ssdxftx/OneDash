@@ -56,6 +56,10 @@ class OneDashApp extends ConsumerWidget {
               oled: theme.oled,
             ),
             themeMode: theme.mode.themeMode,
+            themeAnimationDuration: listAnimations
+                ? AppTokens.dPage
+                : Duration.zero,
+            themeAnimationCurve: AppTokens.curveBase,
             routerConfig: appRouter,
             locale: localeOption.toLocale(),
             supportedLocales: AppLocalizations.supportedLocales,
@@ -75,12 +79,7 @@ class OneDashApp extends ConsumerWidget {
                   textScaler: TextScaler.linear(scale),
                   disableAnimations: reduceMotion,
                 ),
-                child: AnimatedTheme(
-                  data: Theme.of(context),
-                  duration: reduceMotion ? Duration.zero : AppTokens.dPage,
-                  curve: AppTokens.curveBase,
-                  child: child ?? const SizedBox.shrink(),
-                ),
+                child: child ?? const SizedBox.shrink(),
               );
             },
           ),

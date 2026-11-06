@@ -72,4 +72,55 @@ void main() {
     expect(tester.getSize(find.byType(RemovableListItem)).height, 100);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('入场动画只播一次，回收重建后保持完整高度', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: const Scaffold(body: _RecycleHarness()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.drag(find.byType(ListView), const Offset(0, -3000));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, 3000));
+    await tester.pumpAndSettle();
+
+    final row = find.byType(RemovableListItem).first;
+    expect(tester.getSize(row).height, 80);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+class _RecycleHarness extends StatefulWidget {
+  const _RecycleHarness();
+
+  @override
+  State<_RecycleHarness> createState() => _RecycleHarnessState();
+}
+
+class _RecycleHarnessState extends State<_RecycleHarness> {
+  bool _animateEntry = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _animateEntry = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: 30,
+      itemBuilder: (context, index) => RemovableListItem(
+        key: ValueKey(index),
+        removing: false,
+        animateIn: _animateEntry,
+        child: const SizedBox(height: 80, child: Text('row')),
+      ),
+    );
+  }
 }

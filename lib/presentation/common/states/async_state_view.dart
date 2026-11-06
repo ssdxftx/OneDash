@@ -73,6 +73,10 @@ class AsyncStateView<T> extends StatelessWidget {
       duration: context.motion(AppTokens.dBase),
       switchInCurve: AppTokens.curveBase,
       switchOutCurve: AppTokens.curveBase,
+      layoutBuilder: (currentChild, previousChildren) => Stack(
+        alignment: Alignment.topCenter,
+        children: [...previousChildren, if (currentChild != null) currentChild],
+      ),
       child: KeyedSubtree(key: ValueKey((state, contentKey)), child: child),
     );
   }

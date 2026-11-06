@@ -21,7 +21,9 @@ class AppBarLarge extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onTitleTap;
 
   @override
-  Size get preferredSize => Size.fromHeight(subtitle == null ? 64 : 84);
+  Size get preferredSize => Size.fromHeight(
+    subtitle == null ? AppTokens.appBarHeight : AppTokens.appBarLargeHeight,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +61,9 @@ class SliverAppBarLarge extends StatelessWidget {
     final scheme = context.scheme;
     return SliverAppBar(
       pinned: pinned,
-      toolbarHeight: subtitle == null ? 64 : 84,
+      toolbarHeight: subtitle == null
+          ? AppTokens.appBarHeight
+          : AppTokens.appBarLargeHeight,
       backgroundColor: scheme.surface,
       surfaceTintColor: Colors.transparent,
       shadowColor: scheme.outlineVariant,

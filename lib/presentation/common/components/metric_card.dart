@@ -161,6 +161,7 @@ class MetricRing extends StatelessWidget {
     this.strokeWidth = 8,
     this.color,
     this.center,
+    this.centerBuilder,
   });
 
   final double value;
@@ -169,6 +170,7 @@ class MetricRing extends StatelessWidget {
   final double strokeWidth;
   final Color? color;
   final Widget? center;
+  final Widget Function(BuildContext context, double progress)? centerBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -199,6 +201,7 @@ class MetricRing extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child:
+                        centerBuilder?.call(context, progress) ??
                         center ??
                         Text(
                           '${(progress * 100).toStringAsFixed(0)}%',

@@ -46,4 +46,17 @@ void main() {
     expect(StatusPulse.debugReferences, 0);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('TickerMode 关闭时释放脉冲', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        const TickerMode(enabled: false, child: StatusDot(status: 'error')),
+      ),
+    );
+    await tester.pump();
+
+    expect(StatusPulse.debugReferences, 0);
+    await tester.pumpWidget(const SizedBox.shrink());
+    expect(tester.takeException(), isNull);
+  });
 }

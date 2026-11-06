@@ -27,7 +27,10 @@ class _StatusDotState extends State<StatusDot> {
     return status == 'error' || status == 'failed' || status == 'dead';
   }
 
-  bool get _pulsing => _shouldPulse && !context.reduceMotion;
+  bool get _pulsing =>
+      _shouldPulse &&
+      !context.reduceMotion &&
+      TickerMode.valuesOf(context).enabled;
 
   @override
   void didChangeDependencies() {

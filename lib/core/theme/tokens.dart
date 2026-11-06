@@ -32,6 +32,9 @@ abstract final class AppTokens {
   static const double iconNav = 24;
   static const double iconEmpty = 28;
 
+  static const double appBarHeight = 64;
+  static const double appBarLargeHeight = 84;
+
   static const double rowOneLine = 56;
   static const double rowTwoLine = 72;
   static const double rowThreeLine = 88;

@@ -51,6 +51,7 @@ Future<void> showContainerActionsPage(
   required int serverId,
   required ContainerItemDto item,
   required Future<void> Function() onChanged,
+  Future<void> Function(String name)? onRemoving,
 }) {
   return Navigator.of(context, rootNavigator: true).push<void>(
     MaterialPageRoute<void>(
@@ -70,6 +71,7 @@ Future<void> showContainerActionsPage(
               serverId: serverId,
               item: item,
               onChanged: onChanged,
+              onRemoving: onRemoving,
               fullPage: true,
             ),
           ],
@@ -87,6 +89,7 @@ class _ContainerActionsBody extends StatelessWidget {
     required this.item,
     required this.onChanged,
     required this.fullPage,
+    this.onRemoving,
   });
 
   final BuildContext hostContext;
@@ -94,6 +97,7 @@ class _ContainerActionsBody extends StatelessWidget {
   final int serverId;
   final ContainerItemDto item;
   final Future<void> Function() onChanged;
+  final Future<void> Function(String name)? onRemoving;
   final bool fullPage;
 
   @override
@@ -298,7 +302,7 @@ class _ContainerActionsBody extends StatelessWidget {
               danger: true,
               onTap: () {
                 Navigator.of(context).pop();
-                _remove(hostContext, ref, item, onChanged);
+                _remove(hostContext, ref, item, onChanged, onRemoving);
               },
             ),
           ],
@@ -324,8 +328,9 @@ Future<void> _operate(
   WidgetRef ref,
   ContainerItemDto item,
   String operation,
-  Future<void> Function() onChanged,
-) async {
+  Future<void> Function() onChanged, {
+  Future<void> Function()? beforeRefresh,
+}) async {
   final l10n = AppLocalizations.of(context);
   final repository = await ref.read(containerRepositoryProvider.future);
   if (!context.mounted) return;
@@ -349,6 +354,7 @@ Future<void> _operate(
   );
   if (!success || !context.mounted) return;
   AppToast.success(context, l10n.action_done);
+  await beforeRefresh?.call();
   await onChanged();
 }
 
@@ -357,6 +363,7 @@ Future<void> _remove(
   WidgetRef ref,
   ContainerItemDto item,
   Future<void> Function() onChanged,
+  Future<void> Function(String name)? onRemoving,
 ) async {
   final l10n = AppLocalizations.of(context);
   final confirmed = await showConfirmSheet(
@@ -367,7 +374,14 @@ Future<void> _remove(
     requireText: item.name,
   );
   if (!confirmed || !context.mounted) return;
-  await _operate(context, ref, item, 'remove', onChanged);
+  await _operate(
+    context,
+    ref,
+    item,
+    'remove',
+    onChanged,
+    beforeRefresh: onRemoving == null ? null : () => onRemoving(item.name),
+  );
 }
 
 Future<void> _upgrade(

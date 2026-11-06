@@ -46,8 +46,16 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
   String _filter = 'all';
   final Set<String> _selected = {};
   final Set<String> _removing = {};
+  bool _animateEntry = true;
 
   bool get _selectionMode => _selecting;
+
+  void _stopEntryAnimation(bool hasItems) {
+    if (!_animateEntry || !hasItems) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _animateEntry = false);
+    });
+  }
 
   void _toggle(String name) {
     setState(() {
@@ -324,56 +332,63 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                         context.push('/s/${widget.serverId}/containers/create'),
                   ),
                 ),
-                builder: (state) => RefreshIndicator(
-                  onRefresh: () =>
-                      ref.read(containersProvider.notifier).refresh(),
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: EdgeInsets.fromLTRB(
-                      context.pagePadding,
-                      AppTokens.s8,
-                      context.pagePadding,
-                      AppTokens.s32,
-                    ),
-                    itemCount: state.items.length,
-                    itemBuilder: (context, index) {
-                      final item = state.items[index];
-                      final stats = state.stats[item.containerID];
-                      return RemovableListItem(
-                        key: ValueKey('container-${item.name}'),
-                        removing: _removing.contains(item.name),
-                        animateIn: true,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: AppTokens.s12),
-                          child: _ContainerCard(
-                            item: item,
-                            cpu: stats?.cpuPercent,
-                            memory: stats == null
-                                ? null
-                                : formatBytes(stats.memoryUsage.toInt()),
-                            selected: _selected.contains(item.name),
-                            selectable: !item.isFromCompose,
-                            selectionMode: _selectionMode,
-                            onTap: _selectionMode
-                                ? () {
-                                    if (!item.isFromCompose) _toggle(item.name);
-                                  }
-                                : () => _showActions(item),
-                            onLongPress: () {
-                              if (!item.isFromCompose) _toggle(item.name);
-                            },
-                            onToggle: () => _operateQuick(
-                              item,
-                              item.state.toLowerCase() == 'running'
-                                  ? 'stop'
-                                  : 'start',
+                builder: (state) {
+                  _stopEntryAnimation(state.items.isNotEmpty);
+                  return RefreshIndicator(
+                    onRefresh: () =>
+                        ref.read(containersProvider.notifier).refresh(),
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.fromLTRB(
+                        context.pagePadding,
+                        AppTokens.s8,
+                        context.pagePadding,
+                        AppTokens.s32,
+                      ),
+                      itemCount: state.items.length,
+                      itemBuilder: (context, index) {
+                        final item = state.items[index];
+                        final stats = state.stats[item.containerID];
+                        return RemovableListItem(
+                          key: ValueKey('container-${item.name}'),
+                          removing: _removing.contains(item.name),
+                          animateIn: _animateEntry,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppTokens.s12,
+                            ),
+                            child: _ContainerCard(
+                              item: item,
+                              cpu: stats?.cpuPercent,
+                              memory: stats == null
+                                  ? null
+                                  : formatBytes(stats.memoryUsage.toInt()),
+                              selected: _selected.contains(item.name),
+                              selectable: !item.isFromCompose,
+                              selectionMode: _selectionMode,
+                              onTap: _selectionMode
+                                  ? () {
+                                      if (!item.isFromCompose) {
+                                        _toggle(item.name);
+                                      }
+                                    }
+                                  : () => _showActions(item),
+                              onLongPress: () {
+                                if (!item.isFromCompose) _toggle(item.name);
+                              },
+                              onToggle: () => _operateQuick(
+                                item,
+                                item.state.toLowerCase() == 'running'
+                                    ? 'stop'
+                                    : 'start',
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -441,12 +456,26 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
   }
 
   Future<void> _showActions(ContainerItemDto item) async {
+    String? removedName;
     await showContainerActionsPage(
       context,
       ref,
       serverId: widget.serverId,
       item: item,
-      onChanged: () => ref.read(containersProvider.notifier).refresh(),
+      onRemoving: (name) async {
+        removedName = name;
+        if (!mounted) return;
+        setState(() => _removing.add(name));
+        await Future<void>.delayed(context.motion(AppTokens.dBase));
+      },
+      onChanged: () async {
+        if (!mounted) return;
+        await ref.read(containersProvider.notifier).refresh();
+        final name = removedName;
+        if (name != null && mounted) {
+          setState(() => _removing.remove(name));
+        }
+      },
     );
   }
 

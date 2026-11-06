@@ -32,7 +32,10 @@ abstract final class AppToast {
       autoCloseDuration: duration,
       showProgressBar: false,
       margin: EdgeInsets.only(
-        top: MediaQuery.paddingOf(context).top + 84 + AppTokens.s8,
+        top:
+            MediaQuery.paddingOf(context).top +
+            AppTokens.appBarLargeHeight +
+            AppTokens.s8,
         left: AppTokens.s16,
         right: AppTokens.s16,
       ),

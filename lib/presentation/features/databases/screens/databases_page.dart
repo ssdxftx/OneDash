@@ -104,6 +104,14 @@ class DatabasesPage extends ConsumerStatefulWidget {
 class _DatabasesPageState extends ConsumerState<DatabasesPage> {
   String _type = '';
   final Set<int> _removing = {};
+  bool _animateEntry = true;
+
+  void _stopEntryAnimation(bool hasItems) {
+    if (!_animateEntry || !hasItems) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _animateEntry = false);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,26 +169,29 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                 title: l10n.databases_empty_title,
                 message: l10n.databases_empty_message,
               ),
-              builder: (_) => ListView.builder(
-                padding: EdgeInsets.all(context.pagePadding),
-                itemCount: filtered.length,
-                itemBuilder: (context, index) {
-                  final item = filtered[index];
-                  return RemovableListItem(
-                    key: ValueKey('database-${item.id}'),
-                    removing: _removing.contains(item.id),
-                    animateIn: true,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: AppTokens.s12),
-                      child: _DatabaseCard(
-                        item: item,
-                        onTap: () => _showActions(item),
-                        onLongPress: () => _showActions(item),
+              builder: (_) {
+                _stopEntryAnimation(filtered.isNotEmpty);
+                return ListView.builder(
+                  padding: EdgeInsets.all(context.pagePadding),
+                  itemCount: filtered.length,
+                  itemBuilder: (context, index) {
+                    final item = filtered[index];
+                    return RemovableListItem(
+                      key: ValueKey('database-${item.id}'),
+                      removing: _removing.contains(item.id),
+                      animateIn: _animateEntry,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                        child: _DatabaseCard(
+                          item: item,
+                          onTap: () => _showActions(item),
+                          onLongPress: () => _showActions(item),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],

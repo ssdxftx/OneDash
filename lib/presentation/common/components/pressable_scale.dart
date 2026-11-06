@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/tokens.dart';
 
 /// 统一的按压缩放反馈（0.98 / 120ms）。
+///
+/// 当前未被引用，保留作为按压反馈的备选实现。
 class PressableScale extends StatefulWidget {
   const PressableScale({
     super.key,

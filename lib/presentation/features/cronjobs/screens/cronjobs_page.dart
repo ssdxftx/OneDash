@@ -35,6 +35,14 @@ class CronjobsPage extends ConsumerStatefulWidget {
 
 class _CronjobsPageState extends ConsumerState<CronjobsPage> {
   final Set<int> _removing = {};
+  bool _animateEntry = true;
+
+  void _stopEntryAnimation(bool hasItems) {
+    if (!_animateEntry || !hasItems) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _animateEntry = false);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,26 +78,29 @@ class _CronjobsPageState extends ConsumerState<CronjobsPage> {
           onAction: () =>
               context.push('/s/${widget.serverId}/more/cronjobs/form'),
         ),
-        builder: (data) => ListView.builder(
-          padding: EdgeInsets.all(context.pagePadding),
-          itemCount: data.items.length,
-          itemBuilder: (context, index) {
-            final item = data.items[index];
-            return RemovableListItem(
-              key: ValueKey('cronjob-${item.id}'),
-              removing: _removing.contains(item.id),
-              animateIn: true,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: AppTokens.s12),
-                child: _CronjobCard(
-                  item: item,
-                  onTap: () => _showActions(context, ref, item),
-                  onLongPress: () => _showActions(context, ref, item),
+        builder: (data) {
+          _stopEntryAnimation(data.items.isNotEmpty);
+          return ListView.builder(
+            padding: EdgeInsets.all(context.pagePadding),
+            itemCount: data.items.length,
+            itemBuilder: (context, index) {
+              final item = data.items[index];
+              return RemovableListItem(
+                key: ValueKey('cronjob-${item.id}'),
+                removing: _removing.contains(item.id),
+                animateIn: _animateEntry,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                  child: _CronjobCard(
+                    item: item,
+                    onTap: () => _showActions(context, ref, item),
+                    onLongPress: () => _showActions(context, ref, item),
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
+              );
+            },
+          );
+        },
       ),
     );
   }

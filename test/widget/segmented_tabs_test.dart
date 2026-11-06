@@ -62,4 +62,125 @@ void main() {
     expect(after.left, greaterThan(before.left!));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('宽度变化后非滚动指示器重新定位', (tester) async {
+    addTearDown(tester.view.reset);
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 400);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: const Scaffold(
+          body: SegmentedTabs(
+            labels: ['概览', '网站', '计划任务'],
+            selectedIndex: 2,
+            scrollable: false,
+            onChanged: _noop,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final wide = tester
+        .widget<AnimatedPositioned>(find.byType(AnimatedPositioned))
+        .left!;
+
+    tester.view.physicalSize = const Size(320, 400);
+    await tester.pumpAndSettle();
+    final narrow = tester
+        .widget<AnimatedPositioned>(find.byType(AnimatedPositioned))
+        .left!;
+
+    expect(narrow, lessThan(wide));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('keepAlive 切换标签不重建页内 State', (tester) async {
+    _ProbeState.builds.clear();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: const Scaffold(
+          body: SegmentedTabsView(
+            labels: ['A', 'B', 'C'],
+            children: [_Probe('A'), _Probe('B'), _Probe('C')],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(_ProbeState.builds['A'], 1);
+
+    await tester.tap(find.text('B'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('C'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('A'));
+    await tester.pumpAndSettle();
+
+    expect(_ProbeState.builds['A'], 1);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('keepAlive 切换标签保留滚动位置', (tester) async {
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: Scaffold(
+          body: SegmentedTabsView(
+            labels: const ['A', 'B'],
+            children: [
+              ListView.builder(
+                controller: controller,
+                itemCount: 30,
+                itemBuilder: (context, index) =>
+                    SizedBox(height: 60, child: Text('A-$index')),
+              ),
+              ListView(
+                children: const [SizedBox(height: 60, child: Text('B-0'))],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    controller.jumpTo(600);
+    await tester.pump();
+
+    await tester.tap(find.text('B'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('A'));
+    await tester.pumpAndSettle();
+
+    expect(controller.offset, 600);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+void _noop(int _) {}
+
+class _Probe extends StatefulWidget {
+  const _Probe(this.name);
+
+  final String name;
+
+  @override
+  State<_Probe> createState() => _ProbeState();
+}
+
+class _ProbeState extends State<_Probe> {
+  static final Map<String, int> builds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    builds[widget.name] = (builds[widget.name] ?? 0) + 1;
+  }
+
+  @override
+  Widget build(BuildContext context) => Text('page-${widget.name}');
 }

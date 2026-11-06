@@ -221,11 +221,11 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                           : score >= 50
                           ? context.appColors.warning
                           : context.appColors.danger,
-                      center: Column(
+                      centerBuilder: (context, progress) => Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            score.toStringAsFixed(0),
+                            (score * progress).toStringAsFixed(0),
                             style: AppTextStyles.numericLarge.copyWith(
                               fontSize: 26,
                             ),

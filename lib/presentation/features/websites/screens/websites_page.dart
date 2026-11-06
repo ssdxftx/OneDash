@@ -48,8 +48,16 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
   bool _selecting = false;
   final Set<int> _selected = {};
   final Set<int> _removing = {};
+  bool _animateEntry = true;
 
   bool get _selectionMode => _selecting;
+
+  void _stopEntryAnimation(bool hasItems) {
+    if (!_animateEntry || !hasItems) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _animateEntry = false);
+    });
+  }
 
   void _toggle(WebsiteDto site) {
     setState(() {
@@ -270,50 +278,53 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                         context.push('/s/${widget.serverId}/websites/create'),
                   ),
                 ),
-                builder: (result) => RefreshIndicator(
-                  onRefresh: () =>
-                      ref.read(websitesProvider.notifier).refresh(),
-                  child: NotificationListener<ScrollNotification>(
-                    onNotification: (notification) {
-                      if (notification.metrics.extentAfter < 400) {
-                        ref.read(websitesProvider.notifier).loadMore();
-                      }
-                      return false;
-                    },
-                    child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.fromLTRB(
-                        context.pagePadding,
-                        AppTokens.s8,
-                        context.pagePadding,
-                        AppTokens.s32,
-                      ),
-                      itemCount: result.items.length,
-                      itemBuilder: (context, index) {
-                        final site = result.items[index];
-                        return RemovableListItem(
-                          key: ValueKey('website-${site.id}'),
-                          removing: _removing.contains(site.id),
-                          animateIn: true,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: AppTokens.s12,
-                            ),
-                            child: _WebsiteCard(
-                              site: site,
-                              selected: _selected.contains(site.id),
-                              selectionMode: _selectionMode,
-                              onTap: _selectionMode
-                                  ? () => _toggle(site)
-                                  : () => _showSiteActions(site),
-                              onLongPress: () => _toggle(site),
-                            ),
-                          ),
-                        );
+                builder: (result) {
+                  _stopEntryAnimation(result.items.isNotEmpty);
+                  return RefreshIndicator(
+                    onRefresh: () =>
+                        ref.read(websitesProvider.notifier).refresh(),
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (notification) {
+                        if (notification.metrics.extentAfter < 400) {
+                          ref.read(websitesProvider.notifier).loadMore();
+                        }
+                        return false;
                       },
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.fromLTRB(
+                          context.pagePadding,
+                          AppTokens.s8,
+                          context.pagePadding,
+                          AppTokens.s32,
+                        ),
+                        itemCount: result.items.length,
+                        itemBuilder: (context, index) {
+                          final site = result.items[index];
+                          return RemovableListItem(
+                            key: ValueKey('website-${site.id}'),
+                            removing: _removing.contains(site.id),
+                            animateIn: _animateEntry,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppTokens.s12,
+                              ),
+                              child: _WebsiteCard(
+                                site: site,
+                                selected: _selected.contains(site.id),
+                                selectionMode: _selectionMode,
+                                onTap: _selectionMode
+                                    ? () => _toggle(site)
+                                    : () => _showSiteActions(site),
+                                onLongPress: () => _toggle(site),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             ),
           ],

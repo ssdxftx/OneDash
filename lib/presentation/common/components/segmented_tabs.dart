@@ -33,6 +33,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
   bool _canScrollLeft = false;
   bool _canScrollRight = false;
   double? _indicatorLeft;
+  double? _lastRowWidth;
 
   List<GlobalKey> _buildKeys() =>
       List.generate(widget.labels.length, (_) => GlobalKey());
@@ -96,6 +97,14 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
     setState(() => _indicatorLeft = left);
   }
 
+  void _handleRowWidth(double width) {
+    if (_lastRowWidth == width) return;
+    _lastRowWidth = width;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _updateIndicator();
+    });
+  }
+
   void _ensureSelectedVisible() {
     if (!mounted || !widget.scrollable || _keys.isEmpty) return;
     final index = widget.selectedIndex.clamp(0, _keys.length - 1);
@@ -138,6 +147,9 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
                 children: [
                   Text(
                     widget.labels[i],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: AppTextStyles.label.copyWith(
                       color: selected
                           ? scheme.primary
@@ -212,7 +224,15 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
                 child: row,
               ),
             )
-          : Padding(padding: widget.padding, child: row),
+          : Padding(
+              padding: widget.padding,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  _handleRowWidth(constraints.maxWidth);
+                  return row;
+                },
+              ),
+            ),
     );
   }
 }
@@ -297,42 +317,34 @@ class _SegmentedTabsViewState extends State<SegmentedTabsView>
               ? AnimatedBuilder(
                   animation: _fade,
                   builder: (context, _) {
-                    final previous = _previous;
+                    final previous = _fade.isCompleted ? null : _previous;
                     return Stack(
                       fit: StackFit.expand,
                       children: [
                         for (var i = 0; i < widget.children.length; i++)
-                          if (_visited.contains(i) &&
-                              i != _index &&
-                              i != previous)
-                            Offstage(
-                              offstage: true,
-                              child: TickerMode(
-                                enabled: false,
-                                child: widget.children[i],
-                              ),
-                            ),
-                        if (previous != null && previous != _index)
                           Positioned.fill(
                             child: IgnorePointer(
+                              ignoring: i != _index,
                               child: TickerMode(
-                                enabled: false,
+                                enabled: i == _index || i == previous,
                                 child: Opacity(
-                                  opacity: 1 - _fade.value,
-                                  child: widget.children[previous],
+                                  opacity: i == _index
+                                      ? _fade.value
+                                      : i == previous
+                                      ? 1 - _fade.value
+                                      : 0,
+                                  child: Offstage(
+                                    offstage:
+                                        !_visited.contains(i) ||
+                                        (i != _index && i != previous),
+                                    child: _visited.contains(i)
+                                        ? widget.children[i]
+                                        : const SizedBox.shrink(),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        Positioned.fill(
-                          child: TickerMode(
-                            enabled: true,
-                            child: Opacity(
-                              opacity: _fade.value,
-                              child: widget.children[_index],
-                            ),
-                          ),
-                        ),
                       ],
                     );
                   },
