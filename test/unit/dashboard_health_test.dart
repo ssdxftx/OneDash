@@ -82,6 +82,14 @@ void main() {
     });
   });
 
+  group('healthProgressText', () {
+    test('normalized progress maps back to the score', () {
+      expect(healthProgressText(0.87), '87');
+      expect(healthProgressText(0.7), '70');
+      expect(healthProgressText(1), '100');
+    });
+  });
+
   group('formatUptime', () {
     test('days and hours', () {
       expect(

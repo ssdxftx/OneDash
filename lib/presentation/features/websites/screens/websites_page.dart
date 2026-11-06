@@ -26,6 +26,7 @@ import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/entry_animation.dart';
 import '../../../common/states/refreshable_empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../../servers/providers/servers_provider.dart';
@@ -40,7 +41,8 @@ class WebsitesPage extends ConsumerStatefulWidget {
   ConsumerState<WebsitesPage> createState() => _WebsitesPageState();
 }
 
-class _WebsitesPageState extends ConsumerState<WebsitesPage> {
+class _WebsitesPageState extends ConsumerState<WebsitesPage>
+    with EntryAnimation<WebsitesPage> {
   final _searchController = TextEditingController();
   final _debouncer = Debouncer();
   bool _searching = false;
@@ -48,16 +50,8 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
   bool _selecting = false;
   final Set<int> _selected = {};
   final Set<int> _removing = {};
-  bool _animateEntry = true;
 
   bool get _selectionMode => _selecting;
-
-  void _stopEntryAnimation(bool hasItems) {
-    if (!_animateEntry || !hasItems) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() => _animateEntry = false);
-    });
-  }
 
   void _toggle(WebsiteDto site) {
     setState(() {
@@ -279,7 +273,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                   ),
                 ),
                 builder: (result) {
-                  _stopEntryAnimation(result.items.isNotEmpty);
+                  stopEntryAnimation(result.items.isNotEmpty);
                   return RefreshIndicator(
                     onRefresh: () =>
                         ref.read(websitesProvider.notifier).refresh(),
@@ -304,7 +298,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage> {
                           return RemovableListItem(
                             key: ValueKey('website-${site.id}'),
                             removing: _removing.contains(site.id),
-                            animateIn: _animateEntry,
+                            animateIn: entryAnimationEnabled,
                             child: Padding(
                               padding: const EdgeInsets.only(
                                 bottom: AppTokens.s12,

@@ -66,4 +66,22 @@ void main() {
     expect(size.width, lessThanOrEqualTo(48));
     expect(size.height, lessThanOrEqualTo(48));
   });
+
+  testWidgets('centerBuilder receives normalized progress', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        MetricRing(
+          value: 87,
+          label: 'Health',
+          centerBuilder: (context, progress) =>
+              Text('${(progress * 100).round()}'),
+        ),
+        1,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('87'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

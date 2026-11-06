@@ -225,7 +225,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            (score * progress).toStringAsFixed(0),
+                            healthProgressText(progress),
                             style: AppTextStyles.numericLarge.copyWith(
                               fontSize: 26,
                             ),

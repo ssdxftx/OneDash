@@ -27,6 +27,13 @@ class OneDashApp extends ConsumerWidget {
         (value) => value.valueOrNull?.listAnimationsEnabled ?? true,
       ),
     );
+    final systemReduceMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ??
+        WidgetsBinding
+            .instance
+            .platformDispatcher
+            .accessibilityFeatures
+            .disableAnimations;
     ref.listen(
       appSettingsControllerProvider.select(
         (value) => value.valueOrNull?.secureScreenEnabled ?? false,
@@ -56,7 +63,7 @@ class OneDashApp extends ConsumerWidget {
               oled: theme.oled,
             ),
             themeMode: theme.mode.themeMode,
-            themeAnimationDuration: listAnimations
+            themeAnimationDuration: listAnimations && !systemReduceMotion
                 ? AppTokens.dPage
                 : Duration.zero,
             themeAnimationCurve: AppTokens.curveBase,

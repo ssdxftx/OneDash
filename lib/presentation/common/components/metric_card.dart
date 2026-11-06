@@ -170,6 +170,10 @@ class MetricRing extends StatelessWidget {
   final double strokeWidth;
   final Color? color;
   final Widget? center;
+
+  /// 接收 `0..1` 的归一化进度（`value / 100`），不是百分比数值。
+  ///
+  /// 例如显示整数分值：`Text('${(progress * 100).round()}')`。
   final Widget Function(BuildContext context, double progress)? centerBuilder;
 
   @override

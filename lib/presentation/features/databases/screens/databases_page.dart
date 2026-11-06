@@ -21,6 +21,7 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/entry_animation.dart';
 import '../../../common/states/error_toast.dart';
 import '../widgets/database_create_sheet.dart';
 
@@ -101,17 +102,10 @@ class DatabasesPage extends ConsumerStatefulWidget {
   ConsumerState<DatabasesPage> createState() => _DatabasesPageState();
 }
 
-class _DatabasesPageState extends ConsumerState<DatabasesPage> {
+class _DatabasesPageState extends ConsumerState<DatabasesPage>
+    with EntryAnimation<DatabasesPage> {
   String _type = '';
   final Set<int> _removing = {};
-  bool _animateEntry = true;
-
-  void _stopEntryAnimation(bool hasItems) {
-    if (!_animateEntry || !hasItems) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() => _animateEntry = false);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +164,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                 message: l10n.databases_empty_message,
               ),
               builder: (_) {
-                _stopEntryAnimation(filtered.isNotEmpty);
+                stopEntryAnimation(filtered.isNotEmpty);
                 return ListView.builder(
                   padding: EdgeInsets.all(context.pagePadding),
                   itemCount: filtered.length,
@@ -179,7 +173,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage> {
                     return RemovableListItem(
                       key: ValueKey('database-${item.id}'),
                       removing: _removing.contains(item.id),
-                      animateIn: _animateEntry,
+                      animateIn: entryAnimationEnabled,
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: AppTokens.s12),
                         child: _DatabaseCard(

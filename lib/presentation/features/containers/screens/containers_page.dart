@@ -24,6 +24,7 @@ import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../../common/states/entry_animation.dart';
 import '../../../common/states/refreshable_empty_state.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../providers/containers_provider.dart';
@@ -38,7 +39,8 @@ class ContainersPage extends ConsumerStatefulWidget {
   ConsumerState<ContainersPage> createState() => _ContainersPageState();
 }
 
-class _ContainersPageState extends ConsumerState<ContainersPage> {
+class _ContainersPageState extends ConsumerState<ContainersPage>
+    with EntryAnimation<ContainersPage> {
   final _searchController = TextEditingController();
   final _searchDebouncer = Debouncer();
   bool _searching = false;
@@ -46,16 +48,8 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
   String _filter = 'all';
   final Set<String> _selected = {};
   final Set<String> _removing = {};
-  bool _animateEntry = true;
 
   bool get _selectionMode => _selecting;
-
-  void _stopEntryAnimation(bool hasItems) {
-    if (!_animateEntry || !hasItems) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() => _animateEntry = false);
-    });
-  }
 
   void _toggle(String name) {
     setState(() {
@@ -333,7 +327,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                   ),
                 ),
                 builder: (state) {
-                  _stopEntryAnimation(state.items.isNotEmpty);
+                  stopEntryAnimation(state.items.isNotEmpty);
                   return RefreshIndicator(
                     onRefresh: () =>
                         ref.read(containersProvider.notifier).refresh(),
@@ -352,7 +346,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                         return RemovableListItem(
                           key: ValueKey('container-${item.name}'),
                           removing: _removing.contains(item.name),
-                          animateIn: _animateEntry,
+                          animateIn: entryAnimationEnabled,
                           child: Padding(
                             padding: const EdgeInsets.only(
                               bottom: AppTokens.s12,

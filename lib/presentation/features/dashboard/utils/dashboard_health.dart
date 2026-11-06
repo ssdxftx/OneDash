@@ -25,6 +25,9 @@ double healthScore({
       .toDouble();
 }
 
+String healthProgressText(double progress) =>
+    (progress.clamp(0, 1) * 100).toStringAsFixed(0);
+
 String healthLabel(double score, AppLocalizations l10n) {
   if (score >= 85) return l10n.dashboard_health_excellent;
   if (score >= 70) return l10n.dashboard_health_good;
