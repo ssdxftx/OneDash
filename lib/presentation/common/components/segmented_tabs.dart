@@ -36,6 +36,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
   bool _overflows = false;
   double? _indicatorLeft;
   double? _lastRowWidth;
+  double? _lastViewportWidth;
 
   List<GlobalKey> _buildKeys() =>
       List.generate(widget.labels.length, (_) => GlobalKey());
@@ -79,7 +80,8 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
     final position = _controller.position;
     final canLeft = position.pixels > 0.5;
     final canRight = position.pixels < position.maxScrollExtent - 0.5;
-    final overflows = position.maxScrollExtent > 0.5;
+    final reserved = _overflows ? 28.0 : 0.0;
+    final overflows = position.maxScrollExtent - reserved > 0.5;
     if (canLeft == _canScrollLeft &&
         canRight == _canScrollRight &&
         overflows == _overflows) {
@@ -103,6 +105,14 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
         (tab.size.width - 20) / 2;
     if (_indicatorLeft != null && (_indicatorLeft! - left).abs() < 0.5) return;
     setState(() => _indicatorLeft = left);
+  }
+
+  void _handleViewportWidth(double width) {
+    if (_lastViewportWidth == width) return;
+    _lastViewportWidth = width;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _updateEdges();
+    });
   }
 
   void _handleRowWidth(double width) {
@@ -202,29 +212,34 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
       ],
     );
     final scrollArea = widget.scrollable
-        ? ShaderMask(
-            blendMode: BlendMode.dstIn,
-            shaderCallback: (bounds) => LinearGradient(
-              colors: [
-                if (_canScrollLeft)
-                  scheme.surface.withValues(alpha: 0)
-                else
-                  scheme.surface,
-                scheme.surface,
-                scheme.surface,
-                if (_canScrollRight)
-                  scheme.surface.withValues(alpha: 0)
-                else
-                  scheme.surface,
-              ],
-              stops: appEdgeFadeStops(bounds.width),
-            ).createShader(bounds),
-            child: SingleChildScrollView(
-              controller: _controller,
-              scrollDirection: Axis.horizontal,
-              padding: widget.padding,
-              child: row,
-            ),
+        ? LayoutBuilder(
+            builder: (context, constraints) {
+              _handleViewportWidth(constraints.maxWidth);
+              return ShaderMask(
+                blendMode: BlendMode.dstIn,
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: [
+                    if (_canScrollLeft)
+                      scheme.surface.withValues(alpha: 0)
+                    else
+                      scheme.surface,
+                    scheme.surface,
+                    scheme.surface,
+                    if (_canScrollRight)
+                      scheme.surface.withValues(alpha: 0)
+                    else
+                      scheme.surface,
+                  ],
+                  stops: appEdgeFadeStops(bounds.width),
+                ).createShader(bounds),
+                child: SingleChildScrollView(
+                  controller: _controller,
+                  scrollDirection: Axis.horizontal,
+                  padding: widget.padding,
+                  child: row,
+                ),
+              );
+            },
           )
         : Padding(
             padding: widget.padding,

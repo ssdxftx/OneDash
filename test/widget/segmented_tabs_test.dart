@@ -112,6 +112,43 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('宽度变化后重新计算是否溢出', (tester) async {
+    tester.view.physicalSize = const Size(320, 400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: const Scaffold(
+          body: SegmentedTabs(
+            labels: [
+              'Basic Configuration',
+              'Security',
+              'Rewrite',
+              'Redirect',
+              'OpenResty',
+            ],
+            selectedIndex: 0,
+            onChanged: _noop,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('segmentedTabsMoreHint')), findsOneWidget);
+
+    tester.view.physicalSize = const Size(844, 400);
+    await tester.pumpAndSettle();
+
+    final position = tester
+        .state<ScrollableState>(find.byType(Scrollable).first)
+        .position;
+    expect(position.maxScrollExtent, 0);
+    expect(find.byKey(const Key('segmentedTabsMoreHint')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('点击右侧提示会滚动标签行且不误选标签', (tester) async {
     tester.view.physicalSize = const Size(320, 400);
     tester.view.devicePixelRatio = 1;
