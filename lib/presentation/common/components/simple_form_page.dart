@@ -167,6 +167,7 @@ class FormSheet extends StatelessWidget {
                 AppTokens.s20,
                 AppTokens.s24,
               ),
+              children: children,
             ),
           ),
         ),

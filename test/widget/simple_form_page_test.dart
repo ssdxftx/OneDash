@@ -92,6 +92,7 @@ void main() {
     expect(find.byType(FormSheet), findsOneWidget);
     final route = ModalRoute.of(tester.element(find.byType(FormSheet)));
     expect(route, isA<ModalBottomSheetRoute<void>>());
+    expect(find.byType(TextField), findsOneWidget);
     final box = tester.getRect(find.byType(FormSheet));
     expect(box.height, closeTo(844 * 0.74, 1));
   });

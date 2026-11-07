@@ -386,6 +386,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                 ),
                 const SizedBox(height: AppTokens.s12),
                 DropdownButtonFormField<int>(
+                  key: ValueKey('group-${groups.length}-${defaultGroup?.id}'),
                   initialValue: groups.any((group) => group.id == _groupId)
                       ? _groupId
                       : defaultGroup?.id ?? 1,
