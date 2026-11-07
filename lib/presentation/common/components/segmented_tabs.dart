@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tokens.dart';
 import 'edge_fade.dart';
@@ -233,37 +234,42 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
           bottom: BorderSide(color: scheme.outlineVariant, width: 1),
         ),
       ),
-      child: Stack(
+      child: Row(
         children: [
-          scrollArea,
+          Expanded(child: scrollArea),
           if (widget.scrollable && _canScrollRight)
-            Positioned(
-              right: 0,
-              top: 0,
-              bottom: 0,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  if (!_controller.hasClients) return;
-                  final target = (_controller.offset + 160).clamp(
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                if (!_controller.hasClients) return;
+                final target = (_controller.offset + 160).clamp(
+                  0.0,
+                  _controller.position.maxScrollExtent,
+                );
+                _controller.animateTo(
+                  target,
+                  duration: context.motion(const Duration(milliseconds: 200)),
+                  curve: AppTokens.curveFast,
+                );
+              },
+              onHorizontalDragUpdate: (details) {
+                if (!_controller.hasClients) return;
+                _controller.jumpTo(
+                  (_controller.offset - details.delta.dx).clamp(
                     0.0,
                     _controller.position.maxScrollExtent,
-                  );
-                  _controller.animateTo(
-                    target,
-                    duration: context.motion(const Duration(milliseconds: 200)),
-                    curve: AppTokens.curveFast,
-                  );
-                },
-                child: SizedBox(
-                  width: 28,
-                  child: Center(
-                    child: Icon(
-                      Icons.chevron_right,
-                      key: const Key('segmentedTabsMoreHint'),
-                      size: 18,
-                      color: scheme.onSurfaceVariant,
-                    ),
+                  ),
+                );
+              },
+              child: SizedBox(
+                width: 28,
+                height: 44,
+                child: Center(
+                  child: Icon(
+                    TablerIcons.chevron_right,
+                    key: const Key('segmentedTabsMoreHint'),
+                    size: 18,
+                    color: scheme.onSurfaceVariant,
                   ),
                 ),
               ),
