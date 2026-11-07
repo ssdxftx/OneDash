@@ -15,6 +15,7 @@ import '../../../common/components/app_icon.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/filter_chips.dart';
 import '../../../common/components/search_field.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/segmented_tabs.dart';
@@ -273,53 +274,106 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
   }
 }
 
-class _CatalogTab extends ConsumerWidget {
+class _CatalogTab extends ConsumerStatefulWidget {
   const _CatalogTab({required this.serverId, required this.query});
 
   final int serverId;
   final String query;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_CatalogTab> createState() => _CatalogTabState();
+}
+
+class _CatalogTabState extends ConsumerState<_CatalogTab> {
+  final Set<String> _tags = {};
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final catalog = ref.watch(appCatalogProvider(query));
-    return AsyncStateView(
-      value: catalog,
-      onRetry: () => ref.invalidate(appCatalogProvider(query)),
-      loading: const SkeletonList(itemCount: 8),
-      isEmpty: (data) => data.items.isEmpty,
-      empty: RefreshableEmptyState(
-        onRefresh: () => ref.refresh(appCatalogProvider(query).future),
-        child: EmptyState(
-          icon: TablerIcons.apps,
-          title: l10n.apps_emptyTitle,
-          message: l10n.apps_emptyMessage,
-        ),
-      ),
-      builder: (data) => RefreshIndicator(
-        onRefresh: () => ref.refresh(appCatalogProvider(query).future),
-        child: ListView.builder(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.all(context.pagePadding),
-          itemCount: data.items.length,
-          itemBuilder: (context, index) {
-            final app = data.items[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppTokens.s12),
-              child: _AppRow(
-                app: app,
-                cacheKey: '$serverId:${app.key}',
-                onTap: () => showAppDetailSheet(
-                  context,
-                  serverId: serverId,
-                  appId: app.key,
+    final catalog = ref.watch(appCatalogProvider(widget.query));
+    final tags = ref.watch(appTagsProvider);
+    return Column(
+      children: [
+        tags.when(
+          data: (items) => items.isEmpty
+              ? const SizedBox.shrink()
+              : AppFilterChips<String>(
+                  options: [for (final tag in items) tag.key],
+                  labelOf: (key) {
+                    final item = items.firstWhere(
+                      (tag) => tag.key == key,
+                      orElse: () => items.first,
+                    );
+                    return item.name.isEmpty ? item.key : item.name;
+                  },
+                  selected: _tags,
+                  multiSelect: true,
+                  onChanged: (value) => setState(() {
+                    _tags
+                      ..clear()
+                      ..addAll(value);
+                  }),
                 ),
-              ),
-            );
-          },
+          loading: () => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
         ),
-      ),
+        Expanded(
+          child: AsyncStateView(
+            value: catalog,
+            onRetry: () => ref.invalidate(appCatalogProvider(widget.query)),
+            loading: const SkeletonList(itemCount: 8),
+            isEmpty: (data) => _visible(data.items).isEmpty,
+            empty: RefreshableEmptyState(
+              onRefresh: () =>
+                  ref.refresh(appCatalogProvider(widget.query).future),
+              child: EmptyState(
+                icon: TablerIcons.apps,
+                title: l10n.apps_emptyTitle,
+                message: l10n.apps_emptyMessage,
+              ),
+            ),
+            builder: (data) => RefreshIndicator(
+              onRefresh: () =>
+                  ref.refresh(appCatalogProvider(widget.query).future),
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.all(context.pagePadding),
+                itemCount: _visible(data.items).length,
+                itemBuilder: (context, index) {
+                  final app = _visible(data.items)[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                    child: _AppRow(
+                      app: app,
+                      cacheKey: '${widget.serverId}:${app.key}',
+                      onTap: () => showAppDetailSheet(
+                        context,
+                        serverId: widget.serverId,
+                        appId: app.key,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ],
     );
+  }
+
+  List<AppCatalogDto> _visible(List<AppCatalogDto> items) {
+    if (_tags.isEmpty) return items;
+    final names = <String>{
+      for (final tag in ref.read(appTagsProvider).valueOrNull ?? const [])
+        if (_tags.contains(tag.key)) tag.name,
+    };
+    return items
+        .where(
+          (app) =>
+              app.tags.any((tag) => _tags.contains(tag) || names.contains(tag)),
+        )
+        .toList(growable: false);
   }
 }
 

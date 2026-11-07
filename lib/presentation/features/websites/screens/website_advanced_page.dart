@@ -11,6 +11,7 @@ import '../../../../data/dto/website/website_dto.dart';
 import '../../../../data/dto/website/website_cors_dto.dart';
 import '../../../../data/dto/website/website_leech_dto.dart';
 import '../../../../data/dto/website/website_redirect_dto.dart';
+import '../../../../data/dto/website/openresty_status_dto.dart';
 import '../../../../data/dto/website/website_real_ip_dto.dart';
 import '../../../../data/dto/website/website_update_req.dart';
 import '../../../../data/repositories_impl/runtime_repository_impl.dart';
@@ -72,6 +73,14 @@ final _pathAuthProvider = FutureProvider.autoDispose
           .then((repository) => repository.listWebsitePathAuths(id));
     }, name: 'websitePathAuthProvider');
 
+final _openRestyStatusProvider = FutureProvider.autoDispose<OpenRestyStatusDto>(
+  (ref) async {
+    final repository = await ref.watch(websiteRepositoryProvider.future);
+    return repository.getOpenRestyStatus();
+  },
+  name: 'openRestyStatusProvider',
+);
+
 final _redirectProvider = FutureProvider.autoDispose
     .family<List<WebsiteRedirectDto>, int>((ref, id) {
       return ref
@@ -84,10 +93,12 @@ class WebsiteAdvancedPage extends ConsumerStatefulWidget {
     super.key,
     required this.serverId,
     required this.websiteId,
+    this.embedded = false,
   });
 
   final int serverId;
   final int websiteId;
+  final bool embedded;
 
   @override
   ConsumerState<WebsiteAdvancedPage> createState() =>
@@ -95,9 +106,66 @@ class WebsiteAdvancedPage extends ConsumerStatefulWidget {
 }
 
 class _WebsiteAdvancedPageState extends ConsumerState<WebsiteAdvancedPage> {
+  void _refresh() {
+    ref.invalidate(websiteDetailProvider(widget.websiteId));
+    ref.invalidate(_authProvider(widget.websiteId));
+    ref.invalidate(_corsProvider(widget.websiteId));
+    ref.invalidate(_leechProvider(widget.websiteId));
+    ref.invalidate(_realIpProvider(widget.websiteId));
+    ref.invalidate(_redirectProvider(widget.websiteId));
+    ref.invalidate(_pathAuthProvider(widget.websiteId));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final content = SegmentedTabsView(
+      labels: [
+        l10n.websites_basicConfig,
+        l10n.websites_security,
+        l10n.websites_rewrite,
+        l10n.websites_redirect,
+        'OpenResty',
+      ],
+      children: [
+        _BasicTab(websiteId: widget.websiteId),
+        _SecurityTab(websiteId: widget.websiteId),
+        _RewriteTab(websiteId: widget.websiteId),
+        _RedirectTab(websiteId: widget.websiteId),
+        const _OpenRestyTab(),
+      ],
+    );
+    if (widget.embedded) {
+      return SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.78,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.websites_advanced,
+                    style: AppTextStyles.titleM,
+                  ),
+                ),
+                IconButton(
+                  tooltip: l10n.action_refresh,
+                  onPressed: _refresh,
+                  icon: const Icon(TablerIcons.refresh),
+                ),
+                IconButton(
+                  tooltip: l10n.action_close,
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(TablerIcons.x),
+                ),
+              ],
+            ),
+            Expanded(child: content),
+          ],
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: l10n.websites_advanced,
@@ -105,36 +173,28 @@ class _WebsiteAdvancedPageState extends ConsumerState<WebsiteAdvancedPage> {
           AppIconButton(
             icon: TablerIcons.refresh,
             tooltip: l10n.action_refresh,
-            onPressed: () {
-              ref.invalidate(websiteDetailProvider(widget.websiteId));
-              ref.invalidate(_authProvider(widget.websiteId));
-              ref.invalidate(_corsProvider(widget.websiteId));
-              ref.invalidate(_leechProvider(widget.websiteId));
-              ref.invalidate(_realIpProvider(widget.websiteId));
-              ref.invalidate(_redirectProvider(widget.websiteId));
-              ref.invalidate(_pathAuthProvider(widget.websiteId));
-            },
+            onPressed: _refresh,
           ),
         ],
       ),
-      body: SegmentedTabsView(
-        labels: [
-          l10n.websites_basicConfig,
-          l10n.websites_security,
-          l10n.websites_rewrite,
-          l10n.websites_redirect,
-          'OpenResty',
-        ],
-        children: [
-          _BasicTab(websiteId: widget.websiteId),
-          _SecurityTab(websiteId: widget.websiteId),
-          _RewriteTab(websiteId: widget.websiteId),
-          _RedirectTab(websiteId: widget.websiteId),
-          const _OpenRestyTab(),
-        ],
-      ),
+      body: content,
     );
   }
+}
+
+Future<void> showWebsiteAdvancedSheet(
+  BuildContext context, {
+  required int serverId,
+  required int websiteId,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    builder: (_) => WebsiteAdvancedPage(
+      serverId: serverId,
+      websiteId: websiteId,
+      embedded: true,
+    ),
+  );
 }
 
 class _BasicTab extends ConsumerWidget {
@@ -1683,9 +1743,47 @@ class _OpenRestyTabState extends ConsumerState<_OpenRestyTab> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     if (_loading) return const SkeletonList(itemCount: 6);
+    final status = ref.watch(_openRestyStatusProvider);
     return ListView(
       padding: EdgeInsets.all(context.pagePadding),
       children: [
+        Text(l10n.websites_openRestyStatus, style: AppTextStyles.titleS),
+        const SizedBox(height: AppTokens.s8),
+        status.when(
+          data: (data) => TonalCard(
+            child: SplitListGroup(
+              flat: true,
+              children: [
+                SplitListTile(
+                  title: l10n.websites_status,
+                  value: data.active > 0
+                      ? l10n.containers_running
+                      : l10n.containers_stopped,
+                ),
+                SplitListTile(
+                  title: l10n.websites_openRestyActive,
+                  value: '${data.active}',
+                ),
+                SplitListTile(
+                  title: l10n.websites_openRestyRequests,
+                  value: '${data.requests}',
+                ),
+                SplitListTile(
+                  title: l10n.websites_openRestyAcceptsHandled,
+                  value: '${data.accepts} / ${data.handled}',
+                ),
+              ],
+            ),
+          ),
+          loading: () => const SkeletonList(itemCount: 2),
+          error: (error, _) => Text(
+            describeError(error, l10n),
+            style: AppTextStyles.bodyS.copyWith(
+              color: context.appColors.warning,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppTokens.s24),
         Text(l10n.websites_openRestyPerformance, style: AppTextStyles.titleS),
         const SizedBox(height: AppTokens.s8),
         for (final entry in _controllers.entries) ...[

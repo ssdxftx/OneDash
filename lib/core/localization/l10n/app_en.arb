@@ -2980,6 +2980,10 @@
   "@containers_ports": {
     "description": "Container port mappings section."
   },
+  "containers_storageVolumes": "Storage volumes",
+  "@containers_storageVolumes": {
+    "description": "Storage volume entry"
+  },
   "containers_volumes": "Volumes",
   "@containers_volumes": {
     "description": "Container volume mappings section."
@@ -7227,5 +7231,710 @@
         "type": "int"
       }
     }
+  },
+  "apps_rebuild": "Rebuild",
+  "@apps_rebuild": {
+    "description": "Rebuild an installed app."
+  },
+  "apps_reload": "Reload",
+  "@apps_reload": {
+    "description": "Reload an installed app."
+  },
+  "apps_rebuildConfirm": "Rebuild recreates the container. Unsaved runtime data may be lost.",
+  "@apps_rebuildConfirm": {
+    "description": "Confirmation message for rebuilding an installed app."
+  },
+  "apps_installLog": "Install log",
+  "@apps_installLog": {
+    "description": "Install log entry for an installed app."
+  },
+  "apps_installLogEmpty": "No install log for this app yet.",
+  "@apps_installLogEmpty": {
+    "description": "Empty install log message."
+  },
+  "host_subtitleOps": "SSH · Disk · Diagnostics",
+  "@host_subtitleOps": {
+    "description": "Host page subtitle in the more menu."
+  },
+  "toolbox_timeSwapDns": "Time · Swap · DNS",
+  "@toolbox_timeSwapDns": {
+    "description": "Combined toolbox entry for time, swap and DNS."
+  },
+  "supervisor_titleLong": "Supervisor",
+  "@supervisor_titleLong": {
+    "description": "Supervisor entry in the more menu."
+  },
+  "containers_volumesEmpty": "No volumes",
+  "@containers_volumesEmpty": {
+    "description": "Empty volume list title."
+  },
+  "containers_volumesEmptyHint": "Volumes created by containers will appear here.",
+  "@containers_volumesEmptyHint": {
+    "description": "Empty volume list hint."
+  },
+  "containers_volumeDeleteConfirm": "Delete volume {name}? Data stored on it will be lost.",
+  "@containers_volumeDeleteConfirm": {
+    "description": "Confirmation message for deleting a volume.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "files_recycleEnabled": "Recycle bin is on",
+  "@files_recycleEnabled": {
+    "description": "Recycle bin enabled status."
+  },
+  "files_recycleDisabled": "Recycle bin is off",
+  "@files_recycleDisabled": {
+    "description": "Recycle bin disabled status."
+  },
+  "dashboard_monitorOptions": "Monitor devices",
+  "@dashboard_monitorOptions": {
+    "description": "Title for monitor device selection."
+  },
+  "dashboard_monitorDisk": "Disk IO",
+  "@dashboard_monitorDisk": {
+    "description": "Disk IO monitor option."
+  },
+  "dashboard_monitorNetwork": "Network interface",
+  "@dashboard_monitorNetwork": {
+    "description": "Network interface monitor option."
+  },
+  "containers_limitAvailable": "Host limit: {cpu} cores · {memory} MB",
+  "@containers_limitAvailable": {
+    "description": "Host resource limit hint.",
+    "placeholders": {
+      "cpu": {
+        "type": "int"
+      },
+      "memory": {
+        "type": "int"
+      }
+    }
+  },
+  "alerts_disk": "Monitored disk",
+  "@alerts_disk": {
+    "description": "Disk alert mount path."
+  },
+  "alerts_diskHint": "Choose the mount path to monitor",
+  "@alerts_diskHint": {
+    "description": "Disk alert mount path hint."
+  },
+  "backups_localDir": "Local directory",
+  "@backups_localDir": {
+    "description": "Local backup directory label."
+  },
+  "panelSettings_bindAddress": "Interface address",
+  "@panelSettings_bindAddress": {
+    "description": "Panel bind interface address."
+  },
+  "apps_filterTags": "Tags",
+  "@apps_filterTags": {
+    "description": "App tag filter label."
+  },
+  "dashboard_monitorAll": "All",
+  "@dashboard_monitorAll": {
+    "description": "All monitor devices"
+  },
+  "toolbox_ftpSystemUser": "System user",
+  "@toolbox_ftpSystemUser": {
+    "description": "Select a system user for FTP"
+  },
+  "websites_uploadSslFile": "Upload from file",
+  "@websites_uploadSslFile": {
+    "description": "Upload from file"
+  },
+  "websites_uploadSslPaste": "Paste PEM",
+  "@websites_uploadSslPaste": {
+    "description": "Paste PEM"
+  },
+  "websites_selectCertificateFile": "Select certificate file",
+  "@websites_selectCertificateFile": {
+    "description": "Select certificate file"
+  },
+  "websites_selectPrivateKeyFile": "Select private key file",
+  "@websites_selectPrivateKeyFile": {
+    "description": "Select private key file"
+  },
+  "websites_openRestyStatus": "OpenResty status",
+  "@websites_openRestyStatus": {
+    "description": "OpenResty status"
+  },
+  "websites_openRestyActive": "Active connections",
+  "@websites_openRestyActive": {
+    "description": "Active connections"
+  },
+  "websites_openRestyRequests": "Requests",
+  "@websites_openRestyRequests": {
+    "description": "Requests"
+  },
+  "websites_openRestyAcceptsHandled": "Accepted / handled",
+  "@websites_openRestyAcceptsHandled": {
+    "description": "Accepted / handled"
+  },
+  "panelSettings_previewSnapshot": "Preview",
+  "@panelSettings_previewSnapshot": {
+    "description": "Preview"
+  },
+  "panelSettings_snapshotContent": "Snapshot content",
+  "@panelSettings_snapshotContent": {
+    "description": "Snapshot content"
+  },
+  "servers_reorder": "Reorder",
+  "@servers_reorder": {
+    "description": "Reorder"
+  },
+  "servers_reorderHint": "Drag to reorder servers",
+  "@servers_reorderHint": {
+    "description": "Drag to reorder servers"
+  },
+  "websites_organizationUnit": "Organization unit",
+  "@websites_organizationUnit": {
+    "description": "Organization unit"
+  },
+  "websites_province": "Province",
+  "@websites_province": {
+    "description": "Province"
+  },
+  "websites_city": "City",
+  "@websites_city": {
+    "description": "City"
+  },
+  "websites_keyType": "Key type",
+  "@websites_keyType": {
+    "description": "Key type"
+  },
+  "websites_certPath": "Certificate path",
+  "@websites_certPath": {
+    "description": "Certificate path"
+  },
+  "websites_privateKeyPath": "Private key path",
+  "@websites_privateKeyPath": {
+    "description": "Private key path"
+  },
+  "websites_status": "Status",
+  "@websites_status": {
+    "description": "Status"
+  },
+  "ai_title": "AI tools",
+  "@ai_title": {
+    "description": "AI tools"
+  },
+  "ai_models": "Models",
+  "@ai_models": {
+    "description": "Models"
+  },
+  "ai_gpu": "GPU",
+  "@ai_gpu": {
+    "description": "GPU"
+  },
+  "ai_mcp": "MCP servers",
+  "@ai_mcp": {
+    "description": "MCP servers"
+  },
+  "ai_models_empty": "No models",
+  "@ai_models_empty": {
+    "description": "No models"
+  },
+  "ai_models_empty_hint": "Add an Ollama model to start.",
+  "@ai_models_empty_hint": {
+    "description": "Add an Ollama model to start."
+  },
+  "ai_gpu_empty": "No GPU detected",
+  "@ai_gpu_empty": {
+    "description": "No GPU detected"
+  },
+  "ai_gpu_empty_hint": "GPU information appears when a supported device is present.",
+  "@ai_gpu_empty_hint": {
+    "description": "GPU information appears when a supported device is present."
+  },
+  "ai_mcp_empty": "No MCP servers",
+  "@ai_mcp_empty": {
+    "description": "No MCP servers"
+  },
+  "ai_mcp_empty_hint": "Add an MCP server to expose tools.",
+  "@ai_mcp_empty_hint": {
+    "description": "Add an MCP server to expose tools."
+  },
+  "ai_model_add": "Add model",
+  "@ai_model_add": {
+    "description": "Add model"
+  },
+  "ai_model_name": "Model name",
+  "@ai_model_name": {
+    "description": "Model name"
+  },
+  "ai_model_size": "Size",
+  "@ai_model_size": {
+    "description": "Size"
+  },
+  "ai_model_status": "Status",
+  "@ai_model_status": {
+    "description": "Status"
+  },
+  "ai_model_from": "Source",
+  "@ai_model_from": {
+    "description": "Source"
+  },
+  "ai_model_load": "Load",
+  "@ai_model_load": {
+    "description": "Load"
+  },
+  "ai_model_unload": "Unload",
+  "@ai_model_unload": {
+    "description": "Unload"
+  },
+  "ai_mcp_add": "Add MCP server",
+  "@ai_mcp_add": {
+    "description": "Add MCP server"
+  },
+  "ai_mcp_name": "Server name",
+  "@ai_mcp_name": {
+    "description": "Server name"
+  },
+  "ai_mcp_type": "Runtime",
+  "@ai_mcp_type": {
+    "description": "Runtime"
+  },
+  "ai_mcp_command": "Command",
+  "@ai_mcp_command": {
+    "description": "Command"
+  },
+  "ai_mcp_container": "Container name",
+  "@ai_mcp_container": {
+    "description": "Container name"
+  },
+  "ai_mcp_port": "Port",
+  "@ai_mcp_port": {
+    "description": "Port"
+  },
+  "ai_mcp_sse_path": "SSE path",
+  "@ai_mcp_sse_path": {
+    "description": "SSE path"
+  },
+  "ai_mcp_url": "Base URL",
+  "@ai_mcp_url": {
+    "description": "Base URL"
+  },
+  "ai_mcp_protocol": "Output protocol",
+  "@ai_mcp_protocol": {
+    "description": "Output protocol"
+  },
+  "ai_mcp_transport": "Transport",
+  "@ai_mcp_transport": {
+    "description": "Transport"
+  },
+  "ai_mcp_running": "Running",
+  "@ai_mcp_running": {
+    "description": "Running"
+  },
+  "ai_mcp_stopped": "Stopped",
+  "@ai_mcp_stopped": {
+    "description": "Stopped"
+  },
+  "ai_mcp_start": "Start",
+  "@ai_mcp_start": {
+    "description": "Start"
+  },
+  "ai_mcp_stop": "Stop",
+  "@ai_mcp_stop": {
+    "description": "Stop"
+  },
+  "ai_mcp_restart": "Restart",
+  "@ai_mcp_restart": {
+    "description": "Restart"
+  },
+  "ai_mcp_test": "Test connection",
+  "@ai_mcp_test": {
+    "description": "Test connection"
+  },
+  "ai_mcp_delete_confirm": "Delete MCP server {name}?",
+  "@ai_mcp_delete_confirm": {
+    "description": "Delete MCP server {name}?",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_gpu_driver": "Driver",
+  "@ai_gpu_driver": {
+    "description": "Driver"
+  },
+  "ai_gpu_cuda": "CUDA",
+  "@ai_gpu_cuda": {
+    "description": "CUDA"
+  },
+  "ai_gpu_memory": "Memory",
+  "@ai_gpu_memory": {
+    "description": "Memory"
+  },
+  "ai_gpu_utilization": "Utilization",
+  "@ai_gpu_utilization": {
+    "description": "Utilization"
+  },
+  "ai_gpu_temperature": "Temperature",
+  "@ai_gpu_temperature": {
+    "description": "Temperature"
+  },
+  "ai_gpu_processes": "Processes",
+  "@ai_gpu_processes": {
+    "description": "Processes"
+  },
+  "ai_mcp_connection_ok": "Connection OK",
+  "@ai_mcp_connection_ok": {
+    "description": "Connection OK"
+  },
+  "ai_mcp_connection_failed": "Connection failed",
+  "@ai_mcp_connection_failed": {
+    "description": "Connection failed"
+  },
+  "databases_redisCommand": "Redis command line",
+  "@databases_redisCommand": {
+    "description": "Redis command line"
+  },
+  "ai_subtitle": "Models · GPU · MCP",
+  "@ai_subtitle": {
+    "description": "Models · GPU · MCP"
+  },
+  "ai_mcp_detail": "Details",
+  "@ai_mcp_detail": {
+    "description": "Details"
+  },
+  "ai_mcp_environments": "Environment variables",
+  "@ai_mcp_environments": {
+    "description": "Environment variables"
+  },
+  "ai_mcp_volumes": "Volumes",
+  "@ai_mcp_volumes": {
+    "description": "Volumes"
+  },
+  "ai_mcp_env_hint": "One KEY=VALUE per line",
+  "@ai_mcp_env_hint": {
+    "description": "One KEY=VALUE per line"
+  },
+  "ai_mcp_volume_hint": "One source:target per line",
+  "@ai_mcp_volume_hint": {
+    "description": "One source:target per line"
+  },
+  "ai_mcp_domain": "MCP domain",
+  "@ai_mcp_domain": {
+    "description": "MCP domain"
+  },
+  "ai_mcp_bind_domain": "Bind domain",
+  "@ai_mcp_bind_domain": {
+    "description": "Bind domain"
+  },
+  "ai_mcp_update_domain": "Update domain",
+  "@ai_mcp_update_domain": {
+    "description": "Update domain"
+  },
+  "ai_mcp_ssl_id": "SSL ID",
+  "@ai_mcp_ssl_id": {
+    "description": "SSL ID"
+  },
+  "ai_mcp_ip_list": "Allowed IPs",
+  "@ai_mcp_ip_list": {
+    "description": "Allowed IPs"
+  },
+  "ai_mcp_conn_url": "Connection URL",
+  "@ai_mcp_conn_url": {
+    "description": "Connection URL"
+  },
+  "ai_mcp_sync_status": "Sync status",
+  "@ai_mcp_sync_status": {
+    "description": "Sync status"
+  },
+  "ai_accounts": "Model accounts",
+  "@ai_accounts": {
+    "description": "Model accounts"
+  },
+  "ai_agents": "Agents",
+  "@ai_agents": {
+    "description": "Agents"
+  },
+  "ai_accounts_empty": "No model accounts",
+  "@ai_accounts_empty": {
+    "description": "No model accounts"
+  },
+  "ai_accounts_empty_hint": "Add a provider account to use models.",
+  "@ai_accounts_empty_hint": {
+    "description": "Add a provider account to use models."
+  },
+  "ai_agents_empty": "No agents",
+  "@ai_agents_empty": {
+    "description": "No agents"
+  },
+  "ai_agents_empty_hint": "Installed agents will appear here.",
+  "@ai_agents_empty_hint": {
+    "description": "Installed agents will appear here."
+  },
+  "ai_account_provider": "Provider",
+  "@ai_account_provider": {
+    "description": "Provider"
+  },
+  "ai_account_verified": "Verified",
+  "@ai_account_verified": {
+    "description": "Verified"
+  },
+  "ai_account_unverified": "Unverified",
+  "@ai_account_unverified": {
+    "description": "Unverified"
+  },
+  "ai_agent_status": "Status",
+  "@ai_agent_status": {
+    "description": "Status"
+  },
+  "ai_agent_model": "Model",
+  "@ai_agent_model": {
+    "description": "Model"
+  },
+  "ai_agent_website": "Website",
+  "@ai_agent_website": {
+    "description": "Website"
+  },
+  "ai_agent_token_reset": "Reset token",
+  "@ai_agent_token_reset": {
+    "description": "Reset token"
+  },
+  "ai_agent_remark": "Remark",
+  "@ai_agent_remark": {
+    "description": "Remark"
+  },
+  "ai_agent_delete_confirm": "Delete agent {name}?",
+  "@ai_agent_delete_confirm": {
+    "description": "Delete agent {name}?",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_agent_upgradable": "Upgrade available",
+  "@ai_agent_upgradable": {
+    "description": "Upgrade available"
+  },
+  "ai_account_add": "Add model account",
+  "@ai_account_add": {
+    "description": "Add model account"
+  },
+  "ai_account_edit": "Edit model account",
+  "@ai_account_edit": {
+    "description": "Edit model account"
+  },
+  "ai_account_name": "Account name",
+  "@ai_account_name": {
+    "description": "Account name"
+  },
+  "ai_account_api_key": "API key",
+  "@ai_account_api_key": {
+    "description": "API key"
+  },
+  "ai_account_base_url": "Base URL",
+  "@ai_account_base_url": {
+    "description": "Base URL"
+  },
+  "ai_account_api_type": "API type",
+  "@ai_account_api_type": {
+    "description": "API type"
+  },
+  "ai_account_verify_model": "Verify model",
+  "@ai_account_verify_model": {
+    "description": "Verify model"
+  },
+  "ai_account_validate": "Validate availability",
+  "@ai_account_validate": {
+    "description": "Validate availability"
+  },
+  "ai_account_remember_key": "Remember API key",
+  "@ai_account_remember_key": {
+    "description": "Remember API key"
+  },
+  "ai_account_remark": "Remark",
+  "@ai_account_remark": {
+    "description": "Remark"
+  },
+  "ai_agent_model_config": "Model configuration",
+  "@ai_agent_model_config": {
+    "description": "Model configuration"
+  },
+  "ai_agent_fallbacks": "Fallback models",
+  "@ai_agent_fallbacks": {
+    "description": "Fallback models"
+  },
+  "ai_agent_add": "Add agent",
+  "@ai_agent_add": {
+    "description": "Add agent"
+  },
+  "ai_agent_type": "Agent type",
+  "@ai_agent_type": {
+    "description": "Agent type"
+  },
+  "ai_agent_version": "Version",
+  "@ai_agent_version": {
+    "description": "Version"
+  },
+  "ai_agent_port": "WebUI port",
+  "@ai_agent_port": {
+    "description": "WebUI port"
+  },
+  "ai_agent_access_host": "Access host",
+  "@ai_agent_access_host": {
+    "description": "Access host"
+  },
+  "ai_agent_username": "Dashboard username",
+  "@ai_agent_username": {
+    "description": "Dashboard username"
+  },
+  "ai_agent_password": "Dashboard password",
+  "@ai_agent_password": {
+    "description": "Dashboard password"
+  },
+  "ai_agent_bind_website": "Bind website",
+  "@ai_agent_bind_website": {
+    "description": "Bind website"
+  },
+  "ai_agent_unbind_website": "Unbind website",
+  "@ai_agent_unbind_website": {
+    "description": "Unbind website"
+  },
+  "ai_agent_select_website": "Select website",
+  "@ai_agent_select_website": {
+    "description": "Select website"
+  },
+  "ai_agent_roles": "Roles",
+  "@ai_agent_roles": {
+    "description": "Roles"
+  },
+  "ai_agent_channels": "Channels",
+  "@ai_agent_channels": {
+    "description": "Channels"
+  },
+  "ai_agent_roles_empty": "No roles",
+  "@ai_agent_roles_empty": {
+    "description": "No roles"
+  },
+  "ai_agent_channels_empty": "No channels",
+  "@ai_agent_channels_empty": {
+    "description": "No channels"
+  },
+  "ai_agent_delete_role_confirm": "Delete role {name}?",
+  "@ai_agent_delete_role_confirm": {
+    "description": "Delete role {name}?",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_agent_bound": "Bound",
+  "@ai_agent_bound": {
+    "description": "Bound"
+  },
+  "ai_agent_unbound": "Unbound",
+  "@ai_agent_unbound": {
+    "description": "Unbound"
+  },
+  "ai_agent_role_add": "Add role",
+  "@ai_agent_role_add": {
+    "description": "Add role"
+  },
+  "ai_agent_binding_channel": "Channel",
+  "@ai_agent_binding_channel": {
+    "description": "Channel"
+  },
+  "ai_agent_account_id": "Account ID",
+  "@ai_agent_account_id": {
+    "description": "Account ID"
+  },
+  "ai_agent_role_name": "Role name",
+  "@ai_agent_role_name": {
+    "description": "Role name"
+  },
+  "ai_agent_bind_channel": "Bind channel",
+  "@ai_agent_bind_channel": {
+    "description": "Bind channel"
+  },
+  "ai_agent_unbind_channel": "Unbind channel",
+  "@ai_agent_unbind_channel": {
+    "description": "Unbind channel"
+  },
+  "ai_agent_feishu": "Feishu channel",
+  "@ai_agent_feishu": {
+    "description": "Feishu channel"
+  },
+  "ai_agent_channel_enabled": "Enabled",
+  "@ai_agent_channel_enabled": {
+    "description": "Enabled"
+  },
+  "ai_agent_group_policy": "Group policy",
+  "@ai_agent_group_policy": {
+    "description": "Group policy"
+  },
+  "ai_agent_require_mention": "Require mention",
+  "@ai_agent_require_mention": {
+    "description": "Require mention"
+  },
+  "ai_agent_streaming": "Streaming",
+  "@ai_agent_streaming": {
+    "description": "Streaming"
+  },
+  "ai_agent_thread_session": "Thread session",
+  "@ai_agent_thread_session": {
+    "description": "Thread session"
+  },
+  "ai_agent_connection_mode": "Connection mode",
+  "@ai_agent_connection_mode": {
+    "description": "Connection mode"
+  },
+  "ai_agent_bots": "Bots",
+  "@ai_agent_bots": {
+    "description": "Bots"
+  },
+  "ai_agent_channel_saved": "Channel settings saved",
+  "@ai_agent_channel_saved": {
+    "description": "Channel settings saved"
+  },
+  "ai_agent_channel_config": "Channel configuration",
+  "@ai_agent_channel_config": {
+    "description": "Channel configuration"
+  },
+  "ai_agent_channel_json": "Channel JSON",
+  "@ai_agent_channel_json": {
+    "description": "Channel JSON"
+  },
+  "ai_agent_channel_json_invalid": "Channel JSON is invalid",
+  "@ai_agent_channel_json_invalid": {
+    "description": "Channel JSON is invalid"
+  },
+  "ai_agent_channel_json_hint": "Edit the JSON returned by the panel. agentId is added on save.",
+  "@ai_agent_channel_json_hint": {
+    "description": "Edit the JSON returned by the panel. agentId is added on save."
+  },
+  "ai_agent_channel_delete": "Remove channel config",
+  "@ai_agent_channel_delete": {
+    "description": "Remove channel config"
+  },
+  "ai_agent_channel_delete_confirm": "Remove {channel} configuration for this agent?",
+  "@ai_agent_channel_delete_confirm": {
+    "description": "Remove {channel} configuration for this agent?",
+    "placeholders": {
+      "channel": {
+        "type": "String"
+      }
+    }
+  },
+  "databases_redisKeys": "Browse keys",
+  "@databases_redisKeys": {
+    "description": "Browse keys"
+  },
+  "ai_agent_weixin_login": "Weixin QR login",
+  "@ai_agent_weixin_login": {
+    "description": "Weixin QR login"
+  },
+  "ai_agent_weixin_login_hint": "Scan the QR code shown in the task log to connect Weixin.",
+  "@ai_agent_weixin_login_hint": {
+    "description": "Scan the QR code shown in the task log to connect Weixin."
   }
 }

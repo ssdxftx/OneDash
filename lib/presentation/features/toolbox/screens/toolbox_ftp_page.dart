@@ -60,6 +60,14 @@ class _ToolboxFtpPageState extends ConsumerState<ToolboxFtpPage> {
     final password = TextEditingController();
     final path = TextEditingController(text: '/');
     final description = TextEditingController();
+    List<String> systemUsers = const [];
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      systemUsers = await repository.loadUsers();
+    } catch (_) {
+      systemUsers = const [];
+    }
+    if (!mounted) return;
     final confirmed = await pushFormPage<bool>(
       context,
       Builder(
@@ -68,6 +76,21 @@ class _ToolboxFtpPageState extends ConsumerState<ToolboxFtpPage> {
           saveLabel: l10n.action_create,
           onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
+            if (systemUsers.isNotEmpty) ...[
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: l10n.toolbox_ftpSystemUser,
+                ),
+                items: [
+                  for (final name in systemUsers)
+                    DropdownMenuItem(value: name, child: Text(name)),
+                ],
+                onChanged: (name) {
+                  if (name != null) user.text = name;
+                },
+              ),
+              const SizedBox(height: AppTokens.s12),
+            ],
             AppTextField(
               controller: user,
               label: l10n.toolbox_ftpUser,

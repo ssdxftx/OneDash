@@ -39,16 +39,135 @@ class WebsiteSslManagePage extends ConsumerWidget {
     required this.serverId,
     required this.websiteId,
     required this.domain,
+    this.embedded = false,
   });
 
   final int serverId;
   final int websiteId;
   final String domain;
+  final bool embedded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final certs = ref.watch(_sslListProvider);
+    final content = AsyncStateView(
+      value: certs,
+      onRetry: () => ref.invalidate(_sslListProvider),
+      loading: const SkeletonList(itemCount: 6),
+      isEmpty: (items) => items.isEmpty,
+      empty: EmptyState(
+        icon: TablerIcons.shield_off,
+        title: l10n.websites_noSslCertificate,
+        message: l10n.websites_sslManageHint,
+        actionLabel: l10n.websites_uploadSsl,
+        onAction: () => _upload(context, ref),
+      ),
+      builder: (items) => ListView.separated(
+        padding: EdgeInsets.all(context.pagePadding),
+        itemCount: items.length,
+        separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
+        itemBuilder: (context, index) {
+          final cert = items[index];
+          final expiry = _expiryState(context, cert, l10n);
+          return TonalCard(
+            onTap: () => _showActions(context, ref, cert),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    StatusDot(status: cert.status.toLowerCase()),
+                    const SizedBox(width: AppTokens.s8),
+                    Expanded(
+                      child: Text(
+                        cert.primaryDomain.isEmpty
+                            ? 'SSL #${cert.id}'
+                            : cert.primaryDomain,
+                        style: AppTextStyles.titleS,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Icon(
+                      TablerIcons.chevron_right,
+                      size: AppTokens.iconList,
+                      color: context.scheme.onSurfaceVariant,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppTokens.s8),
+                SplitListGroup(
+                  flat: true,
+                  children: [
+                    SplitListTile(
+                      title: l10n.websites_sslProvider,
+                      value: sslProviderLabel(cert.provider, l10n),
+                    ),
+                    SplitListTile(
+                      title: l10n.websites_sslExpire,
+                      value: expiry == null
+                          ? cert.expireDate
+                          : '${expiry.label} · ${cert.expireDate}',
+                      valueStyle: expiry == null
+                          ? null
+                          : TextStyle(color: expiry.color),
+                    ),
+                    SplitListTile(
+                      title: l10n.websites_autoRenew,
+                      value: cert.autoRenew
+                          ? l10n.websites_enabled
+                          : l10n.websites_disabled,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+    if (embedded) {
+      return SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.78,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.websites_sslManage,
+                    style: AppTextStyles.titleM,
+                  ),
+                ),
+                IconButton(
+                  tooltip: l10n.action_refresh,
+                  onPressed: () => ref.invalidate(_sslListProvider),
+                  icon: const Icon(TablerIcons.refresh),
+                ),
+                IconButton(
+                  tooltip: l10n.websites_uploadSsl,
+                  onPressed: () => _upload(context, ref),
+                  icon: const Icon(TablerIcons.upload),
+                ),
+                IconButton(
+                  tooltip: l10n.websites_applySsl,
+                  onPressed: () => _apply(context, ref, domain),
+                  icon: const Icon(TablerIcons.plus),
+                ),
+                IconButton(
+                  tooltip: l10n.action_close,
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(TablerIcons.x),
+                ),
+              ],
+            ),
+            Expanded(child: content),
+          ],
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: l10n.websites_sslManage,
@@ -70,82 +189,7 @@ class WebsiteSslManagePage extends ConsumerWidget {
           ),
         ],
       ),
-      body: AsyncStateView(
-        value: certs,
-        onRetry: () => ref.invalidate(_sslListProvider),
-        loading: const SkeletonList(itemCount: 6),
-        isEmpty: (items) => items.isEmpty,
-        empty: EmptyState(
-          icon: TablerIcons.shield_off,
-          title: l10n.websites_noSslCertificate,
-          message: l10n.websites_sslManageHint,
-          actionLabel: l10n.websites_uploadSsl,
-          onAction: () => _upload(context, ref),
-        ),
-        builder: (items) => ListView.separated(
-          padding: EdgeInsets.all(context.pagePadding),
-          itemCount: items.length,
-          separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
-          itemBuilder: (context, index) {
-            final cert = items[index];
-            final expiry = _expiryState(context, cert, l10n);
-            return TonalCard(
-              onTap: () => _showActions(context, ref, cert),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      StatusDot(status: cert.status.toLowerCase()),
-                      const SizedBox(width: AppTokens.s8),
-                      Expanded(
-                        child: Text(
-                          cert.primaryDomain.isEmpty
-                              ? 'SSL #${cert.id}'
-                              : cert.primaryDomain,
-                          style: AppTextStyles.titleS,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Icon(
-                        TablerIcons.chevron_right,
-                        size: AppTokens.iconList,
-                        color: context.scheme.onSurfaceVariant,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppTokens.s8),
-                  SplitListGroup(
-                    flat: true,
-                    children: [
-                      SplitListTile(
-                        title: l10n.websites_sslProvider,
-                        value: sslProviderLabel(cert.provider, l10n),
-                      ),
-                      SplitListTile(
-                        title: l10n.websites_sslExpire,
-                        value: expiry == null
-                            ? cert.expireDate
-                            : '${expiry.label} · ${cert.expireDate}',
-                        valueStyle: expiry == null
-                            ? null
-                            : TextStyle(color: expiry.color),
-                      ),
-                      SplitListTile(
-                        title: l10n.websites_autoRenew,
-                        value: cert.autoRenew
-                            ? l10n.websites_enabled
-                            : l10n.websites_disabled,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
+      body: content,
     );
   }
 
@@ -170,6 +214,63 @@ class WebsiteSslManagePage extends ConsumerWidget {
   }
 
   Future<void> _upload(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final choice = await showSelectionMenu<String>(
+      context,
+      title: l10n.websites_uploadSsl,
+      options: [
+        SelectionOption(
+          label: l10n.websites_uploadSslPaste,
+          value: 'paste',
+          icon: TablerIcons.clipboard_text,
+        ),
+        SelectionOption(
+          label: l10n.websites_uploadSslFile,
+          value: 'file',
+          icon: TablerIcons.upload,
+        ),
+      ],
+    );
+    if (!context.mounted || choice == null) return;
+    if (choice == 'file') {
+      await _uploadFile(context, ref);
+    } else {
+      await _uploadPaste(context, ref);
+    }
+  }
+
+  Future<void> _uploadFile(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final cert = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['pem', 'crt', 'cer'],
+    );
+    if (cert == null || cert.files.single.path == null || !context.mounted) {
+      return;
+    }
+    final key = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['pem', 'key'],
+    );
+    if (key == null || key.files.single.path == null || !context.mounted) {
+      return;
+    }
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.uploadSslByFile(
+        certificatePath: cert.files.single.path!,
+        privateKeyPath: key.files.single.path!,
+      );
+      ref.invalidate(_sslListProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _uploadPaste(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     final cert = TextEditingController();
     final key = TextEditingController();
@@ -350,6 +451,14 @@ class WebsiteSslManagePage extends ConsumerWidget {
           const SizedBox(height: AppTokens.s16),
           SplitListGroup(
             children: [
+              SplitListTile(
+                leading: const Icon(TablerIcons.info_circle),
+                title: l10n.error_details,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _showDetail(context, ref, cert);
+                },
+              ),
               if (domain.trim().isNotEmpty)
                 SplitListTile(
                   leading: const Icon(TablerIcons.shield_check),
@@ -398,6 +507,90 @@ class WebsiteSslManagePage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _showDetail(
+    BuildContext context,
+    WidgetRef ref,
+    SslManageDto cert,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final detail = await repository.getSsl(cert.id);
+      if (!context.mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.9,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    detail.primaryDomain.isEmpty
+                        ? 'SSL #${detail.id}'
+                        : detail.primaryDomain,
+                    style: AppTextStyles.titleL,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  tooltip: l10n.action_close,
+                  onPressed: () => Navigator.of(sheetContext).pop(),
+                  icon: const Icon(TablerIcons.x),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTokens.s12),
+            SplitListGroup(
+              children: [
+                SplitListTile(
+                  title: l10n.websites_domains,
+                  value: detail.domains,
+                ),
+                SplitListTile(
+                  title: l10n.websites_sslProvider,
+                  value: sslProviderLabel(detail.provider, l10n),
+                ),
+                SplitListTile(title: l10n.websites_type, value: detail.type),
+                SplitListTile(
+                  title: l10n.websites_sslExpire,
+                  value: detail.expireDate,
+                ),
+                SplitListTile(
+                  title: l10n.websites_autoRenew,
+                  value: detail.autoRenew
+                      ? l10n.websites_enabled
+                      : l10n.websites_disabled,
+                ),
+                if (detail.description.isNotEmpty)
+                  SplitListTile(
+                    title: l10n.websites_remark,
+                    value: detail.description,
+                  ),
+                if (detail.certPath.isNotEmpty)
+                  SplitListTile(
+                    title: l10n.websites_certPath,
+                    value: detail.certPath,
+                  ),
+                if (detail.privateKeyPath.isNotEmpty)
+                  SplitListTile(
+                    title: l10n.websites_privateKeyPath,
+                    value: detail.privateKeyPath,
+                  ),
+              ],
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _bind(
@@ -589,4 +782,21 @@ class WebsiteSslManagePage extends ConsumerWidget {
       showErrorToast(context, error);
     }
   }
+}
+
+Future<void> showWebsiteSslSheet(
+  BuildContext context, {
+  required int serverId,
+  required int websiteId,
+  required String domain,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    builder: (_) => WebsiteSslManagePage(
+      serverId: serverId,
+      websiteId: websiteId,
+      domain: domain,
+      embedded: true,
+    ),
+  );
 }

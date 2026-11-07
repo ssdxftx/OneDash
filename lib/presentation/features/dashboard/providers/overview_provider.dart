@@ -46,6 +46,30 @@ class OverviewState {
   }
 }
 
+typedef MonitorSelection = ({String io, String net});
+
+final overviewSelectionProvider = StateProvider.autoDispose
+    .family<MonitorSelection, int>(
+      (ref, serverId) => (io: 'all', net: 'all'),
+      name: 'overviewSelectionProvider',
+    );
+
+final overviewIoOptionsProvider = FutureProvider.autoDispose
+    .family<List<String>, int>((ref, serverId) async {
+      final repository = await ref.watch(
+        dashboardRepositoryForServerProvider(serverId).future,
+      );
+      return repository.getMonitorIoOptions();
+    }, name: 'overviewIoOptionsProvider');
+
+final overviewNetOptionsProvider = FutureProvider.autoDispose
+    .family<List<String>, int>((ref, serverId) async {
+      final repository = await ref.watch(
+        dashboardRepositoryForServerProvider(serverId).future,
+      );
+      return repository.getMonitorNetOptions();
+    }, name: 'overviewNetOptionsProvider');
+
 final overviewProvider = AsyncNotifierProvider.autoDispose
     .family<OverviewController, OverviewState, int>(
       OverviewController.new,
@@ -72,9 +96,10 @@ class OverviewController
     final repository = await ref.watch(
       dashboardRepositoryForServerProvider(serverId).future,
     );
+    final selection = ref.watch(overviewSelectionProvider(serverId));
     final dashboard = await repository.getDashboardSnapshot(
-      ioOption: 'all',
-      netOption: 'all',
+      ioOption: selection.io,
+      netOption: selection.net,
     );
     _lastSent = dashboard.current.netBytesSent;
     _lastRecv = dashboard.current.netBytesRecv;
@@ -119,9 +144,10 @@ class OverviewController
       final repository = await ref.read(
         dashboardRepositoryForServerProvider(arg).future,
       );
+      final selection = ref.read(overviewSelectionProvider(arg));
       final latest = await repository.getDashboardCurrent(
-        ioOption: 'all',
-        netOption: 'all',
+        ioOption: selection.io,
+        netOption: selection.net,
       );
       if (_disposed) return;
       final now = DateTime.now();

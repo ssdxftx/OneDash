@@ -1180,32 +1180,6 @@ String _websiteTabTitle(int tab, AppLocalizations l10n) {
 }
 
 /// Fullscreen host for one website tab, used by deep links.
-class WebsiteTabPage extends ConsumerWidget {
-  const WebsiteTabPage({
-    super.key,
-    required this.serverId,
-    required this.websiteId,
-    required this.tab,
-  });
-
-  final int serverId;
-  final int websiteId;
-  final int tab;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final detail = ref.watch(websiteDetailProvider(websiteId));
-    return Scaffold(
-      appBar: AppBarLarge(
-        title: detail.valueOrNull?.website.primaryDomain ?? l10n.websites_title,
-        subtitle: _websiteTabTitle(tab, l10n),
-      ),
-      body: _WebsiteTabBody(serverId: serverId, websiteId: websiteId, tab: tab),
-    );
-  }
-}
-
 /// Opens one website tab as a sheet above the current action sheet.
 Future<void> showWebsiteTabSheet(
   BuildContext context, {

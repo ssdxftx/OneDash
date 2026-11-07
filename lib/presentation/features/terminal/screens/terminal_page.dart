@@ -26,10 +26,20 @@ import '../../../common/states/empty_state.dart';
 enum _TerminalStatus { connecting, connected, disconnected, error }
 
 class TerminalPage extends ConsumerStatefulWidget {
-  const TerminalPage({super.key, required this.serverId, this.containerName});
+  const TerminalPage({
+    super.key,
+    required this.serverId,
+    this.containerName,
+    this.redisName,
+    this.redisFrom,
+    this.initialCommand,
+  });
 
   final int serverId;
   final String? containerName;
+  final String? redisName;
+  final String? redisFrom;
+  final String? initialCommand;
 
   @override
   ConsumerState<TerminalPage> createState() => _TerminalPageState();
@@ -70,6 +80,7 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
       final uri = server.baseUrl;
       final wsScheme = uri.scheme == 'https' ? 'wss' : 'ws';
       final isContainer = widget.containerName != null;
+      final isRedis = widget.redisName != null;
       final query = <String, String>{
         'cols': '${_terminal.viewWidth}',
         'rows': '${_terminal.viewHeight}',
@@ -79,11 +90,15 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
           'containerid': widget.containerName!,
           'user': 'root',
           'command': '/bin/sh',
+        } else if (isRedis) ...{
+          'source': 'redis',
+          'name': widget.redisName!,
+          'from': widget.redisFrom ?? 'local',
         } else ...{
           'source': 'host',
         },
       };
-      final paths = isContainer
+      final paths = isContainer || isRedis
           ? const [
               '/api/v2/hosts/terminal/container',
               '/api/v2/containers/exec',
@@ -119,7 +134,11 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
             )
             .toList(growable: false),
         cacheScope: widget.serverId,
-        cacheKey: isContainer ? 'terminal.container' : 'terminal.host',
+        cacheKey: isContainer
+            ? 'terminal.container'
+            : isRedis
+            ? 'terminal.redis'
+            : 'terminal.host',
       );
 
       _channel = channel;
@@ -173,6 +192,18 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
         }
       };
       if (mounted) setState(() => _status = _TerminalStatus.connected);
+      final initial = widget.initialCommand?.trim();
+      if (initial != null && initial.isNotEmpty) {
+        Future<void>.delayed(const Duration(milliseconds: 900), () {
+          if (!mounted || _status != _TerminalStatus.connected) return;
+          _channel?.sink.add(
+            jsonEncode({
+              'type': 'cmd',
+              'data': base64Encode(utf8.encode('$initial\r')),
+            }),
+          );
+        });
+      }
     } catch (error) {
       if (!mounted) return;
       setState(() {

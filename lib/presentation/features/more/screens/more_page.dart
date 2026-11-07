@@ -92,6 +92,27 @@ class MorePage extends ConsumerWidget {
                         ),
                         _tile(
                           context,
+                          icon: TablerIcons.brand_docker,
+                          title: l10n.more_runtimes,
+                          subtitle: l10n.more_runtimesSubtitle,
+                          onTap: () =>
+                              context.push('/s/$serverId/more/runtimes'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.brain,
+                          title: l10n.ai_title,
+                          subtitle: l10n.ai_subtitle,
+                          onTap: () => context.push('/s/$serverId/more/ai'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTokens.s24),
+                    SectionHeader(title: l10n.more_group_ops),
+                    SplitListGroup(
+                      children: [
+                        _tile(
+                          context,
                           icon: TablerIcons.clock,
                           title: l10n.more_cronjobs,
                           subtitle: counts == null
@@ -100,56 +121,6 @@ class MorePage extends ConsumerWidget {
                           onTap: () =>
                               context.push('/s/$serverId/more/cronjobs'),
                         ),
-                        _tile(
-                          context,
-                          icon: TablerIcons.brand_docker,
-                          title: l10n.more_runtimes,
-                          subtitle: l10n.more_runtimesSubtitle,
-                          onTap: () =>
-                              context.push('/s/$serverId/more/runtimes'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppTokens.s24),
-                    SectionHeader(title: l10n.more_group_web),
-                    SplitListGroup(
-                      children: [
-                        _tile(
-                          context,
-                          icon: TablerIcons.world,
-                          title: l10n.nav_websites,
-                          subtitle: counts == null
-                              ? null
-                              : l10n.websites_count(counts.websiteNumber),
-                          onTap: () => context.go('/s/$serverId/websites'),
-                        ),
-                        _tile(
-                          context,
-                          icon: TablerIcons.stack_2,
-                          title: l10n.containers_compose,
-                          subtitle: l10n.more_composeSubtitle,
-                          onTap: () =>
-                              context.push('/s/$serverId/more/compose'),
-                        ),
-                        _tile(
-                          context,
-                          icon: TablerIcons.shield,
-                          title: l10n.more_firewall,
-                          onTap: () =>
-                              context.push('/s/$serverId/more/firewall'),
-                        ),
-                        _tile(
-                          context,
-                          icon: TablerIcons.folder,
-                          title: l10n.websites_groupManagement,
-                          onTap: () => context.push('/s/$serverId/more/groups'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppTokens.s24),
-                    SectionHeader(title: l10n.more_group_ops),
-                    SplitListGroup(
-                      children: [
                         _tile(
                           context,
                           icon: TablerIcons.file_text,
@@ -174,7 +145,7 @@ class MorePage extends ConsumerWidget {
                           context,
                           icon: TablerIcons.server,
                           title: l10n.host_title,
-                          subtitle: l10n.host_monitor,
+                          subtitle: l10n.host_subtitleOps,
                           onTap: () => context.push('/s/$serverId/more/host'),
                         ),
                         _tile(
@@ -193,8 +164,15 @@ class MorePage extends ConsumerWidget {
                         ),
                         _tile(
                           context,
+                          icon: TablerIcons.shield,
+                          title: l10n.more_firewall,
+                          onTap: () =>
+                              context.push('/s/$serverId/more/firewall'),
+                        ),
+                        _tile(
+                          context,
                           icon: TablerIcons.settings_cog,
-                          title: l10n.supervisor_title,
+                          title: l10n.supervisor_titleLong,
                           onTap: () =>
                               context.push('/s/$serverId/more/host-tools'),
                         ),

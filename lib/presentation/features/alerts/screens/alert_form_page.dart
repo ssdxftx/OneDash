@@ -17,6 +17,20 @@ import '../../../common/components/section_header.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
 
+final alertDisksProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+      final repository = await ref.watch(alertRepositoryProvider.future);
+      return repository.listDisks();
+    }, name: 'alertDisksProvider');
+
+String _diskPath(Map<String, dynamic> disk) {
+  for (final key in const ['path', 'mountPoint', 'name', 'device']) {
+    final value = '${disk[key] ?? ''}'.trim();
+    if (value.isNotEmpty) return value;
+  }
+  return '';
+}
+
 final alertConfigsProvider = FutureProvider.autoDispose<List<AlertConfigInfo>>((
   ref,
 ) async {
@@ -39,6 +53,7 @@ class AlertFormPage extends ConsumerStatefulWidget {
 class _AlertFormPageState extends ConsumerState<AlertFormPage> {
   final _title = TextEditingController();
   final _project = TextEditingController();
+  final _disk = TextEditingController();
   final _cycle = TextEditingController(text: '7');
   final _count = TextEditingController(text: '80');
   final _sendCount = TextEditingController(text: '3');
@@ -87,6 +102,7 @@ class _AlertFormPageState extends ConsumerState<AlertFormPage> {
         _type = alert.type;
         _title.text = alert.title;
         _project.text = alert.project;
+        if (alert.type == 'disk') _disk.text = alert.project;
         _cycle.text = '${alert.cycle}';
         _count.text = '${alert.count}';
         _sendCount.text = '${alert.sendCount}';
@@ -105,6 +121,7 @@ class _AlertFormPageState extends ConsumerState<AlertFormPage> {
   void dispose() {
     _title.dispose();
     _project.dispose();
+    _disk.dispose();
     _cycle.dispose();
     _count.dispose();
     _sendCount.dispose();
@@ -131,7 +148,7 @@ class _AlertFormPageState extends ConsumerState<AlertFormPage> {
         title: _title.text.trim().isEmpty
             ? _defaultTitle(_type, l10n)
             : _title.text.trim(),
-        project: _project.text.trim(),
+        project: _type == 'disk' ? _disk.text.trim() : _project.text.trim(),
         status: _status,
         sendCount: int.tryParse(_sendCount.text.trim()) ?? 3,
         advancedParams: _advancedParams.text.trim(),
@@ -208,11 +225,52 @@ class _AlertFormPageState extends ConsumerState<AlertFormPage> {
                   helper: l10n.alerts_titleHint,
                 ),
                 const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _project,
-                  label: l10n.alerts_project,
-                  helper: l10n.alerts_projectHint,
-                ),
+                if (_type == 'disk')
+                  ref
+                      .watch(alertDisksProvider)
+                      .when(
+                        data: (disks) {
+                          final options = disks
+                              .map(_diskPath)
+                              .where((path) => path.isNotEmpty)
+                              .toSet()
+                              .toList(growable: false);
+                          return DropdownButtonFormField<String>(
+                            initialValue: options.contains(_disk.text)
+                                ? _disk.text
+                                : null,
+                            decoration: InputDecoration(
+                              labelText: l10n.alerts_disk,
+                              helperText: l10n.alerts_diskHint,
+                            ),
+                            items: [
+                              for (final path in options)
+                                DropdownMenuItem(
+                                  value: path,
+                                  child: Text(path),
+                                ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() => _disk.text = value);
+                              }
+                            },
+                          );
+                        },
+                        loading: () => const LinearProgressIndicator(),
+                        error: (error, _) => Text(
+                          describeError(error, l10n),
+                          style: AppTextStyles.bodyS.copyWith(
+                            color: context.scheme.error,
+                          ),
+                        ),
+                      )
+                else
+                  AppTextField(
+                    controller: _project,
+                    label: l10n.alerts_project,
+                    helper: l10n.alerts_projectHint,
+                  ),
               ],
             ),
           ),

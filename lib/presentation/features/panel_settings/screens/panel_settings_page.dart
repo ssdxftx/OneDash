@@ -792,6 +792,14 @@ class _PanelSettingsBody extends ConsumerWidget {
     _PanelSettingsData data,
   ) async {
     final controller = TextEditingController(text: data.value('bindDomain'));
+    List<String> interfaces = const [];
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      interfaces = await repository.loadInterfaceAddr();
+    } catch (_) {
+      interfaces = const [];
+    }
+    if (!context.mounted) return;
     final value = await pushFormPage<String>(
       context,
       Builder(
@@ -800,6 +808,21 @@ class _PanelSettingsBody extends ConsumerWidget {
           onSave: () async =>
               Navigator.of(pageContext).pop(controller.text.trim()),
           children: [
+            if (interfaces.isNotEmpty) ...[
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: l10n.panelSettings_bindAddress,
+                ),
+                items: [
+                  for (final address in interfaces)
+                    DropdownMenuItem(value: address, child: Text(address)),
+                ],
+                onChanged: (address) {
+                  if (address != null) controller.text = address;
+                },
+              ),
+              const SizedBox(height: AppTokens.s12),
+            ],
             AppTextField(controller: controller, hint: 'panel.example.com'),
           ],
         ),

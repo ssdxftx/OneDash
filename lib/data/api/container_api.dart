@@ -339,6 +339,16 @@ class ContainerApi {
     return ApiResponseParser.list(resp, ContainerOptionDto.fromJson);
   }
 
+  /// 批量删除挂载卷。
+  /// POST /api/v2/containers/volume/del
+  Future<void> deleteVolumes(List<String> names) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/volume/del',
+      data: {'names': names},
+    );
+    ApiResponseParser.ok(resp);
+  }
+
   /// 获取全部镜像信息。
   /// GET /api/v2/containers/image
   Future<List<ContainerOptionDto>> getImages() async {

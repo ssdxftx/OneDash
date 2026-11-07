@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/dto/app/app_catalog_dto.dart';
 import '../../../../data/dto/app/app_catalog_search_req.dart';
+import '../../../../data/dto/app/app_tag_dto.dart';
 import '../../../../data/dto/app/app_detail_dto.dart';
 import '../../../../data/dto/app/app_installed_dto.dart';
 import '../../../../data/dto/app/app_installed_info_dto.dart';
@@ -20,6 +21,12 @@ final appCatalogProvider = FutureProvider.autoDispose
             ),
           );
     }, name: 'appCatalogProvider');
+
+final appTagsProvider = FutureProvider.autoDispose<List<AppTagDto>>((ref) {
+  return ref
+      .watch(appRepositoryProvider.future)
+      .then((repository) => repository.listAppTags());
+}, name: 'appTagsProvider');
 
 final installedAppsProvider =
     FutureProvider.autoDispose<PageResult<AppInstalledDto>>((ref) {

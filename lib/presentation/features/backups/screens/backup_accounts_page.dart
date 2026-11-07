@@ -189,6 +189,18 @@ class BackupAccountsPage extends ConsumerWidget {
         ? rawType
         : backupAccountTypes.first;
     bool rememberAuth = current?['rememberAuth'] == true;
+    String? localDir;
+    if (isLocalAccount) {
+      try {
+        final repository = await ref.read(
+          backupAccountRepositoryProvider.future,
+        );
+        localDir = await repository.getLocalDir();
+      } catch (_) {
+        localDir = null;
+      }
+    }
+    if (!context.mounted) return;
     final saved = await pushFormPage<bool>(
       context,
       StatefulBuilder(
@@ -224,6 +236,13 @@ class BackupAccountsPage extends ConsumerWidget {
                   if (value != null) setState(() => type = value);
                 },
               ),
+            if (isLocalAccount && localDir != null) ...[
+              const SizedBox(height: AppTokens.s12),
+              InputDecorator(
+                decoration: InputDecoration(labelText: l10n.backups_localDir),
+                child: Text(localDir),
+              ),
+            ],
             const SizedBox(height: AppTokens.s12),
             AppTextField(controller: accessKey, label: l10n.backups_accessKey),
             const SizedBox(height: AppTokens.s12),

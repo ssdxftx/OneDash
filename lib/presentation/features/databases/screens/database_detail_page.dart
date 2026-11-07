@@ -31,12 +31,14 @@ class DatabaseDetailPage extends ConsumerStatefulWidget {
     required this.databaseName,
     required this.type,
     required this.instance,
+    this.from = 'local',
   });
 
   final int serverId;
   final String databaseName;
   final String type;
   final String instance;
+  final String from;
 
   @override
   ConsumerState<DatabaseDetailPage> createState() => _DatabaseDetailPageState();
@@ -452,15 +454,37 @@ class _PasswordRow extends StatelessWidget {
   }
 }
 
-/// Fullscreen host for the users or advanced database tab.
-class DatabaseTabPage extends ConsumerWidget {
-  const DatabaseTabPage({
-    super.key,
+/// Opens a database users/advanced tab as a sheet above the action sheet.
+Future<void> showDatabaseTabSheet(
+  BuildContext context, {
+  required int serverId,
+  required String databaseName,
+  required String type,
+  required String instance,
+  required int tab,
+  String from = 'local',
+}) {
+  return showAppSheet<void>(
+    context: context,
+    builder: (_) => _DatabaseTabSheet(
+      serverId: serverId,
+      databaseName: databaseName,
+      type: type,
+      instance: instance,
+      tab: tab,
+      from: from,
+    ),
+  );
+}
+
+class _DatabaseTabSheet extends ConsumerWidget {
+  const _DatabaseTabSheet({
     required this.serverId,
     required this.databaseName,
     required this.type,
     required this.instance,
     required this.tab,
+    this.from = 'local',
   });
 
   final int serverId;
@@ -468,6 +492,7 @@ class DatabaseTabPage extends ConsumerWidget {
   final String type;
   final String instance;
   final int tab;
+  final String from;
 
   DatabaseKey get _key => (name: databaseName, type: type, instance: instance);
 
@@ -475,24 +500,63 @@ class DatabaseTabPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final detail = ref.watch(databaseDetailProvider(_key));
-    return Scaffold(
-      appBar: AppBarLarge(
-        title: databaseName,
-        subtitle: tab == 1
-            ? l10n.databases_usersGrants
-            : l10n.databases_advanced,
-      ),
-      body: AsyncStateView(
-        value: detail,
-        onRetry: () => ref.invalidate(databaseDetailProvider(_key)),
-        loading: const SkeletonList(itemCount: 6),
-        builder: (state) => tab == 1
-            ? DatabaseUsersTab(item: state.item, type: type, instance: instance)
-            : DatabaseAdvancedTab(
-                type: type,
-                instance: instance,
-                databaseName: databaseName,
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.78,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      databaseName,
+                      style: AppTextStyles.titleM,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      tab == 1
+                          ? l10n.databases_usersGrants
+                          : l10n.databases_advanced,
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: context.scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              IconButton(
+                tooltip: l10n.action_close,
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(TablerIcons.x),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTokens.s8),
+          Expanded(
+            child: AsyncStateView(
+              value: detail,
+              onRetry: () => ref.invalidate(databaseDetailProvider(_key)),
+              loading: const SkeletonList(itemCount: 6),
+              builder: (state) => tab == 1
+                  ? DatabaseUsersTab(
+                      item: state.item,
+                      type: type,
+                      instance: instance,
+                    )
+                  : DatabaseAdvancedTab(
+                      type: type,
+                      instance: instance,
+                      databaseName: databaseName,
+                      serverId: serverId,
+                      from: from,
+                    ),
+            ),
+          ),
+        ],
       ),
     );
   }

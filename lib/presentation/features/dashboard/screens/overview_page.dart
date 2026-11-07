@@ -12,6 +12,7 @@ import '../../../common/charts/area_chart.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/buttons.dart';
 import '../../../common/components/metric_card.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/server_switcher_sheet.dart';
@@ -19,6 +20,7 @@ import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_mapper.dart';
+import '../../../common/states/error_toast.dart';
 import '../../../common/states/error_state.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../providers/overview_provider.dart';
@@ -100,6 +102,31 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                     onPressed: () => ref
                         .read(overviewProvider(widget.serverId).notifier)
                         .refresh(),
+                  ),
+                  AppIconButton(
+                    icon: TablerIcons.adjustments,
+                    tooltip: l10n.dashboard_monitorOptions,
+                    onPressed: () async {
+                      final current = ref.read(
+                        overviewSelectionProvider(widget.serverId),
+                      );
+                      final next = await showAppSheet<MonitorSelection>(
+                        context: context,
+                        builder: (_) => _MonitorOptionsSheet(
+                          serverId: widget.serverId,
+                          initial: current,
+                        ),
+                      );
+                      if (next == null || !mounted) return;
+                      ref
+                              .read(
+                                overviewSelectionProvider(
+                                  widget.serverId,
+                                ).notifier,
+                              )
+                              .state =
+                          next;
+                    },
                   ),
                   AppIconButton(
                     icon: TablerIcons.terminal_2,
@@ -829,6 +856,90 @@ class _QuickAction extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _MonitorOptionsSheet extends ConsumerStatefulWidget {
+  const _MonitorOptionsSheet({required this.serverId, required this.initial});
+
+  final int serverId;
+  final MonitorSelection initial;
+
+  @override
+  ConsumerState<_MonitorOptionsSheet> createState() =>
+      _MonitorOptionsSheetState();
+}
+
+class _MonitorOptionsSheetState extends ConsumerState<_MonitorOptionsSheet> {
+  late String _io = widget.initial.io;
+  late String _net = widget.initial.net;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final ioOptions = ref.watch(overviewIoOptionsProvider(widget.serverId));
+    final netOptions = ref.watch(overviewNetOptionsProvider(widget.serverId));
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.dashboard_monitorOptions, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s16),
+        ioOptions.when(
+          data: (items) => DropdownButtonFormField<String>(
+            initialValue: _io,
+            decoration: InputDecoration(labelText: l10n.dashboard_monitorDisk),
+            items: [
+              DropdownMenuItem(
+                value: 'all',
+                child: Text(l10n.dashboard_monitorAll),
+              ),
+              for (final item in items)
+                DropdownMenuItem(value: item, child: Text(item)),
+            ],
+            onChanged: (value) {
+              if (value != null) setState(() => _io = value);
+            },
+          ),
+          loading: () => const LinearProgressIndicator(),
+          error: (error, _) => Text(
+            describeError(error, l10n),
+            style: AppTextStyles.bodyS.copyWith(color: context.scheme.error),
+          ),
+        ),
+        const SizedBox(height: AppTokens.s12),
+        netOptions.when(
+          data: (items) => DropdownButtonFormField<String>(
+            initialValue: _net,
+            decoration: InputDecoration(
+              labelText: l10n.dashboard_monitorNetwork,
+            ),
+            items: [
+              DropdownMenuItem(
+                value: 'all',
+                child: Text(l10n.dashboard_monitorAll),
+              ),
+              for (final item in items)
+                DropdownMenuItem(value: item, child: Text(item)),
+            ],
+            onChanged: (value) {
+              if (value != null) setState(() => _net = value);
+            },
+          ),
+          loading: () => const LinearProgressIndicator(),
+          error: (error, _) => Text(
+            describeError(error, l10n),
+            style: AppTextStyles.bodyS.copyWith(color: context.scheme.error),
+          ),
+        ),
+        const SizedBox(height: AppTokens.s20),
+        PrimaryButton(
+          label: l10n.action_confirm,
+          expanded: true,
+          onPressed: () => Navigator.of(context).pop((io: _io, net: _net)),
+        ),
+      ],
     );
   }
 }

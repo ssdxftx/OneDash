@@ -144,6 +144,10 @@ class SnapshotPage extends ConsumerWidget {
                     runSpacing: AppTokens.s4,
                     children: [
                       TextButton(
+                        onPressed: () => _preview(context, ref),
+                        child: Text(l10n.panelSettings_previewSnapshot),
+                      ),
+                      TextButton(
                         onPressed: () => _recreate(context, ref, id),
                         child: Text(l10n.panelSettings_recreateSnapshot),
                       ),
@@ -176,6 +180,57 @@ class SnapshotPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _preview(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      final data = await repository.loadSnapshotData();
+      if (!context.mounted) return;
+      final pretty = const JsonEncoder.withIndent('  ').convert(data);
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.92,
+        builder: (sheetContext) => SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.8,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.panelSettings_snapshotContent,
+                      style: AppTextStyles.titleM,
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: l10n.action_close,
+                    onPressed: () => Navigator.of(sheetContext).pop(),
+                    icon: const Icon(TablerIcons.x),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTokens.s8),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: SelectableText(
+                    pretty,
+                    style: AppTextStyles.bodyS.copyWith(
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _import(BuildContext context, WidgetRef ref) async {

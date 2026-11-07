@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/dto/container/container_compose_dto.dart';
 import '../../../../data/dto/container/container_item_stats_dto.dart';
+import '../../../../data/dto/container/container_limit_dto.dart';
+import '../../../../data/dto/container/container_option_dto.dart';
 import '../../../../data/dto/container/container_status_dto.dart';
 import '../../../../data/dto/container/image_dtos.dart';
 import '../../../../data/dto/container/network_dtos.dart';
@@ -52,3 +54,16 @@ final containerComposeProvider =
       final repository = await ref.watch(containerRepositoryProvider.future);
       return repository.searchCompose();
     }, name: 'composeProvider');
+
+final containerVolumesProvider =
+    FutureProvider.autoDispose<List<ContainerOptionDto>>((ref) async {
+      final repository = await ref.watch(containerRepositoryProvider.future);
+      return repository.getVolumes();
+    }, name: 'containerVolumesProvider');
+
+final containerLimitProvider = FutureProvider.autoDispose<ContainerLimitDto>((
+  ref,
+) async {
+  final repository = await ref.watch(containerRepositoryProvider.future);
+  return repository.getContainerLimit();
+}, name: 'containerLimitProvider');

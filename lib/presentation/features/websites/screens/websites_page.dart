@@ -33,7 +33,9 @@ import '../../../common/states/error_toast.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../providers/websites_provider.dart';
 import 'website_accounts_page.dart';
+import 'website_advanced_page.dart';
 import 'website_detail_page.dart';
+import 'website_ssl_manage_page.dart';
 import '../widgets/website_log_page.dart';
 
 class WebsitesPage extends ConsumerStatefulWidget {
@@ -196,6 +198,16 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                           value: 'templates',
                           icon: TablerIcons.layout,
                         ),
+                        SelectionOption(
+                          label: l10n.websites_certificateAccounts,
+                          value: 'accounts',
+                          icon: TablerIcons.certificate,
+                        ),
+                        SelectionOption(
+                          label: l10n.websites_groupManagement,
+                          value: 'groups',
+                          icon: TablerIcons.folder,
+                        ),
                       ],
                     );
                     if (!mounted || value == null) return;
@@ -221,6 +233,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                       await context.push(
                         '/s/${widget.serverId}/websites/templates',
                       );
+                    } else if (value == 'accounts') {
+                      if (!context.mounted) return;
+                      await showWebsiteAccountsSheet(context);
+                    } else if (value == 'groups') {
+                      if (!context.mounted) return;
+                      await context.push('/s/${widget.serverId}/more/groups');
                     }
                   },
                 ),
@@ -484,13 +502,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                   icon: TablerIcons.lock,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_sslCertificate,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/${widget.serverId}/websites/${site.id}/ssl'
-                      '?domain=${Uri.encodeComponent(site.primaryDomain)}',
-                    );
-                  },
+                  onTap: () => showWebsiteSslSheet(
+                    sheetContext,
+                    serverId: widget.serverId,
+                    websiteId: site.id,
+                    domain: site.primaryDomain,
+                  ),
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.arrows_exchange,
@@ -518,18 +535,11 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                   icon: TablerIcons.adjustments,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.websites_advanced,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/${widget.serverId}/websites/${site.id}/advanced',
-                    );
-                  },
-                ),
-                ActionSheetRow(
-                  icon: TablerIcons.certificate,
-                  iconColor: context.scheme.onSurfaceVariant,
-                  title: l10n.websites_certificateAccounts,
-                  onTap: () => showWebsiteAccountsSheet(sheetContext),
+                  onTap: () => showWebsiteAdvancedSheet(
+                    sheetContext,
+                    serverId: widget.serverId,
+                    websiteId: site.id,
+                  ),
                 ),
               ],
             ),

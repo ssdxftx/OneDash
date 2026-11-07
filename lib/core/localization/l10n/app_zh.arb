@@ -685,6 +685,10 @@
   "containers_image": "镜像",
   "containers_name": "名称",
   "containers_ports": "端口映射",
+  "containers_storageVolumes": "存储卷",
+  "@containers_storageVolumes": {
+    "description": "存储卷入口"
+  },
   "containers_volumes": "目录挂载",
   "containers_env": "环境变量",
   "containers_advanced": "高级",
@@ -1726,5 +1730,710 @@
         "type": "int"
       }
     }
+  },
+  "apps_rebuild": "重建",
+  "@apps_rebuild": {
+    "description": "重建已安装应用"
+  },
+  "apps_reload": "重载",
+  "@apps_reload": {
+    "description": "重载已安装应用"
+  },
+  "apps_rebuildConfirm": "重建会重新创建容器，未持久化的运行时数据可能丢失。",
+  "@apps_rebuildConfirm": {
+    "description": "重建应用确认文案"
+  },
+  "apps_installLog": "安装日志",
+  "@apps_installLog": {
+    "description": "已安装应用的安装日志"
+  },
+  "apps_installLogEmpty": "该应用暂无安装日志。",
+  "@apps_installLogEmpty": {
+    "description": "安装日志为空"
+  },
+  "host_subtitleOps": "SSH · 磁盘 · 诊断",
+  "@host_subtitleOps": {
+    "description": "更多页主机入口副标题"
+  },
+  "toolbox_timeSwapDns": "时区 · Swap · DNS",
+  "@toolbox_timeSwapDns": {
+    "description": "合并后的时间与网络设置入口"
+  },
+  "supervisor_titleLong": "Supervisor 守护",
+  "@supervisor_titleLong": {
+    "description": "更多页进程守护入口"
+  },
+  "containers_volumesEmpty": "暂无存储卷",
+  "@containers_volumesEmpty": {
+    "description": "存储卷为空标题"
+  },
+  "containers_volumesEmptyHint": "容器创建的存储卷会显示在这里。",
+  "@containers_volumesEmptyHint": {
+    "description": "存储卷为空提示"
+  },
+  "containers_volumeDeleteConfirm": "删除存储卷 {name}？其中的数据将丢失。",
+  "@containers_volumeDeleteConfirm": {
+    "description": "删除存储卷确认文案",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "files_recycleEnabled": "回收站已开启",
+  "@files_recycleEnabled": {
+    "description": "回收站开启状态"
+  },
+  "files_recycleDisabled": "回收站已关闭",
+  "@files_recycleDisabled": {
+    "description": "回收站关闭状态"
+  },
+  "dashboard_monitorOptions": "监控设备",
+  "@dashboard_monitorOptions": {
+    "description": "监控设备选择"
+  },
+  "dashboard_monitorDisk": "磁盘 IO",
+  "@dashboard_monitorDisk": {
+    "description": "磁盘 IO"
+  },
+  "dashboard_monitorNetwork": "网络接口",
+  "@dashboard_monitorNetwork": {
+    "description": "网络接口"
+  },
+  "containers_limitAvailable": "宿主上限：{cpu} 核 · {memory} MB",
+  "@containers_limitAvailable": {
+    "description": "宿主资源上限提示",
+    "placeholders": {
+      "cpu": {
+        "type": "int"
+      },
+      "memory": {
+        "type": "int"
+      }
+    }
+  },
+  "alerts_disk": "监控磁盘",
+  "@alerts_disk": {
+    "description": "告警磁盘挂载点"
+  },
+  "alerts_diskHint": "选择要监控的挂载路径",
+  "@alerts_diskHint": {
+    "description": "告警磁盘提示"
+  },
+  "backups_localDir": "本地目录",
+  "@backups_localDir": {
+    "description": "本地备份目录"
+  },
+  "panelSettings_bindAddress": "网卡地址",
+  "@panelSettings_bindAddress": {
+    "description": "面板绑定网卡地址"
+  },
+  "apps_filterTags": "标签",
+  "@apps_filterTags": {
+    "description": "应用标签筛选"
+  },
+  "dashboard_monitorAll": "全部",
+  "@dashboard_monitorAll": {
+    "description": "全部监控设备"
+  },
+  "toolbox_ftpSystemUser": "系统用户",
+  "@toolbox_ftpSystemUser": {
+    "description": "从系统用户中选择 FTP 用户"
+  },
+  "websites_uploadSslFile": "从文件上传",
+  "@websites_uploadSslFile": {
+    "description": "从文件上传"
+  },
+  "websites_uploadSslPaste": "粘贴 PEM",
+  "@websites_uploadSslPaste": {
+    "description": "粘贴 PEM"
+  },
+  "websites_selectCertificateFile": "选择证书文件",
+  "@websites_selectCertificateFile": {
+    "description": "选择证书文件"
+  },
+  "websites_selectPrivateKeyFile": "选择私钥文件",
+  "@websites_selectPrivateKeyFile": {
+    "description": "选择私钥文件"
+  },
+  "websites_openRestyStatus": "OpenResty 运行状态",
+  "@websites_openRestyStatus": {
+    "description": "OpenResty 运行状态"
+  },
+  "websites_openRestyActive": "活动连接",
+  "@websites_openRestyActive": {
+    "description": "活动连接"
+  },
+  "websites_openRestyRequests": "请求总数",
+  "@websites_openRestyRequests": {
+    "description": "请求总数"
+  },
+  "websites_openRestyAcceptsHandled": "接收 / 处理",
+  "@websites_openRestyAcceptsHandled": {
+    "description": "接收 / 处理"
+  },
+  "panelSettings_previewSnapshot": "预览",
+  "@panelSettings_previewSnapshot": {
+    "description": "预览"
+  },
+  "panelSettings_snapshotContent": "快照内容",
+  "@panelSettings_snapshotContent": {
+    "description": "快照内容"
+  },
+  "servers_reorder": "排序",
+  "@servers_reorder": {
+    "description": "排序"
+  },
+  "servers_reorderHint": "拖动调整服务器顺序",
+  "@servers_reorderHint": {
+    "description": "拖动调整服务器顺序"
+  },
+  "websites_organizationUnit": "组织单位",
+  "@websites_organizationUnit": {
+    "description": "组织单位"
+  },
+  "websites_province": "省份",
+  "@websites_province": {
+    "description": "省份"
+  },
+  "websites_city": "城市",
+  "@websites_city": {
+    "description": "城市"
+  },
+  "websites_keyType": "密钥类型",
+  "@websites_keyType": {
+    "description": "密钥类型"
+  },
+  "websites_certPath": "证书路径",
+  "@websites_certPath": {
+    "description": "证书路径"
+  },
+  "websites_privateKeyPath": "私钥路径",
+  "@websites_privateKeyPath": {
+    "description": "私钥路径"
+  },
+  "websites_status": "状态",
+  "@websites_status": {
+    "description": "状态"
+  },
+  "ai_title": "AI 工具",
+  "@ai_title": {
+    "description": "AI 工具"
+  },
+  "ai_models": "模型",
+  "@ai_models": {
+    "description": "模型"
+  },
+  "ai_gpu": "GPU",
+  "@ai_gpu": {
+    "description": "GPU"
+  },
+  "ai_mcp": "MCP 服务",
+  "@ai_mcp": {
+    "description": "MCP 服务"
+  },
+  "ai_models_empty": "暂无模型",
+  "@ai_models_empty": {
+    "description": "暂无模型"
+  },
+  "ai_models_empty_hint": "添加 Ollama 模型后显示在这里。",
+  "@ai_models_empty_hint": {
+    "description": "添加 Ollama 模型后显示在这里。"
+  },
+  "ai_gpu_empty": "未检测到 GPU",
+  "@ai_gpu_empty": {
+    "description": "未检测到 GPU"
+  },
+  "ai_gpu_empty_hint": "检测到支持的设备后会显示 GPU 信息。",
+  "@ai_gpu_empty_hint": {
+    "description": "检测到支持的设备后会显示 GPU 信息。"
+  },
+  "ai_mcp_empty": "暂无 MCP 服务",
+  "@ai_mcp_empty": {
+    "description": "暂无 MCP 服务"
+  },
+  "ai_mcp_empty_hint": "添加 MCP 服务以对外提供工具。",
+  "@ai_mcp_empty_hint": {
+    "description": "添加 MCP 服务以对外提供工具。"
+  },
+  "ai_model_add": "添加模型",
+  "@ai_model_add": {
+    "description": "添加模型"
+  },
+  "ai_model_name": "模型名称",
+  "@ai_model_name": {
+    "description": "模型名称"
+  },
+  "ai_model_size": "大小",
+  "@ai_model_size": {
+    "description": "大小"
+  },
+  "ai_model_status": "状态",
+  "@ai_model_status": {
+    "description": "状态"
+  },
+  "ai_model_from": "来源",
+  "@ai_model_from": {
+    "description": "来源"
+  },
+  "ai_model_load": "加载",
+  "@ai_model_load": {
+    "description": "加载"
+  },
+  "ai_model_unload": "卸载",
+  "@ai_model_unload": {
+    "description": "卸载"
+  },
+  "ai_mcp_add": "添加 MCP 服务",
+  "@ai_mcp_add": {
+    "description": "添加 MCP 服务"
+  },
+  "ai_mcp_name": "服务名称",
+  "@ai_mcp_name": {
+    "description": "服务名称"
+  },
+  "ai_mcp_type": "运行类型",
+  "@ai_mcp_type": {
+    "description": "运行类型"
+  },
+  "ai_mcp_command": "启动命令",
+  "@ai_mcp_command": {
+    "description": "启动命令"
+  },
+  "ai_mcp_container": "容器名称",
+  "@ai_mcp_container": {
+    "description": "容器名称"
+  },
+  "ai_mcp_port": "端口",
+  "@ai_mcp_port": {
+    "description": "端口"
+  },
+  "ai_mcp_sse_path": "SSE 路径",
+  "@ai_mcp_sse_path": {
+    "description": "SSE 路径"
+  },
+  "ai_mcp_url": "基础 URL",
+  "@ai_mcp_url": {
+    "description": "基础 URL"
+  },
+  "ai_mcp_protocol": "输出协议",
+  "@ai_mcp_protocol": {
+    "description": "输出协议"
+  },
+  "ai_mcp_transport": "传输方式",
+  "@ai_mcp_transport": {
+    "description": "传输方式"
+  },
+  "ai_mcp_running": "运行中",
+  "@ai_mcp_running": {
+    "description": "运行中"
+  },
+  "ai_mcp_stopped": "已停止",
+  "@ai_mcp_stopped": {
+    "description": "已停止"
+  },
+  "ai_mcp_start": "启动",
+  "@ai_mcp_start": {
+    "description": "启动"
+  },
+  "ai_mcp_stop": "停止",
+  "@ai_mcp_stop": {
+    "description": "停止"
+  },
+  "ai_mcp_restart": "重启",
+  "@ai_mcp_restart": {
+    "description": "重启"
+  },
+  "ai_mcp_test": "测试连接",
+  "@ai_mcp_test": {
+    "description": "测试连接"
+  },
+  "ai_mcp_delete_confirm": "删除 MCP 服务 {name}？",
+  "@ai_mcp_delete_confirm": {
+    "description": "删除 MCP 服务 {name}？",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_gpu_driver": "驱动",
+  "@ai_gpu_driver": {
+    "description": "驱动"
+  },
+  "ai_gpu_cuda": "CUDA",
+  "@ai_gpu_cuda": {
+    "description": "CUDA"
+  },
+  "ai_gpu_memory": "显存",
+  "@ai_gpu_memory": {
+    "description": "显存"
+  },
+  "ai_gpu_utilization": "利用率",
+  "@ai_gpu_utilization": {
+    "description": "利用率"
+  },
+  "ai_gpu_temperature": "温度",
+  "@ai_gpu_temperature": {
+    "description": "温度"
+  },
+  "ai_gpu_processes": "进程",
+  "@ai_gpu_processes": {
+    "description": "进程"
+  },
+  "ai_mcp_connection_ok": "连接正常",
+  "@ai_mcp_connection_ok": {
+    "description": "连接正常"
+  },
+  "ai_mcp_connection_failed": "连接失败",
+  "@ai_mcp_connection_failed": {
+    "description": "连接失败"
+  },
+  "databases_redisCommand": "Redis 命令行",
+  "@databases_redisCommand": {
+    "description": "Redis 命令行"
+  },
+  "ai_subtitle": "模型 · GPU · MCP",
+  "@ai_subtitle": {
+    "description": "模型 · GPU · MCP"
+  },
+  "ai_mcp_detail": "详情",
+  "@ai_mcp_detail": {
+    "description": "详情"
+  },
+  "ai_mcp_environments": "环境变量",
+  "@ai_mcp_environments": {
+    "description": "环境变量"
+  },
+  "ai_mcp_volumes": "存储卷",
+  "@ai_mcp_volumes": {
+    "description": "存储卷"
+  },
+  "ai_mcp_env_hint": "每行一个 KEY=VALUE",
+  "@ai_mcp_env_hint": {
+    "description": "每行一个 KEY=VALUE"
+  },
+  "ai_mcp_volume_hint": "每行一个 source:target",
+  "@ai_mcp_volume_hint": {
+    "description": "每行一个 source:target"
+  },
+  "ai_mcp_domain": "MCP 域名",
+  "@ai_mcp_domain": {
+    "description": "MCP 域名"
+  },
+  "ai_mcp_bind_domain": "绑定域名",
+  "@ai_mcp_bind_domain": {
+    "description": "绑定域名"
+  },
+  "ai_mcp_update_domain": "更新域名",
+  "@ai_mcp_update_domain": {
+    "description": "更新域名"
+  },
+  "ai_mcp_ssl_id": "SSL ID",
+  "@ai_mcp_ssl_id": {
+    "description": "SSL ID"
+  },
+  "ai_mcp_ip_list": "允许的 IP",
+  "@ai_mcp_ip_list": {
+    "description": "允许的 IP"
+  },
+  "ai_mcp_conn_url": "连接地址",
+  "@ai_mcp_conn_url": {
+    "description": "连接地址"
+  },
+  "ai_mcp_sync_status": "同步状态",
+  "@ai_mcp_sync_status": {
+    "description": "同步状态"
+  },
+  "ai_accounts": "模型账户",
+  "@ai_accounts": {
+    "description": "模型账户"
+  },
+  "ai_agents": "Agent",
+  "@ai_agents": {
+    "description": "Agent"
+  },
+  "ai_accounts_empty": "暂无模型账户",
+  "@ai_accounts_empty": {
+    "description": "暂无模型账户"
+  },
+  "ai_accounts_empty_hint": "添加模型提供商账户后即可使用。",
+  "@ai_accounts_empty_hint": {
+    "description": "添加模型提供商账户后即可使用。"
+  },
+  "ai_agents_empty": "暂无 Agent",
+  "@ai_agents_empty": {
+    "description": "暂无 Agent"
+  },
+  "ai_agents_empty_hint": "安装后的 Agent 会显示在这里。",
+  "@ai_agents_empty_hint": {
+    "description": "安装后的 Agent 会显示在这里。"
+  },
+  "ai_account_provider": "提供商",
+  "@ai_account_provider": {
+    "description": "提供商"
+  },
+  "ai_account_verified": "已验证",
+  "@ai_account_verified": {
+    "description": "已验证"
+  },
+  "ai_account_unverified": "未验证",
+  "@ai_account_unverified": {
+    "description": "未验证"
+  },
+  "ai_agent_status": "状态",
+  "@ai_agent_status": {
+    "description": "状态"
+  },
+  "ai_agent_model": "模型",
+  "@ai_agent_model": {
+    "description": "模型"
+  },
+  "ai_agent_website": "网站",
+  "@ai_agent_website": {
+    "description": "网站"
+  },
+  "ai_agent_token_reset": "重置 Token",
+  "@ai_agent_token_reset": {
+    "description": "重置 Token"
+  },
+  "ai_agent_remark": "备注",
+  "@ai_agent_remark": {
+    "description": "备注"
+  },
+  "ai_agent_delete_confirm": "删除 Agent {name}？",
+  "@ai_agent_delete_confirm": {
+    "description": "删除 Agent {name}？",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_agent_upgradable": "可升级",
+  "@ai_agent_upgradable": {
+    "description": "可升级"
+  },
+  "ai_account_add": "添加模型账户",
+  "@ai_account_add": {
+    "description": "添加模型账户"
+  },
+  "ai_account_edit": "编辑模型账户",
+  "@ai_account_edit": {
+    "description": "编辑模型账户"
+  },
+  "ai_account_name": "账户名称",
+  "@ai_account_name": {
+    "description": "账户名称"
+  },
+  "ai_account_api_key": "API Key",
+  "@ai_account_api_key": {
+    "description": "API Key"
+  },
+  "ai_account_base_url": "基础 URL",
+  "@ai_account_base_url": {
+    "description": "基础 URL"
+  },
+  "ai_account_api_type": "API 类型",
+  "@ai_account_api_type": {
+    "description": "API 类型"
+  },
+  "ai_account_verify_model": "验证模型",
+  "@ai_account_verify_model": {
+    "description": "验证模型"
+  },
+  "ai_account_validate": "校验可用性",
+  "@ai_account_validate": {
+    "description": "校验可用性"
+  },
+  "ai_account_remember_key": "记住 API Key",
+  "@ai_account_remember_key": {
+    "description": "记住 API Key"
+  },
+  "ai_account_remark": "备注",
+  "@ai_account_remark": {
+    "description": "备注"
+  },
+  "ai_agent_model_config": "模型配置",
+  "@ai_agent_model_config": {
+    "description": "模型配置"
+  },
+  "ai_agent_fallbacks": "备用模型",
+  "@ai_agent_fallbacks": {
+    "description": "备用模型"
+  },
+  "ai_agent_add": "添加 Agent",
+  "@ai_agent_add": {
+    "description": "添加 Agent"
+  },
+  "ai_agent_type": "Agent 类型",
+  "@ai_agent_type": {
+    "description": "Agent 类型"
+  },
+  "ai_agent_version": "版本",
+  "@ai_agent_version": {
+    "description": "版本"
+  },
+  "ai_agent_port": "WebUI 端口",
+  "@ai_agent_port": {
+    "description": "WebUI 端口"
+  },
+  "ai_agent_access_host": "访问地址",
+  "@ai_agent_access_host": {
+    "description": "访问地址"
+  },
+  "ai_agent_username": "面板用户名",
+  "@ai_agent_username": {
+    "description": "面板用户名"
+  },
+  "ai_agent_password": "面板密码",
+  "@ai_agent_password": {
+    "description": "面板密码"
+  },
+  "ai_agent_bind_website": "绑定网站",
+  "@ai_agent_bind_website": {
+    "description": "绑定网站"
+  },
+  "ai_agent_unbind_website": "解绑网站",
+  "@ai_agent_unbind_website": {
+    "description": "解绑网站"
+  },
+  "ai_agent_select_website": "选择网站",
+  "@ai_agent_select_website": {
+    "description": "选择网站"
+  },
+  "ai_agent_roles": "角色",
+  "@ai_agent_roles": {
+    "description": "角色"
+  },
+  "ai_agent_channels": "渠道",
+  "@ai_agent_channels": {
+    "description": "渠道"
+  },
+  "ai_agent_roles_empty": "暂无角色",
+  "@ai_agent_roles_empty": {
+    "description": "暂无角色"
+  },
+  "ai_agent_channels_empty": "暂无渠道",
+  "@ai_agent_channels_empty": {
+    "description": "暂无渠道"
+  },
+  "ai_agent_delete_role_confirm": "删除角色 {name}？",
+  "@ai_agent_delete_role_confirm": {
+    "description": "删除角色 {name}？",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_agent_bound": "已绑定",
+  "@ai_agent_bound": {
+    "description": "已绑定"
+  },
+  "ai_agent_unbound": "未绑定",
+  "@ai_agent_unbound": {
+    "description": "未绑定"
+  },
+  "ai_agent_role_add": "添加角色",
+  "@ai_agent_role_add": {
+    "description": "添加角色"
+  },
+  "ai_agent_binding_channel": "渠道",
+  "@ai_agent_binding_channel": {
+    "description": "渠道"
+  },
+  "ai_agent_account_id": "账户 ID",
+  "@ai_agent_account_id": {
+    "description": "账户 ID"
+  },
+  "ai_agent_role_name": "角色名称",
+  "@ai_agent_role_name": {
+    "description": "角色名称"
+  },
+  "ai_agent_bind_channel": "绑定渠道",
+  "@ai_agent_bind_channel": {
+    "description": "绑定渠道"
+  },
+  "ai_agent_unbind_channel": "解绑渠道",
+  "@ai_agent_unbind_channel": {
+    "description": "解绑渠道"
+  },
+  "ai_agent_feishu": "飞书渠道",
+  "@ai_agent_feishu": {
+    "description": "飞书渠道"
+  },
+  "ai_agent_channel_enabled": "启用",
+  "@ai_agent_channel_enabled": {
+    "description": "启用"
+  },
+  "ai_agent_group_policy": "群组策略",
+  "@ai_agent_group_policy": {
+    "description": "群组策略"
+  },
+  "ai_agent_require_mention": "需要 @ 提及",
+  "@ai_agent_require_mention": {
+    "description": "需要 @ 提及"
+  },
+  "ai_agent_streaming": "流式回复",
+  "@ai_agent_streaming": {
+    "description": "流式回复"
+  },
+  "ai_agent_thread_session": "话题会话",
+  "@ai_agent_thread_session": {
+    "description": "话题会话"
+  },
+  "ai_agent_connection_mode": "连接方式",
+  "@ai_agent_connection_mode": {
+    "description": "连接方式"
+  },
+  "ai_agent_bots": "机器人",
+  "@ai_agent_bots": {
+    "description": "机器人"
+  },
+  "ai_agent_channel_saved": "渠道设置已保存",
+  "@ai_agent_channel_saved": {
+    "description": "渠道设置已保存"
+  },
+  "ai_agent_channel_config": "渠道配置",
+  "@ai_agent_channel_config": {
+    "description": "渠道配置"
+  },
+  "ai_agent_channel_json": "渠道 JSON",
+  "@ai_agent_channel_json": {
+    "description": "渠道 JSON"
+  },
+  "ai_agent_channel_json_invalid": "渠道 JSON 格式错误",
+  "@ai_agent_channel_json_invalid": {
+    "description": "渠道 JSON 格式错误"
+  },
+  "ai_agent_channel_json_hint": "编辑面板返回的 JSON，保存时会自动补上 agentId。",
+  "@ai_agent_channel_json_hint": {
+    "description": "编辑面板返回的 JSON，保存时会自动补上 agentId。"
+  },
+  "ai_agent_channel_delete": "删除渠道配置",
+  "@ai_agent_channel_delete": {
+    "description": "删除渠道配置"
+  },
+  "ai_agent_channel_delete_confirm": "删除该 Agent 的 {channel} 配置？",
+  "@ai_agent_channel_delete_confirm": {
+    "description": "删除该 Agent 的 {channel} 配置？",
+    "placeholders": {
+      "channel": {
+        "type": "String"
+      }
+    }
+  },
+  "databases_redisKeys": "键浏览",
+  "@databases_redisKeys": {
+    "description": "键浏览"
+  },
+  "ai_agent_weixin_login": "微信扫码登录",
+  "@ai_agent_weixin_login": {
+    "description": "微信扫码登录"
+  },
+  "ai_agent_weixin_login_hint": "扫描任务日志中的二维码完成微信连接。",
+  "@ai_agent_weixin_login_hint": {
+    "description": "扫描任务日志中的二维码完成微信连接。"
   }
 }

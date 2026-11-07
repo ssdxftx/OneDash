@@ -23,6 +23,11 @@ class ServersController extends AsyncNotifier<List<Server>> {
     );
   }
 
+  Future<void> reorder(List<int> orderedIds) async {
+    await ref.read(serverRepositoryProvider).reorder(orderedIds);
+    await refresh();
+  }
+
   Future<void> delete(int id) async {
     await ref.read(serverRepositoryProvider).remove(id);
     ref.invalidate(lastServerIdProvider);

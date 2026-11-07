@@ -24,6 +24,7 @@ import '../../../common/states/empty_state.dart';
 import '../../../common/states/entry_animation.dart';
 import '../../../common/states/error_toast.dart';
 import '../widgets/database_create_sheet.dart';
+import 'database_detail_page.dart';
 
 class _DatabasesState {
   const _DatabasesState({
@@ -259,7 +260,8 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage>
     return '/s/${widget.serverId}/more/databases/'
         '${Uri.encodeComponent(item.name)}'
         '?type=${Uri.encodeComponent(item.dbType)}'
-        '&instance=${Uri.encodeComponent(item.instanceName)}';
+        '&instance=${Uri.encodeComponent(item.instanceName)}'
+        '&from=${Uri.encodeComponent(item.from)}';
   }
 
   Future<void> _showActions(DatabaseSearchItemDto item) async {
@@ -306,19 +308,29 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage>
                   icon: TablerIcons.users,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.databases_usersGrants,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push('${_detailPath(item)}/users');
-                  },
+                  onTap: () => showDatabaseTabSheet(
+                    sheetContext,
+                    serverId: widget.serverId,
+                    databaseName: item.name,
+                    type: item.dbType,
+                    instance: item.instanceName,
+                    tab: 1,
+                    from: item.from,
+                  ),
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.adjustments,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.databases_advanced,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push('${_detailPath(item)}/advanced');
-                  },
+                  onTap: () => showDatabaseTabSheet(
+                    sheetContext,
+                    serverId: widget.serverId,
+                    databaseName: item.name,
+                    type: item.dbType,
+                    instance: item.instanceName,
+                    tab: 2,
+                    from: item.from,
+                  ),
                 ),
               ],
             ),

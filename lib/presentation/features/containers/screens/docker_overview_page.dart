@@ -236,6 +236,12 @@ class _ResourcesBody extends StatelessWidget {
         value: '${status.networkCount}',
         onTap: () => context.push('/s/$serverId/containers/networks'),
       ),
+      _OverviewRowData(
+        icon: TablerIcons.database,
+        title: l10n.containers_storageVolumes,
+        value: '${status.volumeCount}',
+        onTap: () => context.push('/s/$serverId/containers/volumes'),
+      ),
     ];
     return TonalCard(
       padding: EdgeInsets.zero,

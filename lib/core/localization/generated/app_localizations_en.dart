@@ -2201,6 +2201,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get containers_ports => 'Port mappings';
 
   @override
+  String get containers_storageVolumes => 'Storage volumes';
+
+  @override
   String get containers_volumes => 'Volumes';
 
   @override
@@ -5415,4 +5418,525 @@ class AppLocalizationsEn extends AppLocalizations {
   String containers_overview_runningCount(int count) {
     return 'Running $count';
   }
+
+  @override
+  String get apps_rebuild => 'Rebuild';
+
+  @override
+  String get apps_reload => 'Reload';
+
+  @override
+  String get apps_rebuildConfirm =>
+      'Rebuild recreates the container. Unsaved runtime data may be lost.';
+
+  @override
+  String get apps_installLog => 'Install log';
+
+  @override
+  String get apps_installLogEmpty => 'No install log for this app yet.';
+
+  @override
+  String get host_subtitleOps => 'SSH · Disk · Diagnostics';
+
+  @override
+  String get toolbox_timeSwapDns => 'Time · Swap · DNS';
+
+  @override
+  String get supervisor_titleLong => 'Supervisor';
+
+  @override
+  String get containers_volumesEmpty => 'No volumes';
+
+  @override
+  String get containers_volumesEmptyHint =>
+      'Volumes created by containers will appear here.';
+
+  @override
+  String containers_volumeDeleteConfirm(String name) {
+    return 'Delete volume $name? Data stored on it will be lost.';
+  }
+
+  @override
+  String get files_recycleEnabled => 'Recycle bin is on';
+
+  @override
+  String get files_recycleDisabled => 'Recycle bin is off';
+
+  @override
+  String get dashboard_monitorOptions => 'Monitor devices';
+
+  @override
+  String get dashboard_monitorDisk => 'Disk IO';
+
+  @override
+  String get dashboard_monitorNetwork => 'Network interface';
+
+  @override
+  String containers_limitAvailable(int cpu, int memory) {
+    return 'Host limit: $cpu cores · $memory MB';
+  }
+
+  @override
+  String get alerts_disk => 'Monitored disk';
+
+  @override
+  String get alerts_diskHint => 'Choose the mount path to monitor';
+
+  @override
+  String get backups_localDir => 'Local directory';
+
+  @override
+  String get panelSettings_bindAddress => 'Interface address';
+
+  @override
+  String get apps_filterTags => 'Tags';
+
+  @override
+  String get dashboard_monitorAll => 'All';
+
+  @override
+  String get toolbox_ftpSystemUser => 'System user';
+
+  @override
+  String get websites_uploadSslFile => 'Upload from file';
+
+  @override
+  String get websites_uploadSslPaste => 'Paste PEM';
+
+  @override
+  String get websites_selectCertificateFile => 'Select certificate file';
+
+  @override
+  String get websites_selectPrivateKeyFile => 'Select private key file';
+
+  @override
+  String get websites_openRestyStatus => 'OpenResty status';
+
+  @override
+  String get websites_openRestyActive => 'Active connections';
+
+  @override
+  String get websites_openRestyRequests => 'Requests';
+
+  @override
+  String get websites_openRestyAcceptsHandled => 'Accepted / handled';
+
+  @override
+  String get panelSettings_previewSnapshot => 'Preview';
+
+  @override
+  String get panelSettings_snapshotContent => 'Snapshot content';
+
+  @override
+  String get servers_reorder => 'Reorder';
+
+  @override
+  String get servers_reorderHint => 'Drag to reorder servers';
+
+  @override
+  String get websites_organizationUnit => 'Organization unit';
+
+  @override
+  String get websites_province => 'Province';
+
+  @override
+  String get websites_city => 'City';
+
+  @override
+  String get websites_keyType => 'Key type';
+
+  @override
+  String get websites_certPath => 'Certificate path';
+
+  @override
+  String get websites_privateKeyPath => 'Private key path';
+
+  @override
+  String get websites_status => 'Status';
+
+  @override
+  String get ai_title => 'AI tools';
+
+  @override
+  String get ai_models => 'Models';
+
+  @override
+  String get ai_gpu => 'GPU';
+
+  @override
+  String get ai_mcp => 'MCP servers';
+
+  @override
+  String get ai_models_empty => 'No models';
+
+  @override
+  String get ai_models_empty_hint => 'Add an Ollama model to start.';
+
+  @override
+  String get ai_gpu_empty => 'No GPU detected';
+
+  @override
+  String get ai_gpu_empty_hint =>
+      'GPU information appears when a supported device is present.';
+
+  @override
+  String get ai_mcp_empty => 'No MCP servers';
+
+  @override
+  String get ai_mcp_empty_hint => 'Add an MCP server to expose tools.';
+
+  @override
+  String get ai_model_add => 'Add model';
+
+  @override
+  String get ai_model_name => 'Model name';
+
+  @override
+  String get ai_model_size => 'Size';
+
+  @override
+  String get ai_model_status => 'Status';
+
+  @override
+  String get ai_model_from => 'Source';
+
+  @override
+  String get ai_model_load => 'Load';
+
+  @override
+  String get ai_model_unload => 'Unload';
+
+  @override
+  String get ai_mcp_add => 'Add MCP server';
+
+  @override
+  String get ai_mcp_name => 'Server name';
+
+  @override
+  String get ai_mcp_type => 'Runtime';
+
+  @override
+  String get ai_mcp_command => 'Command';
+
+  @override
+  String get ai_mcp_container => 'Container name';
+
+  @override
+  String get ai_mcp_port => 'Port';
+
+  @override
+  String get ai_mcp_sse_path => 'SSE path';
+
+  @override
+  String get ai_mcp_url => 'Base URL';
+
+  @override
+  String get ai_mcp_protocol => 'Output protocol';
+
+  @override
+  String get ai_mcp_transport => 'Transport';
+
+  @override
+  String get ai_mcp_running => 'Running';
+
+  @override
+  String get ai_mcp_stopped => 'Stopped';
+
+  @override
+  String get ai_mcp_start => 'Start';
+
+  @override
+  String get ai_mcp_stop => 'Stop';
+
+  @override
+  String get ai_mcp_restart => 'Restart';
+
+  @override
+  String get ai_mcp_test => 'Test connection';
+
+  @override
+  String ai_mcp_delete_confirm(String name) {
+    return 'Delete MCP server $name?';
+  }
+
+  @override
+  String get ai_gpu_driver => 'Driver';
+
+  @override
+  String get ai_gpu_cuda => 'CUDA';
+
+  @override
+  String get ai_gpu_memory => 'Memory';
+
+  @override
+  String get ai_gpu_utilization => 'Utilization';
+
+  @override
+  String get ai_gpu_temperature => 'Temperature';
+
+  @override
+  String get ai_gpu_processes => 'Processes';
+
+  @override
+  String get ai_mcp_connection_ok => 'Connection OK';
+
+  @override
+  String get ai_mcp_connection_failed => 'Connection failed';
+
+  @override
+  String get databases_redisCommand => 'Redis command line';
+
+  @override
+  String get ai_subtitle => 'Models · GPU · MCP';
+
+  @override
+  String get ai_mcp_detail => 'Details';
+
+  @override
+  String get ai_mcp_environments => 'Environment variables';
+
+  @override
+  String get ai_mcp_volumes => 'Volumes';
+
+  @override
+  String get ai_mcp_env_hint => 'One KEY=VALUE per line';
+
+  @override
+  String get ai_mcp_volume_hint => 'One source:target per line';
+
+  @override
+  String get ai_mcp_domain => 'MCP domain';
+
+  @override
+  String get ai_mcp_bind_domain => 'Bind domain';
+
+  @override
+  String get ai_mcp_update_domain => 'Update domain';
+
+  @override
+  String get ai_mcp_ssl_id => 'SSL ID';
+
+  @override
+  String get ai_mcp_ip_list => 'Allowed IPs';
+
+  @override
+  String get ai_mcp_conn_url => 'Connection URL';
+
+  @override
+  String get ai_mcp_sync_status => 'Sync status';
+
+  @override
+  String get ai_accounts => 'Model accounts';
+
+  @override
+  String get ai_agents => 'Agents';
+
+  @override
+  String get ai_accounts_empty => 'No model accounts';
+
+  @override
+  String get ai_accounts_empty_hint => 'Add a provider account to use models.';
+
+  @override
+  String get ai_agents_empty => 'No agents';
+
+  @override
+  String get ai_agents_empty_hint => 'Installed agents will appear here.';
+
+  @override
+  String get ai_account_provider => 'Provider';
+
+  @override
+  String get ai_account_verified => 'Verified';
+
+  @override
+  String get ai_account_unverified => 'Unverified';
+
+  @override
+  String get ai_agent_status => 'Status';
+
+  @override
+  String get ai_agent_model => 'Model';
+
+  @override
+  String get ai_agent_website => 'Website';
+
+  @override
+  String get ai_agent_token_reset => 'Reset token';
+
+  @override
+  String get ai_agent_remark => 'Remark';
+
+  @override
+  String ai_agent_delete_confirm(String name) {
+    return 'Delete agent $name?';
+  }
+
+  @override
+  String get ai_agent_upgradable => 'Upgrade available';
+
+  @override
+  String get ai_account_add => 'Add model account';
+
+  @override
+  String get ai_account_edit => 'Edit model account';
+
+  @override
+  String get ai_account_name => 'Account name';
+
+  @override
+  String get ai_account_api_key => 'API key';
+
+  @override
+  String get ai_account_base_url => 'Base URL';
+
+  @override
+  String get ai_account_api_type => 'API type';
+
+  @override
+  String get ai_account_verify_model => 'Verify model';
+
+  @override
+  String get ai_account_validate => 'Validate availability';
+
+  @override
+  String get ai_account_remember_key => 'Remember API key';
+
+  @override
+  String get ai_account_remark => 'Remark';
+
+  @override
+  String get ai_agent_model_config => 'Model configuration';
+
+  @override
+  String get ai_agent_fallbacks => 'Fallback models';
+
+  @override
+  String get ai_agent_add => 'Add agent';
+
+  @override
+  String get ai_agent_type => 'Agent type';
+
+  @override
+  String get ai_agent_version => 'Version';
+
+  @override
+  String get ai_agent_port => 'WebUI port';
+
+  @override
+  String get ai_agent_access_host => 'Access host';
+
+  @override
+  String get ai_agent_username => 'Dashboard username';
+
+  @override
+  String get ai_agent_password => 'Dashboard password';
+
+  @override
+  String get ai_agent_bind_website => 'Bind website';
+
+  @override
+  String get ai_agent_unbind_website => 'Unbind website';
+
+  @override
+  String get ai_agent_select_website => 'Select website';
+
+  @override
+  String get ai_agent_roles => 'Roles';
+
+  @override
+  String get ai_agent_channels => 'Channels';
+
+  @override
+  String get ai_agent_roles_empty => 'No roles';
+
+  @override
+  String get ai_agent_channels_empty => 'No channels';
+
+  @override
+  String ai_agent_delete_role_confirm(String name) {
+    return 'Delete role $name?';
+  }
+
+  @override
+  String get ai_agent_bound => 'Bound';
+
+  @override
+  String get ai_agent_unbound => 'Unbound';
+
+  @override
+  String get ai_agent_role_add => 'Add role';
+
+  @override
+  String get ai_agent_binding_channel => 'Channel';
+
+  @override
+  String get ai_agent_account_id => 'Account ID';
+
+  @override
+  String get ai_agent_role_name => 'Role name';
+
+  @override
+  String get ai_agent_bind_channel => 'Bind channel';
+
+  @override
+  String get ai_agent_unbind_channel => 'Unbind channel';
+
+  @override
+  String get ai_agent_feishu => 'Feishu channel';
+
+  @override
+  String get ai_agent_channel_enabled => 'Enabled';
+
+  @override
+  String get ai_agent_group_policy => 'Group policy';
+
+  @override
+  String get ai_agent_require_mention => 'Require mention';
+
+  @override
+  String get ai_agent_streaming => 'Streaming';
+
+  @override
+  String get ai_agent_thread_session => 'Thread session';
+
+  @override
+  String get ai_agent_connection_mode => 'Connection mode';
+
+  @override
+  String get ai_agent_bots => 'Bots';
+
+  @override
+  String get ai_agent_channel_saved => 'Channel settings saved';
+
+  @override
+  String get ai_agent_channel_config => 'Channel configuration';
+
+  @override
+  String get ai_agent_channel_json => 'Channel JSON';
+
+  @override
+  String get ai_agent_channel_json_invalid => 'Channel JSON is invalid';
+
+  @override
+  String get ai_agent_channel_json_hint =>
+      'Edit the JSON returned by the panel. agentId is added on save.';
+
+  @override
+  String get ai_agent_channel_delete => 'Remove channel config';
+
+  @override
+  String ai_agent_channel_delete_confirm(String channel) {
+    return 'Remove $channel configuration for this agent?';
+  }
+
+  @override
+  String get databases_redisKeys => 'Browse keys';
+
+  @override
+  String get ai_agent_weixin_login => 'Weixin QR login';
+
+  @override
+  String get ai_agent_weixin_login_hint =>
+      'Scan the QR code shown in the task log to connect Weixin.';
 }

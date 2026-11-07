@@ -22,6 +22,7 @@ import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import 'runtime_detail_page.dart';
 
 final _runtimesProvider = FutureProvider.autoDispose<PageResult<RuntimeDto>>((
   ref,
@@ -202,51 +203,51 @@ class RuntimesPage extends ConsumerWidget {
                 SplitListTile(
                   leading: const Icon(TablerIcons.puzzle),
                   title: l10n.runtime_extensions,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/$serverId/more/runtimes/${runtime.id}/extensions'
-                      '?type=${Uri.encodeComponent(runtime.type)}'
-                      '&name=${Uri.encodeComponent(runtime.name)}',
-                    );
-                  },
+                  onTap: () => showRuntimeTabSheet(
+                    sheetContext,
+                    serverId: serverId,
+                    id: runtime.id,
+                    type: runtime.type,
+                    name: runtime.name,
+                    tab: 0,
+                  ),
                 ),
                 SplitListTile(
                   leading: const Icon(TablerIcons.file_code),
                   title: l10n.runtime_phpIni,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/$serverId/more/runtimes/${runtime.id}/ini'
-                      '?type=${Uri.encodeComponent(runtime.type)}'
-                      '&name=${Uri.encodeComponent(runtime.name)}',
-                    );
-                  },
+                  onTap: () => showRuntimeTabSheet(
+                    sheetContext,
+                    serverId: serverId,
+                    id: runtime.id,
+                    type: runtime.type,
+                    name: runtime.name,
+                    tab: 1,
+                  ),
                 ),
                 SplitListTile(
                   leading: const Icon(TablerIcons.settings),
                   title: l10n.runtime_fpm,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/$serverId/more/runtimes/${runtime.id}/fpm'
-                      '?type=${Uri.encodeComponent(runtime.type)}'
-                      '&name=${Uri.encodeComponent(runtime.name)}',
-                    );
-                  },
+                  onTap: () => showRuntimeTabSheet(
+                    sheetContext,
+                    serverId: serverId,
+                    id: runtime.id,
+                    type: runtime.type,
+                    name: runtime.name,
+                    tab: 2,
+                  ),
                 ),
               ] else if (runtime.type == 'node')
                 SplitListTile(
                   leading: const Icon(TablerIcons.puzzle),
                   title: l10n.runtime_modules,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/$serverId/more/runtimes/${runtime.id}/modules'
-                      '?type=${Uri.encodeComponent(runtime.type)}'
-                      '&name=${Uri.encodeComponent(runtime.name)}',
-                    );
-                  },
+                  onTap: () => showRuntimeTabSheet(
+                    sheetContext,
+                    serverId: serverId,
+                    id: runtime.id,
+                    type: runtime.type,
+                    name: runtime.name,
+                    tab: 3,
+                  ),
                 ),
               SplitListTile(
                 leading: const Icon(TablerIcons.player_play),

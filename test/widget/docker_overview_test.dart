@@ -12,7 +12,7 @@ import 'package:onedash/presentation/features/containers/screens/docker_overview
 import 'package:onedash/presentation/features/servers/providers/servers_provider.dart';
 
 void main() {
-  testWidgets('overview shows docker, six resources and four disk rows', (
+  testWidgets('overview shows docker, resource entries and four disk rows', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(390, 1600);
@@ -82,6 +82,7 @@ void main() {
     expect(find.text('8'), findsOneWidget);
     expect(find.text('镜像仓库'), findsWidgets);
     expect(find.text('网络'), findsWidgets);
+    expect(find.text('存储卷'), findsOneWidget);
     await tester.drag(find.byType(ListView), const Offset(0, -400));
     await tester.pumpAndSettle();
     expect(find.text('Docker 磁盘占用'), findsOneWidget);

@@ -42,6 +42,11 @@ final _recycleProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>(
   name: 'fileRecycleProvider',
 );
 
+final _recycleStatusProvider = FutureProvider.autoDispose<bool>((ref) async {
+  final repository = await ref.watch(fileRepositoryProvider.future);
+  return repository.getRecycleStatus();
+}, name: 'fileRecycleStatusProvider');
+
 final _sharesProvider = FutureProvider.autoDispose<List<FileShareDto>>((
   ref,
 ) async {
@@ -207,7 +212,29 @@ class _RecycleTab extends ConsumerWidget {
           child: Row(
             children: [
               Expanded(
-                child: Text(l10n.files_recycleBin, style: AppTextStyles.titleS),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.files_recycleBin, style: AppTextStyles.titleS),
+                    const SizedBox(height: AppTokens.s4),
+                    ref
+                        .watch(_recycleStatusProvider)
+                        .when(
+                          data: (enabled) => Text(
+                            enabled
+                                ? l10n.files_recycleEnabled
+                                : l10n.files_recycleDisabled,
+                            style: AppTextStyles.caption.copyWith(
+                              color: enabled
+                                  ? context.appColors.success
+                                  : context.scheme.onSurfaceVariant,
+                            ),
+                          ),
+                          loading: () => const SizedBox.shrink(),
+                          error: (_, _) => const SizedBox.shrink(),
+                        ),
+                  ],
+                ),
               ),
               SecondaryButton(
                 label: l10n.files_clearRecycleBin,

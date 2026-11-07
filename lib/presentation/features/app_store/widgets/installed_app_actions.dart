@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
@@ -18,6 +19,7 @@ import '../../../common/components/buttons.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/task_progress_sheet.dart';
+import '../../log/screens/log_preview_page.dart';
 import '../../../common/states/error_toast.dart';
 import '../providers/app_store_provider.dart';
 
@@ -161,6 +163,128 @@ class InstalledAppActions {
       if (!context.mounted) return;
       showErrorToast(context, error);
     }
+  }
+
+  static Future<void> rebuild(
+    BuildContext context,
+    WidgetRef ref,
+    AppInstalledDto app,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    if (app.appDetailId <= 0) {
+      AppToast.warning(context, l10n.apps_detailMissing);
+      return;
+    }
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.apps_rebuild,
+      message: l10n.apps_rebuildConfirm,
+      confirmLabel: l10n.apps_rebuild,
+    );
+    if (!confirmed || !context.mounted) return;
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      await repository.rebuildInstalled(
+        installId: app.id,
+        detailId: app.appDetailId,
+      );
+      if (!context.mounted) return;
+      ref.invalidate(installedInfoProvider(app.id));
+      ref.invalidate(installedAppsProvider);
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  static Future<void> reload(
+    BuildContext context,
+    WidgetRef ref,
+    AppInstalledDto app,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    if (app.appDetailId <= 0) {
+      AppToast.warning(context, l10n.apps_detailMissing);
+      return;
+    }
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      await repository.reloadInstalled(
+        installId: app.id,
+        detailId: app.appDetailId,
+      );
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  static Future<void> showInstallLog(
+    BuildContext context,
+    WidgetRef ref, {
+    required int installId,
+    required String appName,
+  }) {
+    final l10n = AppLocalizations.of(context);
+    return showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => SizedBox(
+        height: MediaQuery.sizeOf(sheetContext).height * 0.78,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l10n.apps_installLog, style: AppTextStyles.titleM),
+                      Text(
+                        appName,
+                        style: AppTextStyles.bodyS.copyWith(
+                          color: sheetContext.scheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  tooltip: l10n.action_close,
+                  onPressed: () => Navigator.of(sheetContext).pop(),
+                  icon: const Icon(TablerIcons.x),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTokens.s8),
+            Expanded(
+              child: LogPreviewPage(
+                title: l10n.apps_installLog,
+                subtitle: appName,
+                embedded: true,
+                sources: [
+                  LogSourceOption(
+                    label: l10n.apps_installLog,
+                    load: () async {
+                      final repository = await ref.read(
+                        appRepositoryProvider.future,
+                      );
+                      final log = await repository.getAppInstallLog(installId);
+                      return log.lines;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   static Future<void> editParams(

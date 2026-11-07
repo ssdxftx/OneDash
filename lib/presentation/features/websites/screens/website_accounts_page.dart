@@ -20,6 +20,7 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/skeleton.dart';
+import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
@@ -766,6 +767,77 @@ class _CaTab extends ConsumerWidget {
     }
   }
 
+  Future<void> _showDetail(
+    BuildContext context,
+    WidgetRef ref,
+    CaDto item,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final detail = await repository.getCaDetail(item.id);
+      if (!context.mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    detail.name.isEmpty ? 'CA #${detail.id}' : detail.name,
+                    style: AppTextStyles.titleL,
+                  ),
+                ),
+                IconButton(
+                  tooltip: l10n.action_close,
+                  onPressed: () => Navigator.of(sheetContext).pop(),
+                  icon: const Icon(TablerIcons.x),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTokens.s12),
+            SplitListGroup(
+              children: [
+                SplitListTile(
+                  title: l10n.websites_commonName,
+                  value: detail.commonName,
+                ),
+                SplitListTile(
+                  title: l10n.websites_country,
+                  value: detail.country,
+                ),
+                SplitListTile(
+                  title: l10n.websites_organization,
+                  value: detail.organization,
+                ),
+                SplitListTile(
+                  title: l10n.websites_organizationUnit,
+                  value: detail.organizationUnit,
+                ),
+                SplitListTile(
+                  title: l10n.websites_province,
+                  value: detail.province,
+                ),
+                SplitListTile(title: l10n.websites_city, value: detail.city),
+                SplitListTile(
+                  title: l10n.websites_keyType,
+                  value: detail.keyType,
+                ),
+                SplitListTile(title: 'SSL ID', value: detail.sslId),
+              ],
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -798,6 +870,7 @@ class _CaTab extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final item = items[index];
                 return TonalCard(
+                  onTap: () => _showDetail(context, ref, item),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

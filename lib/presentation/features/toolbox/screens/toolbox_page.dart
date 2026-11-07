@@ -89,20 +89,13 @@ class ToolboxPage extends ConsumerWidget {
               children: [
                 SplitListTile(
                   leading: const Icon(TablerIcons.clock),
-                  title: l10n.toolbox_time,
-                  subtitle: displayValue(
-                    context,
-                    value.device['timeZone']?.toString(),
-                  ),
-                  trailing: const Icon(TablerIcons.chevron_right),
-                  onTap: () => context.push('/s/$serverId/more/toolbox/device'),
-                ),
-                SplitListTile(
-                  leading: const Icon(TablerIcons.arrows_exchange),
-                  title: l10n.toolbox_swapDns,
-                  subtitle: ((value.device['dns'] as List?) ?? const [])
-                      .map((item) => '$item')
-                      .join(', '),
+                  title: l10n.toolbox_timeSwapDns,
+                  subtitle: [
+                    displayValue(context, value.device['timeZone']?.toString()),
+                    ((value.device['dns'] as List?) ?? const [])
+                        .map((item) => '$item')
+                        .join(', '),
+                  ].where((item) => item.isNotEmpty).join(' · '),
                   trailing: const Icon(TablerIcons.chevron_right),
                   onTap: () => context.push('/s/$serverId/more/toolbox/device'),
                 ),

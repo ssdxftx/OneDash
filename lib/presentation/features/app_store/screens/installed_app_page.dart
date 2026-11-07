@@ -60,9 +60,16 @@ class InstalledAppPage extends ConsumerWidget {
           ),
           AppIconButton(
             icon: TablerIcons.file_text,
-            tooltip: l10n.containers_viewLogs,
+            tooltip: container == null || container.isEmpty
+                ? l10n.apps_installLog
+                : l10n.containers_viewLogs,
             onPressed: container == null || container.isEmpty
-                ? null
+                ? () => InstalledAppActions.showInstallLog(
+                    context,
+                    ref,
+                    installId: id,
+                    appName: appName,
+                  )
                 : () => openContainerLogs(
                     context,
                     ref,
@@ -133,6 +140,27 @@ class InstalledAppPage extends ConsumerWidget {
               SectionHeader(title: l10n.containers_groupMaintenance),
               SplitListGroup(
                 children: [
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.file_text),
+                    title: l10n.apps_installLog,
+                    onTap: () => InstalledAppActions.showInstallLog(
+                      context,
+                      ref,
+                      installId: id,
+                      appName: appName,
+                    ),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.restore),
+                    title: l10n.apps_rebuild,
+                    onTap: () =>
+                        InstalledAppActions.rebuild(context, ref, app!),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.reload),
+                    title: l10n.apps_reload,
+                    onTap: () => InstalledAppActions.reload(context, ref, app!),
+                  ),
                   if (app.canUpdate)
                     SplitListTile(
                       leading: const Icon(TablerIcons.arrow_up_circle),

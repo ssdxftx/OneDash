@@ -197,6 +197,10 @@ class ContainerRepositoryImpl implements ContainerRepository {
   Future<List<ContainerOptionDto>> getVolumes() => _containerApi.getVolumes();
 
   @override
+  Future<void> deleteVolumes(List<String> names) =>
+      _containerApi.deleteVolumes(names);
+
+  @override
   Future<List<ContainerOptionDto>> getImages() => _containerApi.getImages();
 
   @override

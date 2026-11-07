@@ -2146,6 +2146,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get containers_ports => '端口映射';
 
   @override
+  String get containers_storageVolumes => '存储卷';
+
+  @override
   String get containers_volumes => '目录挂载';
 
   @override
@@ -5291,4 +5294,520 @@ class AppLocalizationsZh extends AppLocalizations {
   String containers_overview_runningCount(int count) {
     return '运行 $count';
   }
+
+  @override
+  String get apps_rebuild => '重建';
+
+  @override
+  String get apps_reload => '重载';
+
+  @override
+  String get apps_rebuildConfirm => '重建会重新创建容器，未持久化的运行时数据可能丢失。';
+
+  @override
+  String get apps_installLog => '安装日志';
+
+  @override
+  String get apps_installLogEmpty => '该应用暂无安装日志。';
+
+  @override
+  String get host_subtitleOps => 'SSH · 磁盘 · 诊断';
+
+  @override
+  String get toolbox_timeSwapDns => '时区 · Swap · DNS';
+
+  @override
+  String get supervisor_titleLong => 'Supervisor 守护';
+
+  @override
+  String get containers_volumesEmpty => '暂无存储卷';
+
+  @override
+  String get containers_volumesEmptyHint => '容器创建的存储卷会显示在这里。';
+
+  @override
+  String containers_volumeDeleteConfirm(String name) {
+    return '删除存储卷 $name？其中的数据将丢失。';
+  }
+
+  @override
+  String get files_recycleEnabled => '回收站已开启';
+
+  @override
+  String get files_recycleDisabled => '回收站已关闭';
+
+  @override
+  String get dashboard_monitorOptions => '监控设备';
+
+  @override
+  String get dashboard_monitorDisk => '磁盘 IO';
+
+  @override
+  String get dashboard_monitorNetwork => '网络接口';
+
+  @override
+  String containers_limitAvailable(int cpu, int memory) {
+    return '宿主上限：$cpu 核 · $memory MB';
+  }
+
+  @override
+  String get alerts_disk => '监控磁盘';
+
+  @override
+  String get alerts_diskHint => '选择要监控的挂载路径';
+
+  @override
+  String get backups_localDir => '本地目录';
+
+  @override
+  String get panelSettings_bindAddress => '网卡地址';
+
+  @override
+  String get apps_filterTags => '标签';
+
+  @override
+  String get dashboard_monitorAll => '全部';
+
+  @override
+  String get toolbox_ftpSystemUser => '系统用户';
+
+  @override
+  String get websites_uploadSslFile => '从文件上传';
+
+  @override
+  String get websites_uploadSslPaste => '粘贴 PEM';
+
+  @override
+  String get websites_selectCertificateFile => '选择证书文件';
+
+  @override
+  String get websites_selectPrivateKeyFile => '选择私钥文件';
+
+  @override
+  String get websites_openRestyStatus => 'OpenResty 运行状态';
+
+  @override
+  String get websites_openRestyActive => '活动连接';
+
+  @override
+  String get websites_openRestyRequests => '请求总数';
+
+  @override
+  String get websites_openRestyAcceptsHandled => '接收 / 处理';
+
+  @override
+  String get panelSettings_previewSnapshot => '预览';
+
+  @override
+  String get panelSettings_snapshotContent => '快照内容';
+
+  @override
+  String get servers_reorder => '排序';
+
+  @override
+  String get servers_reorderHint => '拖动调整服务器顺序';
+
+  @override
+  String get websites_organizationUnit => '组织单位';
+
+  @override
+  String get websites_province => '省份';
+
+  @override
+  String get websites_city => '城市';
+
+  @override
+  String get websites_keyType => '密钥类型';
+
+  @override
+  String get websites_certPath => '证书路径';
+
+  @override
+  String get websites_privateKeyPath => '私钥路径';
+
+  @override
+  String get websites_status => '状态';
+
+  @override
+  String get ai_title => 'AI 工具';
+
+  @override
+  String get ai_models => '模型';
+
+  @override
+  String get ai_gpu => 'GPU';
+
+  @override
+  String get ai_mcp => 'MCP 服务';
+
+  @override
+  String get ai_models_empty => '暂无模型';
+
+  @override
+  String get ai_models_empty_hint => '添加 Ollama 模型后显示在这里。';
+
+  @override
+  String get ai_gpu_empty => '未检测到 GPU';
+
+  @override
+  String get ai_gpu_empty_hint => '检测到支持的设备后会显示 GPU 信息。';
+
+  @override
+  String get ai_mcp_empty => '暂无 MCP 服务';
+
+  @override
+  String get ai_mcp_empty_hint => '添加 MCP 服务以对外提供工具。';
+
+  @override
+  String get ai_model_add => '添加模型';
+
+  @override
+  String get ai_model_name => '模型名称';
+
+  @override
+  String get ai_model_size => '大小';
+
+  @override
+  String get ai_model_status => '状态';
+
+  @override
+  String get ai_model_from => '来源';
+
+  @override
+  String get ai_model_load => '加载';
+
+  @override
+  String get ai_model_unload => '卸载';
+
+  @override
+  String get ai_mcp_add => '添加 MCP 服务';
+
+  @override
+  String get ai_mcp_name => '服务名称';
+
+  @override
+  String get ai_mcp_type => '运行类型';
+
+  @override
+  String get ai_mcp_command => '启动命令';
+
+  @override
+  String get ai_mcp_container => '容器名称';
+
+  @override
+  String get ai_mcp_port => '端口';
+
+  @override
+  String get ai_mcp_sse_path => 'SSE 路径';
+
+  @override
+  String get ai_mcp_url => '基础 URL';
+
+  @override
+  String get ai_mcp_protocol => '输出协议';
+
+  @override
+  String get ai_mcp_transport => '传输方式';
+
+  @override
+  String get ai_mcp_running => '运行中';
+
+  @override
+  String get ai_mcp_stopped => '已停止';
+
+  @override
+  String get ai_mcp_start => '启动';
+
+  @override
+  String get ai_mcp_stop => '停止';
+
+  @override
+  String get ai_mcp_restart => '重启';
+
+  @override
+  String get ai_mcp_test => '测试连接';
+
+  @override
+  String ai_mcp_delete_confirm(String name) {
+    return '删除 MCP 服务 $name？';
+  }
+
+  @override
+  String get ai_gpu_driver => '驱动';
+
+  @override
+  String get ai_gpu_cuda => 'CUDA';
+
+  @override
+  String get ai_gpu_memory => '显存';
+
+  @override
+  String get ai_gpu_utilization => '利用率';
+
+  @override
+  String get ai_gpu_temperature => '温度';
+
+  @override
+  String get ai_gpu_processes => '进程';
+
+  @override
+  String get ai_mcp_connection_ok => '连接正常';
+
+  @override
+  String get ai_mcp_connection_failed => '连接失败';
+
+  @override
+  String get databases_redisCommand => 'Redis 命令行';
+
+  @override
+  String get ai_subtitle => '模型 · GPU · MCP';
+
+  @override
+  String get ai_mcp_detail => '详情';
+
+  @override
+  String get ai_mcp_environments => '环境变量';
+
+  @override
+  String get ai_mcp_volumes => '存储卷';
+
+  @override
+  String get ai_mcp_env_hint => '每行一个 KEY=VALUE';
+
+  @override
+  String get ai_mcp_volume_hint => '每行一个 source:target';
+
+  @override
+  String get ai_mcp_domain => 'MCP 域名';
+
+  @override
+  String get ai_mcp_bind_domain => '绑定域名';
+
+  @override
+  String get ai_mcp_update_domain => '更新域名';
+
+  @override
+  String get ai_mcp_ssl_id => 'SSL ID';
+
+  @override
+  String get ai_mcp_ip_list => '允许的 IP';
+
+  @override
+  String get ai_mcp_conn_url => '连接地址';
+
+  @override
+  String get ai_mcp_sync_status => '同步状态';
+
+  @override
+  String get ai_accounts => '模型账户';
+
+  @override
+  String get ai_agents => 'Agent';
+
+  @override
+  String get ai_accounts_empty => '暂无模型账户';
+
+  @override
+  String get ai_accounts_empty_hint => '添加模型提供商账户后即可使用。';
+
+  @override
+  String get ai_agents_empty => '暂无 Agent';
+
+  @override
+  String get ai_agents_empty_hint => '安装后的 Agent 会显示在这里。';
+
+  @override
+  String get ai_account_provider => '提供商';
+
+  @override
+  String get ai_account_verified => '已验证';
+
+  @override
+  String get ai_account_unverified => '未验证';
+
+  @override
+  String get ai_agent_status => '状态';
+
+  @override
+  String get ai_agent_model => '模型';
+
+  @override
+  String get ai_agent_website => '网站';
+
+  @override
+  String get ai_agent_token_reset => '重置 Token';
+
+  @override
+  String get ai_agent_remark => '备注';
+
+  @override
+  String ai_agent_delete_confirm(String name) {
+    return '删除 Agent $name？';
+  }
+
+  @override
+  String get ai_agent_upgradable => '可升级';
+
+  @override
+  String get ai_account_add => '添加模型账户';
+
+  @override
+  String get ai_account_edit => '编辑模型账户';
+
+  @override
+  String get ai_account_name => '账户名称';
+
+  @override
+  String get ai_account_api_key => 'API Key';
+
+  @override
+  String get ai_account_base_url => '基础 URL';
+
+  @override
+  String get ai_account_api_type => 'API 类型';
+
+  @override
+  String get ai_account_verify_model => '验证模型';
+
+  @override
+  String get ai_account_validate => '校验可用性';
+
+  @override
+  String get ai_account_remember_key => '记住 API Key';
+
+  @override
+  String get ai_account_remark => '备注';
+
+  @override
+  String get ai_agent_model_config => '模型配置';
+
+  @override
+  String get ai_agent_fallbacks => '备用模型';
+
+  @override
+  String get ai_agent_add => '添加 Agent';
+
+  @override
+  String get ai_agent_type => 'Agent 类型';
+
+  @override
+  String get ai_agent_version => '版本';
+
+  @override
+  String get ai_agent_port => 'WebUI 端口';
+
+  @override
+  String get ai_agent_access_host => '访问地址';
+
+  @override
+  String get ai_agent_username => '面板用户名';
+
+  @override
+  String get ai_agent_password => '面板密码';
+
+  @override
+  String get ai_agent_bind_website => '绑定网站';
+
+  @override
+  String get ai_agent_unbind_website => '解绑网站';
+
+  @override
+  String get ai_agent_select_website => '选择网站';
+
+  @override
+  String get ai_agent_roles => '角色';
+
+  @override
+  String get ai_agent_channels => '渠道';
+
+  @override
+  String get ai_agent_roles_empty => '暂无角色';
+
+  @override
+  String get ai_agent_channels_empty => '暂无渠道';
+
+  @override
+  String ai_agent_delete_role_confirm(String name) {
+    return '删除角色 $name？';
+  }
+
+  @override
+  String get ai_agent_bound => '已绑定';
+
+  @override
+  String get ai_agent_unbound => '未绑定';
+
+  @override
+  String get ai_agent_role_add => '添加角色';
+
+  @override
+  String get ai_agent_binding_channel => '渠道';
+
+  @override
+  String get ai_agent_account_id => '账户 ID';
+
+  @override
+  String get ai_agent_role_name => '角色名称';
+
+  @override
+  String get ai_agent_bind_channel => '绑定渠道';
+
+  @override
+  String get ai_agent_unbind_channel => '解绑渠道';
+
+  @override
+  String get ai_agent_feishu => '飞书渠道';
+
+  @override
+  String get ai_agent_channel_enabled => '启用';
+
+  @override
+  String get ai_agent_group_policy => '群组策略';
+
+  @override
+  String get ai_agent_require_mention => '需要 @ 提及';
+
+  @override
+  String get ai_agent_streaming => '流式回复';
+
+  @override
+  String get ai_agent_thread_session => '话题会话';
+
+  @override
+  String get ai_agent_connection_mode => '连接方式';
+
+  @override
+  String get ai_agent_bots => '机器人';
+
+  @override
+  String get ai_agent_channel_saved => '渠道设置已保存';
+
+  @override
+  String get ai_agent_channel_config => '渠道配置';
+
+  @override
+  String get ai_agent_channel_json => '渠道 JSON';
+
+  @override
+  String get ai_agent_channel_json_invalid => '渠道 JSON 格式错误';
+
+  @override
+  String get ai_agent_channel_json_hint => '编辑面板返回的 JSON，保存时会自动补上 agentId。';
+
+  @override
+  String get ai_agent_channel_delete => '删除渠道配置';
+
+  @override
+  String ai_agent_channel_delete_confirm(String channel) {
+    return '删除该 Agent 的 $channel 配置？';
+  }
+
+  @override
+  String get databases_redisKeys => '键浏览';
+
+  @override
+  String get ai_agent_weixin_login => '微信扫码登录';
+
+  @override
+  String get ai_agent_weixin_login_hint => '扫描任务日志中的二维码完成微信连接。';
 }

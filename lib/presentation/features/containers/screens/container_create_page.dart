@@ -7,7 +7,6 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/container/container_info_dto.dart';
-import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
@@ -18,6 +17,7 @@ import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
+import '../providers/container_resources_provider.dart';
 import '../providers/containers_provider.dart';
 
 class ContainerCreatePage extends ConsumerStatefulWidget {
@@ -346,6 +346,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final limit = ref.watch(containerLimitProvider).valueOrNull;
     return Scaffold(
       appBar: AppBarLarge(
         title: widget.isEditing ? l10n.containers_edit : l10n.containers_create,
@@ -549,6 +550,15 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
                     ),
                   ],
                 ),
+                if (limit != null) ...[
+                  const SizedBox(height: AppTokens.s8),
+                  Text(
+                    l10n.containers_limitAvailable(limit.cpu, limit.memory),
+                    style: AppTextStyles.caption.copyWith(
+                      color: context.scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: AppTokens.s8),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,

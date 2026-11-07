@@ -12,6 +12,7 @@ import '../../../../domain/entities/server.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/buttons.dart';
 import '../../../common/components/metric_card.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/skeleton.dart';
@@ -40,6 +41,15 @@ class ServersPage extends ConsumerWidget {
             AppBarLarge(
               title: l10n.servers_title,
               actions: [
+                AppIconButton(
+                  icon: TablerIcons.arrows_sort,
+                  tooltip: l10n.servers_reorder,
+                  onPressed: () async {
+                    final items = servers.valueOrNull;
+                    if (items == null || items.length < 2) return;
+                    await _reorder(context, ref, items);
+                  },
+                ),
                 AppIconButton(
                   icon: TablerIcons.settings,
                   tooltip: l10n.settings_title,
@@ -146,6 +156,87 @@ class ServersPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _reorder(
+    BuildContext context,
+    WidgetRef ref,
+    List<Server> servers,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final order = List<Server>.of(servers);
+    final applied = await showAppSheet<bool>(
+      context: context,
+      maxHeightFactor: 0.8,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setState) => SizedBox(
+          height: MediaQuery.sizeOf(context).height * 0.7,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(l10n.servers_reorder, style: AppTextStyles.titleM),
+                        Text(
+                          l10n.servers_reorderHint,
+                          style: AppTextStyles.bodyS.copyWith(
+                            color: context.scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: l10n.action_close,
+                    onPressed: () => Navigator.of(context).pop(false),
+                    icon: const Icon(TablerIcons.x),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTokens.s8),
+              Expanded(
+                child: ReorderableListView.builder(
+                  buildDefaultDragHandles: false,
+                  itemCount: order.length,
+                  onReorderItem: (oldIndex, newIndex) {
+                    setState(() {
+                      final item = order.removeAt(oldIndex);
+                      order.insert(newIndex, item);
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    final server = order[index];
+                    return ListTile(
+                      key: ValueKey(server.id),
+                      leading: ReorderableDragStartListener(
+                        index: index,
+                        child: const Icon(TablerIcons.grip_vertical),
+                      ),
+                      title: Text(server.displayName),
+                      subtitle: Text('${server.host}:${server.port}'),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: AppTokens.s12),
+              PrimaryButton(
+                label: l10n.action_save,
+                expanded: true,
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (applied != true || !context.mounted) return;
+    await ref
+        .read(serversProvider.notifier)
+        .reorder(order.map((server) => server.id).toList(growable: false));
   }
 
   Future<void> _showServerActions(

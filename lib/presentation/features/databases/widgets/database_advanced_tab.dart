@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
@@ -21,11 +22,15 @@ class DatabaseAdvancedTab extends ConsumerWidget {
     required this.type,
     required this.instance,
     required this.databaseName,
+    this.serverId = 0,
+    this.from = 'local',
   });
 
   final String type;
   final String instance;
   final String databaseName;
+  final int serverId;
+  final String from;
 
   bool get _isRedis => type.toLowerCase() == 'redis';
   bool get _isMysql => const ['mysql', 'mariadb'].contains(type.toLowerCase());
@@ -99,6 +104,31 @@ class DatabaseAdvancedTab extends ConsumerWidget {
                 trailing: const Icon(TablerIcons.chevron_right),
                 onTap: () => _editRedisPersistence(context, ref),
               ),
+              if (serverId > 0) ...[
+                SplitListTile(
+                  leading: const Icon(TablerIcons.terminal_2),
+                  title: l10n.databases_redisCommand,
+                  subtitle: l10n.databases_redis,
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: () => context.push(
+                    '/s/$serverId/terminal'
+                    '?redis=${Uri.encodeComponent(instance)}'
+                    '&redisFrom=${Uri.encodeComponent(from)}',
+                  ),
+                ),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.key),
+                  title: l10n.databases_redisKeys,
+                  subtitle: 'SCAN 0 COUNT 100',
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: () => context.push(
+                    '/s/$serverId/terminal'
+                    '?redis=${Uri.encodeComponent(instance)}'
+                    '&redisFrom=${Uri.encodeComponent(from)}'
+                    '&redisCommand=${Uri.encodeComponent('SCAN 0 COUNT 100')}',
+                  ),
+                ),
+              ],
             ],
           ),
         ],

@@ -126,6 +126,9 @@ abstract interface class ContainerRepository {
   /// 获取所有挂载卷信息。
   Future<List<ContainerOptionDto>> getVolumes();
 
+  /// 批量删除挂载卷。
+  Future<void> deleteVolumes(List<String> names);
+
   /// 获取全部镜像信息。
   Future<List<ContainerOptionDto>> getImages();
 

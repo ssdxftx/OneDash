@@ -4160,6 +4160,12 @@ abstract class AppLocalizations {
   /// **'Port mappings'**
   String get containers_ports;
 
+  /// Storage volume entry
+  ///
+  /// In en, this message translates to:
+  /// **'Storage volumes'**
+  String get containers_storageVolumes;
+
   /// Container volume mappings section.
   ///
   /// In en, this message translates to:
@@ -10315,6 +10321,1014 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Running {count}'**
   String containers_overview_runningCount(int count);
+
+  /// Rebuild an installed app.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuild'**
+  String get apps_rebuild;
+
+  /// Reload an installed app.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload'**
+  String get apps_reload;
+
+  /// Confirmation message for rebuilding an installed app.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuild recreates the container. Unsaved runtime data may be lost.'**
+  String get apps_rebuildConfirm;
+
+  /// Install log entry for an installed app.
+  ///
+  /// In en, this message translates to:
+  /// **'Install log'**
+  String get apps_installLog;
+
+  /// Empty install log message.
+  ///
+  /// In en, this message translates to:
+  /// **'No install log for this app yet.'**
+  String get apps_installLogEmpty;
+
+  /// Host page subtitle in the more menu.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH · Disk · Diagnostics'**
+  String get host_subtitleOps;
+
+  /// Combined toolbox entry for time, swap and DNS.
+  ///
+  /// In en, this message translates to:
+  /// **'Time · Swap · DNS'**
+  String get toolbox_timeSwapDns;
+
+  /// Supervisor entry in the more menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Supervisor'**
+  String get supervisor_titleLong;
+
+  /// Empty volume list title.
+  ///
+  /// In en, this message translates to:
+  /// **'No volumes'**
+  String get containers_volumesEmpty;
+
+  /// Empty volume list hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Volumes created by containers will appear here.'**
+  String get containers_volumesEmptyHint;
+
+  /// Confirmation message for deleting a volume.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete volume {name}? Data stored on it will be lost.'**
+  String containers_volumeDeleteConfirm(String name);
+
+  /// Recycle bin enabled status.
+  ///
+  /// In en, this message translates to:
+  /// **'Recycle bin is on'**
+  String get files_recycleEnabled;
+
+  /// Recycle bin disabled status.
+  ///
+  /// In en, this message translates to:
+  /// **'Recycle bin is off'**
+  String get files_recycleDisabled;
+
+  /// Title for monitor device selection.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor devices'**
+  String get dashboard_monitorOptions;
+
+  /// Disk IO monitor option.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk IO'**
+  String get dashboard_monitorDisk;
+
+  /// Network interface monitor option.
+  ///
+  /// In en, this message translates to:
+  /// **'Network interface'**
+  String get dashboard_monitorNetwork;
+
+  /// Host resource limit hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Host limit: {cpu} cores · {memory} MB'**
+  String containers_limitAvailable(int cpu, int memory);
+
+  /// Disk alert mount path.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitored disk'**
+  String get alerts_disk;
+
+  /// Disk alert mount path hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the mount path to monitor'**
+  String get alerts_diskHint;
+
+  /// Local backup directory label.
+  ///
+  /// In en, this message translates to:
+  /// **'Local directory'**
+  String get backups_localDir;
+
+  /// Panel bind interface address.
+  ///
+  /// In en, this message translates to:
+  /// **'Interface address'**
+  String get panelSettings_bindAddress;
+
+  /// App tag filter label.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get apps_filterTags;
+
+  /// All monitor devices
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get dashboard_monitorAll;
+
+  /// Select a system user for FTP
+  ///
+  /// In en, this message translates to:
+  /// **'System user'**
+  String get toolbox_ftpSystemUser;
+
+  /// Upload from file
+  ///
+  /// In en, this message translates to:
+  /// **'Upload from file'**
+  String get websites_uploadSslFile;
+
+  /// Paste PEM
+  ///
+  /// In en, this message translates to:
+  /// **'Paste PEM'**
+  String get websites_uploadSslPaste;
+
+  /// Select certificate file
+  ///
+  /// In en, this message translates to:
+  /// **'Select certificate file'**
+  String get websites_selectCertificateFile;
+
+  /// Select private key file
+  ///
+  /// In en, this message translates to:
+  /// **'Select private key file'**
+  String get websites_selectPrivateKeyFile;
+
+  /// OpenResty status
+  ///
+  /// In en, this message translates to:
+  /// **'OpenResty status'**
+  String get websites_openRestyStatus;
+
+  /// Active connections
+  ///
+  /// In en, this message translates to:
+  /// **'Active connections'**
+  String get websites_openRestyActive;
+
+  /// Requests
+  ///
+  /// In en, this message translates to:
+  /// **'Requests'**
+  String get websites_openRestyRequests;
+
+  /// Accepted / handled
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted / handled'**
+  String get websites_openRestyAcceptsHandled;
+
+  /// Preview
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get panelSettings_previewSnapshot;
+
+  /// Snapshot content
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot content'**
+  String get panelSettings_snapshotContent;
+
+  /// Reorder
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder'**
+  String get servers_reorder;
+
+  /// Drag to reorder servers
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reorder servers'**
+  String get servers_reorderHint;
+
+  /// Organization unit
+  ///
+  /// In en, this message translates to:
+  /// **'Organization unit'**
+  String get websites_organizationUnit;
+
+  /// Province
+  ///
+  /// In en, this message translates to:
+  /// **'Province'**
+  String get websites_province;
+
+  /// City
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get websites_city;
+
+  /// Key type
+  ///
+  /// In en, this message translates to:
+  /// **'Key type'**
+  String get websites_keyType;
+
+  /// Certificate path
+  ///
+  /// In en, this message translates to:
+  /// **'Certificate path'**
+  String get websites_certPath;
+
+  /// Private key path
+  ///
+  /// In en, this message translates to:
+  /// **'Private key path'**
+  String get websites_privateKeyPath;
+
+  /// Status
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get websites_status;
+
+  /// AI tools
+  ///
+  /// In en, this message translates to:
+  /// **'AI tools'**
+  String get ai_title;
+
+  /// Models
+  ///
+  /// In en, this message translates to:
+  /// **'Models'**
+  String get ai_models;
+
+  /// GPU
+  ///
+  /// In en, this message translates to:
+  /// **'GPU'**
+  String get ai_gpu;
+
+  /// MCP servers
+  ///
+  /// In en, this message translates to:
+  /// **'MCP servers'**
+  String get ai_mcp;
+
+  /// No models
+  ///
+  /// In en, this message translates to:
+  /// **'No models'**
+  String get ai_models_empty;
+
+  /// Add an Ollama model to start.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an Ollama model to start.'**
+  String get ai_models_empty_hint;
+
+  /// No GPU detected
+  ///
+  /// In en, this message translates to:
+  /// **'No GPU detected'**
+  String get ai_gpu_empty;
+
+  /// GPU information appears when a supported device is present.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU information appears when a supported device is present.'**
+  String get ai_gpu_empty_hint;
+
+  /// No MCP servers
+  ///
+  /// In en, this message translates to:
+  /// **'No MCP servers'**
+  String get ai_mcp_empty;
+
+  /// Add an MCP server to expose tools.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an MCP server to expose tools.'**
+  String get ai_mcp_empty_hint;
+
+  /// Add model
+  ///
+  /// In en, this message translates to:
+  /// **'Add model'**
+  String get ai_model_add;
+
+  /// Model name
+  ///
+  /// In en, this message translates to:
+  /// **'Model name'**
+  String get ai_model_name;
+
+  /// Size
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get ai_model_size;
+
+  /// Status
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get ai_model_status;
+
+  /// Source
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get ai_model_from;
+
+  /// Load
+  ///
+  /// In en, this message translates to:
+  /// **'Load'**
+  String get ai_model_load;
+
+  /// Unload
+  ///
+  /// In en, this message translates to:
+  /// **'Unload'**
+  String get ai_model_unload;
+
+  /// Add MCP server
+  ///
+  /// In en, this message translates to:
+  /// **'Add MCP server'**
+  String get ai_mcp_add;
+
+  /// Server name
+  ///
+  /// In en, this message translates to:
+  /// **'Server name'**
+  String get ai_mcp_name;
+
+  /// Runtime
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime'**
+  String get ai_mcp_type;
+
+  /// Command
+  ///
+  /// In en, this message translates to:
+  /// **'Command'**
+  String get ai_mcp_command;
+
+  /// Container name
+  ///
+  /// In en, this message translates to:
+  /// **'Container name'**
+  String get ai_mcp_container;
+
+  /// Port
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get ai_mcp_port;
+
+  /// SSE path
+  ///
+  /// In en, this message translates to:
+  /// **'SSE path'**
+  String get ai_mcp_sse_path;
+
+  /// Base URL
+  ///
+  /// In en, this message translates to:
+  /// **'Base URL'**
+  String get ai_mcp_url;
+
+  /// Output protocol
+  ///
+  /// In en, this message translates to:
+  /// **'Output protocol'**
+  String get ai_mcp_protocol;
+
+  /// Transport
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get ai_mcp_transport;
+
+  /// Running
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get ai_mcp_running;
+
+  /// Stopped
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get ai_mcp_stopped;
+
+  /// Start
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get ai_mcp_start;
+
+  /// Stop
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get ai_mcp_stop;
+
+  /// Restart
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get ai_mcp_restart;
+
+  /// Test connection
+  ///
+  /// In en, this message translates to:
+  /// **'Test connection'**
+  String get ai_mcp_test;
+
+  /// Delete MCP server {name}?
+  ///
+  /// In en, this message translates to:
+  /// **'Delete MCP server {name}?'**
+  String ai_mcp_delete_confirm(String name);
+
+  /// Driver
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get ai_gpu_driver;
+
+  /// CUDA
+  ///
+  /// In en, this message translates to:
+  /// **'CUDA'**
+  String get ai_gpu_cuda;
+
+  /// Memory
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get ai_gpu_memory;
+
+  /// Utilization
+  ///
+  /// In en, this message translates to:
+  /// **'Utilization'**
+  String get ai_gpu_utilization;
+
+  /// Temperature
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get ai_gpu_temperature;
+
+  /// Processes
+  ///
+  /// In en, this message translates to:
+  /// **'Processes'**
+  String get ai_gpu_processes;
+
+  /// Connection OK
+  ///
+  /// In en, this message translates to:
+  /// **'Connection OK'**
+  String get ai_mcp_connection_ok;
+
+  /// Connection failed
+  ///
+  /// In en, this message translates to:
+  /// **'Connection failed'**
+  String get ai_mcp_connection_failed;
+
+  /// Redis command line
+  ///
+  /// In en, this message translates to:
+  /// **'Redis command line'**
+  String get databases_redisCommand;
+
+  /// Models · GPU · MCP
+  ///
+  /// In en, this message translates to:
+  /// **'Models · GPU · MCP'**
+  String get ai_subtitle;
+
+  /// Details
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get ai_mcp_detail;
+
+  /// Environment variables
+  ///
+  /// In en, this message translates to:
+  /// **'Environment variables'**
+  String get ai_mcp_environments;
+
+  /// Volumes
+  ///
+  /// In en, this message translates to:
+  /// **'Volumes'**
+  String get ai_mcp_volumes;
+
+  /// One KEY=VALUE per line
+  ///
+  /// In en, this message translates to:
+  /// **'One KEY=VALUE per line'**
+  String get ai_mcp_env_hint;
+
+  /// One source:target per line
+  ///
+  /// In en, this message translates to:
+  /// **'One source:target per line'**
+  String get ai_mcp_volume_hint;
+
+  /// MCP domain
+  ///
+  /// In en, this message translates to:
+  /// **'MCP domain'**
+  String get ai_mcp_domain;
+
+  /// Bind domain
+  ///
+  /// In en, this message translates to:
+  /// **'Bind domain'**
+  String get ai_mcp_bind_domain;
+
+  /// Update domain
+  ///
+  /// In en, this message translates to:
+  /// **'Update domain'**
+  String get ai_mcp_update_domain;
+
+  /// SSL ID
+  ///
+  /// In en, this message translates to:
+  /// **'SSL ID'**
+  String get ai_mcp_ssl_id;
+
+  /// Allowed IPs
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed IPs'**
+  String get ai_mcp_ip_list;
+
+  /// Connection URL
+  ///
+  /// In en, this message translates to:
+  /// **'Connection URL'**
+  String get ai_mcp_conn_url;
+
+  /// Sync status
+  ///
+  /// In en, this message translates to:
+  /// **'Sync status'**
+  String get ai_mcp_sync_status;
+
+  /// Model accounts
+  ///
+  /// In en, this message translates to:
+  /// **'Model accounts'**
+  String get ai_accounts;
+
+  /// Agents
+  ///
+  /// In en, this message translates to:
+  /// **'Agents'**
+  String get ai_agents;
+
+  /// No model accounts
+  ///
+  /// In en, this message translates to:
+  /// **'No model accounts'**
+  String get ai_accounts_empty;
+
+  /// Add a provider account to use models.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a provider account to use models.'**
+  String get ai_accounts_empty_hint;
+
+  /// No agents
+  ///
+  /// In en, this message translates to:
+  /// **'No agents'**
+  String get ai_agents_empty;
+
+  /// Installed agents will appear here.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed agents will appear here.'**
+  String get ai_agents_empty_hint;
+
+  /// Provider
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get ai_account_provider;
+
+  /// Verified
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get ai_account_verified;
+
+  /// Unverified
+  ///
+  /// In en, this message translates to:
+  /// **'Unverified'**
+  String get ai_account_unverified;
+
+  /// Status
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get ai_agent_status;
+
+  /// Model
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get ai_agent_model;
+
+  /// Website
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get ai_agent_website;
+
+  /// Reset token
+  ///
+  /// In en, this message translates to:
+  /// **'Reset token'**
+  String get ai_agent_token_reset;
+
+  /// Remark
+  ///
+  /// In en, this message translates to:
+  /// **'Remark'**
+  String get ai_agent_remark;
+
+  /// Delete agent {name}?
+  ///
+  /// In en, this message translates to:
+  /// **'Delete agent {name}?'**
+  String ai_agent_delete_confirm(String name);
+
+  /// Upgrade available
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade available'**
+  String get ai_agent_upgradable;
+
+  /// Add model account
+  ///
+  /// In en, this message translates to:
+  /// **'Add model account'**
+  String get ai_account_add;
+
+  /// Edit model account
+  ///
+  /// In en, this message translates to:
+  /// **'Edit model account'**
+  String get ai_account_edit;
+
+  /// Account name
+  ///
+  /// In en, this message translates to:
+  /// **'Account name'**
+  String get ai_account_name;
+
+  /// API key
+  ///
+  /// In en, this message translates to:
+  /// **'API key'**
+  String get ai_account_api_key;
+
+  /// Base URL
+  ///
+  /// In en, this message translates to:
+  /// **'Base URL'**
+  String get ai_account_base_url;
+
+  /// API type
+  ///
+  /// In en, this message translates to:
+  /// **'API type'**
+  String get ai_account_api_type;
+
+  /// Verify model
+  ///
+  /// In en, this message translates to:
+  /// **'Verify model'**
+  String get ai_account_verify_model;
+
+  /// Validate availability
+  ///
+  /// In en, this message translates to:
+  /// **'Validate availability'**
+  String get ai_account_validate;
+
+  /// Remember API key
+  ///
+  /// In en, this message translates to:
+  /// **'Remember API key'**
+  String get ai_account_remember_key;
+
+  /// Remark
+  ///
+  /// In en, this message translates to:
+  /// **'Remark'**
+  String get ai_account_remark;
+
+  /// Model configuration
+  ///
+  /// In en, this message translates to:
+  /// **'Model configuration'**
+  String get ai_agent_model_config;
+
+  /// Fallback models
+  ///
+  /// In en, this message translates to:
+  /// **'Fallback models'**
+  String get ai_agent_fallbacks;
+
+  /// Add agent
+  ///
+  /// In en, this message translates to:
+  /// **'Add agent'**
+  String get ai_agent_add;
+
+  /// Agent type
+  ///
+  /// In en, this message translates to:
+  /// **'Agent type'**
+  String get ai_agent_type;
+
+  /// Version
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get ai_agent_version;
+
+  /// WebUI port
+  ///
+  /// In en, this message translates to:
+  /// **'WebUI port'**
+  String get ai_agent_port;
+
+  /// Access host
+  ///
+  /// In en, this message translates to:
+  /// **'Access host'**
+  String get ai_agent_access_host;
+
+  /// Dashboard username
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard username'**
+  String get ai_agent_username;
+
+  /// Dashboard password
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard password'**
+  String get ai_agent_password;
+
+  /// Bind website
+  ///
+  /// In en, this message translates to:
+  /// **'Bind website'**
+  String get ai_agent_bind_website;
+
+  /// Unbind website
+  ///
+  /// In en, this message translates to:
+  /// **'Unbind website'**
+  String get ai_agent_unbind_website;
+
+  /// Select website
+  ///
+  /// In en, this message translates to:
+  /// **'Select website'**
+  String get ai_agent_select_website;
+
+  /// Roles
+  ///
+  /// In en, this message translates to:
+  /// **'Roles'**
+  String get ai_agent_roles;
+
+  /// Channels
+  ///
+  /// In en, this message translates to:
+  /// **'Channels'**
+  String get ai_agent_channels;
+
+  /// No roles
+  ///
+  /// In en, this message translates to:
+  /// **'No roles'**
+  String get ai_agent_roles_empty;
+
+  /// No channels
+  ///
+  /// In en, this message translates to:
+  /// **'No channels'**
+  String get ai_agent_channels_empty;
+
+  /// Delete role {name}?
+  ///
+  /// In en, this message translates to:
+  /// **'Delete role {name}?'**
+  String ai_agent_delete_role_confirm(String name);
+
+  /// Bound
+  ///
+  /// In en, this message translates to:
+  /// **'Bound'**
+  String get ai_agent_bound;
+
+  /// Unbound
+  ///
+  /// In en, this message translates to:
+  /// **'Unbound'**
+  String get ai_agent_unbound;
+
+  /// Add role
+  ///
+  /// In en, this message translates to:
+  /// **'Add role'**
+  String get ai_agent_role_add;
+
+  /// Channel
+  ///
+  /// In en, this message translates to:
+  /// **'Channel'**
+  String get ai_agent_binding_channel;
+
+  /// Account ID
+  ///
+  /// In en, this message translates to:
+  /// **'Account ID'**
+  String get ai_agent_account_id;
+
+  /// Role name
+  ///
+  /// In en, this message translates to:
+  /// **'Role name'**
+  String get ai_agent_role_name;
+
+  /// Bind channel
+  ///
+  /// In en, this message translates to:
+  /// **'Bind channel'**
+  String get ai_agent_bind_channel;
+
+  /// Unbind channel
+  ///
+  /// In en, this message translates to:
+  /// **'Unbind channel'**
+  String get ai_agent_unbind_channel;
+
+  /// Feishu channel
+  ///
+  /// In en, this message translates to:
+  /// **'Feishu channel'**
+  String get ai_agent_feishu;
+
+  /// Enabled
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get ai_agent_channel_enabled;
+
+  /// Group policy
+  ///
+  /// In en, this message translates to:
+  /// **'Group policy'**
+  String get ai_agent_group_policy;
+
+  /// Require mention
+  ///
+  /// In en, this message translates to:
+  /// **'Require mention'**
+  String get ai_agent_require_mention;
+
+  /// Streaming
+  ///
+  /// In en, this message translates to:
+  /// **'Streaming'**
+  String get ai_agent_streaming;
+
+  /// Thread session
+  ///
+  /// In en, this message translates to:
+  /// **'Thread session'**
+  String get ai_agent_thread_session;
+
+  /// Connection mode
+  ///
+  /// In en, this message translates to:
+  /// **'Connection mode'**
+  String get ai_agent_connection_mode;
+
+  /// Bots
+  ///
+  /// In en, this message translates to:
+  /// **'Bots'**
+  String get ai_agent_bots;
+
+  /// Channel settings saved
+  ///
+  /// In en, this message translates to:
+  /// **'Channel settings saved'**
+  String get ai_agent_channel_saved;
+
+  /// Channel configuration
+  ///
+  /// In en, this message translates to:
+  /// **'Channel configuration'**
+  String get ai_agent_channel_config;
+
+  /// Channel JSON
+  ///
+  /// In en, this message translates to:
+  /// **'Channel JSON'**
+  String get ai_agent_channel_json;
+
+  /// Channel JSON is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Channel JSON is invalid'**
+  String get ai_agent_channel_json_invalid;
+
+  /// Edit the JSON returned by the panel. agentId is added on save.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit the JSON returned by the panel. agentId is added on save.'**
+  String get ai_agent_channel_json_hint;
+
+  /// Remove channel config
+  ///
+  /// In en, this message translates to:
+  /// **'Remove channel config'**
+  String get ai_agent_channel_delete;
+
+  /// Remove {channel} configuration for this agent?
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {channel} configuration for this agent?'**
+  String ai_agent_channel_delete_confirm(String channel);
+
+  /// Browse keys
+  ///
+  /// In en, this message translates to:
+  /// **'Browse keys'**
+  String get databases_redisKeys;
+
+  /// Weixin QR login
+  ///
+  /// In en, this message translates to:
+  /// **'Weixin QR login'**
+  String get ai_agent_weixin_login;
+
+  /// Scan the QR code shown in the task log to connect Weixin.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan the QR code shown in the task log to connect Weixin.'**
+  String get ai_agent_weixin_login_hint;
 }
 
 class _AppLocalizationsDelegate

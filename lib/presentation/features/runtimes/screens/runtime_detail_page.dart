@@ -815,10 +815,29 @@ String _joinNonEmpty(List<String> values) {
       .join(' · ');
 }
 
-/// Fullscreen host for a single runtime configuration tab.
-class RuntimeTabPage extends StatelessWidget {
-  const RuntimeTabPage({
-    super.key,
+/// Opens one runtime configuration tab as a sheet above the action sheet.
+Future<void> showRuntimeTabSheet(
+  BuildContext context, {
+  required int serverId,
+  required int id,
+  required String type,
+  required String name,
+  required int tab,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    builder: (_) => _RuntimeTabSheet(
+      serverId: serverId,
+      id: id,
+      type: type,
+      name: name,
+      tab: tab,
+    ),
+  );
+}
+
+class _RuntimeTabSheet extends StatelessWidget {
+  const _RuntimeTabSheet({
     required this.serverId,
     required this.id,
     required this.type,
@@ -851,9 +870,43 @@ class RuntimeTabPage extends StatelessWidget {
       2 => _FpmTab(id: id),
       _ => _NodeModulesTab(id: id),
     };
-    return Scaffold(
-      appBar: AppBarLarge(title: name, subtitle: label),
-      body: child,
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.8,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: AppTextStyles.titleM,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      label,
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: context.scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                tooltip: l10n.action_close,
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(TablerIcons.x),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTokens.s8),
+          Expanded(child: child),
+        ],
+      ),
     );
   }
 }
