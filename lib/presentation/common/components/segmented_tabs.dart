@@ -193,46 +193,67 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
           ),
       ],
     );
+    final scrollArea = widget.scrollable
+        ? ShaderMask(
+            blendMode: BlendMode.dstIn,
+            shaderCallback: (bounds) => LinearGradient(
+              colors: [
+                if (_canScrollLeft)
+                  scheme.surface.withValues(alpha: 0)
+                else
+                  scheme.surface,
+                scheme.surface,
+                scheme.surface,
+                if (_canScrollRight)
+                  scheme.surface.withValues(alpha: 0)
+                else
+                  scheme.surface,
+              ],
+              stops: appEdgeFadeStops(bounds.width),
+            ).createShader(bounds),
+            child: SingleChildScrollView(
+              controller: _controller,
+              scrollDirection: Axis.horizontal,
+              padding: widget.padding,
+              child: row,
+            ),
+          )
+        : Padding(
+            padding: widget.padding,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                _handleRowWidth(constraints.maxWidth);
+                return row;
+              },
+            ),
+          );
     return Container(
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(color: scheme.outlineVariant, width: 1),
         ),
       ),
-      child: widget.scrollable
-          ? ShaderMask(
-              blendMode: BlendMode.dstIn,
-              shaderCallback: (bounds) => LinearGradient(
-                colors: [
-                  if (_canScrollLeft)
-                    scheme.surface.withValues(alpha: 0)
-                  else
-                    scheme.surface,
-                  scheme.surface,
-                  scheme.surface,
-                  if (_canScrollRight)
-                    scheme.surface.withValues(alpha: 0)
-                  else
-                    scheme.surface,
-                ],
-                stops: appEdgeFadeStops(bounds.width),
-              ).createShader(bounds),
-              child: SingleChildScrollView(
-                controller: _controller,
-                scrollDirection: Axis.horizontal,
-                padding: widget.padding,
-                child: row,
-              ),
-            )
-          : Padding(
-              padding: widget.padding,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  _handleRowWidth(constraints.maxWidth);
-                  return row;
-                },
+      child: Stack(
+        children: [
+          scrollArea,
+          if (widget.scrollable && _canScrollRight)
+            Positioned(
+              right: 2,
+              top: 0,
+              bottom: 0,
+              child: IgnorePointer(
+                child: Center(
+                  child: Icon(
+                    Icons.chevron_right,
+                    key: const Key('segmentedTabsMoreHint'),
+                    size: 18,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
               ),
             ),
+        ],
+      ),
     );
   }
 }

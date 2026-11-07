@@ -30,6 +30,42 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('横向溢出时右侧显示还有更多标签的提示', (tester) async {
+    tester.view.physicalSize = const Size(320, 400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: const Scaffold(
+          body: SegmentedTabs(
+            labels: [
+              'Basic Configuration',
+              'Security',
+              'Rewrite',
+              'Redirect',
+              'OpenResty',
+            ],
+            selectedIndex: 0,
+            onChanged: _noop,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('segmentedTabsMoreHint')), findsOneWidget);
+
+    await tester.drag(
+      find.byType(SingleChildScrollView),
+      const Offset(-600, 0),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('segmentedTabsMoreHint')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('非滚动页签共享指示器跟随选中项移动', (tester) async {
     var selected = 0;
     await tester.pumpWidget(

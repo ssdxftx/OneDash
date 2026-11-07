@@ -213,7 +213,12 @@ class _BasicTab extends ConsumerWidget {
       builder: (data) {
         final site = data.website;
         return ListView(
-          padding: EdgeInsets.all(context.pagePadding),
+          padding: EdgeInsets.fromLTRB(
+            context.pagePadding,
+            context.pagePadding,
+            context.pagePadding,
+            context.pagePadding + MediaQuery.paddingOf(context).bottom,
+          ),
           children: [
             TonalCard(
               child: Row(
@@ -662,7 +667,12 @@ class _SecurityTab extends ConsumerWidget {
     final leech = ref.watch(_leechProvider(websiteId));
     final realIp = ref.watch(_realIpProvider(websiteId));
     return ListView(
-      padding: EdgeInsets.all(context.pagePadding),
+      padding: EdgeInsets.fromLTRB(
+        context.pagePadding,
+        context.pagePadding,
+        context.pagePadding,
+        context.pagePadding + MediaQuery.paddingOf(context).bottom,
+      ),
       children: [
         _StatusCard(
           title: l10n.websites_accessAuth,
@@ -1338,7 +1348,12 @@ class _RewriteTabState extends ConsumerState<_RewriteTab> {
     final l10n = AppLocalizations.of(context);
     if (_loading) return const SkeletonList(itemCount: 4);
     return ListView(
-      padding: EdgeInsets.all(context.pagePadding),
+      padding: EdgeInsets.fromLTRB(
+        context.pagePadding,
+        context.pagePadding,
+        context.pagePadding,
+        context.pagePadding + MediaQuery.paddingOf(context).bottom,
+      ),
       children: [
         if (_templates.isNotEmpty) ...[
           Text(l10n.websites_rewriteTemplates, style: AppTextStyles.bodyS),
@@ -1594,7 +1609,12 @@ class _RedirectTab extends ConsumerWidget {
               message: l10n.websites_noRedirectsHint,
             ),
             builder: (items) => ListView.separated(
-              padding: EdgeInsets.all(context.pagePadding),
+              padding: EdgeInsets.fromLTRB(
+                context.pagePadding,
+                context.pagePadding,
+                context.pagePadding,
+                context.pagePadding + MediaQuery.paddingOf(context).bottom,
+              ),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
               itemBuilder: (context, index) {
@@ -1745,7 +1765,12 @@ class _OpenRestyTabState extends ConsumerState<_OpenRestyTab> {
     if (_loading) return const SkeletonList(itemCount: 6);
     final status = ref.watch(_openRestyStatusProvider);
     return ListView(
-      padding: EdgeInsets.all(context.pagePadding),
+      padding: EdgeInsets.fromLTRB(
+        context.pagePadding,
+        context.pagePadding,
+        context.pagePadding,
+        context.pagePadding + MediaQuery.paddingOf(context).bottom,
+      ),
       children: [
         Text(l10n.websites_openRestyStatus, style: AppTextStyles.titleS),
         const SizedBox(height: AppTokens.s8),

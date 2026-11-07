@@ -64,7 +64,12 @@ class WebsiteSslManagePage extends ConsumerWidget {
         onAction: () => _upload(context, ref),
       ),
       builder: (items) => ListView.separated(
-        padding: EdgeInsets.all(context.pagePadding),
+        padding: EdgeInsets.fromLTRB(
+          context.pagePadding,
+          context.pagePadding,
+          context.pagePadding,
+          context.pagePadding + MediaQuery.paddingOf(context).bottom,
+        ),
         itemCount: items.length,
         separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s12),
         itemBuilder: (context, index) {

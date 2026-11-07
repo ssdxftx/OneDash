@@ -6,6 +6,7 @@ import 'package:onedash/core/localization/generated/app_localizations.dart';
 import 'package:onedash/core/theme/app_theme.dart';
 import 'package:onedash/data/dto/website/website_detail_dto.dart';
 import 'package:onedash/data/dto/website/website_dto.dart';
+import 'package:onedash/presentation/common/components/bottom_sheet_surface.dart';
 import 'package:onedash/presentation/features/websites/providers/websites_provider.dart';
 import 'package:onedash/presentation/features/websites/screens/website_detail_page.dart';
 
@@ -82,6 +83,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Page Not Found'), findsNothing);
+    expect(find.byType(BottomSheetSurface), findsOneWidget);
     expect(find.text('Basic Configuration'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
@@ -98,6 +100,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Page Not Found'), findsNothing);
+      expect(find.byType(BottomSheetSurface), findsOneWidget);
       expect(find.text('Certificate management'), findsWidgets);
       expect(tester.takeException(), isNull);
     },
