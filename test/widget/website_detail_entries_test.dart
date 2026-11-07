@@ -82,6 +82,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Page Not Found'), findsNothing);
+    expect(find.text('Basic Configuration'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 
@@ -97,6 +98,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Page Not Found'), findsNothing);
+      expect(find.text('Certificate management'), findsWidgets);
       expect(tester.takeException(), isNull);
     },
   );

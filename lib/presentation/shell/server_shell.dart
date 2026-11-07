@@ -51,6 +51,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
     with RouteAware {
   bool _visible = true;
   bool _navPresent = true;
+  bool _navRevealPending = false;
   double _accum = 0;
   ModalRoute<dynamic>? _route;
   Timer? _navRemoveTimer;
@@ -105,7 +106,17 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
       );
       setState(() {});
     } else {
-      setState(() => _navPresent = true);
+      if (!_navPresent) {
+        setState(() {
+          _navPresent = true;
+          _navRevealPending = true;
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() => _navRevealPending = false);
+        });
+      } else {
+        setState(() {});
+      }
     }
   }
 
@@ -160,7 +171,10 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
     final scheme = context.scheme;
     final modalOpen = appRouteObserver.popupDepth.value > 0;
     final shown =
-        _visible && !modalOpen && !ref.watch(bottomNavSuppressedProvider);
+        _visible &&
+        !modalOpen &&
+        !_navRevealPending &&
+        !ref.watch(bottomNavSuppressedProvider);
     final hideDuration = context.motion(const Duration(milliseconds: 240));
     final showDuration = context.motion(const Duration(milliseconds: 200));
     return Scaffold(

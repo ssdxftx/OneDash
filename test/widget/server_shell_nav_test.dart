@@ -149,8 +149,19 @@ void main() {
     expect(find.byType(NavigationBar), findsNothing);
 
     Navigator.of(context(), rootNavigator: true).pop();
+    await tester.pump();
+    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(
+      tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).offset,
+      isNot(Offset.zero),
+      reason: 'nav should animate back in instead of appearing instantly',
+    );
     await tester.pumpAndSettle();
     expect(find.byType(NavigationBar), findsOneWidget);
+    expect(
+      tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).offset,
+      Offset.zero,
+    );
   });
 
   testWidgets('last item clears the nav on all five tabs', (tester) async {

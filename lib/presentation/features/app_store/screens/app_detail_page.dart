@@ -113,7 +113,12 @@ class _AppDetailBody extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(app.name, style: AppTextStyles.titleM),
+                    Text(
+                      app.name,
+                      style: AppTextStyles.titleM,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     if (tags.isNotEmpty) ...[
                       const SizedBox(height: AppTokens.s8),
                       Wrap(
