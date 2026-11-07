@@ -33,6 +33,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
   late List<GlobalKey> _keys = _buildKeys();
   bool _canScrollLeft = false;
   bool _canScrollRight = false;
+  bool _overflows = false;
   double? _indicatorLeft;
   double? _lastRowWidth;
 
@@ -78,10 +79,16 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
     final position = _controller.position;
     final canLeft = position.pixels > 0.5;
     final canRight = position.pixels < position.maxScrollExtent - 0.5;
-    if (canLeft == _canScrollLeft && canRight == _canScrollRight) return;
+    final overflows = position.maxScrollExtent > 0.5;
+    if (canLeft == _canScrollLeft &&
+        canRight == _canScrollRight &&
+        overflows == _overflows) {
+      return;
+    }
     setState(() {
       _canScrollLeft = canLeft;
       _canScrollRight = canRight;
+      _overflows = overflows;
     });
   }
 
@@ -237,39 +244,52 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
       child: Row(
         children: [
           Expanded(child: scrollArea),
-          if (widget.scrollable && _canScrollRight)
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                if (!_controller.hasClients) return;
-                final target = (_controller.offset + 160).clamp(
-                  0.0,
-                  _controller.position.maxScrollExtent,
-                );
-                _controller.animateTo(
-                  target,
-                  duration: context.motion(const Duration(milliseconds: 200)),
-                  curve: AppTokens.curveFast,
-                );
-              },
-              onHorizontalDragUpdate: (details) {
-                if (!_controller.hasClients) return;
-                _controller.jumpTo(
-                  (_controller.offset - details.delta.dx).clamp(
-                    0.0,
-                    _controller.position.maxScrollExtent,
-                  ),
-                );
-              },
-              child: SizedBox(
-                width: 28,
-                height: 44,
-                child: Center(
-                  child: Icon(
-                    TablerIcons.chevron_right,
-                    key: const Key('segmentedTabsMoreHint'),
-                    size: 18,
-                    color: scheme.onSurfaceVariant,
+          if (widget.scrollable && _overflows)
+            SizedBox(
+              width: 28,
+              height: 44,
+              child: IgnorePointer(
+                ignoring: !_canScrollRight,
+                child: AnimatedOpacity(
+                  key: const Key('segmentedTabsMoreHintFade'),
+                  opacity: _canScrollRight ? 1 : 0,
+                  duration: context.motion(const Duration(milliseconds: 160)),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      if (!_controller.hasClients) return;
+                      final target = (_controller.offset + 160).clamp(
+                        0.0,
+                        _controller.position.maxScrollExtent,
+                      );
+                      _controller.animateTo(
+                        target,
+                        duration: context.motion(
+                          const Duration(milliseconds: 200),
+                        ),
+                        curve: AppTokens.curveFast,
+                      );
+                    },
+                    onHorizontalDragUpdate: (details) {
+                      if (!_controller.hasClients) return;
+                      _controller.jumpTo(
+                        (_controller.offset - details.delta.dx).clamp(
+                          0.0,
+                          _controller.position.maxScrollExtent,
+                        ),
+                      );
+                    },
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Icon(
+                          TablerIcons.chevron_right,
+                          key: const Key('segmentedTabsMoreHint'),
+                          size: 18,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),

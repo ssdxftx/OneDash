@@ -62,7 +62,53 @@ void main() {
       const Offset(-600, 0),
     );
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('segmentedTabsMoreHint')), findsNothing);
+    expect(find.byKey(const Key('segmentedTabsMoreHint')), findsOneWidget);
+    expect(
+      tester
+          .widget<AnimatedOpacity>(
+            find.byKey(const Key('segmentedTabsMoreHintFade')),
+          )
+          .opacity,
+      0,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('滚到最右后滚动范围不会回退', (tester) async {
+    tester.view.physicalSize = const Size(320, 400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: const Scaffold(
+          body: SegmentedTabs(
+            labels: [
+              'Basic Configuration',
+              'Security',
+              'Rewrite',
+              'Redirect',
+              'OpenResty',
+            ],
+            selectedIndex: 0,
+            onChanged: _noop,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final position = tester
+        .state<ScrollableState>(find.byType(Scrollable).first)
+        .position;
+    final max = position.maxScrollExtent;
+    position.jumpTo(max);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 16));
+
+    expect(position.maxScrollExtent, closeTo(max, 0.01));
+    expect(position.pixels, closeTo(max, 0.01));
     expect(tester.takeException(), isNull);
   });
 
