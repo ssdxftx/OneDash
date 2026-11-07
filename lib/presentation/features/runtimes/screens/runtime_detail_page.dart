@@ -15,6 +15,7 @@ import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
+import '../../../common/components/sheet_title.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -27,12 +28,14 @@ class RuntimeDetailPage extends ConsumerStatefulWidget {
     required this.id,
     required this.type,
     required this.name,
+    this.embedded = false,
   });
 
   final int serverId;
   final int id;
   final String type;
   final String name;
+  final bool embedded;
 
   @override
   ConsumerState<RuntimeDetailPage> createState() => _RuntimeDetailPageState();
@@ -55,21 +58,40 @@ class _RuntimeDetailPageState extends ConsumerState<RuntimeDetailPage> {
             _FpmTab(id: widget.id),
           ]
         : [_NodeModulesTab(id: widget.id)];
+    final body = _isPhp || _isNode
+        ? SegmentedTabsView(
+            scrollable: !widget.embedded,
+            labels: labels,
+            children: children,
+          )
+        : Center(
+            child: Text(
+              l10n.state_empty,
+              style: AppTextStyles.bodyM.copyWith(
+                color: context.scheme.onSurfaceVariant,
+              ),
+            ),
+          );
+    if (widget.embedded) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SheetTitle(
+            title: widget.name,
+            subtitle: '${widget.type} · #${widget.id}',
+            onClose: () => Navigator.of(context).pop(),
+          ),
+          const SizedBox(height: AppTokens.s8),
+          Expanded(child: body),
+        ],
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: widget.name,
         subtitle: '${widget.type} · #${widget.id}',
       ),
-      body: _isPhp || _isNode
-          ? SegmentedTabsView(labels: labels, children: children)
-          : Center(
-              child: Text(
-                l10n.state_empty,
-                style: AppTextStyles.bodyM.copyWith(
-                  color: context.scheme.onSurfaceVariant,
-                ),
-              ),
-            ),
+      body: body,
     );
   }
 }
@@ -909,4 +931,27 @@ class _RuntimeTabSheet extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> showRuntimeDetailSheet(
+  BuildContext context, {
+  required int serverId,
+  required int id,
+  required String type,
+  required String name,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.94,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.80,
+      child: RuntimeDetailPage(
+        serverId: serverId,
+        id: id,
+        type: type,
+        name: name,
+        embedded: true,
+      ),
+    ),
+  );
 }

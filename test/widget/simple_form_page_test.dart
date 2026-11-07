@@ -58,4 +58,41 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('showFormSheet opens a bottom sheet at the configured height', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => showFormSheet<void>(
+                context,
+                title: 'Quick edit',
+                children: const [TextField()],
+                onSave: () async {},
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(FormSheet), findsOneWidget);
+    final route = ModalRoute.of(tester.element(find.byType(FormSheet)));
+    expect(route, isA<ModalBottomSheetRoute<void>>());
+    final box = tester.getRect(find.byType(FormSheet));
+    expect(box.height, closeTo(844 * 0.74, 1));
+  });
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 
+import 'server_edit_page.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/network/dio_client_provider.dart';
@@ -265,10 +266,8 @@ class ServersPage extends ConsumerWidget {
               SplitListTile(
                 leading: const Icon(TablerIcons.edit),
                 title: l10n.action_edit,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  context.push('/servers/${server.id}/edit');
-                },
+                onTap: () =>
+                    showServerEditSheet(sheetContext, serverId: server.id),
               ),
               SplitListTile(
                 leading: const Icon(TablerIcons.copy),

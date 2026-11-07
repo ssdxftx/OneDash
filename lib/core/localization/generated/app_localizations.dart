@@ -11335,6 +11335,306 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Scan the QR code shown in the task log to connect Weixin.'**
   String get ai_agent_weixin_login_hint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Domain, directory, port and index files'**
+  String get websites_basicConfigHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Auth, CORS, hotlink protection and real IP'**
+  String get websites_securityHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewrite rules'**
+  String get websites_rewriteHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Redirect rules'**
+  String get websites_redirectHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward a domain to an existing service'**
+  String get websites_proxyHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Serve HTML / CSS / JS directly'**
+  String get websites_staticHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'PHP / Java / Node.js / Go / Python / .NET'**
+  String get websites_runtimeHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'TCP/UDP proxy'**
+  String get websites_tunnel;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Layer 4 forwarding without HTTP'**
+  String get websites_tunnelHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get websites_port;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol'**
+  String get websites_protocol;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable SSL'**
+  String get websites_enableSsl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'IPv6'**
+  String get websites_ipv6;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Relative to {path}'**
+  String websites_relativeDir(Object path);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Website created'**
+  String get websites_createSuccess;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a certificate'**
+  String get websites_sslRequired;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get websites_menu;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'OpenResty is not installed'**
+  String get websites_openRestyNotInstalled;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'OpenResty is stopped'**
+  String get websites_openRestyStopped;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the app store'**
+  String get websites_openRestyInstall;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get websites_openRestyService;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get websites_openRestyStart;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get websites_openRestyStop;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get websites_openRestyRestart;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload'**
+  String get websites_openRestyReload;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Server names hash bucket size'**
+  String get websites_serverNamesHash;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Client header buffer size'**
+  String get websites_clientHeaderBuffer;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum upload size'**
+  String get websites_maxBodySize;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Keepalive timeout'**
+  String get websites_keepaliveTimeout;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable compression'**
+  String get websites_gzip;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum compressed size'**
+  String get websites_gzipMinLength;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Compression level'**
+  String get websites_gzipCompLevel;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'OpenResty logs'**
+  String get websites_openRestyLogs;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Main configuration'**
+  String get websites_openRestyConfigFile;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Performance'**
+  String get websites_openRestyPerformanceTitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New reverse proxy'**
+  String get websites_createProxyTitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New static site'**
+  String get websites_createStaticTitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New runtime site'**
+  String get websites_createRuntimeTitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New TCP-UDP proxy'**
+  String get websites_createStreamTitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading'**
+  String get websites_openRestyReading;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Writing'**
+  String get websites_openRestyWriting;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting'**
+  String get websites_openRestyWaiting;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Start OpenResty from the service menu first.'**
+  String get websites_openRestyServiceHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Install OpenResty before changing global settings.'**
+  String get websites_openRestyInstallHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Run \"{action}\" on OpenResty?'**
+  String websites_openRestyServiceConfirm(Object action);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Create database'**
+  String get websites_createDb;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Database name'**
+  String get websites_dbName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Create FTP'**
+  String get websites_enableFtp;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'FTP user'**
+  String get websites_ftpUser;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'FTP password'**
+  String get websites_ftpPassword;
 }
 
 class _AppLocalizationsDelegate

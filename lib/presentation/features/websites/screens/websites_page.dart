@@ -21,6 +21,7 @@ import '../../../common/components/buttons.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/search_field.dart';
 import '../../../common/components/server_switcher_sheet.dart';
+import '../../../common/components/sheet_title.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
@@ -31,12 +32,20 @@ import '../../../common/states/entry_animation.dart';
 import '../../../common/states/refreshable_empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../../servers/providers/servers_provider.dart';
+import '../../../../data/dto/app/app_installed_check_req.dart';
+import '../../../../data/dto/app/app_installed_check_res.dart';
+import '../../../../data/repositories_impl/app_repository_impl.dart';
+import '../../containers/widgets/container_log_page.dart';
 import '../providers/websites_provider.dart';
 import 'website_accounts_page.dart';
 import 'website_advanced_page.dart';
 import 'website_detail_page.dart';
 import 'website_ssl_manage_page.dart';
 import '../widgets/website_log_page.dart';
+import 'openresty_config_sheet.dart';
+import 'openresty_performance_sheet.dart';
+import 'openresty_status_sheet.dart';
+import 'website_groups_page.dart';
 
 class WebsitesPage extends ConsumerStatefulWidget {
   const WebsitesPage({super.key, required this.serverId});
@@ -56,6 +65,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
   bool _selecting = false;
   final Set<int> _selected = {};
   final Set<int> _removing = {};
+  final MenuController _menuController = MenuController();
 
   bool get _selectionMode => _selecting;
 
@@ -156,99 +166,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                 ref,
                 currentServerId: widget.serverId,
               ),
-              actions: [
-                AppIconButton(
-                  icon: TablerIcons.refresh,
-                  tooltip: l10n.action_refresh,
-                  onPressed: () =>
-                      ref.read(websitesProvider.notifier).refresh(),
-                ),
-                AppIconButton(
-                  icon: _searching ? TablerIcons.x : TablerIcons.search,
-                  tooltip: l10n.action_search,
-                  onPressed: () {
-                    setState(() {
-                      _searching = !_searching;
-                      if (!_searching) {
-                        _clearSelection();
-                        _searchController.clear();
-                        ref.read(websitesProvider.notifier).search('');
-                      }
-                    });
-                  },
-                ),
-                AppIconButton(
-                  icon: TablerIcons.dots,
-                  tooltip: l10n.action_more,
-                  onPressed: () async {
-                    final value = await showSelectionMenu<String>(
-                      context,
-                      options: [
-                        SelectionOption(
-                          label: _selectionMode
-                              ? l10n.files_cancelSelection
-                              : l10n.files_selectAll,
-                          value: 'select',
-                          icon: _selectionMode
-                              ? TablerIcons.square_x
-                              : TablerIcons.checkbox,
-                        ),
-                        SelectionOption(
-                          label: l10n.websites_templates,
-                          value: 'templates',
-                          icon: TablerIcons.layout,
-                        ),
-                        SelectionOption(
-                          label: l10n.websites_certificateAccounts,
-                          value: 'accounts',
-                          icon: TablerIcons.certificate,
-                        ),
-                        SelectionOption(
-                          label: l10n.websites_groupManagement,
-                          value: 'groups',
-                          icon: TablerIcons.folder,
-                        ),
-                      ],
-                    );
-                    if (!mounted || value == null) return;
-                    if (value == 'select') {
-                      setState(() {
-                        if (_selectionMode) {
-                          _clearSelection();
-                        } else {
-                          _selecting = true;
-                          final items = ref
-                              .read(websitesProvider)
-                              .valueOrNull
-                              ?.items;
-                          _selected.addAll(
-                            (items ?? const []).map((site) => site.id),
-                          );
-                        }
-                      });
-                      ref.read(bottomNavSuppressedProvider.notifier).state =
-                          _selectionMode;
-                    } else if (value == 'templates') {
-                      if (!context.mounted) return;
-                      await context.push(
-                        '/s/${widget.serverId}/websites/templates',
-                      );
-                    } else if (value == 'accounts') {
-                      if (!context.mounted) return;
-                      await showWebsiteAccountsSheet(context);
-                    } else if (value == 'groups') {
-                      if (!context.mounted) return;
-                      await context.push('/s/${widget.serverId}/more/groups');
-                    }
-                  },
-                ),
-                AppIconButton(
-                  icon: TablerIcons.plus,
-                  tooltip: l10n.websites_create,
-                  onPressed: () =>
-                      context.push('/s/${widget.serverId}/websites/create'),
-                ),
-              ],
+              actions: [_moduleMenu(context, l10n)],
             ),
             AnimatedSize(
               duration: context.motion(AppTokens.dBase),
@@ -302,8 +220,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                     title: l10n.websites_empty_title,
                     message: l10n.websites_empty_message,
                     actionLabel: l10n.websites_create,
-                    onAction: () =>
-                        context.push('/s/${widget.serverId}/websites/create'),
+                    onAction: _menuController.open,
                   ),
                 ),
                 builder: (result) {
@@ -397,6 +314,348 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
       'stopped' => l10n.websites_stopped,
       _ => status,
     };
+  }
+
+  Widget _moduleMenu(BuildContext context, AppLocalizations l10n) {
+    return MenuAnchor(
+      controller: _menuController,
+      alignmentOffset: const Offset(-220, 8),
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(
+          context.scheme.surfaceContainer,
+        ),
+        elevation: const WidgetStatePropertyAll(8),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTokens.rLg),
+          ),
+        ),
+        padding: const WidgetStatePropertyAll(
+          EdgeInsets.symmetric(vertical: 6),
+        ),
+      ),
+      menuChildren: [
+        SubmenuButton(
+          menuChildren: [
+            _createItem(
+              context,
+              l10n,
+              TablerIcons.arrows_exchange,
+              l10n.websites_proxy,
+              l10n.websites_proxyHint,
+              'proxy',
+            ),
+            _createItem(
+              context,
+              l10n,
+              TablerIcons.file_text,
+              l10n.websites_static,
+              l10n.websites_staticHint,
+              'static',
+            ),
+            _createItem(
+              context,
+              l10n,
+              TablerIcons.brand_php,
+              l10n.websites_runtime,
+              l10n.websites_runtimeHint,
+              'runtime',
+            ),
+            _createItem(
+              context,
+              l10n,
+              TablerIcons.arrows_split,
+              l10n.websites_tunnel,
+              l10n.websites_tunnelHint,
+              'stream',
+            ),
+          ],
+          child: _menuRow(context, TablerIcons.plus, l10n.websites_create),
+        ),
+        _item(
+          context,
+          TablerIcons.search,
+          l10n.action_search,
+          () => setState(() {
+            _searching = !_searching;
+            if (!_searching) {
+              _clearSelection();
+              _searchController.clear();
+              ref.read(websitesProvider.notifier).search('');
+            }
+          }),
+        ),
+        _item(
+          context,
+          _selectionMode ? TablerIcons.square_x : TablerIcons.checkbox,
+          _selectionMode ? l10n.files_cancelSelection : l10n.files_selectAll,
+          () {
+            setState(() {
+              if (_selectionMode) {
+                _clearSelection();
+              } else {
+                _selecting = true;
+                final items = ref.read(websitesProvider).valueOrNull?.items;
+                _selected.addAll((items ?? const []).map((site) => site.id));
+              }
+            });
+            ref.read(bottomNavSuppressedProvider.notifier).state =
+                _selectionMode;
+          },
+        ),
+        _item(
+          context,
+          TablerIcons.folder,
+          l10n.websites_groupManagement,
+          () => showWebsiteGroupsSheet(context, serverId: widget.serverId),
+        ),
+        _item(
+          context,
+          TablerIcons.layout,
+          l10n.websites_templates,
+          () => context.push('/s/${widget.serverId}/websites/templates'),
+        ),
+        _item(
+          context,
+          TablerIcons.certificate,
+          l10n.websites_certificateAccounts,
+          () => showWebsiteAccountsSheet(context),
+        ),
+        _item(
+          context,
+          TablerIcons.activity,
+          l10n.websites_openRestyStatus,
+          () => _openRestyAction(() => showOpenRestyStatusSheet(context)),
+        ),
+        _item(
+          context,
+          TablerIcons.file_text,
+          l10n.websites_openRestyLogs,
+          _openOpenRestyLogs,
+        ),
+        _item(
+          context,
+          TablerIcons.settings,
+          l10n.websites_openRestyConfigFile,
+          () => _openRestyAction(() => showOpenRestyConfigSheet(context)),
+        ),
+        _item(
+          context,
+          TablerIcons.adjustments,
+          l10n.websites_openRestyPerformanceTitle,
+          () => _openRestyAction(() => showOpenRestyPerformanceSheet(context)),
+        ),
+        SubmenuButton(
+          menuChildren: [
+            _serviceItem('start', l10n.websites_openRestyStart),
+            _serviceItem('stop', l10n.websites_openRestyStop),
+            _serviceItem('restart', l10n.websites_openRestyRestart),
+            _serviceItem('reload', l10n.websites_openRestyReload),
+          ],
+          child: _menuRow(
+            context,
+            TablerIcons.settings_cog,
+            l10n.websites_openRestyService,
+          ),
+        ),
+      ],
+      builder: (context, controller, child) => AppIconButton(
+        icon: TablerIcons.dots,
+        tooltip: l10n.websites_menu,
+        onPressed: () =>
+            controller.isOpen ? controller.close() : controller.open(),
+      ),
+    );
+  }
+
+  Widget _menuRow(
+    BuildContext context,
+    IconData icon,
+    String title, {
+    String? subtitle,
+  }) {
+    return SizedBox(
+      width: 220,
+      child: Row(
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(title, style: AppTextStyles.bodyM),
+                if (subtitle != null)
+                  Text(
+                    subtitle,
+                    style: AppTextStyles.caption.copyWith(
+                      color: context.scheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _item(
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onPressed,
+  ) {
+    return MenuItemButton(
+      onPressed: onPressed,
+      child: _menuRow(context, icon, title),
+    );
+  }
+
+  Widget _createItem(
+    BuildContext context,
+    AppLocalizations l10n,
+    IconData icon,
+    String title,
+    String subtitle,
+    String type,
+  ) {
+    return MenuItemButton(
+      onPressed: () =>
+          context.push('/s/${widget.serverId}/websites/create?type=$type'),
+      child: _menuRow(context, icon, title, subtitle: subtitle),
+    );
+  }
+
+  Widget _serviceItem(String operate, String label) {
+    return MenuItemButton(
+      onPressed: () => _runService(operate, label),
+      child: _menuRow(context, TablerIcons.settings_cog, label),
+    );
+  }
+
+  Future<AppInstalledCheckRes?> _checkOpenResty() async {
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      final check = await repository.checkAppInstalled(
+        const AppInstalledCheckReq(key: 'openresty'),
+      );
+      if (!check.isExist) {
+        if (!mounted) return null;
+        await _showOpenRestyUnavailable(installed: false);
+        return null;
+      }
+      return check;
+    } catch (error) {
+      if (mounted) showErrorToast(context, error);
+      return null;
+    }
+  }
+
+  Future<void> _showOpenRestyUnavailable({required bool installed}) async {
+    final l10n = AppLocalizations.of(context);
+    await showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SheetTitle(
+            title: installed
+                ? l10n.websites_openRestyStopped
+                : l10n.websites_openRestyNotInstalled,
+            onClose: () => Navigator.of(sheetContext).pop(),
+          ),
+          const SizedBox(height: AppTokens.s16),
+          Text(
+            installed
+                ? l10n.websites_openRestyServiceHint
+                : l10n.websites_openRestyInstallHint,
+            style: AppTextStyles.bodyM.copyWith(
+              color: sheetContext.scheme.onSurfaceVariant,
+            ),
+          ),
+          if (!installed) ...[
+            const SizedBox(height: AppTokens.s16),
+            PrimaryButton(
+              label: l10n.websites_openRestyInstall,
+              onPressed: () {
+                Navigator.of(sheetContext).pop();
+                context.push('/s/${widget.serverId}/more/apps?key=openresty');
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openRestyAction(Future<void> Function() action) async {
+    final check = await _checkOpenResty();
+    if (check == null || !mounted) return;
+    if (check.status.toLowerCase() == 'stopped') {
+      await _showOpenRestyUnavailable(installed: true);
+      return;
+    }
+    await action();
+  }
+
+  Future<void> _openOpenRestyLogs() async {
+    final check = await _checkOpenResty();
+    if (check == null || !mounted) return;
+    if (check.containerName.trim().isEmpty) return;
+    await openContainerLogs(
+      context,
+      ref,
+      containerName: check.containerName,
+      subtitle: 'OpenResty',
+    );
+  }
+
+  Future<void> _runService(String operate, String label) async {
+    final l10n = AppLocalizations.of(context);
+    final check = await _checkOpenResty();
+    if (check == null || !mounted) return;
+    if (operate != 'reload') {
+      final confirmed = await showConfirmSheet(
+        context,
+        title: label,
+        message: l10n.websites_openRestyServiceConfirm(label),
+        confirmLabel: label,
+        danger: operate == 'stop',
+      );
+      if (!confirmed || !mounted) return;
+    }
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      switch (operate) {
+        case 'start':
+          await repository.startInstalled(
+            installId: check.appInstallId,
+            detailId: 0,
+          );
+        case 'stop':
+          await repository.stopInstalled(
+            installId: check.appInstallId,
+            detailId: 0,
+          );
+        case 'restart':
+          await repository.restartInstalled(
+            installId: check.appInstallId,
+            detailId: 0,
+          );
+        case 'reload':
+          await repository.reloadInstalled(
+            installId: check.appInstallId,
+            detailId: 0,
+          );
+      }
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (mounted) showErrorToast(context, error);
+    }
   }
 
   Future<void> _showSiteActions(WebsiteDto site) async {

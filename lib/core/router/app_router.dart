@@ -174,8 +174,13 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'websites/create',
           parentNavigatorKey: _rootNavigatorKey,
-          pageBuilder: (context, state) =>
-              slidePage(state, WebsiteCreateWizard(serverId: _serverId(state))),
+          pageBuilder: (context, state) => slidePage(
+            state,
+            WebsiteCreateWizard(
+              serverId: _serverId(state),
+              type: state.uri.queryParameters['type'] ?? 'static',
+            ),
+          ),
         ),
         GoRoute(
           path: 'websites/templates',

@@ -5813,4 +5813,159 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get ai_agent_weixin_login_hint => '扫描任务日志中的二维码完成微信连接。';
+
+  @override
+  String get websites_basicConfigHint => '域名、目录、端口、默认文档';
+
+  @override
+  String get websites_securityHint => '认证、CORS、防盗链、真实 IP';
+
+  @override
+  String get websites_rewriteHint => '伪静态规则';
+
+  @override
+  String get websites_redirectHint => '跳转规则';
+
+  @override
+  String get websites_proxyHint => '把域名转发到已有服务';
+
+  @override
+  String get websites_staticHint => 'HTML / CSS / JS 直接托管';
+
+  @override
+  String get websites_runtimeHint =>
+      'PHP / Java / Node.js / Go / Python / .NET';
+
+  @override
+  String get websites_tunnel => 'TCP/UDP 代理';
+
+  @override
+  String get websites_tunnelHint => '四层转发，不走 HTTP';
+
+  @override
+  String get websites_port => '端口';
+
+  @override
+  String get websites_protocol => '协议';
+
+  @override
+  String get websites_enableSsl => '启用 SSL';
+
+  @override
+  String get websites_ipv6 => 'IPv6';
+
+  @override
+  String websites_relativeDir(Object path) {
+    return '相对主目录：$path';
+  }
+
+  @override
+  String get websites_createSuccess => '网站创建成功';
+
+  @override
+  String get websites_sslRequired => '请选择证书';
+
+  @override
+  String get websites_menu => '菜单';
+
+  @override
+  String get websites_openRestyNotInstalled => 'OpenResty 未安装';
+
+  @override
+  String get websites_openRestyStopped => 'OpenResty 已停止';
+
+  @override
+  String get websites_openRestyInstall => '前往应用商店安装';
+
+  @override
+  String get websites_openRestyService => '服务';
+
+  @override
+  String get websites_openRestyStart => '启动';
+
+  @override
+  String get websites_openRestyStop => '停止';
+
+  @override
+  String get websites_openRestyRestart => '重启';
+
+  @override
+  String get websites_openRestyReload => '重载';
+
+  @override
+  String get websites_serverNamesHash => '服务器名称哈希桶大小';
+
+  @override
+  String get websites_clientHeaderBuffer => '客户端请求头缓冲区';
+
+  @override
+  String get websites_maxBodySize => '最大上传文件';
+
+  @override
+  String get websites_keepaliveTimeout => '长连接超时';
+
+  @override
+  String get websites_gzip => '启用压缩';
+
+  @override
+  String get websites_gzipMinLength => '最小压缩文件';
+
+  @override
+  String get websites_gzipCompLevel => '压缩级别';
+
+  @override
+  String get websites_openRestyLogs => 'OpenResty 日志';
+
+  @override
+  String get websites_openRestyConfigFile => '主配置';
+
+  @override
+  String get websites_openRestyPerformanceTitle => '性能调整';
+
+  @override
+  String get websites_createProxyTitle => '新建反向代理';
+
+  @override
+  String get websites_createStaticTitle => '新建静态网站';
+
+  @override
+  String get websites_createRuntimeTitle => '新建运行环境';
+
+  @override
+  String get websites_createStreamTitle => '新建 TCP-UDP 代理';
+
+  @override
+  String get websites_openRestyReading => '正在读取';
+
+  @override
+  String get websites_openRestyWriting => '正在写入';
+
+  @override
+  String get websites_openRestyWaiting => '等待中';
+
+  @override
+  String get websites_openRestyServiceHint => '请先到服务菜单启动 OpenResty。';
+
+  @override
+  String get websites_openRestyInstallHint => '请先安装 OpenResty 后再使用全局配置。';
+
+  @override
+  String websites_openRestyServiceConfirm(Object action) {
+    return '确认对 OpenResty 执行「$action」？';
+  }
+
+  @override
+  String get websites_createDb => '创建数据库';
+
+  @override
+  String get websites_dbName => '数据库名';
+
+  @override
+  String get websites_enableFtp => '创建 FTP';
+
+  @override
+  String get websites_ftpUser => 'FTP 用户名';
+
+  @override
+  String get websites_ftpPassword => 'FTP 密码';
 }

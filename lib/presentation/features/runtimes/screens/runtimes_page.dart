@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
@@ -190,14 +189,13 @@ class RuntimesPage extends ConsumerWidget {
               SplitListTile(
                 leading: const Icon(TablerIcons.info_circle),
                 title: l10n.error_details,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  context.push(
-                    '/s/$serverId/more/runtimes/${runtime.id}'
-                    '?type=${Uri.encodeComponent(runtime.type)}'
-                    '&name=${Uri.encodeComponent(runtime.name)}',
-                  );
-                },
+                onTap: () => showRuntimeDetailSheet(
+                  sheetContext,
+                  serverId: serverId,
+                  id: runtime.id,
+                  type: runtime.type,
+                  name: runtime.name,
+                ),
               ),
               if (runtime.type.startsWith('php')) ...[
                 SplitListTile(

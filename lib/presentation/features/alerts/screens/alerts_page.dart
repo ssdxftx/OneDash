@@ -25,6 +25,7 @@ import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import 'alert_form_page.dart';
 
 final _alertsProvider = FutureProvider.autoDispose<List<AlertInfo>>((
   ref,
@@ -196,9 +197,10 @@ class _AlertListTab extends ConsumerWidget {
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.action_edit,
                   onTap: () async {
-                    Navigator.of(sheetContext).pop();
-                    await context.push(
-                      '/s/$serverId/more/alerts/form?id=${alert.id}',
+                    await showAlertFormSheet(
+                      sheetContext,
+                      serverId: serverId,
+                      alertId: alert.id,
                     );
                     ref.invalidate(_alertsProvider);
                   },

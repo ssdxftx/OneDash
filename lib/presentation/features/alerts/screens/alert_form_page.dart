@@ -11,9 +11,11 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/form_footer.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/section_header.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
 
@@ -39,10 +41,16 @@ final alertConfigsProvider = FutureProvider.autoDispose<List<AlertConfigInfo>>((
 }, name: 'alertConfigsProvider');
 
 class AlertFormPage extends ConsumerStatefulWidget {
-  const AlertFormPage({super.key, required this.serverId, this.alertId});
+  const AlertFormPage({
+    super.key,
+    required this.serverId,
+    this.alertId,
+    this.embedded = false,
+  });
 
   final int serverId;
   final int? alertId;
+  final bool embedded;
 
   bool get isEditing => alertId != null;
 
@@ -181,6 +189,177 @@ class _AlertFormPageState extends ConsumerState<AlertFormPage> {
         .map((item) => item.trim())
         .where((item) => item.isNotEmpty)
         .toSet();
+    final children = <Widget>[
+      SectionHeader(title: l10n.alerts_rule),
+      TonalCard(
+        child: Column(
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: _type,
+              decoration: InputDecoration(labelText: l10n.alerts_type),
+              items: [
+                for (final type in _types)
+                  DropdownMenuItem(
+                    value: type,
+                    child: Text(_typeLabel(type, l10n)),
+                  ),
+              ],
+              onChanged: widget.isEditing
+                  ? null
+                  : (value) {
+                      if (value != null) setState(() => _type = value);
+                    },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: _title,
+              label: l10n.alerts_title,
+              helper: l10n.alerts_titleHint,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            if (_type == 'disk')
+              ref
+                  .watch(alertDisksProvider)
+                  .when(
+                    data: (disks) {
+                      final options = disks
+                          .map(_diskPath)
+                          .where((path) => path.isNotEmpty)
+                          .toSet()
+                          .toList(growable: false);
+                      return DropdownButtonFormField<String>(
+                        initialValue: options.contains(_disk.text)
+                            ? _disk.text
+                            : null,
+                        decoration: InputDecoration(
+                          labelText: l10n.alerts_disk,
+                          helperText: l10n.alerts_diskHint,
+                        ),
+                        items: [
+                          for (final path in options)
+                            DropdownMenuItem(value: path, child: Text(path)),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() => _disk.text = value);
+                          }
+                        },
+                      );
+                    },
+                    loading: () => const LinearProgressIndicator(),
+                    error: (error, _) => Text(
+                      describeError(error, l10n),
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: context.scheme.error,
+                      ),
+                    ),
+                  )
+            else
+              AppTextField(
+                controller: _project,
+                label: l10n.alerts_project,
+                helper: l10n.alerts_projectHint,
+              ),
+          ],
+        ),
+      ),
+      const SizedBox(height: AppTokens.s24),
+      SectionHeader(title: l10n.alerts_threshold),
+      TonalCard(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    controller: _count,
+                    label: l10n.alerts_count,
+                    keyboardType: TextInputType.number,
+                    helper: l10n.alerts_countHint,
+                  ),
+                ),
+                const SizedBox(width: AppTokens.s12),
+                Expanded(
+                  child: AppTextField(
+                    controller: _cycle,
+                    label: l10n.alerts_cycle,
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: _sendCount,
+              label: l10n.alerts_sendCount,
+              keyboardType: TextInputType.number,
+              helper: l10n.alerts_sendCountHint,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: _advancedParams,
+              label: l10n.alerts_advancedParams,
+              helper: l10n.alerts_advancedParamsHint,
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: AppTokens.s24),
+      SectionHeader(title: l10n.alerts_notification),
+      TonalCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            configs.when(
+              data: (items) => items.isEmpty
+                  ? Text(
+                      l10n.alerts_noConfigs,
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: context.appColors.warning,
+                      ),
+                    )
+                  : AppFilterChips<String>(
+                      options: [for (final item in items) '${item.id}'],
+                      labelOf: (value) {
+                        final item = items.firstWhere(
+                          (config) => '${config.id}' == value,
+                        );
+                        return item.title.isEmpty ? item.type : item.title;
+                      },
+                      selected: selected,
+                      onChanged: (values) {
+                        _method.text = values.join(',');
+                        setState(() {});
+                      },
+                    ),
+              loading: () => const LinearProgressIndicator(),
+              error: (error, _) => Text(
+                describeError(error, l10n),
+                style: AppTextStyles.bodyS.copyWith(
+                  color: context.scheme.error,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: _method,
+              label: l10n.alerts_method,
+              helper: l10n.alerts_methodHint,
+              onChanged: (_) => setState(() {}),
+            ),
+          ],
+        ),
+      ),
+    ];
+    if (widget.embedded) {
+      return FormSheet(
+        title: widget.isEditing ? l10n.alerts_edit : l10n.alerts_create,
+        onSave: _submit,
+        saving: _submitting || (widget.isEditing && !_loaded),
+        saveLabel: widget.isEditing ? l10n.action_save : l10n.alerts_create,
+        children: children,
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: widget.isEditing ? l10n.alerts_edit : l10n.alerts_create,
@@ -197,171 +376,7 @@ class _AlertFormPageState extends ConsumerState<AlertFormPage> {
           AppTokens.s16,
           AppTokens.s32,
         ),
-        children: [
-          SectionHeader(title: l10n.alerts_rule),
-          TonalCard(
-            child: Column(
-              children: [
-                DropdownButtonFormField<String>(
-                  initialValue: _type,
-                  decoration: InputDecoration(labelText: l10n.alerts_type),
-                  items: [
-                    for (final type in _types)
-                      DropdownMenuItem(
-                        value: type,
-                        child: Text(_typeLabel(type, l10n)),
-                      ),
-                  ],
-                  onChanged: widget.isEditing
-                      ? null
-                      : (value) {
-                          if (value != null) setState(() => _type = value);
-                        },
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _title,
-                  label: l10n.alerts_title,
-                  helper: l10n.alerts_titleHint,
-                ),
-                const SizedBox(height: AppTokens.s12),
-                if (_type == 'disk')
-                  ref
-                      .watch(alertDisksProvider)
-                      .when(
-                        data: (disks) {
-                          final options = disks
-                              .map(_diskPath)
-                              .where((path) => path.isNotEmpty)
-                              .toSet()
-                              .toList(growable: false);
-                          return DropdownButtonFormField<String>(
-                            initialValue: options.contains(_disk.text)
-                                ? _disk.text
-                                : null,
-                            decoration: InputDecoration(
-                              labelText: l10n.alerts_disk,
-                              helperText: l10n.alerts_diskHint,
-                            ),
-                            items: [
-                              for (final path in options)
-                                DropdownMenuItem(
-                                  value: path,
-                                  child: Text(path),
-                                ),
-                            ],
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() => _disk.text = value);
-                              }
-                            },
-                          );
-                        },
-                        loading: () => const LinearProgressIndicator(),
-                        error: (error, _) => Text(
-                          describeError(error, l10n),
-                          style: AppTextStyles.bodyS.copyWith(
-                            color: context.scheme.error,
-                          ),
-                        ),
-                      )
-                else
-                  AppTextField(
-                    controller: _project,
-                    label: l10n.alerts_project,
-                    helper: l10n.alerts_projectHint,
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppTokens.s24),
-          SectionHeader(title: l10n.alerts_threshold),
-          TonalCard(
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppTextField(
-                        controller: _count,
-                        label: l10n.alerts_count,
-                        keyboardType: TextInputType.number,
-                        helper: l10n.alerts_countHint,
-                      ),
-                    ),
-                    const SizedBox(width: AppTokens.s12),
-                    Expanded(
-                      child: AppTextField(
-                        controller: _cycle,
-                        label: l10n.alerts_cycle,
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _sendCount,
-                  label: l10n.alerts_sendCount,
-                  keyboardType: TextInputType.number,
-                  helper: l10n.alerts_sendCountHint,
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _advancedParams,
-                  label: l10n.alerts_advancedParams,
-                  helper: l10n.alerts_advancedParamsHint,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppTokens.s24),
-          SectionHeader(title: l10n.alerts_notification),
-          TonalCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                configs.when(
-                  data: (items) => items.isEmpty
-                      ? Text(
-                          l10n.alerts_noConfigs,
-                          style: AppTextStyles.bodyS.copyWith(
-                            color: context.appColors.warning,
-                          ),
-                        )
-                      : AppFilterChips<String>(
-                          options: [for (final item in items) '${item.id}'],
-                          labelOf: (value) {
-                            final item = items.firstWhere(
-                              (config) => '${config.id}' == value,
-                            );
-                            return item.title.isEmpty ? item.type : item.title;
-                          },
-                          selected: selected,
-                          onChanged: (values) {
-                            _method.text = values.join(',');
-                            setState(() {});
-                          },
-                        ),
-                  loading: () => const LinearProgressIndicator(),
-                  error: (error, _) => Text(
-                    describeError(error, l10n),
-                    style: AppTextStyles.bodyS.copyWith(
-                      color: context.scheme.error,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _method,
-                  label: l10n.alerts_method,
-                  helper: l10n.alerts_methodHint,
-                  onChanged: (_) => setState(() {}),
-                ),
-              ],
-            ),
-          ),
-        ],
+        children: children,
       ),
       bottomNavigationBar: FormFooter(
         child: PrimaryButton(
@@ -394,4 +409,23 @@ class _AlertFormPageState extends ConsumerState<AlertFormPage> {
 
   String _defaultTitle(String type, AppLocalizations l10n) =>
       _typeLabel(type, l10n);
+}
+
+Future<void> showAlertFormSheet(
+  BuildContext context, {
+  required int serverId,
+  int? alertId,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.94,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.78,
+      child: AlertFormPage(
+        serverId: serverId,
+        alertId: alertId,
+        embedded: true,
+      ),
+    ),
+  );
 }

@@ -21,6 +21,8 @@ import '../../../common/components/split_list_group.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import '../screens/container_create_page.dart';
+import '../screens/container_detail_page.dart';
 import 'container_log_page.dart';
 
 Future<void> showContainerActions(
@@ -145,12 +147,11 @@ class _ContainerActionsBody extends StatelessWidget {
               icon: TablerIcons.info_circle,
               iconColor: context.scheme.onSurfaceVariant,
               title: l10n.error_details,
-              onTap: () {
-                Navigator.of(context).pop();
-                hostContext.push(
-                  '/s/$serverId/containers/${Uri.encodeComponent(item.name)}',
-                );
-              },
+              onTap: () => showContainerDetailSheet(
+                hostContext,
+                serverId: serverId,
+                containerName: item.name,
+              ),
             ),
             ActionSheetRow(
               icon: TablerIcons.player_play,
@@ -223,12 +224,11 @@ class _ContainerActionsBody extends StatelessWidget {
               iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_edit,
               subtitle: l10n.containers_editSubtitle,
-              onTap: () {
-                Navigator.of(context).pop();
-                hostContext.push(
-                  '/s/$serverId/containers/${Uri.encodeComponent(item.name)}/edit',
-                );
-              },
+              onTap: () => showContainerEditSheet(
+                hostContext,
+                serverId: serverId,
+                containerName: item.name,
+              ),
             ),
             ActionSheetRow(
               icon: TablerIcons.arrow_up_circle,

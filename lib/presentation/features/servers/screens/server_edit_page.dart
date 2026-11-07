@@ -17,7 +17,9 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/section_header.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/tonal_card.dart';
 import '../providers/servers_provider.dart';
@@ -36,9 +38,10 @@ class _DiagnosisStep {
 }
 
 class ServerEditPage extends ConsumerStatefulWidget {
-  const ServerEditPage({super.key, this.serverId});
+  const ServerEditPage({super.key, this.serverId, this.embedded = false});
 
   final int? serverId;
+  final bool embedded;
 
   bool get isEditing => serverId != null;
 
@@ -393,6 +396,176 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
       );
     }
 
+    final children = <Widget>[
+      SectionHeader(title: l10n.server_edit_address),
+      TonalCard(
+        child: Column(
+          children: [
+            AppTextField(
+              controller: _nameController,
+              label: l10n.server_edit_name,
+              hint: l10n.server_edit_name_hint,
+            ),
+            const SizedBox(height: AppTokens.s16),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.server_edit_https),
+              value: _isHttps,
+              onChanged: (value) {
+                setState(() {
+                  _isHttps = value;
+                  _syncDefaultPort(value);
+                });
+              },
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: AppTextField(
+                    controller: _hostController,
+                    label: l10n.server_edit_host,
+                    hint: l10n.server_edit_host_hint,
+                    keyboardType: TextInputType.url,
+                    validator: _validateHost,
+                  ),
+                ),
+                const SizedBox(width: AppTokens.s12),
+                Expanded(
+                  flex: 2,
+                  child: AppTextField(
+                    controller: _portController,
+                    label: l10n.server_edit_port,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validator: _validatePort,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: AppTokens.s24),
+      SectionHeader(title: l10n.server_edit_api_key),
+      TonalCard(
+        child: Column(
+          children: [
+            AppTextField(
+              controller: _apiKeyController,
+              label: l10n.server_edit_api_key,
+              hint: l10n.server_edit_api_key_hint,
+              obscure: _obscureKey,
+              validator: _validateKey,
+              suffix: IconButton(
+                tooltip: _obscureKey ? l10n.common_show : l10n.common_hide,
+                icon: Icon(
+                  _obscureKey ? TablerIcons.eye : TablerIcons.eye_off,
+                  size: AppTokens.iconList,
+                ),
+                onPressed: () => setState(() => _obscureKey = !_obscureKey),
+              ),
+            ),
+            const SizedBox(height: AppTokens.s8),
+            Row(
+              children: [
+                Icon(
+                  TablerIcons.info_circle,
+                  size: AppTokens.iconList,
+                  color: scheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: AppTokens.s8),
+                Expanded(
+                  child: Text(
+                    l10n.server_edit_key_guide,
+                    style: AppTextStyles.bodyS.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTokens.s8),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                l10n.server_edit_allow_insecure,
+                style: AppTextStyles.bodyM,
+              ),
+              subtitle: Text(
+                l10n.server_edit_allow_insecure_hint,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              value: _allowInsecure,
+              onChanged: (value) => setState(() => _allowInsecure = value),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: AppTokens.s24),
+      SectionHeader(title: l10n.server_edit_test),
+      TonalCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final step in _steps) ...[
+              _DiagnosisRow(step: step),
+              if (step != _steps.last) const SizedBox(height: AppTokens.s12),
+            ],
+            if (_clockDrift != null) ...[
+              const SizedBox(height: AppTokens.s12),
+              Row(
+                children: [
+                  Icon(
+                    TablerIcons.clock_exclamation,
+                    size: AppTokens.iconList,
+                    color: context.appColors.warning,
+                  ),
+                  const SizedBox(width: AppTokens.s8),
+                  Expanded(
+                    child: Text(
+                      _clockDrift!,
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: context.appColors.warning,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: AppTokens.s16),
+            SecondaryButton(
+              label: l10n.server_edit_test,
+              icon: TablerIcons.plug_connected,
+              loading: _diagnosing,
+              onPressed: _diagnosing ? null : _runDiagnosis,
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: AppTokens.s24),
+      if (!widget.embedded)
+        PrimaryButton(
+          label: l10n.server_edit_save,
+          icon: TablerIcons.device_floppy,
+          loading: _saving,
+          onPressed: _saving ? null : _save,
+        ),
+      const SizedBox(height: AppTokens.s32),
+    ];
+    if (widget.embedded) {
+      return FormSheet(
+        title: l10n.server_edit_edit_title,
+        onSave: _save,
+        saving: _saving,
+        saveLabel: l10n.server_edit_save,
+        formKey: _formKey,
+        children: children,
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: widget.isEditing
@@ -403,172 +576,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
         key: _formKey,
         child: ListView(
           padding: EdgeInsets.all(context.pagePadding),
-          children: [
-            SectionHeader(title: l10n.server_edit_address),
-            TonalCard(
-              child: Column(
-                children: [
-                  AppTextField(
-                    controller: _nameController,
-                    label: l10n.server_edit_name,
-                    hint: l10n.server_edit_name_hint,
-                  ),
-                  const SizedBox(height: AppTokens.s16),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l10n.server_edit_https),
-                    value: _isHttps,
-                    onChanged: (value) {
-                      setState(() {
-                        _isHttps = value;
-                        _syncDefaultPort(value);
-                      });
-                    },
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: AppTextField(
-                          controller: _hostController,
-                          label: l10n.server_edit_host,
-                          hint: l10n.server_edit_host_hint,
-                          keyboardType: TextInputType.url,
-                          validator: _validateHost,
-                        ),
-                      ),
-                      const SizedBox(width: AppTokens.s12),
-                      Expanded(
-                        flex: 2,
-                        child: AppTextField(
-                          controller: _portController,
-                          label: l10n.server_edit_port,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          validator: _validatePort,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppTokens.s24),
-            SectionHeader(title: l10n.server_edit_api_key),
-            TonalCard(
-              child: Column(
-                children: [
-                  AppTextField(
-                    controller: _apiKeyController,
-                    label: l10n.server_edit_api_key,
-                    hint: l10n.server_edit_api_key_hint,
-                    obscure: _obscureKey,
-                    validator: _validateKey,
-                    suffix: IconButton(
-                      tooltip: _obscureKey
-                          ? l10n.common_show
-                          : l10n.common_hide,
-                      icon: Icon(
-                        _obscureKey ? TablerIcons.eye : TablerIcons.eye_off,
-                        size: AppTokens.iconList,
-                      ),
-                      onPressed: () =>
-                          setState(() => _obscureKey = !_obscureKey),
-                    ),
-                  ),
-                  const SizedBox(height: AppTokens.s8),
-                  Row(
-                    children: [
-                      Icon(
-                        TablerIcons.info_circle,
-                        size: AppTokens.iconList,
-                        color: scheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: AppTokens.s8),
-                      Expanded(
-                        child: Text(
-                          l10n.server_edit_key_guide,
-                          style: AppTextStyles.bodyS.copyWith(
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppTokens.s8),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(
-                      l10n.server_edit_allow_insecure,
-                      style: AppTextStyles.bodyM,
-                    ),
-                    subtitle: Text(
-                      l10n.server_edit_allow_insecure_hint,
-                      style: AppTextStyles.bodyS.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                    value: _allowInsecure,
-                    onChanged: (value) =>
-                        setState(() => _allowInsecure = value),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppTokens.s24),
-            SectionHeader(title: l10n.server_edit_test),
-            TonalCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (final step in _steps) ...[
-                    _DiagnosisRow(step: step),
-                    if (step != _steps.last)
-                      const SizedBox(height: AppTokens.s12),
-                  ],
-                  if (_clockDrift != null) ...[
-                    const SizedBox(height: AppTokens.s12),
-                    Row(
-                      children: [
-                        Icon(
-                          TablerIcons.clock_exclamation,
-                          size: AppTokens.iconList,
-                          color: context.appColors.warning,
-                        ),
-                        const SizedBox(width: AppTokens.s8),
-                        Expanded(
-                          child: Text(
-                            _clockDrift!,
-                            style: AppTextStyles.bodyS.copyWith(
-                              color: context.appColors.warning,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  const SizedBox(height: AppTokens.s16),
-                  SecondaryButton(
-                    label: l10n.server_edit_test,
-                    icon: TablerIcons.plug_connected,
-                    loading: _diagnosing,
-                    onPressed: _diagnosing ? null : _runDiagnosis,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppTokens.s24),
-            PrimaryButton(
-              label: l10n.server_edit_save,
-              icon: TablerIcons.device_floppy,
-              loading: _saving,
-              onPressed: _saving ? null : _save,
-            ),
-            const SizedBox(height: AppTokens.s32),
-          ],
+          children: children,
         ),
       ),
     );
@@ -620,4 +628,18 @@ class _DiagnosisRow extends StatelessWidget {
       ],
     );
   }
+}
+
+Future<void> showServerEditSheet(
+  BuildContext context, {
+  required int serverId,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.94,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.82,
+      child: ServerEditPage(serverId: serverId, embedded: true),
+    ),
+  );
 }

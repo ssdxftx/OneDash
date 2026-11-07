@@ -21,6 +21,7 @@ import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/entry_animation.dart';
 import '../../../common/states/error_toast.dart';
+import 'cronjob_form_page.dart';
 import '../providers/cronjobs_provider.dart';
 import '../widgets/cronjob_records_sheet.dart';
 import '../../../common/formatters/value_labels.dart';
@@ -197,12 +198,11 @@ class _CronjobsPageState extends ConsumerState<CronjobsPage>
                   icon: TablerIcons.edit,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.cronjobs_edit,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/${widget.serverId}/more/cronjobs/form?id=${item.id}',
-                    );
-                  },
+                  onTap: () => showCronjobFormSheet(
+                    sheetContext,
+                    serverId: widget.serverId,
+                    cronjobId: item.id,
+                  ),
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.history,

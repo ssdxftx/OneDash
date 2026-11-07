@@ -14,6 +14,7 @@ import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/segmented_tabs.dart';
+import '../../../common/components/sheet_title.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
@@ -32,6 +33,7 @@ class DatabaseDetailPage extends ConsumerStatefulWidget {
     required this.type,
     required this.instance,
     this.from = 'local',
+    this.embedded = false,
   });
 
   final int serverId;
@@ -39,6 +41,7 @@ class DatabaseDetailPage extends ConsumerStatefulWidget {
   final String type;
   final String instance;
   final String from;
+  final bool embedded;
 
   @override
   ConsumerState<DatabaseDetailPage> createState() => _DatabaseDetailPageState();
@@ -79,6 +82,145 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final detail = ref.watch(databaseDetailProvider(_key));
+    final body = AsyncStateView(
+      value: detail,
+      onRetry: () => ref.invalidate(databaseDetailProvider(_key)),
+      loading: const SkeletonList(itemCount: 6),
+      builder: (state) => SegmentedTabsView(
+        scrollable: !widget.embedded,
+        labels: [
+          l10n.databases_title,
+          l10n.databases_usersGrants,
+          l10n.databases_advanced,
+        ],
+        children: [
+          ListView(
+            padding: EdgeInsets.all(context.pagePadding),
+            children: [
+              TonalCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(state.item.name, style: AppTextStyles.titleL),
+                    const SizedBox(height: AppTokens.s4),
+                    Text(
+                      '${state.item.from} · ${state.item.format}',
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: context.scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppTokens.s24),
+              SplitListGroup(
+                children: [
+                  if ((_conn('host', state) ?? '').isNotEmpty)
+                    _CopyRow(
+                      label: l10n.databases_address,
+                      value: _conn('host', state)!,
+                      onCopy: _copy,
+                    ),
+                  if ((_conn('port', state) ?? '').isNotEmpty)
+                    _CopyRow(
+                      label: l10n.databases_port,
+                      value: _conn('port', state)!,
+                      onCopy: _copy,
+                    ),
+                  if (state.item.username.trim().isNotEmpty)
+                    _CopyRow(
+                      label: l10n.databases_username,
+                      value: state.item.username,
+                      onCopy: _copy,
+                    ),
+                  if (state.item.password.isNotEmpty)
+                    _PasswordRow(
+                      label: l10n.databases_password,
+                      value: state.item.password,
+                      visible: _showPassword,
+                      onToggle: _togglePassword,
+                      onCopy: _copy,
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppTokens.s24),
+              SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppTokens.s8,
+                ),
+                title: Text(
+                  l10n.databases_remoteAccess,
+                  style: AppTextStyles.bodyM,
+                ),
+                subtitle: Text(
+                  state.remoteAccess
+                      ? l10n.databases_enabled
+                      : l10n.databases_disabled,
+                  style: AppTextStyles.bodyS.copyWith(
+                    color: context.scheme.onSurfaceVariant,
+                  ),
+                ),
+                value: state.remoteAccess,
+                onChanged: _setRemoteAccess,
+              ),
+              const SizedBox(height: AppTokens.s16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showStatus(state),
+                      icon: const Icon(TablerIcons.activity),
+                      label: Text(l10n.databases_status),
+                    ),
+                  ),
+                  const SizedBox(width: AppTokens.s12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _changePassword(state.item.id),
+                      icon: const Icon(TablerIcons.key),
+                      label: Text(l10n.databases_changePassword),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTokens.s12),
+              OutlinedButton.icon(
+                onPressed: _delete,
+                icon: const Icon(TablerIcons.trash),
+                label: Text(l10n.databases_deleteDatabase),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: context.appColors.danger,
+                ),
+              ),
+            ],
+          ),
+          DatabaseUsersTab(
+            item: state.item,
+            type: widget.type,
+            instance: widget.instance,
+          ),
+          DatabaseAdvancedTab(
+            type: widget.type,
+            instance: widget.instance,
+            databaseName: widget.databaseName,
+          ),
+        ],
+      ),
+    );
+    if (widget.embedded) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SheetTitle(
+            title: widget.databaseName,
+            subtitle: widget.type,
+            onClose: () => Navigator.of(context).pop(),
+          ),
+          const SizedBox(height: AppTokens.s8),
+          Expanded(child: body),
+        ],
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: widget.databaseName,
@@ -91,130 +233,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
           ),
         ],
       ),
-      body: AsyncStateView(
-        value: detail,
-        onRetry: () => ref.invalidate(databaseDetailProvider(_key)),
-        loading: const SkeletonList(itemCount: 6),
-        builder: (state) => SegmentedTabsView(
-          labels: [
-            l10n.databases_title,
-            l10n.databases_usersGrants,
-            l10n.databases_advanced,
-          ],
-          children: [
-            ListView(
-              padding: EdgeInsets.all(context.pagePadding),
-              children: [
-                TonalCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(state.item.name, style: AppTextStyles.titleL),
-                      const SizedBox(height: AppTokens.s4),
-                      Text(
-                        '${state.item.from} · ${state.item.format}',
-                        style: AppTextStyles.bodyS.copyWith(
-                          color: context.scheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: AppTokens.s24),
-                SplitListGroup(
-                  children: [
-                    if ((_conn('host', state) ?? '').isNotEmpty)
-                      _CopyRow(
-                        label: l10n.databases_address,
-                        value: _conn('host', state)!,
-                        onCopy: _copy,
-                      ),
-                    if ((_conn('port', state) ?? '').isNotEmpty)
-                      _CopyRow(
-                        label: l10n.databases_port,
-                        value: _conn('port', state)!,
-                        onCopy: _copy,
-                      ),
-                    if (state.item.username.trim().isNotEmpty)
-                      _CopyRow(
-                        label: l10n.databases_username,
-                        value: state.item.username,
-                        onCopy: _copy,
-                      ),
-                    if (state.item.password.isNotEmpty)
-                      _PasswordRow(
-                        label: l10n.databases_password,
-                        value: state.item.password,
-                        visible: _showPassword,
-                        onToggle: _togglePassword,
-                        onCopy: _copy,
-                      ),
-                  ],
-                ),
-                const SizedBox(height: AppTokens.s24),
-                SwitchListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppTokens.s8,
-                  ),
-                  title: Text(
-                    l10n.databases_remoteAccess,
-                    style: AppTextStyles.bodyM,
-                  ),
-                  subtitle: Text(
-                    state.remoteAccess
-                        ? l10n.databases_enabled
-                        : l10n.databases_disabled,
-                    style: AppTextStyles.bodyS.copyWith(
-                      color: context.scheme.onSurfaceVariant,
-                    ),
-                  ),
-                  value: state.remoteAccess,
-                  onChanged: _setRemoteAccess,
-                ),
-                const SizedBox(height: AppTokens.s16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _showStatus(state),
-                        icon: const Icon(TablerIcons.activity),
-                        label: Text(l10n.databases_status),
-                      ),
-                    ),
-                    const SizedBox(width: AppTokens.s12),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _changePassword(state.item.id),
-                        icon: const Icon(TablerIcons.key),
-                        label: Text(l10n.databases_changePassword),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppTokens.s12),
-                OutlinedButton.icon(
-                  onPressed: _delete,
-                  icon: const Icon(TablerIcons.trash),
-                  label: Text(l10n.databases_deleteDatabase),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: context.appColors.danger,
-                  ),
-                ),
-              ],
-            ),
-            DatabaseUsersTab(
-              item: state.item,
-              type: widget.type,
-              instance: widget.instance,
-            ),
-            DatabaseAdvancedTab(
-              type: widget.type,
-              instance: widget.instance,
-              databaseName: widget.databaseName,
-            ),
-          ],
-        ),
-      ),
+      body: body,
     );
   }
 
@@ -560,4 +579,29 @@ class _DatabaseTabSheet extends ConsumerWidget {
       ),
     );
   }
+}
+
+Future<void> showDatabaseDetailSheet(
+  BuildContext context, {
+  required int serverId,
+  required String databaseName,
+  required String type,
+  required String instance,
+  String from = 'local',
+}) {
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.94,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.80,
+      child: DatabaseDetailPage(
+        serverId: serverId,
+        databaseName: databaseName,
+        type: type,
+        instance: instance,
+        from: from,
+        embedded: true,
+      ),
+    ),
+  );
 }

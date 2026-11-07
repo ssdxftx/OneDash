@@ -11,6 +11,7 @@ import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/sheet_title.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
@@ -25,14 +26,68 @@ final _groupsProvider = FutureProvider.autoDispose<List<WebsiteGroupDto>>((
 }, name: 'websiteGroupsProvider');
 
 class WebsiteGroupsPage extends ConsumerWidget {
-  const WebsiteGroupsPage({super.key, required this.serverId});
+  const WebsiteGroupsPage({
+    super.key,
+    required this.serverId,
+    this.embedded = false,
+  });
 
   final int serverId;
+  final bool embedded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final groups = ref.watch(_groupsProvider);
+    final create = IconButton(
+      tooltip: l10n.action_create,
+      onPressed: () => _openEditor(context, ref),
+      icon: const Icon(TablerIcons.plus),
+    );
+    final body = AsyncStateView(
+      value: groups,
+      onRetry: () => ref.invalidate(_groupsProvider),
+      loading: const SkeletonList(itemCount: 4),
+      builder: (items) {
+        if (items.isEmpty) {
+          return EmptyState(
+            icon: TablerIcons.folder,
+            title: l10n.websites_groupEmpty,
+            actionLabel: l10n.action_create,
+            onAction: () => _openEditor(context, ref),
+          );
+        }
+        return ListView(
+          padding: EdgeInsets.all(context.pagePadding),
+          children: [
+            SplitListGroup(
+              children: [
+                for (final group in items)
+                  WebsiteGroupTile(
+                    group: group,
+                    onEdit: () => _openEditor(context, ref, group: group),
+                    onDelete: () => _delete(context, ref, group),
+                  ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+    if (embedded) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SheetTitle(
+            title: l10n.websites_groupManagement,
+            onClose: () => Navigator.of(context).pop(),
+            actions: [create],
+          ),
+          const SizedBox(height: AppTokens.s8),
+          Expanded(child: body),
+        ],
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: l10n.websites_groupManagement,
@@ -44,36 +99,7 @@ class WebsiteGroupsPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: AsyncStateView(
-        value: groups,
-        onRetry: () => ref.invalidate(_groupsProvider),
-        loading: const SkeletonList(itemCount: 4),
-        builder: (items) {
-          if (items.isEmpty) {
-            return EmptyState(
-              icon: TablerIcons.folder,
-              title: l10n.websites_groupEmpty,
-              actionLabel: l10n.action_create,
-              onAction: () => _openEditor(context, ref),
-            );
-          }
-          return ListView(
-            padding: EdgeInsets.all(context.pagePadding),
-            children: [
-              SplitListGroup(
-                children: [
-                  for (final group in items)
-                    WebsiteGroupTile(
-                      group: group,
-                      onEdit: () => _openEditor(context, ref, group: group),
-                      onDelete: () => _delete(context, ref, group),
-                    ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
+      body: body,
     );
   }
 
@@ -273,4 +299,18 @@ class WebsiteGroupTile extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> showWebsiteGroupsSheet(
+  BuildContext context, {
+  required int serverId,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.90,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.70,
+      child: WebsiteGroupsPage(serverId: serverId, embedded: true),
+    ),
+  );
 }

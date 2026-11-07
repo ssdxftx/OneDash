@@ -31,6 +31,7 @@ import '../../../common/states/error_toast.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../containers/widgets/container_log_page.dart';
 import '../widgets/installed_app_actions.dart';
+import 'installed_app_page.dart';
 import '../providers/app_store_provider.dart';
 import 'app_detail_page.dart';
 
@@ -432,13 +433,12 @@ class _InstalledTab extends ConsumerWidget {
                   icon: TablerIcons.info_circle,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.error_details,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(
-                      '/s/$serverId/more/apps/installed/${app.id}'
-                      '?detailId=${app.appDetailId}',
-                    );
-                  },
+                  onTap: () => showInstalledAppSheet(
+                    sheetContext,
+                    serverId: serverId,
+                    installId: '${app.id}',
+                    detailId: app.appDetailId,
+                  ),
                 ),
                 if (hasContainer)
                   ActionSheetRow(

@@ -13,9 +13,11 @@ import '../../../../data/dto/container/container_info_dto.dart';
 import '../../../../data/dto/container/container_stats_dto.dart';
 import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/log_view.dart';
 import '../../../common/components/metric_card.dart';
 import '../../../common/components/segmented_tabs.dart';
+import '../../../common/components/sheet_title.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
@@ -40,10 +42,12 @@ class ContainerDetailPage extends ConsumerStatefulWidget {
     super.key,
     required this.serverId,
     required this.containerName,
+    this.embedded = false,
   });
 
   final int serverId;
   final String containerName;
+  final bool embedded;
 
   @override
   ConsumerState<ContainerDetailPage> createState() =>
@@ -128,6 +132,42 @@ class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final info = ref.watch(_containerInfoProvider(widget.containerName));
+    final body = SegmentedTabsView(
+      scrollable: !widget.embedded,
+      labels: [l10n.nav_overview, l10n.containers_logs, l10n.containers_config],
+      onChanged: (index) {
+        if (index == 1 && _tabIndex != 1) {
+          _tabIndex = index;
+          _fetchLogs();
+          return;
+        }
+        _tabIndex = index;
+      },
+      children: [
+        _OverviewTab(containerName: widget.containerName),
+        LogView(
+          lines: _logBuffer.lines,
+          paused: _paused,
+          onPauseChanged: (value) => setState(() => _paused = value),
+          onClear: () => setState(_logBuffer.clear),
+        ),
+        _ConfigTab(containerName: widget.containerName),
+      ],
+    );
+    if (widget.embedded) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SheetTitle(
+            title: widget.containerName,
+            subtitle: info.valueOrNull?.image,
+            onClose: () => Navigator.of(context).pop(),
+          ),
+          const SizedBox(height: AppTokens.s8),
+          Expanded(child: body),
+        ],
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: widget.containerName,
@@ -142,33 +182,28 @@ class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage>
           ),
         ],
       ),
-      body: SegmentedTabsView(
-        labels: [
-          l10n.nav_overview,
-          l10n.containers_logs,
-          l10n.containers_config,
-        ],
-        onChanged: (index) {
-          if (index == 1 && _tabIndex != 1) {
-            _tabIndex = index;
-            _fetchLogs();
-            return;
-          }
-          _tabIndex = index;
-        },
-        children: [
-          _OverviewTab(containerName: widget.containerName),
-          LogView(
-            lines: _logBuffer.lines,
-            paused: _paused,
-            onPauseChanged: (value) => setState(() => _paused = value),
-            onClear: () => setState(_logBuffer.clear),
-          ),
-          _ConfigTab(containerName: widget.containerName),
-        ],
-      ),
+      body: body,
     );
   }
+}
+
+Future<void> showContainerDetailSheet(
+  BuildContext context, {
+  required int serverId,
+  required String containerName,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.94,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.82,
+      child: ContainerDetailPage(
+        serverId: serverId,
+        containerName: containerName,
+        embedded: true,
+      ),
+    ),
+  );
 }
 
 class _OverviewTab extends ConsumerWidget {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
@@ -256,14 +255,6 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage>
     ref.invalidate(_databasesProvider);
   }
 
-  String _detailPath(DatabaseSearchItemDto item) {
-    return '/s/${widget.serverId}/more/databases/'
-        '${Uri.encodeComponent(item.name)}'
-        '?type=${Uri.encodeComponent(item.dbType)}'
-        '&instance=${Uri.encodeComponent(item.instanceName)}'
-        '&from=${Uri.encodeComponent(item.from)}';
-  }
-
   Future<void> _showActions(DatabaseSearchItemDto item) async {
     final l10n = AppLocalizations.of(context);
     final colors = context.appColors;
@@ -299,10 +290,14 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage>
                   icon: TablerIcons.info_circle,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.error_details,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push(_detailPath(item));
-                  },
+                  onTap: () => showDatabaseDetailSheet(
+                    sheetContext,
+                    serverId: widget.serverId,
+                    databaseName: item.name,
+                    type: item.dbType,
+                    instance: item.instanceName,
+                    from: item.from,
+                  ),
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.users,

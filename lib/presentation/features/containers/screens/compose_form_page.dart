@@ -12,17 +12,25 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/form_footer.dart';
 import '../../../common/components/section_header.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
 
 class ComposeFormPage extends ConsumerStatefulWidget {
-  const ComposeFormPage({super.key, required this.serverId, this.compose});
+  const ComposeFormPage({
+    super.key,
+    required this.serverId,
+    this.compose,
+    this.embedded = false,
+  });
 
   final int serverId;
   final ContainerComposeDto? compose;
+  final bool embedded;
 
   bool get isEditing => compose != null;
 
@@ -172,6 +180,67 @@ class _ComposeFormPageState extends ConsumerState<ComposeFormPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final children = <Widget>[
+      SectionHeader(title: l10n.containers_compose),
+      TonalCard(
+        child: Column(
+          children: [
+            AppTextField(
+              controller: _name,
+              label: l10n.containers_name,
+              enabled: !widget.isEditing,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: _env,
+              label: l10n.containers_env,
+              hint: 'KEY=VALUE',
+              maxLines: 3,
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.containers_forcePull),
+              value: _forcePull,
+              onChanged: (value) => setState(() => _forcePull = value),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: AppTokens.s24),
+      const SectionHeader(title: 'docker-compose.yml'),
+      if (_loading)
+        const Padding(
+          padding: EdgeInsets.all(AppTokens.s24),
+          child: Center(child: CircularProgressIndicator()),
+        )
+      else
+        TonalCard(
+          child: AppTextField(
+            controller: _content,
+            hint: 'services:\n  web:\n    image: nginx:alpine',
+            maxLines: 18,
+          ),
+        ),
+    ];
+    if (widget.embedded) {
+      return FormSheet(
+        title: widget.isEditing
+            ? l10n.containers_updateCompose
+            : l10n.containers_createCompose,
+        onSave: _submit,
+        saving: _submitting,
+        saveLabel: widget.isEditing
+            ? l10n.action_save
+            : l10n.containers_createCompose,
+        footer: _loading
+            ? null
+            : SecondaryButton(
+                label: l10n.containers_testCompose,
+                onPressed: _submitting ? null : _test,
+              ),
+        children: children,
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: widget.isEditing
@@ -190,48 +259,7 @@ class _ComposeFormPageState extends ConsumerState<ComposeFormPage> {
           AppTokens.s16,
           AppTokens.s32,
         ),
-        children: [
-          SectionHeader(title: l10n.containers_compose),
-          TonalCard(
-            child: Column(
-              children: [
-                AppTextField(
-                  controller: _name,
-                  label: l10n.containers_name,
-                  enabled: !widget.isEditing,
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _env,
-                  label: l10n.containers_env,
-                  hint: 'KEY=VALUE',
-                  maxLines: 3,
-                ),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.containers_forcePull),
-                  value: _forcePull,
-                  onChanged: (value) => setState(() => _forcePull = value),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppTokens.s24),
-          const SectionHeader(title: 'docker-compose.yml'),
-          if (_loading)
-            const Padding(
-              padding: EdgeInsets.all(AppTokens.s24),
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else
-            TonalCard(
-              child: AppTextField(
-                controller: _content,
-                hint: 'services:\n  web:\n    image: nginx:alpine',
-                maxLines: 18,
-              ),
-            ),
-        ],
+        children: children,
       ),
       bottomNavigationBar: FormFooter(
         child: Column(
@@ -258,4 +286,23 @@ class _ComposeFormPageState extends ConsumerState<ComposeFormPage> {
       ),
     );
   }
+}
+
+Future<void> showComposeFormSheet(
+  BuildContext context, {
+  required int serverId,
+  ContainerComposeDto? compose,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.96,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.82,
+      child: ComposeFormPage(
+        serverId: serverId,
+        compose: compose,
+        embedded: true,
+      ),
+    ),
+  );
 }

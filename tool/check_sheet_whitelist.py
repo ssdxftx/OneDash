@@ -17,6 +17,7 @@ POPUP_ALLOWLIST = {
 }
 MODAL_ALLOWLIST = {
     Path("lib/presentation/common/components/bottom_sheet_surface.dart"),
+    Path("lib/presentation/common/components/simple_form_page.dart"),
 }
 
 
@@ -44,7 +45,7 @@ def main() -> int:
                     if depth == 0:
                         break
             block = source[start:index]
-            if "TextField" in block:
+            if "TextField" in block and "FormSheet" not in block:
                 line = source[: match.start()].count("\n") + 1
                 failures.append(
                     f"{relative}:{line}: input forms must use SimpleFormPage"

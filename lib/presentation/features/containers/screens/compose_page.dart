@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 
+import 'compose_form_page.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/container/container_compose_dto.dart';
@@ -267,10 +268,11 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.action_edit,
                   subtitle: l10n.containers_updateCompose,
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    context.push('/s/$serverId/more/compose/form', extra: item);
-                  },
+                  onTap: () => showComposeFormSheet(
+                    sheetContext,
+                    serverId: serverId,
+                    compose: item,
+                  ),
                 ),
                 ActionSheetRow(
                   icon: TablerIcons.file_text,

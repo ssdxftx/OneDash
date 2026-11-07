@@ -5942,4 +5942,163 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get ai_agent_weixin_login_hint =>
       'Scan the QR code shown in the task log to connect Weixin.';
+
+  @override
+  String get websites_basicConfigHint =>
+      'Domain, directory, port and index files';
+
+  @override
+  String get websites_securityHint =>
+      'Auth, CORS, hotlink protection and real IP';
+
+  @override
+  String get websites_rewriteHint => 'Rewrite rules';
+
+  @override
+  String get websites_redirectHint => 'Redirect rules';
+
+  @override
+  String get websites_proxyHint => 'Forward a domain to an existing service';
+
+  @override
+  String get websites_staticHint => 'Serve HTML / CSS / JS directly';
+
+  @override
+  String get websites_runtimeHint =>
+      'PHP / Java / Node.js / Go / Python / .NET';
+
+  @override
+  String get websites_tunnel => 'TCP/UDP proxy';
+
+  @override
+  String get websites_tunnelHint => 'Layer 4 forwarding without HTTP';
+
+  @override
+  String get websites_port => 'Port';
+
+  @override
+  String get websites_protocol => 'Protocol';
+
+  @override
+  String get websites_enableSsl => 'Enable SSL';
+
+  @override
+  String get websites_ipv6 => 'IPv6';
+
+  @override
+  String websites_relativeDir(Object path) {
+    return 'Relative to $path';
+  }
+
+  @override
+  String get websites_createSuccess => 'Website created';
+
+  @override
+  String get websites_sslRequired => 'Select a certificate';
+
+  @override
+  String get websites_menu => 'Menu';
+
+  @override
+  String get websites_openRestyNotInstalled => 'OpenResty is not installed';
+
+  @override
+  String get websites_openRestyStopped => 'OpenResty is stopped';
+
+  @override
+  String get websites_openRestyInstall => 'Open the app store';
+
+  @override
+  String get websites_openRestyService => 'Service';
+
+  @override
+  String get websites_openRestyStart => 'Start';
+
+  @override
+  String get websites_openRestyStop => 'Stop';
+
+  @override
+  String get websites_openRestyRestart => 'Restart';
+
+  @override
+  String get websites_openRestyReload => 'Reload';
+
+  @override
+  String get websites_serverNamesHash => 'Server names hash bucket size';
+
+  @override
+  String get websites_clientHeaderBuffer => 'Client header buffer size';
+
+  @override
+  String get websites_maxBodySize => 'Maximum upload size';
+
+  @override
+  String get websites_keepaliveTimeout => 'Keepalive timeout';
+
+  @override
+  String get websites_gzip => 'Enable compression';
+
+  @override
+  String get websites_gzipMinLength => 'Minimum compressed size';
+
+  @override
+  String get websites_gzipCompLevel => 'Compression level';
+
+  @override
+  String get websites_openRestyLogs => 'OpenResty logs';
+
+  @override
+  String get websites_openRestyConfigFile => 'Main configuration';
+
+  @override
+  String get websites_openRestyPerformanceTitle => 'Performance';
+
+  @override
+  String get websites_createProxyTitle => 'New reverse proxy';
+
+  @override
+  String get websites_createStaticTitle => 'New static site';
+
+  @override
+  String get websites_createRuntimeTitle => 'New runtime site';
+
+  @override
+  String get websites_createStreamTitle => 'New TCP-UDP proxy';
+
+  @override
+  String get websites_openRestyReading => 'Reading';
+
+  @override
+  String get websites_openRestyWriting => 'Writing';
+
+  @override
+  String get websites_openRestyWaiting => 'Waiting';
+
+  @override
+  String get websites_openRestyServiceHint =>
+      'Start OpenResty from the service menu first.';
+
+  @override
+  String get websites_openRestyInstallHint =>
+      'Install OpenResty before changing global settings.';
+
+  @override
+  String websites_openRestyServiceConfirm(Object action) {
+    return 'Run \"$action\" on OpenResty?';
+  }
+
+  @override
+  String get websites_createDb => 'Create database';
+
+  @override
+  String get websites_dbName => 'Database name';
+
+  @override
+  String get websites_enableFtp => 'Create FTP';
+
+  @override
+  String get websites_ftpUser => 'FTP user';
+
+  @override
+  String get websites_ftpPassword => 'FTP password';
 }

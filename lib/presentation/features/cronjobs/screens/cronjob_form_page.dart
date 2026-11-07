@@ -12,17 +12,25 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/form_footer.dart';
 import '../../../common/components/section_header.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
 import '../providers/cronjobs_provider.dart';
 
 class CronjobFormPage extends ConsumerStatefulWidget {
-  const CronjobFormPage({super.key, required this.serverId, this.cronjobId});
+  const CronjobFormPage({
+    super.key,
+    required this.serverId,
+    this.cronjobId,
+    this.embedded = false,
+  });
 
   final int serverId;
   final int? cronjobId;
+  final bool embedded;
 
   bool get isEditing => cronjobId != null;
 
@@ -196,6 +204,189 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final children = <Widget>[
+      SectionHeader(title: l10n.cronjobs_basic),
+      TonalCard(
+        child: Column(
+          children: [
+            AppTextField(
+              controller: _name,
+              label: l10n.cronjobs_name,
+              hint: 'daily-backup',
+            ),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: _type,
+              decoration: InputDecoration(labelText: l10n.cronjobs_type),
+              items: [
+                for (final type in _types)
+                  DropdownMenuItem(
+                    value: type,
+                    child: Text(_typeLabel(type, l10n)),
+                  ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => _type = value);
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: _spec,
+              label: l10n.cronjobs_spec,
+              hint: '30 1 * * *',
+              helper: l10n.cronjobs_specHint,
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: AppTokens.s24),
+      SectionHeader(title: l10n.cronjobs_taskConfig),
+      TonalCard(
+        child: Column(
+          children: [
+            if (_type == 'shell') ...[
+              AppTextField(
+                controller: _script,
+                label: l10n.cronjobs_script,
+                hint: '#!/bin/bash\n...',
+                maxLines: 8,
+              ),
+            ],
+            if (_type == 'log')
+              AppTextField(
+                controller: _sourceDir,
+                label: l10n.cronjobs_logFiles,
+                hint: '/var/log/nginx/access.log',
+                helper: l10n.cronjobs_logFilesHint,
+              ),
+            if (_type == 'curl')
+              AppTextField(
+                controller: _url,
+                label: l10n.cronjobs_url,
+                hint: 'https://example.com/health',
+              ),
+            if (_type == 'website')
+              AppTextField(
+                controller: _website,
+                label: l10n.cronjobs_website,
+                hint: 'example.com',
+              ),
+            if (_type == 'database') ...[
+              DropdownButtonFormField<String>(
+                initialValue: _dbType.text,
+                decoration: InputDecoration(
+                  labelText: l10n.cronjobs_databaseType,
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
+                  DropdownMenuItem(value: 'mariadb', child: Text('MariaDB')),
+                  DropdownMenuItem(
+                    value: 'postgresql',
+                    child: Text('PostgreSQL'),
+                  ),
+                  DropdownMenuItem(value: 'redis', child: Text('Redis')),
+                  DropdownMenuItem(value: 'mongodb', child: Text('MongoDB')),
+                ],
+                onChanged: (value) {
+                  if (value != null) setState(() => _dbType.text = value);
+                },
+              ),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: _dbName,
+                label: l10n.cronjobs_databaseName,
+                hint: 'app_db',
+              ),
+            ],
+            if (_type == 'directory') ...[
+              AppTextField(
+                controller: _sourceDir,
+                label: _isDir ? l10n.cronjobs_directory : l10n.cronjobs_files,
+                hint: _isDir ? '/opt/data' : '/opt/data/file.txt',
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.cronjobs_backupDirectory),
+                value: _isDir,
+                onChanged: (value) => setState(() => _isDir = value),
+              ),
+            ],
+            if (_type == 'app')
+              AppTextField(
+                controller: _appId,
+                label: l10n.cronjobs_app,
+                hint: 'app-install-id',
+              ),
+            if (_type == 'snapshot')
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.cronjobs_withImage),
+                value: _withImage,
+                onChanged: (value) => setState(() => _withImage = value),
+              ),
+            if (_type == 'cleanLog')
+              AppTextField(
+                controller: _scopes,
+                label: l10n.cronjobs_scopes,
+                hint: 'system,ssh',
+                helper: l10n.cronjobs_scopesHint,
+              ),
+            if (_type == 'clean' || _type == 'ntp')
+              Text(
+                _type == 'ntp'
+                    ? l10n.cronjobs_ntpHint
+                    : l10n.cronjobs_cleanHint,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: context.scheme.onSurfaceVariant,
+                ),
+              ),
+          ],
+        ),
+      ),
+      const SizedBox(height: AppTokens.s24),
+      SectionHeader(title: l10n.cronjobs_execution),
+      TonalCard(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    controller: _retainCopies,
+                    label: l10n.cronjobs_retainCopies,
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                const SizedBox(width: AppTokens.s12),
+                Expanded(
+                  child: AppTextField(
+                    controller: _retryTimes,
+                    label: l10n.cronjobs_retryTimes,
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: _timeout,
+              label: l10n.cronjobs_timeout,
+              keyboardType: TextInputType.number,
+              helper: l10n.cronjobs_timeoutHint,
+            ),
+          ],
+        ),
+      ),
+    ];
+    if (widget.embedded) {
+      return FormSheet(
+        title: widget.isEditing ? l10n.cronjobs_edit : l10n.cronjobs_create,
+        onSave: _submit,
+        saving: _submitting || (widget.isEditing && !_loaded),
+        saveLabel: widget.isEditing ? l10n.action_save : l10n.cronjobs_create,
+        children: children,
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: widget.isEditing ? l10n.cronjobs_edit : l10n.cronjobs_create,
@@ -212,188 +403,7 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
           AppTokens.s16,
           AppTokens.s32,
         ),
-        children: [
-          SectionHeader(title: l10n.cronjobs_basic),
-          TonalCard(
-            child: Column(
-              children: [
-                AppTextField(
-                  controller: _name,
-                  label: l10n.cronjobs_name,
-                  hint: 'daily-backup',
-                ),
-                const SizedBox(height: AppTokens.s12),
-                DropdownButtonFormField<String>(
-                  initialValue: _type,
-                  decoration: InputDecoration(labelText: l10n.cronjobs_type),
-                  items: [
-                    for (final type in _types)
-                      DropdownMenuItem(
-                        value: type,
-                        child: Text(_typeLabel(type, l10n)),
-                      ),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) setState(() => _type = value);
-                  },
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _spec,
-                  label: l10n.cronjobs_spec,
-                  hint: '30 1 * * *',
-                  helper: l10n.cronjobs_specHint,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppTokens.s24),
-          SectionHeader(title: l10n.cronjobs_taskConfig),
-          TonalCard(
-            child: Column(
-              children: [
-                if (_type == 'shell') ...[
-                  AppTextField(
-                    controller: _script,
-                    label: l10n.cronjobs_script,
-                    hint: '#!/bin/bash\n...',
-                    maxLines: 8,
-                  ),
-                ],
-                if (_type == 'log')
-                  AppTextField(
-                    controller: _sourceDir,
-                    label: l10n.cronjobs_logFiles,
-                    hint: '/var/log/nginx/access.log',
-                    helper: l10n.cronjobs_logFilesHint,
-                  ),
-                if (_type == 'curl')
-                  AppTextField(
-                    controller: _url,
-                    label: l10n.cronjobs_url,
-                    hint: 'https://example.com/health',
-                  ),
-                if (_type == 'website')
-                  AppTextField(
-                    controller: _website,
-                    label: l10n.cronjobs_website,
-                    hint: 'example.com',
-                  ),
-                if (_type == 'database') ...[
-                  DropdownButtonFormField<String>(
-                    initialValue: _dbType.text,
-                    decoration: InputDecoration(
-                      labelText: l10n.cronjobs_databaseType,
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
-                      DropdownMenuItem(
-                        value: 'mariadb',
-                        child: Text('MariaDB'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'postgresql',
-                        child: Text('PostgreSQL'),
-                      ),
-                      DropdownMenuItem(value: 'redis', child: Text('Redis')),
-                      DropdownMenuItem(
-                        value: 'mongodb',
-                        child: Text('MongoDB'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) setState(() => _dbType.text = value);
-                    },
-                  ),
-                  const SizedBox(height: AppTokens.s12),
-                  AppTextField(
-                    controller: _dbName,
-                    label: l10n.cronjobs_databaseName,
-                    hint: 'app_db',
-                  ),
-                ],
-                if (_type == 'directory') ...[
-                  AppTextField(
-                    controller: _sourceDir,
-                    label: _isDir
-                        ? l10n.cronjobs_directory
-                        : l10n.cronjobs_files,
-                    hint: _isDir ? '/opt/data' : '/opt/data/file.txt',
-                  ),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l10n.cronjobs_backupDirectory),
-                    value: _isDir,
-                    onChanged: (value) => setState(() => _isDir = value),
-                  ),
-                ],
-                if (_type == 'app')
-                  AppTextField(
-                    controller: _appId,
-                    label: l10n.cronjobs_app,
-                    hint: 'app-install-id',
-                  ),
-                if (_type == 'snapshot')
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l10n.cronjobs_withImage),
-                    value: _withImage,
-                    onChanged: (value) => setState(() => _withImage = value),
-                  ),
-                if (_type == 'cleanLog')
-                  AppTextField(
-                    controller: _scopes,
-                    label: l10n.cronjobs_scopes,
-                    hint: 'system,ssh',
-                    helper: l10n.cronjobs_scopesHint,
-                  ),
-                if (_type == 'clean' || _type == 'ntp')
-                  Text(
-                    _type == 'ntp'
-                        ? l10n.cronjobs_ntpHint
-                        : l10n.cronjobs_cleanHint,
-                    style: AppTextStyles.bodyS.copyWith(
-                      color: context.scheme.onSurfaceVariant,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppTokens.s24),
-          SectionHeader(title: l10n.cronjobs_execution),
-          TonalCard(
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppTextField(
-                        controller: _retainCopies,
-                        label: l10n.cronjobs_retainCopies,
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                    const SizedBox(width: AppTokens.s12),
-                    Expanded(
-                      child: AppTextField(
-                        controller: _retryTimes,
-                        label: l10n.cronjobs_retryTimes,
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _timeout,
-                  label: l10n.cronjobs_timeout,
-                  keyboardType: TextInputType.number,
-                  helper: l10n.cronjobs_timeoutHint,
-                ),
-              ],
-            ),
-          ),
-        ],
+        children: children,
       ),
       bottomNavigationBar: FormFooter(
         child: PrimaryButton(
@@ -427,4 +437,23 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
       _ => type,
     };
   }
+}
+
+Future<void> showCronjobFormSheet(
+  BuildContext context, {
+  required int serverId,
+  int? cronjobId,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.94,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.78,
+      child: CronjobFormPage(
+        serverId: serverId,
+        cronjobId: cronjobId,
+        embedded: true,
+      ),
+    ),
+  );
 }

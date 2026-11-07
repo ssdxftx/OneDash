@@ -14,6 +14,7 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/form_footer.dart';
 import '../../../common/components/section_header.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
@@ -25,10 +26,12 @@ class ContainerCreatePage extends ConsumerStatefulWidget {
     super.key,
     required this.serverId,
     this.containerName,
+    this.embedded = false,
   });
 
   final int serverId;
   final String? containerName;
+  final bool embedded;
 
   bool get isEditing => containerName != null;
 
@@ -347,6 +350,222 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final limit = ref.watch(containerLimitProvider).valueOrNull;
+    final children = <Widget>[
+      SectionHeader(title: l10n.containers_title),
+      TonalCard(
+        child: Column(
+          children: [
+            AppTextField(
+              controller: _image,
+              label: l10n.containers_image,
+              hint: 'nginx:alpine',
+              suffix: IconButton(
+                tooltip: l10n.containers_selectImage,
+                onPressed: _pickImage,
+                icon: const Icon(TablerIcons.photo),
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: _name,
+              label: l10n.containers_name,
+              hint: 'my-nginx',
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: _restartPolicy,
+              decoration: InputDecoration(
+                labelText: l10n.containers_restartPolicy,
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: 'unless-stopped',
+                  child: Text('unless-stopped'),
+                ),
+                DropdownMenuItem(value: 'always', child: Text('always')),
+                DropdownMenuItem(
+                  value: 'on-failure',
+                  child: Text('on-failure'),
+                ),
+                DropdownMenuItem(value: 'no', child: Text('no')),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => _restartPolicy = value);
+              },
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: AppTokens.s24),
+      SectionHeader(
+        title: l10n.containers_ports,
+        trailing: TextButton(
+          onPressed: _addPort,
+          child: Text(l10n.containers_add),
+        ),
+      ),
+      for (var index = 0; index < _ports.length; index++) ...[
+        _PortRow(
+          fields: _ports[index],
+          onRemove: () => _removePort(index),
+          onChanged: () => setState(() {}),
+          canRemove: _ports.length > 1,
+        ),
+        const SizedBox(height: AppTokens.s8),
+      ],
+      const SizedBox(height: AppTokens.s16),
+      SectionHeader(
+        title: l10n.containers_volumes,
+        trailing: TextButton(
+          onPressed: _addVolume,
+          child: Text(l10n.containers_add),
+        ),
+      ),
+      for (var index = 0; index < _volumes.length; index++) ...[
+        _VolumeRow(
+          fields: _volumes[index],
+          onRemove: () => _removeVolume(index),
+          canRemove: _volumes.length > 1,
+        ),
+        const SizedBox(height: AppTokens.s8),
+      ],
+      const SizedBox(height: AppTokens.s16),
+      SectionHeader(
+        title: l10n.containers_env,
+        trailing: TextButton(
+          onPressed: _addEnv,
+          child: Text(l10n.containers_add),
+        ),
+      ),
+      for (var index = 0; index < _envs.length; index++) ...[
+        TonalCard(
+          padding: const EdgeInsets.all(AppTokens.s12),
+          child: Row(
+            children: [
+              Expanded(
+                child: AppTextField(
+                  controller: _envs[index].value,
+                  hint: l10n.containers_envHint,
+                ),
+              ),
+              if (_envs.length > 1)
+                IconButton(
+                  tooltip: l10n.containers_removeRow,
+                  onPressed: () => _removeEnv(index),
+                  icon: const Icon(TablerIcons.trash),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppTokens.s8),
+      ],
+      const SizedBox(height: AppTokens.s16),
+      TonalCard(
+        padding: EdgeInsets.zero,
+        child: ExpansionTile(
+          title: Text(l10n.containers_advanced, style: AppTextStyles.titleS),
+          subtitle: Text(
+            l10n.containers_advancedHint,
+            style: AppTextStyles.bodyS.copyWith(
+              color: context.scheme.onSurfaceVariant,
+            ),
+          ),
+          childrenPadding: const EdgeInsets.fromLTRB(
+            AppTokens.s16,
+            0,
+            AppTokens.s16,
+            AppTokens.s16,
+          ),
+          children: [
+            AppTextField(
+              controller: _command,
+              label: l10n.containers_command,
+              hint: l10n.containers_cmdHint,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: _entrypoint,
+              label: l10n.containers_entrypoint,
+              hint: l10n.containers_entrypointHint,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: _workingDir,
+              label: l10n.containers_workingDir,
+              hint: l10n.containers_workingDirHint,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: _network,
+              decoration: InputDecoration(labelText: l10n.containers_network),
+              items: [
+                for (final network in _networks)
+                  DropdownMenuItem(value: network, child: Text(network)),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => _network = value);
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    controller: _cpu,
+                    label: l10n.containers_cpuLimit,
+                    hint: '1.0',
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppTokens.s12),
+                Expanded(
+                  child: AppTextField(
+                    controller: _memory,
+                    label: l10n.containers_memoryLimit,
+                    hint: '512',
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+            if (limit != null) ...[
+              const SizedBox(height: AppTokens.s8),
+              Text(
+                l10n.containers_limitAvailable(limit.cpu, limit.memory),
+                style: AppTextStyles.caption.copyWith(
+                  color: context.scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+            const SizedBox(height: AppTokens.s8),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.containers_privileged),
+              value: _privileged,
+              onChanged: (value) => setState(() => _privileged = value),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.containers_autoRemove),
+              value: _autoRemove,
+              onChanged: (value) => setState(() => _autoRemove = value),
+            ),
+          ],
+        ),
+      ),
+    ];
+    if (widget.embedded) {
+      return FormSheet(
+        title: l10n.containers_edit,
+        onSave: _submit,
+        saving: _submitting,
+        children: children,
+      );
+    }
     return Scaffold(
       appBar: AppBarLarge(
         title: widget.isEditing ? l10n.containers_edit : l10n.containers_create,
@@ -363,219 +582,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
           AppTokens.s16,
           AppTokens.s32,
         ),
-        children: [
-          SectionHeader(title: l10n.containers_title),
-          TonalCard(
-            child: Column(
-              children: [
-                AppTextField(
-                  controller: _image,
-                  label: l10n.containers_image,
-                  hint: 'nginx:alpine',
-                  suffix: IconButton(
-                    tooltip: l10n.containers_selectImage,
-                    onPressed: _pickImage,
-                    icon: const Icon(TablerIcons.photo),
-                  ),
-                  onChanged: (_) => setState(() {}),
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _name,
-                  label: l10n.containers_name,
-                  hint: 'my-nginx',
-                  onChanged: (_) => setState(() {}),
-                ),
-                const SizedBox(height: AppTokens.s12),
-                DropdownButtonFormField<String>(
-                  initialValue: _restartPolicy,
-                  decoration: InputDecoration(
-                    labelText: l10n.containers_restartPolicy,
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'unless-stopped',
-                      child: Text('unless-stopped'),
-                    ),
-                    DropdownMenuItem(value: 'always', child: Text('always')),
-                    DropdownMenuItem(
-                      value: 'on-failure',
-                      child: Text('on-failure'),
-                    ),
-                    DropdownMenuItem(value: 'no', child: Text('no')),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) setState(() => _restartPolicy = value);
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppTokens.s24),
-          SectionHeader(
-            title: l10n.containers_ports,
-            trailing: TextButton(
-              onPressed: _addPort,
-              child: Text(l10n.containers_add),
-            ),
-          ),
-          for (var index = 0; index < _ports.length; index++) ...[
-            _PortRow(
-              fields: _ports[index],
-              onRemove: () => _removePort(index),
-              onChanged: () => setState(() {}),
-              canRemove: _ports.length > 1,
-            ),
-            const SizedBox(height: AppTokens.s8),
-          ],
-          const SizedBox(height: AppTokens.s16),
-          SectionHeader(
-            title: l10n.containers_volumes,
-            trailing: TextButton(
-              onPressed: _addVolume,
-              child: Text(l10n.containers_add),
-            ),
-          ),
-          for (var index = 0; index < _volumes.length; index++) ...[
-            _VolumeRow(
-              fields: _volumes[index],
-              onRemove: () => _removeVolume(index),
-              canRemove: _volumes.length > 1,
-            ),
-            const SizedBox(height: AppTokens.s8),
-          ],
-          const SizedBox(height: AppTokens.s16),
-          SectionHeader(
-            title: l10n.containers_env,
-            trailing: TextButton(
-              onPressed: _addEnv,
-              child: Text(l10n.containers_add),
-            ),
-          ),
-          for (var index = 0; index < _envs.length; index++) ...[
-            TonalCard(
-              padding: const EdgeInsets.all(AppTokens.s12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: AppTextField(
-                      controller: _envs[index].value,
-                      hint: l10n.containers_envHint,
-                    ),
-                  ),
-                  if (_envs.length > 1)
-                    IconButton(
-                      tooltip: l10n.containers_removeRow,
-                      onPressed: () => _removeEnv(index),
-                      icon: const Icon(TablerIcons.trash),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppTokens.s8),
-          ],
-          const SizedBox(height: AppTokens.s16),
-          TonalCard(
-            padding: EdgeInsets.zero,
-            child: ExpansionTile(
-              title: Text(
-                l10n.containers_advanced,
-                style: AppTextStyles.titleS,
-              ),
-              subtitle: Text(
-                l10n.containers_advancedHint,
-                style: AppTextStyles.bodyS.copyWith(
-                  color: context.scheme.onSurfaceVariant,
-                ),
-              ),
-              childrenPadding: const EdgeInsets.fromLTRB(
-                AppTokens.s16,
-                0,
-                AppTokens.s16,
-                AppTokens.s16,
-              ),
-              children: [
-                AppTextField(
-                  controller: _command,
-                  label: l10n.containers_command,
-                  hint: l10n.containers_cmdHint,
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _entrypoint,
-                  label: l10n.containers_entrypoint,
-                  hint: l10n.containers_entrypointHint,
-                ),
-                const SizedBox(height: AppTokens.s12),
-                AppTextField(
-                  controller: _workingDir,
-                  label: l10n.containers_workingDir,
-                  hint: l10n.containers_workingDirHint,
-                ),
-                const SizedBox(height: AppTokens.s12),
-                DropdownButtonFormField<String>(
-                  initialValue: _network,
-                  decoration: InputDecoration(
-                    labelText: l10n.containers_network,
-                  ),
-                  items: [
-                    for (final network in _networks)
-                      DropdownMenuItem(value: network, child: Text(network)),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) setState(() => _network = value);
-                  },
-                ),
-                const SizedBox(height: AppTokens.s12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppTextField(
-                        controller: _cpu,
-                        label: l10n.containers_cpuLimit,
-                        hint: '1.0',
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppTokens.s12),
-                    Expanded(
-                      child: AppTextField(
-                        controller: _memory,
-                        label: l10n.containers_memoryLimit,
-                        hint: '512',
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                ),
-                if (limit != null) ...[
-                  const SizedBox(height: AppTokens.s8),
-                  Text(
-                    l10n.containers_limitAvailable(limit.cpu, limit.memory),
-                    style: AppTextStyles.caption.copyWith(
-                      color: context.scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: AppTokens.s8),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.containers_privileged),
-                  value: _privileged,
-                  onChanged: (value) => setState(() => _privileged = value),
-                ),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.containers_autoRemove),
-                  value: _autoRemove,
-                  onChanged: (value) => setState(() => _autoRemove = value),
-                ),
-              ],
-            ),
-          ),
-        ],
+        children: children,
       ),
       bottomNavigationBar: FormFooter(
         child: Column(
@@ -851,4 +858,23 @@ class _ImagePickerSheetState extends State<_ImagePickerSheet> {
       ],
     );
   }
+}
+
+Future<void> showContainerEditSheet(
+  BuildContext context, {
+  required int serverId,
+  required String containerName,
+}) {
+  return showAppSheet<void>(
+    context: context,
+    maxHeightFactor: 0.94,
+    builder: (sheetContext) => SizedBox(
+      height: MediaQuery.sizeOf(sheetContext).height * 0.82,
+      child: ContainerCreatePage(
+        serverId: serverId,
+        containerName: containerName,
+        embedded: true,
+      ),
+    ),
+  );
 }
