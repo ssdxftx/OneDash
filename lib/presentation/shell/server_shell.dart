@@ -52,9 +52,18 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
   bool _visible = true;
   bool _navPresent = true;
   bool _navRevealPending = false;
+  bool _atTabRoot = true;
   double _accum = 0;
   ModalRoute<dynamic>? _route;
+  GoRouter? _router;
   Timer? _navRemoveTimer;
+
+  static bool _isAtTabRoot(GoRouter router) {
+    final matches = router.routerDelegate.currentConfiguration.matches;
+    if (matches.isEmpty) return false;
+    final shell = matches.last;
+    return shell is! ShellRouteMatch || shell.matches.length <= 1;
+  }
 
   bool _onScroll(ScrollNotification notification) {
     if (notification.metrics.axis != Axis.vertical) return false;
@@ -123,12 +132,30 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    final router = GoRouter.of(context);
+    if (!identical(router, _router)) {
+      _router?.routerDelegate.removeListener(_onRouteChanged);
+      _router = router;
+      router.routerDelegate.addListener(_onRouteChanged);
+      _atTabRoot = _isAtTabRoot(router);
+    }
+
     final route = ModalRoute.of(context);
     if (route != null && route != _route) {
       if (_route != null) appRouteObserver.unsubscribe(this);
       _route = route;
       appRouteObserver.subscribe(this, route);
     }
+  }
+
+  void _onRouteChanged() {
+    final router = _router;
+    if (!mounted || router == null) return;
+    final atRoot = _isAtTabRoot(router);
+    if (atRoot == _atTabRoot) return;
+    setState(() => _atTabRoot = atRoot);
+    if (atRoot) _show();
   }
 
   @override
@@ -147,6 +174,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
   @override
   void dispose() {
     _navRemoveTimer?.cancel();
+    _router?.routerDelegate.removeListener(_onRouteChanged);
     appRouteObserver.unsubscribe(this);
     appRouteObserver.popupDepth.removeListener(_onPopupDepth);
     super.dispose();
@@ -172,6 +200,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
     final modalOpen = appRouteObserver.popupDepth.value > 0;
     final shown =
         _visible &&
+        _atTabRoot &&
         !modalOpen &&
         !_navRevealPending &&
         !ref.watch(bottomNavSuppressedProvider);
@@ -263,6 +292,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
               borderRadius: radius,
               child: MediaQuery.removePadding(
                 context: context,
+                removeTop: true,
                 removeBottom: true,
                 child: NavigationBar(
                   height: AppTokens.bottomNavHeight,

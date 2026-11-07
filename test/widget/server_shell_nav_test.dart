@@ -38,6 +38,13 @@ GoRouter _router() {
                           Text('item $path $index'),
                     ),
                   ),
+                  routes: [
+                    GoRoute(
+                      path: 'detail',
+                      builder: (context, state) =>
+                          const Scaffold(body: Text('detail')),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -50,6 +57,7 @@ GoRouter _router() {
 Widget _app(
   GoRouter router, {
   bool reduceMotion = false,
+  double topInset = 0,
   double bottomInset = 0,
 }) {
   return ProviderScope(
@@ -63,8 +71,11 @@ Widget _app(
         return MediaQuery(
           data: media.copyWith(
             disableAnimations: reduceMotion,
-            padding: media.padding.copyWith(bottom: bottomInset),
-            viewPadding: media.viewPadding.copyWith(bottom: bottomInset),
+            padding: media.padding.copyWith(top: topInset, bottom: bottomInset),
+            viewPadding: media.viewPadding.copyWith(
+              top: topInset,
+              bottom: bottomInset,
+            ),
           ),
           child: child ?? const SizedBox.shrink(),
         );
@@ -225,5 +236,114 @@ void main() {
     expect(nav.width, lessThanOrEqualTo(AppTokens.bottomNavMaxWidth));
     final screen = tester.view.physicalSize.width;
     expect(nav.center.dx, closeTo(screen / 2, 1));
+  });
+
+  testWidgets('status bar inset does not inflate the capsule', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(_app(_router(), topInset: 47));
+    await tester.pumpAndSettle();
+
+    final nav = tester.getRect(find.byType(NavigationBar));
+    expect(nav.height, closeTo(AppTokens.bottomNavHeight, 0.01));
+  });
+
+  testWidgets('branch pushed page hides nav and restores on pop', (
+    tester,
+  ) async {
+    final router = _router();
+    await tester.pumpWidget(_app(router));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).offset,
+      Offset.zero,
+    );
+
+    unawaited(router.push('/a/detail'));
+    await tester.pumpAndSettle();
+    final slide = tester.widget<AnimatedSlide>(find.byType(AnimatedSlide));
+    expect(slide.offset, const Offset(0, 1.2));
+
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).offset,
+      Offset.zero,
+    );
+  });
+
+  testWidgets('deep link to branch detail starts hidden without flashing', (
+    tester,
+  ) async {
+    final router = GoRouter(
+      initialLocation: '/a/detail',
+      observers: [appRouteObserver],
+      routes: [
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) =>
+              ServerShell(serverId: 1, navigationShell: navigationShell),
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/a',
+                  builder: (context, state) =>
+                      const Scaffold(body: Text('root')),
+                  routes: [
+                    GoRoute(
+                      path: 'detail',
+                      builder: (context, state) =>
+                          const Scaffold(body: Text('detail')),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            for (final path in const ['b', 'c', 'd', 'e'])
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/$path',
+                    builder: (context, state) =>
+                        const Scaffold(body: Text('root')),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ],
+    );
+    await tester.pumpWidget(_app(router));
+    await tester.pump();
+    expect(
+      tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).offset,
+      const Offset(0, 1.2),
+    );
+  });
+
+  testWidgets('returning from a scrolled detail still shows the nav', (
+    tester,
+  ) async {
+    final router = _router();
+    await tester.pumpWidget(_app(router));
+    await tester.pumpAndSettle();
+
+    await tester.drag(find.byType(ListView).first, const Offset(0, -400));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(
+      tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).offset,
+      isNot(Offset.zero),
+    );
+
+    unawaited(router.push('/a/detail'));
+    await tester.pumpAndSettle();
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<AnimatedSlide>(find.byType(AnimatedSlide)).offset,
+      Offset.zero,
+    );
   });
 }
