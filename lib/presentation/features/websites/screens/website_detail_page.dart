@@ -23,6 +23,8 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../widgets/website_load_balance_tab.dart';
 import '../widgets/website_log_page.dart';
 import '../widgets/website_ssl_sheet.dart';
+import 'website_advanced_page.dart';
+import 'website_ssl_manage_page.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/skeleton.dart';
@@ -114,8 +116,10 @@ class WebsiteDetailPage extends ConsumerWidget {
                   case 'open':
                     await _open(context, site);
                   case 'advanced':
-                    await context.push(
-                      '/s/$serverId/websites/${site.id}/advanced',
+                    await showWebsiteAdvancedSheet(
+                      context,
+                      serverId: serverId,
+                      websiteId: site.id,
                     );
                   case 'accounts':
                     await context.push('/s/$serverId/websites/accounts');
@@ -627,9 +631,11 @@ class _SslTab extends StatelessWidget {
             ),
             const SizedBox(height: AppTokens.s8),
             OutlinedButton.icon(
-              onPressed: () => context.push(
-                '/s/$serverId/websites/${detail.website.id}/ssl'
-                '?domain=${Uri.encodeComponent(detail.website.primaryDomain)}',
+              onPressed: () => showWebsiteSslSheet(
+                context,
+                serverId: serverId,
+                websiteId: detail.website.id,
+                domain: detail.website.primaryDomain,
               ),
               icon: const Icon(TablerIcons.shield),
               label: Text(l10n.websites_sslManage),
@@ -702,9 +708,11 @@ class _SslTab extends StatelessWidget {
         ),
         const SizedBox(height: AppTokens.s8),
         OutlinedButton.icon(
-          onPressed: () => context.push(
-            '/s/$serverId/websites/${detail.website.id}/ssl'
-            '?domain=${Uri.encodeComponent(detail.website.primaryDomain)}',
+          onPressed: () => showWebsiteSslSheet(
+            context,
+            serverId: serverId,
+            websiteId: detail.website.id,
+            domain: detail.website.primaryDomain,
           ),
           icon: const Icon(TablerIcons.shield),
           label: Text(l10n.websites_sslManage),
