@@ -238,16 +238,32 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
           scrollArea,
           if (widget.scrollable && _canScrollRight)
             Positioned(
-              right: 2,
+              right: 0,
               top: 0,
               bottom: 0,
-              child: IgnorePointer(
-                child: Center(
-                  child: Icon(
-                    Icons.chevron_right,
-                    key: const Key('segmentedTabsMoreHint'),
-                    size: 18,
-                    color: scheme.onSurfaceVariant,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  if (!_controller.hasClients) return;
+                  final target = (_controller.offset + 160).clamp(
+                    0.0,
+                    _controller.position.maxScrollExtent,
+                  );
+                  _controller.animateTo(
+                    target,
+                    duration: context.motion(const Duration(milliseconds: 200)),
+                    curve: AppTokens.curveFast,
+                  );
+                },
+                child: SizedBox(
+                  width: 28,
+                  child: Center(
+                    child: Icon(
+                      Icons.chevron_right,
+                      key: const Key('segmentedTabsMoreHint'),
+                      size: 18,
+                      color: scheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ),

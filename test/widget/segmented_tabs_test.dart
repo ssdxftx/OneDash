@@ -66,6 +66,43 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('点击右侧提示会滚动标签行且不误选标签', (tester) async {
+    tester.view.physicalSize = const Size(320, 400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final taps = <int>[];
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: Scaffold(
+          body: SegmentedTabs(
+            labels: const [
+              'Basic Configuration',
+              'Security',
+              'Rewrite',
+              'Redirect',
+              'OpenResty',
+            ],
+            selectedIndex: 0,
+            onChanged: taps.add,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('segmentedTabsMoreHint')));
+    await tester.pumpAndSettle();
+
+    final scrollable = tester.state<ScrollableState>(
+      find.byType(Scrollable).first,
+    );
+    expect(taps, isEmpty);
+    expect(scrollable.position.pixels, greaterThan(0));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('非滚动页签共享指示器跟随选中项移动', (tester) async {
     var selected = 0;
     await tester.pumpWidget(
