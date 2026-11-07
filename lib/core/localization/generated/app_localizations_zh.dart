@@ -5154,6 +5154,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get logs_raw => '原文';
 
   @override
+  String get logs_rawData => '原始数据';
+
+  @override
   String get logs_structured => '结构化';
 
   @override

@@ -5277,6 +5277,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logs_raw => 'Raw';
 
   @override
+  String get logs_rawData => 'Raw data';
+
+  @override
   String get logs_structured => 'Structured';
 
   @override

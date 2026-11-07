@@ -56,6 +56,17 @@ void main() {
     expect(parsed.time, '2026-03-01T10:00:00Z');
   });
 
+  test('parses XFF when the log adds a third quoted field', () {
+    final parsed = parseLogLine(
+      '203.0.113.10 - - [05/Nov/2026:06:10:12 +0800] '
+      '"GET /api/health HTTP/1.1" 200 1200 "-" "curl/8.0" '
+      '"198.51.100.7, 203.0.113.10" 0.012',
+    );
+    expect(parsed.format, LogFormat.nginxAccess);
+    expect(parsed.xff, '198.51.100.7, 203.0.113.10');
+    expect(parsed.duration, '0.012s');
+  });
+
   test('falls back to the original line on unknown formats', () {
     const raw = 'plain text with no timestamp';
     final parsed = parseLogLine(raw);

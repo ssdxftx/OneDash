@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
@@ -97,7 +98,9 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   int _page = 1;
   bool _end = true;
   bool _loadingEarlier = false;
+  bool _atTop = true;
   bool _atBottom = true;
+  final Set<String> _expanded = <String>{};
   String _query = '';
   bool _loadInFlight = false;
   List<String>? _filteredSource;
@@ -145,8 +148,14 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   void _handleScroll() {
     if (!_scrollController.hasClients) return;
     final position = _scrollController.position;
+    final atTop = position.pixels <= 24;
     final atBottom = position.pixels >= position.maxScrollExtent - 24;
-    if (atBottom != _atBottom) setState(() => _atBottom = atBottom);
+    if (atTop != _atTop || atBottom != _atBottom) {
+      setState(() {
+        _atTop = atTop;
+        _atBottom = atBottom;
+      });
+    }
   }
 
   Future<void> _load({bool silent = false}) async {
@@ -186,7 +195,11 @@ class _LogPreviewPageState extends State<LogPreviewPage>
           _mode = hasAccess ? LogDisplayMode.cards : LogDisplayMode.raw;
         }
       });
-      if (silent && _follow && _atBottom) _scrollToBottom();
+      if (silent &&
+          _follow &&
+          (_mode == LogDisplayMode.cards ? _atTop : _atBottom)) {
+        _scrollToFollowEdge();
+      }
     } catch (error) {
       if (!mounted) return;
       setState(() {
@@ -251,11 +264,14 @@ class _LogPreviewPageState extends State<LogPreviewPage>
     }
   }
 
-  void _scrollToBottom() {
+  void _scrollToFollowEdge() {
     if (!_scrollController.hasClients) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scrollController.hasClients) return;
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      final position = _scrollController.position;
+      _scrollController.jumpTo(
+        _mode == LogDisplayMode.cards ? 0 : position.maxScrollExtent,
+      );
     });
   }
 
@@ -265,7 +281,9 @@ class _LogPreviewPageState extends State<LogPreviewPage>
     if (!_follow) return;
     _timer = Timer.periodic(widget.followInterval, (_) => _load(silent: true));
     _load(silent: true);
-    if (_atBottom) _scrollToBottom();
+    if (_mode == LogDisplayMode.cards ? _atTop : _atBottom) {
+      _scrollToFollowEdge();
+    }
   }
 
   void _selectSource(int index) {
@@ -445,7 +463,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
           ),
         ),
         const SizedBox(height: AppTokens.s8),
-        if (_showEarlier(start))
+        if (_mode != LogDisplayMode.cards && _showEarlier(start))
           Padding(
             padding: const EdgeInsets.fromLTRB(
               AppTokens.s16,
@@ -467,7 +485,10 @@ class _LogPreviewPageState extends State<LogPreviewPage>
                     ),
                   ),
           )
-        else if (_source.loadPage != null && _end && _lines.isNotEmpty)
+        else if (_mode != LogDisplayMode.cards &&
+            _source.loadPage != null &&
+            _end &&
+            _lines.isNotEmpty)
           Padding(
             padding: const EdgeInsets.fromLTRB(
               AppTokens.s16,
@@ -543,6 +564,31 @@ class _LogPreviewPageState extends State<LogPreviewPage>
     );
   }
 
+  void _toggleExpanded(String raw) {
+    setState(() {
+      if (!_expanded.remove(raw)) _expanded.add(raw);
+    });
+  }
+
+  Widget _earlierButton() {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppTokens.s8),
+      child: Center(
+        child: _loadingEarlier
+            ? const SizedBox.square(
+                dimension: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : TextButton.icon(
+                onPressed: _loadEarlier,
+                icon: const Icon(TablerIcons.chevron_up, size: 18),
+                label: Text(l10n.logs_loadEarlier),
+              ),
+      ),
+    );
+  }
+
   bool _showEarlier(int start) {
     if (_source.loadPage != null) return !_end;
     return start > 0;
@@ -584,6 +630,8 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       );
     }
     if (_mode == LogDisplayMode.cards) {
+      final showFooter =
+          _showEarlier(start) || (_source.loadPage != null && _end);
       return Scrollbar(
         controller: _scrollController,
         child: ListView.separated(
@@ -594,14 +642,41 @@ class _LogPreviewPageState extends State<LogPreviewPage>
             context.pagePadding,
             AppTokens.s16,
           ),
-          itemCount: visible.length,
+          itemCount: visible.length + (showFooter ? 1 : 0),
           separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
           itemBuilder: (context, index) {
-            final raw = visible[index];
+            if (index == visible.length) {
+              return _showEarlier(start)
+                  ? _earlierButton()
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppTokens.s16,
+                      ),
+                      child: Center(
+                        child: Text(
+                          l10n.logs_startOfFile,
+                          style: AppTextStyles.caption.copyWith(
+                            color: context.scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    );
+            }
+            final raw = visible[visible.length - 1 - index];
             final parsed = parseLogLine(raw);
+            final expanded = _expanded.contains(raw);
             return parsed.isAccess
-                ? _AccessLogCard(parsed: parsed)
-                : _PlainLogCard(raw: raw);
+                ? _AccessLogCard(
+                    parsed: parsed,
+                    raw: raw,
+                    expanded: expanded,
+                    onTap: () => _toggleExpanded(raw),
+                  )
+                : _PlainLogCard(
+                    raw: raw,
+                    expanded: expanded,
+                    onTap: () => _toggleExpanded(raw),
+                  );
           },
         ),
       );
@@ -665,9 +740,17 @@ DateTime? _parseAccessTime(String? raw) {
 }
 
 class _AccessLogCard extends StatelessWidget {
-  const _AccessLogCard({required this.parsed});
+  const _AccessLogCard({
+    required this.parsed,
+    required this.raw,
+    required this.expanded,
+    required this.onTap,
+  });
 
   final ParsedLogLine parsed;
+  final String raw;
+  final bool expanded;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -717,6 +800,7 @@ class _AccessLogCard extends StatelessWidget {
     );
     return TonalCard(
       padding: const EdgeInsets.all(AppTokens.s12),
+      onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -765,13 +849,115 @@ class _AccessLogCard extends StatelessWidget {
               ],
             ),
           const SizedBox(height: AppTokens.s8),
-          Text(
-            parsed.path ?? parsed.message,
-            maxLines: largeText ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.bodyS.copyWith(
-              fontFamily: 'monospace',
-              color: scheme.onSurfaceVariant,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  parsed.path ?? parsed.message,
+                  maxLines: largeText ? 2 : 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bodyS.copyWith(
+                    fontFamily: 'monospace',
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              Icon(
+                expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
+                size: 16,
+                color: scheme.onSurfaceVariant,
+              ),
+            ],
+          ),
+          AnimatedSize(
+            duration: context.motion(const Duration(milliseconds: 160)),
+            curve: AppTokens.curveBase,
+            alignment: Alignment.topCenter,
+            child: expanded
+                ? _AccessLogDetails(parsed: parsed, raw: raw)
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AccessLogDetails extends StatelessWidget {
+  const _AccessLogDetails({required this.parsed, required this.raw});
+
+  final ParsedLogLine parsed;
+  final String raw;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = context.scheme;
+    final time = _parseAccessTime(parsed.time);
+    final rows = <Widget>[
+      if (time != null)
+        _detailRow(
+          context,
+          l10n.logs_time,
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(time),
+        ),
+      if (parsed.path?.trim().isNotEmpty ?? false)
+        _detailRow(context, l10n.logs_path, parsed.path!),
+      if (parsed.userAgent?.trim().isNotEmpty ?? false)
+        _detailRow(context, l10n.logs_userAgent, parsed.userAgent!),
+      if (parsed.bytes != null)
+        _detailRow(context, l10n.logs_bytes, formatBytes(parsed.bytes)),
+      if (parsed.xff?.trim().isNotEmpty ?? false)
+        _detailRow(context, 'XFF', parsed.xff!),
+      if (parsed.duration?.trim().isNotEmpty ?? false)
+        _detailRow(context, l10n.logs_duration, parsed.duration!),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: AppTokens.s8),
+        Divider(height: 1, color: scheme.outlineVariant),
+        const SizedBox(height: AppTokens.s8),
+        ...rows,
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: raw));
+              if (!context.mounted) return;
+              AppToast.success(
+                context,
+                l10n.common_copiedLabel(l10n.logs_rawData),
+              );
+            },
+            icon: const Icon(TablerIcons.copy, size: 16),
+            label: Text(l10n.action_copy),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _detailRow(BuildContext context, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppTokens.s8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 92,
+            child: Text(
+              label,
+              style: AppTextStyles.caption.copyWith(
+                color: context.scheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppTokens.s8),
+          Expanded(
+            child: SelectableText(
+              value,
+              style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
             ),
           ),
         ],
@@ -781,19 +967,49 @@ class _AccessLogCard extends StatelessWidget {
 }
 
 class _PlainLogCard extends StatelessWidget {
-  const _PlainLogCard({required this.raw});
+  const _PlainLogCard({
+    required this.raw,
+    required this.expanded,
+    required this.onTap,
+  });
 
   final String raw;
+  final bool expanded;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return TonalCard(
       padding: const EdgeInsets.all(AppTokens.s12),
-      child: Text(
-        raw,
-        maxLines: 4,
-        overflow: TextOverflow.ellipsis,
-        style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            raw,
+            maxLines: expanded ? null : 4,
+            overflow: expanded ? null : TextOverflow.ellipsis,
+            style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+          ),
+          if (expanded)
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: raw));
+                  if (!context.mounted) return;
+                  AppToast.success(
+                    context,
+                    AppLocalizations.of(context).common_copiedLabel(
+                      AppLocalizations.of(context).logs_rawData,
+                    ),
+                  );
+                },
+                icon: const Icon(TablerIcons.copy, size: 16),
+                label: Text(AppLocalizations.of(context).action_copy),
+              ),
+            ),
+        ],
       ),
     );
   }

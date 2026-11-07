@@ -7057,6 +7057,10 @@
     "description": "Filter the loaded log buffer by text."
   },
   "logs_raw": "Raw",
+  "logs_rawData": "Raw data",
+  "@logs_rawData": {
+    "description": "Label for copying the original log line"
+  },
   "@logs_raw": {
     "description": "Show original log lines."
   },

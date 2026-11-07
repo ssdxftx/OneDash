@@ -63,4 +63,115 @@ void main() {
       findsNothing,
     );
   });
+
+  Widget wrap(Widget child) => MaterialApp(
+    theme: AppTheme.build(Brightness.light),
+    locale: const Locale('zh'),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: child,
+  );
+
+  testWidgets('newest access line renders first and expands details', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      wrap(
+        LogPreviewPage(
+          title: 'Logs',
+          sources: [
+            LogSourceOption(
+              label: 'access',
+              load: () async => [
+                '10.0.0.1 - - [06/Nov/2026:01:02:03 +0800] '
+                    '"GET /old HTTP/1.1" 200 1 "-" "old-agent"',
+                '10.0.0.2 - - [06/Nov/2026:01:02:04 +0800] '
+                    '"GET /new HTTP/1.1" 404 2 "-" "new-agent" '
+                    '"198.51.100.7, 10.0.0.2"',
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final firstCard = find.byType(TonalCard).first;
+    expect(
+      find.descendant(of: firstCard, matching: find.text('10.0.0.2')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('10.0.0.2'));
+    await tester.pumpAndSettle();
+    expect(find.text('new-agent'), findsOneWidget);
+    expect(find.text('XFF'), findsOneWidget);
+    expect(find.text('198.51.100.7, 10.0.0.2'), findsOneWidget);
+
+    await tester.tap(find.text('10.0.0.2').first);
+    await tester.pumpAndSettle();
+    expect(find.text('new-agent'), findsNothing);
+  });
+
+  testWidgets('XFF label is hidden for lines without it', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        LogPreviewPage(
+          title: 'Logs',
+          sources: [
+            LogSourceOption(
+              label: 'access',
+              load: () async => [
+                '10.0.0.1 - - [06/Nov/2026:01:02:03 +0800] '
+                    '"GET /old HTTP/1.1" 200 1 "-" "old-agent"',
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('10.0.0.1'));
+    await tester.pumpAndSettle();
+    expect(find.text('old-agent'), findsOneWidget);
+    expect(find.text('XFF'), findsNothing);
+  });
+
+  testWidgets('earlier button sits at the end of the card list', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      wrap(
+        LogPreviewPage(
+          title: 'Logs',
+          sources: [
+            LogSourceOption(
+              label: 'access',
+              load: () async => [
+                '10.0.0.1 - - [06/Nov/2026:01:02:03 +0800] '
+                    '"GET /old HTTP/1.1" 200 1 "-" "agent"',
+              ],
+              loadPage: (page, size) async => const LogBatch(
+                lines: [
+                  '10.0.0.1 - - [06/Nov/2026:01:02:03 +0800] '
+                      '"GET /old HTTP/1.1" 200 1 "-" "agent"',
+                ],
+                end: false,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final cards = find.byType(TonalCard);
+    final button = find.text('加载更早的行');
+    expect(button, findsOneWidget);
+    expect(
+      tester.getTopLeft(button).dy,
+      greaterThan(tester.getBottomLeft(cards.first).dy),
+    );
+  });
 }

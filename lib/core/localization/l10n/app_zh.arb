@@ -1671,6 +1671,7 @@
   "runtimes_emptyMessage": "从应用商店安装运行时后会显示在这里。",
   "logs_searchHint": "搜索日志行",
   "logs_raw": "原文",
+  "logs_rawData": "原始数据",
   "logs_structured": "结构化",
   "logs_time": "时间",
   "logs_startOfFile": "已到文件开头",

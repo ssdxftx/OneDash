@@ -19,6 +19,7 @@ class ParsedLogLine {
     this.bytes,
     this.upstream,
     this.duration,
+    this.xff,
   });
 
   final LogLevel level;
@@ -34,6 +35,7 @@ class ParsedLogLine {
   final int? bytes;
   final String? upstream;
   final String? duration;
+  final String? xff;
 
   bool get isAccess => format == LogFormat.nginxAccess;
   bool get isError => format == LogFormat.nginxError;
@@ -45,8 +47,12 @@ class ParsedLogLine {
 }
 
 final _nginxAccess = RegExp(
-  r'^(\S+) \S+ \S+ \[([^\]]+)\] "([A-Z]+) (\S+)(?: [^"]*)?" '
-  r'(\d{3}) (\d+|-)(?: "([^"]*)" "([^"]*)")?(.*)$',
+  r'^(?<ip>\S+) \S+ \S+ \[(?<time>[^\]]+)\] '
+  r'"(?<method>[A-Z]+) (?<path>\S+)(?: [^"]*)?" '
+  r'(?<status>\d{3}) (?<bytes>\d+|-)'
+  r'(?: "(?<referer>[^"]*)" "(?<ua>[^"]*)")?'
+  r'(?: "(?<xff>[^"]*)")?'
+  r'(?<extra>.*)$',
 );
 
 final _nginxError = RegExp(
@@ -91,21 +97,23 @@ ParsedLogLine parseLogLine(String raw) {
 
   final access = _nginxAccess.firstMatch(trimmed);
   if (access != null) {
-    final status = int.tryParse(access.group(5) ?? '');
+    final status = int.tryParse(access.namedGroup('status') ?? '');
+    final extra = access.namedGroup('extra') ?? '';
     return ParsedLogLine(
       level: _levelForStatus(status),
       format: LogFormat.nginxAccess,
       message: trimmed,
-      time: access.group(2),
-      ip: access.group(1),
-      method: access.group(3),
-      path: access.group(4),
+      time: access.namedGroup('time'),
+      ip: access.namedGroup('ip'),
+      method: access.namedGroup('method'),
+      path: access.namedGroup('path'),
       status: status,
-      bytes: int.tryParse(access.group(6) ?? ''),
-      referer: _clean(access.group(7)),
-      userAgent: _clean(access.group(8)),
-      upstream: _field(access.group(9) ?? '', 'upstream_addr'),
-      duration: _accessDuration(access.group(9) ?? ''),
+      bytes: int.tryParse(access.namedGroup('bytes') ?? ''),
+      referer: _clean(access.namedGroup('referer')),
+      userAgent: _clean(access.namedGroup('ua')),
+      xff: _clean(access.namedGroup('xff')),
+      upstream: _field(extra, 'upstream_addr'),
+      duration: _accessDuration(extra),
     );
   }
 

@@ -10058,6 +10058,12 @@ abstract class AppLocalizations {
   /// **'Raw'**
   String get logs_raw;
 
+  /// Label for copying the original log line
+  ///
+  /// In en, this message translates to:
+  /// **'Raw data'**
+  String get logs_rawData;
+
   /// Parse time and level from log lines.
   ///
   /// In en, this message translates to:
