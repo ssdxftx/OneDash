@@ -375,6 +375,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
             ),
             const SizedBox(height: AppTokens.s12),
             DropdownButtonFormField<String>(
+              isExpanded: true,
               initialValue: _restartPolicy,
               decoration: InputDecoration(
                 labelText: l10n.containers_restartPolicy,
@@ -498,6 +499,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
             ),
             const SizedBox(height: AppTokens.s12),
             DropdownButtonFormField<String>(
+              isExpanded: true,
               initialValue: _network,
               decoration: InputDecoration(labelText: l10n.containers_network),
               items: [
@@ -713,6 +715,7 @@ class _PortRow extends StatelessWidget {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
+                  isExpanded: true,
                   initialValue: fields.protocol,
                   decoration: InputDecoration(
                     labelText: l10n.firewall_ruleProtocol,
