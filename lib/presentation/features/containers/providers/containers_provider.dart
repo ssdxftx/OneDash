@@ -84,3 +84,8 @@ final dockerStatusProvider = FutureProvider.autoDispose((ref) async {
   final repository = await ref.watch(containerRepositoryProvider.future);
   return repository.getDockerStatus();
 }, name: 'dockerStatusProvider');
+
+final dockerDaemonConfigProvider = FutureProvider.autoDispose((ref) async {
+  final repository = await ref.watch(containerRepositoryProvider.future);
+  return repository.getDaemonConfig();
+}, name: 'dockerDaemonConfigProvider');

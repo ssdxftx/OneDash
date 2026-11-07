@@ -95,12 +95,17 @@ class _DockerCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final docker = ref.watch(dockerStatusProvider);
+    final daemon = ref.watch(dockerDaemonConfigProvider).valueOrNull;
     return docker.when(
       loading: () => const _CardSkeleton(height: 88),
       error: (error, stack) =>
           _ErrorCard(message: describeError(error, l10n), onRetry: onRetry),
-      data: (status) =>
-          _DockerBody(serverId: serverId, status: status, onRefresh: onRetry),
+      data: (status) => _DockerBody(
+        serverId: serverId,
+        status: status,
+        version: daemon?.version ?? status.version,
+        onRefresh: onRetry,
+      ),
     );
   }
 }
@@ -109,11 +114,13 @@ class _DockerBody extends StatelessWidget {
   const _DockerBody({
     required this.serverId,
     required this.status,
+    required this.version,
     required this.onRefresh,
   });
 
   final int serverId;
   final DockerStatusDto status;
+  final String version;
   final VoidCallback onRefresh;
 
   @override
@@ -121,7 +128,7 @@ class _DockerBody extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final colors = context.appColors;
     final running = status.isAvailable;
-    final version = status.version.trim();
+    final dockerVersion = version.trim();
     return TonalCard(
       child: Row(
         children: [
@@ -146,7 +153,9 @@ class _DockerBody extends StatelessWidget {
                 const Text('Docker', style: AppTextStyles.titleM),
                 const SizedBox(height: AppTokens.s4),
                 Text(
-                  version.isEmpty ? l10n.containers_dockerService : 'v$version',
+                  dockerVersion.isEmpty
+                      ? l10n.containers_dockerService
+                      : 'v$dockerVersion',
                   style: AppTextStyles.bodyS.copyWith(
                     color: context.scheme.onSurfaceVariant,
                   ),

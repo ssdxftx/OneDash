@@ -28,6 +28,11 @@ GoRouter _router() {
                   builder: (context, state) => Scaffold(
                     body: ListView.builder(
                       itemExtent: 80,
+                      padding: EdgeInsets.only(
+                        bottom:
+                            AppTokens.bottomNavClearance +
+                            MediaQuery.paddingOf(context).bottom,
+                      ),
                       itemCount: 30,
                       itemBuilder: (context, index) =>
                           Text('item $path $index'),
@@ -146,6 +151,32 @@ void main() {
     Navigator.of(context(), rootNavigator: true).pop();
     await tester.pumpAndSettle();
     expect(find.byType(NavigationBar), findsOneWidget);
+  });
+
+  testWidgets('last item clears the nav on all five tabs', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    for (final path in const ['a', 'b', 'c', 'd', 'e']) {
+      final router = _router();
+      await tester.pumpWidget(_app(router, bottomInset: 34));
+      await tester.pumpAndSettle();
+      router.go('/$path');
+      await tester.pumpAndSettle();
+
+      final navTop = tester.getRect(find.byType(NavigationBar)).top;
+      await tester.drag(find.byType(ListView).first, const Offset(0, -4000));
+      await tester.pumpAndSettle();
+
+      final last = tester.getRect(find.text('item $path 29'));
+      expect(
+        last.bottom,
+        lessThanOrEqualTo(navTop),
+        reason: 'tab $path last item overlaps the floating nav',
+      );
+      expect(tester.takeException(), isNull);
+    }
   });
 
   testWidgets('reduce motion uses zero duration', (tester) async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onedash/core/localization/generated/app_localizations.dart';
 import 'package:onedash/core/theme/app_theme.dart';
@@ -15,7 +16,7 @@ void main() {
   testWidgets('access logs render as cards without overflow at 320dp/2x', (
     tester,
   ) async {
-    tester.view.physicalSize = const Size(320, 640);
+    tester.view.physicalSize = const Size(320, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
@@ -45,10 +46,13 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byType(TonalCard), findsNWidgets(_lines.length));
 
+    final ip = tester.renderObject<RenderParagraph>(find.text('10.0.0.1'));
+    expect(ip.didExceedMaxLines, isFalse);
+
     final longPath = tester.widget<Text>(
       find.textContaining('/api/v1/very/long/path'),
     );
-    expect(longPath.maxLines, 1);
+    expect(longPath.maxLines, 2);
     expect(longPath.overflow, TextOverflow.ellipsis);
     expect(
       find.byWidgetPredicate(

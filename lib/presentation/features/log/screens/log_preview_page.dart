@@ -85,6 +85,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   final _scrollController = ScrollController();
 
   List<String> _lines = const [];
+  bool _hasAccess = false;
   Object? _error;
   bool _loading = true;
   bool _follow = false;
@@ -104,8 +105,6 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   List<String>? _filteredCache;
 
   LogSourceOption get _source => widget.sources[_sourceIndex];
-
-  bool get _hasAccess => _lines.any((line) => parseLogLine(line).isAccess);
 
   @override
   void initState() {
@@ -177,6 +176,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       final hasAccess = lines.any((line) => parseLogLine(line).isAccess);
       setState(() {
         _lines = lines;
+        _hasAccess = hasAccess;
         _loading = false;
         _error = null;
         _page = 1;
@@ -228,8 +228,17 @@ class _LogPreviewPageState extends State<LogPreviewPage>
           ? const <String>[]
           : incoming.sublist(0, incoming.length - overlap);
       final repeated = listEquals(incoming, existing) || prepend.isEmpty;
+      final hasAccess = prepend.isEmpty
+          ? _hasAccess
+          : [
+              ...prepend,
+              ...existing,
+            ].any((line) => parseLogLine(line).isAccess);
       setState(() {
-        if (prepend.isNotEmpty) _lines = [...prepend, ..._lines];
+        if (prepend.isNotEmpty) {
+          _lines = [...prepend, ..._lines];
+          _hasAccess = hasAccess;
+        }
         _page += 1;
         _end = batch.end || repeated;
         _window = _lines.length;
@@ -267,6 +276,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       _page = 1;
       _end = true;
       _lines = const [];
+      _hasAccess = false;
       _modePinned = false;
       _mode = LogDisplayMode.raw;
     });
@@ -673,68 +683,91 @@ class _AccessLogCard extends StatelessWidget {
         ? colors.warning
         : colors.success;
     final time = _parseAccessTime(parsed.time);
+    final largeText = MediaQuery.textScalerOf(context).scale(1) > 1.4;
+    final statusText = Text(
+      status?.toString() ?? '-',
+      style: AppTextStyles.bodyS.copyWith(
+        fontFamily: 'monospace',
+        fontWeight: FontWeight.w600,
+        color: statusColor,
+      ),
+    );
+    final methodText = Text(
+      parsed.method ?? '-',
+      style: AppTextStyles.caption.copyWith(
+        fontFamily: 'monospace',
+        color: scheme.onSurfaceVariant,
+      ),
+    );
+    final ipText = Text(
+      parsed.ip ?? l10n.format_relativeUnknown,
+      maxLines: largeText ? 2 : 1,
+      overflow: TextOverflow.ellipsis,
+      style: AppTextStyles.bodyS.copyWith(
+        fontFamily: 'monospace',
+        fontWeight: FontWeight.w600,
+      ),
+    );
+    final timeText = Text(
+      formatRelativeTime(time, l10n),
+      maxLines: largeText ? 2 : 1,
+      overflow: TextOverflow.ellipsis,
+      textAlign: largeText ? TextAlign.start : TextAlign.end,
+      style: AppTextStyles.caption.copyWith(color: scheme.onSurfaceVariant),
+    );
     return TonalCard(
       padding: const EdgeInsets.all(AppTokens.s12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: statusColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: AppTokens.s8),
-              Text(
-                status?.toString() ?? '-',
-                style: AppTextStyles.bodyS.copyWith(
-                  fontFamily: 'monospace',
-                  fontWeight: FontWeight.w600,
-                  color: statusColor,
-                ),
-              ),
-              const SizedBox(width: AppTokens.s8),
-              Text(
-                parsed.method ?? '-',
-                style: AppTextStyles.caption.copyWith(
-                  fontFamily: 'monospace',
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(width: AppTokens.s8),
-              Expanded(
-                child: Text(
-                  parsed.ip ?? l10n.format_relativeUnknown,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.bodyS.copyWith(
-                    fontFamily: 'monospace',
-                    fontWeight: FontWeight.w600,
+          if (largeText) ...[
+            Row(
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    shape: BoxShape.circle,
                   ),
                 ),
-              ),
-              const SizedBox(width: AppTokens.s8),
-              Flexible(
-                child: Text(
-                  formatRelativeTime(time, l10n),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.end,
-                  style: AppTextStyles.caption.copyWith(
-                    color: scheme.onSurfaceVariant,
+                const SizedBox(width: AppTokens.s8),
+                statusText,
+                const SizedBox(width: AppTokens.s8),
+                methodText,
+              ],
+            ),
+            const SizedBox(height: AppTokens.s4),
+            Wrap(
+              spacing: AppTokens.s8,
+              runSpacing: AppTokens.s4,
+              children: [ipText, timeText],
+            ),
+          ] else
+            Row(
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    shape: BoxShape.circle,
                   ),
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(width: AppTokens.s8),
+                statusText,
+                const SizedBox(width: AppTokens.s8),
+                methodText,
+                const SizedBox(width: AppTokens.s8),
+                Expanded(child: ipText),
+                const SizedBox(width: AppTokens.s8),
+                Flexible(child: timeText),
+              ],
+            ),
           const SizedBox(height: AppTokens.s8),
           Text(
             parsed.path ?? parsed.message,
-            maxLines: 1,
+            maxLines: largeText ? 2 : 1,
             overflow: TextOverflow.ellipsis,
             style: AppTextStyles.bodyS.copyWith(
               fontFamily: 'monospace',

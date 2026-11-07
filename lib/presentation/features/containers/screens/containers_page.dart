@@ -350,7 +350,8 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
                         context.pagePadding,
                         AppTokens.s8,
                         context.pagePadding,
-                        AppTokens.bottomNavClearance,
+                        AppTokens.bottomNavClearance +
+                            MediaQuery.paddingOf(context).bottom,
                       ),
                       itemCount: state.items.length,
                       itemBuilder: (context, index) {

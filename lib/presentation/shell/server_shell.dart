@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -48,8 +50,10 @@ class _ServerShellScaffold extends ConsumerStatefulWidget {
 class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
     with RouteAware {
   bool _visible = true;
+  bool _navPresent = true;
   double _accum = 0;
   ModalRoute<dynamic>? _route;
+  Timer? _navRemoveTimer;
 
   bool _onScroll(ScrollNotification notification) {
     if (notification.metrics.axis != Axis.vertical) return false;
@@ -86,7 +90,23 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
   }
 
   void _onPopupDepth() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    _navRemoveTimer?.cancel();
+    if (appRouteObserver.popupDepth.value > 0) {
+      final reduceMotion =
+          MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+      _navRemoveTimer = Timer(
+        reduceMotion ? Duration.zero : const Duration(milliseconds: 120),
+        () {
+          if (mounted && appRouteObserver.popupDepth.value > 0) {
+            setState(() => _navPresent = false);
+          }
+        },
+      );
+      setState(() {});
+    } else {
+      setState(() => _navPresent = true);
+    }
   }
 
   @override
@@ -115,6 +135,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
 
   @override
   void dispose() {
+    _navRemoveTimer?.cancel();
     appRouteObserver.unsubscribe(this);
     appRouteObserver.popupDepth.removeListener(_onPopupDepth);
     super.dispose();
@@ -160,7 +181,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
               ),
             ),
           ),
-          if (!modalOpen)
+          if (_navPresent)
             Positioned(
               left: 0,
               right: 0,
@@ -175,7 +196,11 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
                     curve: AppTokens.curveBase,
                     child: AnimatedOpacity(
                       opacity: shown ? 1 : 0,
-                      duration: shown ? showDuration : hideDuration,
+                      duration: modalOpen
+                          ? const Duration(milliseconds: 120)
+                          : shown
+                          ? showDuration
+                          : hideDuration,
                       curve: AppTokens.curveBase,
                       child: _floatingNav(context, l10n, scheme),
                     ),

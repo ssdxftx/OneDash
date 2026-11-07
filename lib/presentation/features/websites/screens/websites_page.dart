@@ -324,7 +324,8 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                           context.pagePadding,
                           AppTokens.s8,
                           context.pagePadding,
-                          AppTokens.bottomNavClearance,
+                          AppTokens.bottomNavClearance +
+                              MediaQuery.paddingOf(context).bottom,
                         ),
                         itemCount: result.items.length,
                         itemBuilder: (context, index) {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onedash/core/localization/generated/app_localizations.dart';
 import 'package:onedash/core/theme/app_theme.dart';
+import 'package:onedash/data/dto/container/container_daemon_config_dto.dart';
 import 'package:onedash/data/dto/container/container_item_stats_dto.dart';
 import 'package:onedash/data/dto/container/container_status_dto.dart';
 import 'package:onedash/data/dto/container/docker_status_dto.dart';
@@ -23,6 +24,23 @@ void main() {
       ProviderScope(
         overrides: [
           serverByIdProvider(1).overrideWith((ref) async => null),
+          dockerDaemonConfigProvider.overrideWith(
+            (ref) async => const ContainerDaemonConfigDto(
+              isSwarm: false,
+              version: '29.1.5',
+              registryMirrors: [],
+              insecureRegistries: [],
+              liveRestore: false,
+              iptables: true,
+              cgroupDriver: 'cgroupfs',
+              ipv6: false,
+              fixedCidrV6: '',
+              ip6Tables: false,
+              experimental: false,
+              logMaxSize: '',
+              logMaxFile: '',
+            ),
+          ),
           dockerStatusProvider.overrideWith(
             (ref) async => const DockerStatusDto(
               isActive: true,
@@ -75,7 +93,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.text('v27.1.1'), findsOneWidget);
+    expect(find.text('v29.1.5'), findsOneWidget);
     expect(find.text('运行 10'), findsOneWidget);
     expect(find.text('12'), findsOneWidget);
     expect(find.text('3'), findsOneWidget);

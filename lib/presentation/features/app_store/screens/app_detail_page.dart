@@ -171,18 +171,17 @@ class _AppDetailBody extends ConsumerWidget {
         ),
         if (links.isNotEmpty) ...[
           const SizedBox(height: AppTokens.s16),
-          Row(
+          Wrap(
+            spacing: AppTokens.s8,
+            runSpacing: AppTokens.s8,
             children: [
-              for (var index = 0; index < links.length; index++) ...[
-                if (index > 0) const SizedBox(width: AppTokens.s8),
-                Expanded(
-                  child: SecondaryButton(
-                    label: links[index].$1,
-                    icon: links[index].$2,
-                    onPressed: () => _openUrl(context, links[index].$3),
-                  ),
+              for (final link in links)
+                SecondaryButton(
+                  label: link.$1,
+                  icon: link.$2,
+                  expanded: false,
+                  onPressed: () => _openUrl(context, link.$3),
                 ),
-              ],
             ],
           ),
         ],
