@@ -16,6 +16,20 @@ String appStatusLabel(String status, AppLocalizations l10n) {
   };
 }
 
+/// 容器状态是 Docker 开放字符串，已知值本地化，未知值保留原值。
+String containerStateLabel(String state, AppLocalizations l10n) {
+  return switch (state.toLowerCase()) {
+    'running' => l10n.common_running,
+    'exited' || 'stopped' || 'created' => l10n.common_stopped,
+    'paused' => l10n.common_paused,
+    'restarting' => l10n.common_restarting,
+    'removing' => l10n.common_removing,
+    'dead' => l10n.common_abnormal,
+    '' => l10n.common_unknown,
+    _ => _passthrough(state, 'containerStateLabel'),
+  };
+}
+
 /// SSH 认证方式是开放字符串，已知值本地化，未知值保留原值。
 String sshAuthModeLabel(String mode, AppLocalizations l10n) {
   return switch (mode.toLowerCase()) {

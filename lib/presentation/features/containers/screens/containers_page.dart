@@ -24,6 +24,7 @@ import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../../common/formatters/status_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/entry_animation.dart';
@@ -534,15 +535,6 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
   }
 }
 
-String _stateLabel(String state, AppLocalizations l10n) {
-  return switch (state.toLowerCase()) {
-    'running' => l10n.containers_running,
-    'stopped' || 'exited' => l10n.containers_stopped,
-    'paused' => l10n.containers_pause,
-    _ => l10n.containers_abnormal,
-  };
-}
-
 class _ContainerCard extends StatelessWidget {
   const _ContainerCard({
     required this.item,
@@ -592,7 +584,7 @@ class _ContainerCard extends StatelessWidget {
                 ),
               ),
               Text(
-                _stateLabel(item.state, l10n),
+                containerStateLabel(item.state, l10n),
                 style: AppTextStyles.caption.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),

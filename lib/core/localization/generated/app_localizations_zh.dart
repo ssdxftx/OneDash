@@ -5217,9 +5217,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get logs_duration => '耗时';
 
   @override
-  String get logs_request => '请求';
-
-  @override
   String get logs_follow => '跟随';
 
   @override
@@ -6101,4 +6098,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get logs_message => '错误信息';
+
+  @override
+  String get common_removing => '删除中';
+
+  @override
+  String get logs_result => '结果';
 }

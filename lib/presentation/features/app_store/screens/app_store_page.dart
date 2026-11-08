@@ -421,7 +421,7 @@ class _InstalledTab extends ConsumerWidget {
           subtitle: '${app.version} · ${app.httpPort}',
           trailing: ActionSheetStatusPill(
             label: appStatusLabel(app.status, l10n),
-            color: running ? colors.success : colors.info,
+            color: colors.status(app.status),
           ),
         ),
         child: Column(

@@ -5341,9 +5341,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logs_duration => 'Duration';
 
   @override
-  String get logs_request => 'Request';
-
-  @override
   String get logs_follow => 'Follow';
 
   @override
@@ -6236,4 +6233,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logs_message => 'Error message';
+
+  @override
+  String get common_removing => 'Removing';
+
+  @override
+  String get logs_result => 'Result';
 }

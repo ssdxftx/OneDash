@@ -261,7 +261,7 @@ class _OperationLogTab extends ConsumerWidget {
           LogDetailField(label: l10n.logs_path, value: item.path),
           LogDetailField(label: l10n.logs_source, value: item.source),
           LogDetailField(
-            label: l10n.logs_status,
+            label: l10n.logs_result,
             value: item.isSuccess ? l10n.common_success : l10n.common_failed,
           ),
           if (item.message.trim().isNotEmpty)

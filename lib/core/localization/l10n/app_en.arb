@@ -7124,8 +7124,6 @@
   "@logs_upstream": {},
   "logs_duration": "Duration",
   "@logs_duration": {},
-  "logs_request": "Request",
-  "@logs_request": {},
   "logs_follow": "Follow",
   "@logs_follow": {
     "description": "Keep refreshing the log while open."
@@ -8180,5 +8178,9 @@
   "logs_authMode": "Auth method",
   "@logs_authMode": {"description": "OneDash UI text."},
   "logs_message": "Error message",
-  "@logs_message": {"description": "OneDash UI text."}
+  "@logs_message": {"description": "OneDash UI text."},
+  "common_removing": "Removing",
+  "@common_removing": {"description": "OneDash UI text."},
+  "logs_result": "Result",
+  "@logs_result": {"description": "OneDash UI text."}
 }

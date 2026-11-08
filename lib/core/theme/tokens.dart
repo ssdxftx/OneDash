@@ -150,8 +150,13 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
       'running' || 'running ' || 'active' || 'healthy' || 'success' => success,
       'stopped' || 'inactive' || 'exited' || 'paused' => neutral,
       'offline' || 'disconnected' || 'unreachable' => danger,
-      'error' || 'failed' || 'failure' || 'dead' => danger,
-      'pending' || 'starting' || 'waiting' || 'restarting' => warning,
+      'error' || 'failed' || 'failure' || 'dead' || 'unhealthy' => danger,
+      'pending' ||
+      'starting' ||
+      'waiting' ||
+      'restarting' ||
+      'installing' ||
+      'upgrading' => warning,
       _ => info,
     };
   }

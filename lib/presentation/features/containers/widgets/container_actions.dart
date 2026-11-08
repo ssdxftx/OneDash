@@ -12,6 +12,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/container/container_search_dto.dart';
 import '../../../../data/dto/container/container_stats_dto.dart';
 import '../../../../data/repositories_impl/container_repository_impl.dart';
+import '../../../common/formatters/status_labels.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
@@ -78,7 +79,7 @@ class _ContainerActionsBody extends StatelessWidget {
       title: item.name,
       subtitle: item.imageName,
       trailing: ActionSheetStatusPill(
-        label: _stateLabel(item.state, l10n),
+        label: containerStateLabel(item.state, l10n),
         color: colors.status(state),
       ),
     );
@@ -508,15 +509,6 @@ Future<void> _showMonitor(
     builder: (sheetContext) =>
         _ContainerMonitorSheet(containerID: item.containerID, name: item.name),
   );
-}
-
-String _stateLabel(String state, AppLocalizations l10n) {
-  return switch (state.toLowerCase()) {
-    'running' => l10n.containers_running,
-    'stopped' || 'exited' || 'created' => l10n.containers_stopped,
-    'paused' => l10n.containers_pause,
-    _ => l10n.containers_abnormal,
-  };
 }
 
 String _operationLabel(String operation, AppLocalizations l10n) {

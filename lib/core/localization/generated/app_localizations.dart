@@ -10172,12 +10172,6 @@ abstract class AppLocalizations {
   /// **'Duration'**
   String get logs_duration;
 
-  /// No description provided for @logs_request.
-  ///
-  /// In en, this message translates to:
-  /// **'Request'**
-  String get logs_request;
-
   /// Keep refreshing the log while open.
   ///
   /// In en, this message translates to:
@@ -11881,6 +11875,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error message'**
   String get logs_message;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Removing'**
+  String get common_removing;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get logs_result;
 }
 
 class _AppLocalizationsDelegate

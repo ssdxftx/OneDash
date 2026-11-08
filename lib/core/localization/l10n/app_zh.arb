@@ -1690,7 +1690,6 @@
   "logs_bytes": "响应字节",
   "logs_upstream": "上游",
   "logs_duration": "耗时",
-  "logs_request": "请求",
   "logs_follow": "跟随",
   "logs_stopFollow": "停止跟随",
   "logs_loadEarlier": "加载更早的行",
@@ -2527,5 +2526,7 @@
   "common_paused": "已暂停",
   "common_abnormal": "异常",
   "logs_authMode": "认证方式",
-  "logs_message": "错误信息"
+  "logs_message": "错误信息",
+  "common_removing": "删除中",
+  "logs_result": "结果"
 }
