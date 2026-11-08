@@ -20,7 +20,6 @@ import '../../../common/components/search_field.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/simple_form_page.dart';
-import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
@@ -31,6 +30,7 @@ import '../../../common/states/error_toast.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../containers/widgets/container_log_page.dart';
 import '../widgets/installed_app_actions.dart';
+import '../widgets/installed_skeleton.dart';
 import 'installed_app_page.dart';
 import '../providers/app_store_provider.dart';
 import 'app_detail_page.dart';
@@ -181,6 +181,8 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // 预热：进入页面即发出已安装请求，而不是等用户点 tab。
+    ref.watch(installedAppsProvider);
     final server = ref.watch(serverByIdProvider(widget.serverId)).valueOrNull;
     return Scaffold(
       appBar: AppBarLarge(
@@ -322,7 +324,7 @@ class _CatalogTabState extends ConsumerState<_CatalogTab> {
           child: AsyncStateView(
             value: catalog,
             onRetry: () => ref.invalidate(appCatalogProvider(widget.query)),
-            loading: const SkeletonList(itemCount: 8),
+            loading: const CatalogAppSkeletonList(),
             isEmpty: (data) => _visible(data.items).isEmpty,
             empty: RefreshableEmptyState(
               onRefresh: () =>
@@ -614,7 +616,7 @@ class _InstalledTab extends ConsumerWidget {
     return AsyncStateView(
       value: installed,
       onRetry: () => ref.invalidate(installedAppsProvider),
-      loading: const SkeletonList(itemCount: 8),
+      loading: const InstalledAppSkeletonList(),
       isEmpty: (data) => _visible(data.items).isEmpty,
       empty: RefreshableEmptyState(
         onRefresh: () => ref.refresh(installedAppsProvider.future),

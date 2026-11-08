@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/dto/app/app_catalog_dto.dart';
@@ -30,6 +32,11 @@ final appTagsProvider = FutureProvider.autoDispose<List<AppTagDto>>((ref) {
 
 final installedAppsProvider =
     FutureProvider.autoDispose<PageResult<AppInstalledDto>>((ref) {
+      // 5 分钟内保留缓存：退出页面再进来不重拉，超过则正常销毁。
+      final link = ref.keepAlive();
+      final timer = Timer(const Duration(minutes: 5), link.close);
+      ref.onDispose(timer.cancel);
+
       return ref
           .watch(appRepositoryProvider.future)
           .then(
