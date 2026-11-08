@@ -52,30 +52,25 @@ class LoginLogRow extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (item.hasLocation || item.hasDevice) ...[
-                    const SizedBox(height: 6),
-                    Wrap(
-                      spacing: AppTokens.s12,
-                      runSpacing: 4,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        if (item.hasLocation)
-                          MetaInfo(
-                            icon: TablerIcons.map_pin,
-                            text: item.address,
-                          ),
-                        if (item.hasDevice)
-                          MetaInfo(
-                            icon: TablerIcons.device_laptop,
-                            text: item.deviceLabel,
-                          ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: AppTokens.s12,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      if (item.hasLocation)
+                        MetaInfo(icon: TablerIcons.map_pin, text: item.address),
+                      if (item.hasDevice)
                         MetaInfo(
-                          icon: TablerIcons.clock,
-                          text: formatLogTime(item.createdAt),
+                          icon: TablerIcons.device_laptop,
+                          text: item.deviceLabel,
                         ),
-                      ],
-                    ),
-                  ],
+                      MetaInfo(
+                        icon: TablerIcons.clock,
+                        text: formatLogTime(item.createdAt),
+                      ),
+                    ],
+                  ),
                   if (!item.isSuccess && item.message.trim().isNotEmpty) ...[
                     const SizedBox(height: 6),
                     LogErrorText(text: item.message),
