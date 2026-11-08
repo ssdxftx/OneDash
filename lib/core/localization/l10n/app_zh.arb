@@ -2500,5 +2500,19 @@
   "websites_dbName": "数据库名",
   "websites_enableFtp": "创建 FTP",
   "websites_ftpUser": "FTP 用户名",
-  "websites_ftpPassword": "FTP 密码"
+  "websites_ftpPassword": "FTP 密码",
+  "common_success": "成功",
+  "common_failed": "失败",
+  "common_unknown": "未知",
+  "logs_source": "模块",
+  "logs_address": "归属地",
+  "logs_device": "设备",
+  "taskLog_copy": "复制日志",
+  "taskLog_copied": "已复制",
+  "taskLog_emptyTitle": "暂无日志",
+  "taskLog_readFailedTitle": "读取任务日志失败",
+  "taskLog_executing": "执行中",
+  "taskLog_expired": "该任务的日志已被清理",
+  "taskLog_lines": "{count} 行",
+  "taskLog_finished": "已完成"
 }

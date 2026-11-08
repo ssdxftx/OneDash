@@ -8119,5 +8119,40 @@
   "websites_ftpUser": "FTP user",
   "@websites_ftpUser": {"description": "OneDash UI text."},
   "websites_ftpPassword": "FTP password",
-  "@websites_ftpPassword": {"description": "OneDash UI text."}
+  "@websites_ftpPassword": {"description": "OneDash UI text."},
+  "common_success": "Success",
+  "@common_success": {"description": "OneDash UI text."},
+  "common_failed": "Failed",
+  "@common_failed": {"description": "OneDash UI text."},
+  "common_unknown": "Unknown",
+  "@common_unknown": {"description": "OneDash UI text."},
+  "logs_source": "Source",
+  "@logs_source": {"description": "OneDash UI text."},
+  "logs_address": "Location",
+  "@logs_address": {"description": "OneDash UI text."},
+  "logs_device": "Device",
+  "@logs_device": {"description": "OneDash UI text."},
+  "taskLog_copy": "Copy log",
+  "@taskLog_copy": {"description": "OneDash UI text."},
+  "taskLog_copied": "Copied",
+  "@taskLog_copied": {"description": "OneDash UI text."},
+  "taskLog_emptyTitle": "No log yet",
+  "@taskLog_emptyTitle": {"description": "OneDash UI text."},
+  "taskLog_readFailedTitle": "Failed to read task log",
+  "@taskLog_readFailedTitle": {"description": "OneDash UI text."},
+  "taskLog_executing": "Running",
+  "@taskLog_executing": {"description": "OneDash UI text."},
+  "taskLog_expired": "The log for this task has been cleaned",
+  "@taskLog_expired": {"description": "OneDash UI text."},
+  "taskLog_lines": "{count} lines",
+  "@taskLog_lines": {
+    "description": "Number of log lines.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "taskLog_finished": "Finished",
+  "@taskLog_finished": {"description": "OneDash UI text."}
 }

@@ -6152,4 +6152,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_ftpPassword => 'FTP password';
+
+  @override
+  String get common_success => 'Success';
+
+  @override
+  String get common_failed => 'Failed';
+
+  @override
+  String get common_unknown => 'Unknown';
+
+  @override
+  String get logs_source => 'Source';
+
+  @override
+  String get logs_address => 'Location';
+
+  @override
+  String get logs_device => 'Device';
+
+  @override
+  String get taskLog_copy => 'Copy log';
+
+  @override
+  String get taskLog_copied => 'Copied';
+
+  @override
+  String get taskLog_emptyTitle => 'No log yet';
+
+  @override
+  String get taskLog_readFailedTitle => 'Failed to read task log';
+
+  @override
+  String get taskLog_executing => 'Running';
+
+  @override
+  String get taskLog_expired => 'The log for this task has been cleaned';
+
+  @override
+  String taskLog_lines(int count) {
+    return '$count lines';
+  }
+
+  @override
+  String get taskLog_finished => 'Finished';
 }

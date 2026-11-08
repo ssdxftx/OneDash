@@ -6018,4 +6018,48 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_ftpPassword => 'FTP 密码';
+
+  @override
+  String get common_success => '成功';
+
+  @override
+  String get common_failed => '失败';
+
+  @override
+  String get common_unknown => '未知';
+
+  @override
+  String get logs_source => '模块';
+
+  @override
+  String get logs_address => '归属地';
+
+  @override
+  String get logs_device => '设备';
+
+  @override
+  String get taskLog_copy => '复制日志';
+
+  @override
+  String get taskLog_copied => '已复制';
+
+  @override
+  String get taskLog_emptyTitle => '暂无日志';
+
+  @override
+  String get taskLog_readFailedTitle => '读取任务日志失败';
+
+  @override
+  String get taskLog_executing => '执行中';
+
+  @override
+  String get taskLog_expired => '该任务的日志已被清理';
+
+  @override
+  String taskLog_lines(int count) {
+    return '$count 行';
+  }
+
+  @override
+  String get taskLog_finished => '已完成';
 }

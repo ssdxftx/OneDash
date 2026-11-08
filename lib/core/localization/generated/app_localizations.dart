@@ -11719,6 +11719,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'FTP password'**
   String get websites_ftpPassword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get common_success;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get common_failed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get common_unknown;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get logs_source;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get logs_address;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Device'**
+  String get logs_device;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy log'**
+  String get taskLog_copy;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get taskLog_copied;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No log yet'**
+  String get taskLog_emptyTitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to read task log'**
+  String get taskLog_readFailedTitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get taskLog_executing;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'The log for this task has been cleaned'**
+  String get taskLog_expired;
+
+  /// Number of log lines.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} lines'**
+  String taskLog_lines(int count);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished'**
+  String get taskLog_finished;
 }
 
 class _AppLocalizationsDelegate

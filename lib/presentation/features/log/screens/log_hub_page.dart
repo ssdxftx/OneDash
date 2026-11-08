@@ -4,124 +4,29 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../data/dto/log/login_log_dto.dart';
-import '../../../../data/dto/log/operation_log_dto.dart';
-import '../../../../data/dto/log/ssh_log_dto.dart';
-import '../../../../data/dto/log/task_log_dto.dart';
+import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../../data/repositories_impl/log_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../../data/repositories_impl/file_repository_impl.dart';
-import 'log_preview_page.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
-import '../../../common/components/status_dot.dart';
 import '../../../common/states/async_state_view.dart';
-import '../../../common/states/error_toast.dart';
 import '../../../common/states/empty_state.dart';
-
-class _LogEntry {
-  const _LogEntry({
-    required this.time,
-    required this.status,
-    required this.title,
-    required this.detail,
-  });
-
-  final String time;
-  final String status;
-  final String title;
-  final String detail;
-}
-
-final _logsProvider = FutureProvider.autoDispose.family<List<_LogEntry>, int>((
-  ref,
-  index,
-) async {
-  final repository = await ref.watch(logRepositoryProvider.future);
-  switch (index) {
-    case 0:
-      final page = await repository.searchOperationLogs(
-        page: 1,
-        pageSize: 50,
-        source: '',
-        status: '',
-        node: '',
-        operation: '',
-      );
-      return page.items
-          .map(
-            (OperationLogDto e) => _LogEntry(
-              time: _format(e.createdAt),
-              status: e.status,
-              title: '${e.method} ${e.path}',
-              detail: e.message.isEmpty ? e.source : e.message,
-            ),
-          )
-          .toList();
-    case 1:
-      final page = await repository.searchLoginLogs(
-        page: 1,
-        pageSize: 50,
-        ip: '',
-        status: '',
-      );
-      return page.items
-          .map(
-            (LoginLogDto e) => _LogEntry(
-              time: _format(e.createdAt),
-              status: e.status,
-              title: e.ip,
-              detail: e.message.isEmpty ? e.agent : e.message,
-            ),
-          )
-          .toList();
-    case 2:
-      final page = await repository.searchSshLogs(
-        page: 1,
-        pageSize: 50,
-        info: '',
-        status: 'All',
-      );
-      return page.items
-          .map(
-            (SshLogDto e) => _LogEntry(
-              time: e.dateStr.isEmpty ? _format(e.date) : e.dateStr,
-              status: e.status,
-              title: '${e.user}@${e.address}',
-              detail: e.message,
-            ),
-          )
-          .toList();
-    default:
-      final page = await repository.searchTaskLogs(
-        page: 1,
-        pageSize: 50,
-        status: '',
-        type: '',
-        taskID: '',
-      );
-      return page.items
-          .map(
-            (TaskLogDto e) => _LogEntry(
-              time: _format(e.createdAt),
-              status: e.status,
-              title: e.name,
-              detail: e.errorMsg.isEmpty ? e.operate : e.errorMsg,
-            ),
-          )
-          .toList();
-  }
-}, name: 'logsProvider');
-
-String _format(DateTime time) {
-  final local = time.toLocal();
-  return '${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')} '
-      '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
-}
+import '../../../common/states/error_toast.dart';
+import '../models/login_log_item.dart';
+import '../models/operation_log_item.dart';
+import '../models/ssh_log_item.dart';
+import '../models/task_log_item.dart';
+import '../providers/log_providers.dart';
+import '../widgets/log_row_parts.dart';
+import '../widgets/login_log_row.dart';
+import '../widgets/operation_log_row.dart';
+import '../widgets/ssh_log_row.dart';
+import '../widgets/task_log_row.dart';
+import 'log_preview_page.dart';
 
 class LogHubPage extends ConsumerWidget {
   const LogHubPage({super.key, required this.serverId});
@@ -155,10 +60,10 @@ class LogHubPage extends ConsumerWidget {
           l10n.logs_task,
         ],
         children: const [
-          _LogTab(index: 0),
-          _LogTab(index: 1),
-          _LogTab(index: 2),
-          _LogTab(index: 3),
+          _OperationLogTab(),
+          _LoginLogTab(),
+          _SshLogTab(),
+          _TaskLogTab(),
         ],
       ),
     );
@@ -285,8 +190,8 @@ extension on LogHubPage {
     try {
       final repository = await ref.read(logRepositoryProvider.future);
       await repository.cleanLogs(type);
-      ref.invalidate(_logsProvider(0));
-      ref.invalidate(_logsProvider(1));
+      ref.invalidate(operationLogsProvider);
+      ref.invalidate(loginLogsProvider);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);
     } catch (error) {
@@ -296,73 +201,273 @@ extension on LogHubPage {
   }
 }
 
-class _LogTab extends ConsumerWidget {
-  const _LogTab({required this.index});
+Widget _logSkeleton() => const SkeletonList(
+  itemCount: 8,
+  itemHeight: 104,
+  padding: EdgeInsets.all(AppTokens.s16),
+);
 
-  final int index;
+Widget _emptyState(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
+  return EmptyState(
+    icon: TablerIcons.file_text,
+    title: l10n.log_empty,
+    message: l10n.log_emptyMessage,
+  );
+}
+
+class _OperationLogTab extends ConsumerWidget {
+  const _OperationLogTab();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final logs = ref.watch(_logsProvider(index));
+    final logs = ref.watch(operationLogsProvider);
     return AsyncStateView(
       value: logs,
-      onRetry: () => ref.invalidate(_logsProvider(index)),
-      loading: const SkeletonList(itemCount: 8, itemHeight: 56),
+      onRetry: () => ref.invalidate(operationLogsProvider),
+      loading: _logSkeleton(),
       isEmpty: (items) => items.isEmpty,
-      empty: EmptyState(
-        icon: TablerIcons.file_text,
-        title: l10n.log_empty,
-        message: l10n.log_emptyMessage,
-      ),
+      empty: _emptyState(context),
       builder: (items) => ListView.builder(
         padding: EdgeInsets.all(context.pagePadding),
         itemCount: items.length,
-        itemBuilder: (context, i) {
-          final item = items[i];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: AppTokens.s8),
-            child: SplitListGroup(
-              children: [
-                SplitListTile(
-                  leading: StatusDot(status: item.status.toLowerCase()),
-                  title: item.title,
-                  subtitle: '${item.time}  ${item.detail}',
-                  onTap: () => showAppSheet<void>(
-                    context: context,
-                    builder: (sheetContext) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(item.title, style: AppTextStyles.titleL),
-                        const SizedBox(height: AppTokens.s4),
-                        Text(
-                          '${item.time} · ${item.status}',
-                          style: AppTextStyles.bodyS.copyWith(
-                            color: sheetContext.scheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: AppTokens.s16),
-                        SelectableText(
-                          item.detail,
-                          style: AppTextStyles.bodyM.copyWith(
-                            fontFamily: 'monospace',
-                            height: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: AppTokens.s16),
-                        SecondaryButton(
-                          label: AppLocalizations.of(sheetContext).action_close,
-                          onPressed: () => Navigator.of(sheetContext).pop(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+        itemBuilder: (context, i) => OperationLogRow(
+          item: items[i],
+          onTap: () => _showOperationDetail(context, items[i], l10n),
+        ),
+      ),
+    );
+  }
+
+  void _showOperationDetail(
+    BuildContext context,
+    OperationLogItem item,
+    AppLocalizations l10n,
+  ) {
+    final tone = item.isSuccess
+        ? context.appColors.success
+        : context.appColors.danger;
+    showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LogDetailHeader(
+            title: item.title,
+            statusLabel: item.isSuccess
+                ? l10n.common_success
+                : l10n.common_failed,
+            tone: tone,
+            time: formatLogTime(item.createdAt),
+          ),
+          LogDetailField(label: l10n.logs_method, value: item.method),
+          LogDetailField(label: l10n.logs_path, value: item.path),
+          LogDetailField(label: l10n.logs_source, value: item.source),
+          LogDetailField(label: l10n.logs_status, value: item.status),
+          if (item.message.trim().isNotEmpty)
+            LogDetailField(label: l10n.logs_request, value: item.message),
+          const SizedBox(height: AppTokens.s16),
+          SecondaryButton(
+            label: AppLocalizations.of(sheetContext).action_close,
+            onPressed: () => Navigator.of(sheetContext).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LoginLogTab extends ConsumerWidget {
+  const _LoginLogTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final logs = ref.watch(loginLogsProvider);
+    return AsyncStateView(
+      value: logs,
+      onRetry: () => ref.invalidate(loginLogsProvider),
+      loading: _logSkeleton(),
+      isEmpty: (items) => items.isEmpty,
+      empty: _emptyState(context),
+      builder: (items) => ListView.builder(
+        padding: EdgeInsets.all(context.pagePadding),
+        itemCount: items.length,
+        itemBuilder: (context, i) => LoginLogRow(
+          item: items[i],
+          onTap: () => _showLoginDetail(context, items[i], l10n),
+        ),
+      ),
+    );
+  }
+
+  void _showLoginDetail(
+    BuildContext context,
+    LoginLogItem item,
+    AppLocalizations l10n,
+  ) {
+    final tone = item.isSuccess
+        ? context.appColors.success
+        : context.appColors.danger;
+    showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LogDetailHeader(
+            title: item.ip,
+            statusLabel: item.isSuccess
+                ? l10n.common_success
+                : l10n.common_failed,
+            tone: tone,
+            time: formatLogTime(item.createdAt),
+            icon: TablerIcons.login,
+          ),
+          LogDetailField(label: l10n.logs_ip, value: item.ip),
+          if (item.hasLocation)
+            LogDetailField(label: l10n.logs_address, value: item.address),
+          if (item.hasDevice)
+            LogDetailField(label: l10n.logs_device, value: item.deviceLabel),
+          if (item.message.trim().isNotEmpty)
+            LogDetailField(label: l10n.logs_request, value: item.message),
+          const SizedBox(height: AppTokens.s16),
+          SecondaryButton(
+            label: AppLocalizations.of(sheetContext).action_close,
+            onPressed: () => Navigator.of(sheetContext).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SshLogTab extends ConsumerWidget {
+  const _SshLogTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final logs = ref.watch(sshLogsProvider);
+    return AsyncStateView(
+      value: logs,
+      onRetry: () => ref.invalidate(sshLogsProvider),
+      loading: _logSkeleton(),
+      isEmpty: (items) => items.isEmpty,
+      empty: _emptyState(context),
+      builder: (items) => ListView.builder(
+        padding: EdgeInsets.all(context.pagePadding),
+        itemCount: items.length,
+        itemBuilder: (context, i) => SshLogRow(
+          item: items[i],
+          onTap: () => _showSshDetail(context, items[i], l10n),
+        ),
+      ),
+    );
+  }
+
+  void _showSshDetail(
+    BuildContext context,
+    SshLogItem item,
+    AppLocalizations l10n,
+  ) {
+    final tone = item.isSuccess
+        ? context.appColors.success
+        : context.appColors.danger;
+    showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LogDetailHeader(
+            title: item.title,
+            statusLabel: item.isSuccess
+                ? l10n.common_success
+                : l10n.common_failed,
+            tone: tone,
+            time: formatLogTime(item.date),
+            icon: TablerIcons.terminal_2,
+          ),
+          LogDetailField(label: l10n.logs_ip, value: item.address),
+          if (item.hasArea)
+            LogDetailField(label: l10n.logs_address, value: item.area),
+          if (item.authMode.isNotEmpty)
+            LogDetailField(label: l10n.logs_method, value: item.authMode),
+          if (item.message.trim().isNotEmpty)
+            LogDetailField(label: l10n.logs_request, value: item.message),
+          const SizedBox(height: AppTokens.s16),
+          SecondaryButton(
+            label: AppLocalizations.of(sheetContext).action_close,
+            onPressed: () => Navigator.of(sheetContext).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TaskLogTab extends ConsumerWidget {
+  const _TaskLogTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final logs = ref.watch(taskLogsProvider);
+    return AsyncStateView(
+      value: logs,
+      onRetry: () => ref.invalidate(taskLogsProvider),
+      loading: _logSkeleton(),
+      isEmpty: (items) => items.isEmpty,
+      empty: _emptyState(context),
+      builder: (items) => ListView.builder(
+        padding: EdgeInsets.all(context.pagePadding),
+        itemCount: items.length,
+        itemBuilder: (context, i) => TaskLogRow(
+          item: items[i],
+          onTap: () => _showTaskDetail(context, items[i], l10n),
+        ),
+      ),
+    );
+  }
+
+  void _showTaskDetail(
+    BuildContext context,
+    TaskLogItem item,
+    AppLocalizations l10n,
+  ) {
+    final tone = item.isExecuting
+        ? context.appColors.warning
+        : (item.isSuccess
+              ? context.appColors.success
+              : context.appColors.danger);
+    showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LogDetailHeader(
+            title: item.name,
+            statusLabel: item.isExecuting
+                ? l10n.taskLog_executing
+                : (item.isSuccess ? l10n.common_success : l10n.common_failed),
+            tone: tone,
+            time: formatLogTime(item.createdAt),
+            icon: TablerIcons.list_check,
+          ),
+          if (item.operate.trim().isNotEmpty)
+            LogDetailField(label: l10n.logs_request, value: item.operate),
+          if (item.errorMsg.trim().isNotEmpty)
+            LogDetailField(label: l10n.error_details, value: item.errorMsg),
+          const SizedBox(height: AppTokens.s16),
+          SecondaryButton(
+            label: AppLocalizations.of(sheetContext).action_close,
+            onPressed: () => Navigator.of(sheetContext).pop(),
+          ),
+        ],
       ),
     );
   }
