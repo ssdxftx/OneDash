@@ -10,12 +10,19 @@ final cronjobsProvider = FutureProvider.autoDispose<PageResult<CronjobDto>>((
   return ref
       .watch(cronjobRepositoryProvider.future)
       .then(
-        (repository) => repository.searchCronjobs({'page': 1, 'pageSize': 100}),
+        (repository) => repository.searchCronjobs({
+          'page': 1,
+          'pageSize': 100,
+          'info': '',
+          'orderBy': 'createdAt',
+          'order': 'descending',
+        }),
       );
 }, name: 'cronjobsProvider');
 
 final cronjobRecordsProvider = FutureProvider.autoDispose
     .family<PageResult<CronjobRecordDto>, int>((ref, id) {
+      final now = DateTime.now();
       return ref
           .watch(cronjobRepositoryProvider.future)
           .then(
@@ -23,6 +30,12 @@ final cronjobRecordsProvider = FutureProvider.autoDispose
               'page': 1,
               'pageSize': 50,
               'cronjobID': id,
+              'startTime': now
+                  .subtract(const Duration(days: 30))
+                  .toUtc()
+                  .toIso8601String(),
+              'endTime': now.toUtc().toIso8601String(),
+              'status': '',
             }),
           );
     }, name: 'cronjobRecordsProvider');

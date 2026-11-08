@@ -6836,6 +6836,18 @@ abstract class AppLocalizations {
   /// **'Delete every execution record of {name}?'**
   String cronjobs_cleanRecordsConfirm(String name);
 
+  /// Record window length in days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last {days} days'**
+  String cronjobs_recordsRange(int days);
+
+  /// Total execution record count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} records'**
+  String cronjobs_recordsTotal(int count);
+
   /// OneDash UI text.
   ///
   /// In en, this message translates to:

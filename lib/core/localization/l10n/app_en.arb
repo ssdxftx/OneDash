@@ -4794,6 +4794,24 @@
       }
     }
   },
+  "cronjobs_recordsRange": "Last {days} days",
+  "@cronjobs_recordsRange": {
+    "description": "Record window length in days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "cronjobs_recordsTotal": "{count} records",
+  "@cronjobs_recordsTotal": {
+    "description": "Total execution record count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "cronjobs_noRecords": "No execution records",
   "@cronjobs_noRecords": {
     "description": "OneDash UI text."

@@ -3497,6 +3497,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String cronjobs_recordsRange(int days) {
+    return '最近 $days 天';
+  }
+
+  @override
+  String cronjobs_recordsTotal(int count) {
+    return '共 $count 条';
+  }
+
+  @override
   String get cronjobs_noRecords => '暂无执行记录';
 
   @override

@@ -1134,6 +1134,8 @@
   "cronjobs_records": "执行记录",
   "cronjobs_cleanRecords": "清理记录",
   "cronjobs_cleanRecordsConfirm": "确定清理 {name} 的全部执行记录吗？",
+  "cronjobs_recordsRange": "最近 {days} 天",
+  "cronjobs_recordsTotal": "共 {count} 条",
   "cronjobs_noRecords": "暂无执行记录",
   "cronjobs_noRecordsHint": "任务执行后会在这里显示记录。",
   "cronjobs_recordLog": "执行日志",

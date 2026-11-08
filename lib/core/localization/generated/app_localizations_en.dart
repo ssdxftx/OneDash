@@ -3580,6 +3580,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String cronjobs_recordsRange(int days) {
+    return 'Last $days days';
+  }
+
+  @override
+  String cronjobs_recordsTotal(int count) {
+    return '$count records';
+  }
+
+  @override
   String get cronjobs_noRecords => 'No execution records';
 
   @override

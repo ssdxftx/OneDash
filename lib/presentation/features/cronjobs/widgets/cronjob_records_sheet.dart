@@ -109,7 +109,17 @@ class CronjobRecordsSheet extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: AppTokens.s16),
+        const SizedBox(height: AppTokens.s8),
+        records.maybeWhen(
+          data: (data) => Text(
+            '${l10n.cronjobs_recordsRange(30)} · ${l10n.cronjobs_recordsTotal(data.total)}',
+            style: AppTextStyles.caption.copyWith(
+              color: context.scheme.onSurfaceVariant,
+            ),
+          ),
+          orElse: () => const SizedBox.shrink(),
+        ),
+        const SizedBox(height: AppTokens.s12),
         SizedBox(
           height: (MediaQuery.sizeOf(context).height * 0.45)
               .clamp(200.0, 420.0)
