@@ -137,7 +137,7 @@ class LogApi {
         'page': page,
         'pageSize': pageSize,
         if (info.isNotEmpty) 'info': info,
-        'Status': status,
+        'Status': status.isEmpty ? 'All' : status,
       },
     );
     return PageResult<SshLogDto>.fromJson(
@@ -156,7 +156,10 @@ class LogApi {
   }) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/hosts/ssh/log/export',
-      data: {if (info.isNotEmpty) 'info': info, 'Status': status},
+      data: {
+        if (info.isNotEmpty) 'info': info,
+        'Status': status.isEmpty ? 'All' : status,
+      },
     );
     return ApiResponseParser.primitive<String>(resp);
   }

@@ -84,7 +84,7 @@ final _logsProvider = FutureProvider.autoDispose.family<List<_LogEntry>, int>((
         page: 1,
         pageSize: 50,
         info: '',
-        status: '',
+        status: 'All',
       );
       return page.items
           .map(
