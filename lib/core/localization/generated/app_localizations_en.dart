@@ -3590,6 +3590,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get containers_diskStatsUnsupported =>
+      'Disk usage is unavailable on this panel version.';
+
+  @override
   String get cronjobs_noRecords => 'No execution records';
 
   @override

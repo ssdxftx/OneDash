@@ -6851,6 +6851,12 @@ abstract class AppLocalizations {
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
+  /// **'Disk usage is unavailable on this panel version.'**
+  String get containers_diskStatsUnsupported;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
   /// **'No execution records'**
   String get cronjobs_noRecords;
 

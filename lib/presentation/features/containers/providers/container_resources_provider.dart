@@ -20,9 +20,13 @@ final containerStatusProvider = FutureProvider.autoDispose<ContainerStatusDto>((
 }, name: 'containerStatusProvider');
 
 final containerItemStatsProvider =
-    FutureProvider.autoDispose<ContainerItemStatsDto>((ref) async {
+    FutureProvider.autoDispose<ContainerItemStatsDto?>((ref) async {
       final repository = await ref.watch(containerRepositoryProvider.future);
-      return repository.getItemStats();
+      try {
+        return await repository.getItemStats();
+      } catch (_) {
+        return null;
+      }
     }, name: 'containerItemStatsProvider');
 
 final containerImagesProvider =

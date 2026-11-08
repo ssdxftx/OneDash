@@ -4812,6 +4812,10 @@
       }
     }
   },
+  "containers_diskStatsUnsupported": "Disk usage is unavailable on this panel version.",
+  "@containers_diskStatsUnsupported": {
+    "description": "OneDash UI text."
+  },
   "cronjobs_noRecords": "No execution records",
   "@cronjobs_noRecords": {
     "description": "OneDash UI text."

@@ -95,17 +95,28 @@ class _DockerCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final docker = ref.watch(dockerStatusProvider);
-    final daemon = ref.watch(dockerDaemonConfigProvider).valueOrNull;
-    return docker.when(
-      loading: () => const _CardSkeleton(height: 88),
-      error: (error, stack) =>
-          _ErrorCard(message: describeError(error, l10n), onRetry: onRetry),
-      data: (status) => _DockerBody(
-        serverId: serverId,
-        status: status,
-        version: daemon?.version ?? status.version,
-        onRefresh: onRetry,
+    final daemon = ref.watch(dockerDaemonConfigProvider);
+    return _asyncBody(
+      docker,
+      (status) => _asyncBody(
+        daemon,
+        (config) => _DockerBody(
+          serverId: serverId,
+          status: status,
+          version: config.version,
+          onRefresh: onRetry,
+        ),
+        skeleton: const _DockerSkeleton(),
+        onError: (_) => _DockerBody(
+          serverId: serverId,
+          status: status,
+          version: '',
+          onRefresh: onRetry,
+        ),
       ),
+      skeleton: const _DockerSkeleton(),
+      onError: (error) =>
+          _ErrorCard(message: describeError(error, l10n), onRetry: onRetry),
     );
   }
 }
@@ -189,11 +200,12 @@ class _ResourcesCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final status = ref.watch(containerStatusProvider);
-    return status.when(
-      loading: () => const _CardSkeleton(height: 300),
-      error: (error, stack) =>
+    return _asyncBody(
+      status,
+      (data) => _ResourcesBody(serverId: serverId, status: data),
+      skeleton: const _ResourcesSkeleton(),
+      onError: (error) =>
           _ErrorCard(message: describeError(error, l10n), onRetry: onRetry),
-      data: (data) => _ResourcesBody(serverId: serverId, status: data),
     );
   }
 }
@@ -363,13 +375,13 @@ class _DiskCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final stats = ref.watch(containerItemStatsProvider);
-    return stats.when(
-      loading: () => const _CardSkeleton(height: 240),
-      error: (error, stack) =>
-          _ErrorCard(message: describeError(error, l10n), onRetry: onRetry),
-      data: (data) => _DiskBody(stats: data),
+    return _asyncBody(
+      stats,
+      (data) =>
+          data == null ? const _DiskUnavailable() : _DiskBody(stats: data),
+      skeleton: const _DiskSkeleton(),
+      onError: (_) => const _DiskUnavailable(),
     );
   }
 }
@@ -540,19 +552,211 @@ class _ErrorCard extends StatelessWidget {
   }
 }
 
-class _CardSkeleton extends StatelessWidget {
-  const _CardSkeleton({required this.height});
+Widget _asyncBody<T>(
+  AsyncValue<T> value,
+  Widget Function(T data) build, {
+  required Widget skeleton,
+  required Widget Function(Object error) onError,
+}) {
+  if (value.hasValue) return build(value.value as T);
+  if (value.hasError) return onError(value.error!);
+  return skeleton;
+}
 
-  final double height;
+Widget _bar(
+  BuildContext context, {
+  required double width,
+  required double height,
+  double radius = 3,
+}) {
+  return Container(
+    width: width,
+    height: height,
+    decoration: BoxDecoration(
+      color: context.scheme.onSurfaceVariant.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(radius),
+    ),
+  );
+}
+
+class _DockerSkeleton extends StatelessWidget {
+  const _DockerSkeleton();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      decoration: BoxDecoration(
-        color: context.scheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(AppTokens.rLg),
-        border: Border.all(color: context.scheme.outlineVariant),
+    return TonalCard(
+      child: Row(
+        children: [
+          _bar(context, width: 44, height: 44, radius: AppTokens.rMd),
+          const SizedBox(width: AppTokens.s12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _bar(context, width: 64, height: 18),
+                const SizedBox(height: AppTokens.s4),
+                _bar(context, width: 44, height: 14),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppTokens.s8),
+          _bar(context, width: 56, height: 24, radius: AppTokens.rFull),
+          const SizedBox(width: AppTokens.s8),
+          _bar(context, width: 48, height: 48, radius: AppTokens.rFull),
+        ],
+      ),
+    );
+  }
+}
+
+class _ResourcesSkeleton extends StatelessWidget {
+  const _ResourcesSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return TonalCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppTokens.s16,
+              AppTokens.s12,
+              AppTokens.s16,
+              AppTokens.s4,
+            ),
+            child: _bar(context, width: 48, height: 16),
+          ),
+          for (var index = 0; index < 7; index++) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppTokens.s16,
+                AppTokens.s12,
+                AppTokens.s12,
+                AppTokens.s12,
+              ),
+              child: Row(
+                children: [
+                  _bar(
+                    context,
+                    width: AppTokens.iconList,
+                    height: AppTokens.iconList,
+                    radius: 4,
+                  ),
+                  const SizedBox(width: AppTokens.s12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _bar(context, width: double.infinity, height: 21),
+                        if (index == 0) ...[
+                          const SizedBox(height: 2),
+                          _bar(context, width: 64, height: 16),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 24),
+                  _bar(context, width: 28, height: 21),
+                  const SizedBox(width: AppTokens.s4),
+                  _bar(
+                    context,
+                    width: AppTokens.iconList,
+                    height: AppTokens.iconList,
+                    radius: 4,
+                  ),
+                ],
+              ),
+            ),
+            if (index < 6)
+              Divider(
+                height: 1,
+                indent: AppTokens.s48,
+                color: context.scheme.outlineVariant,
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DiskSkeleton extends StatelessWidget {
+  const _DiskSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return TonalCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppTokens.s16,
+              AppTokens.s12,
+              AppTokens.s16,
+              AppTokens.s4,
+            ),
+            child: _bar(context, width: 72, height: 16),
+          ),
+          for (var index = 0; index < 4; index++) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTokens.s16,
+                vertical: AppTokens.s12,
+              ),
+              child: Row(
+                children: [
+                  Expanded(child: _bar(context, width: 72, height: 21)),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _bar(context, width: 56, height: 21),
+                      _bar(context, width: 72, height: 16),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            if (index < 3)
+              Divider(
+                height: 1,
+                indent: AppTokens.s16,
+                color: context.scheme.outlineVariant,
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DiskUnavailable extends StatelessWidget {
+  const _DiskUnavailable();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return TonalCard(
+      child: Row(
+        children: [
+          Icon(
+            TablerIcons.database_off,
+            color: context.scheme.onSurfaceVariant,
+            size: AppTokens.iconList,
+          ),
+          const SizedBox(width: AppTokens.s12),
+          Expanded(
+            child: Text(
+              l10n.containers_diskStatsUnsupported,
+              style: AppTextStyles.bodyS.copyWith(
+                color: context.scheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

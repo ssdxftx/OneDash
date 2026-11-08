@@ -3507,6 +3507,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get containers_diskStatsUnsupported => '当前面板版本不支持磁盘统计';
+
+  @override
   String get cronjobs_noRecords => '暂无执行记录';
 
   @override
