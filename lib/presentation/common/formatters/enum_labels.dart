@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../../../core/localization/generated/app_localizations.dart';
 
 /// 1Panel 备份账号类型常量，服务端按大写精确匹配。
@@ -36,7 +38,7 @@ String alertTypeLabel(String raw, AppLocalizations l10n) =>
       'net' || 'network' => l10n.alert_type_network,
       'smart' => l10n.alert_type_smart,
       'log' => l10n.alert_type_log,
-      _ => raw,
+      _ => _unknown(raw, l10n),
     };
 
 String alertMethodLabel(String raw, AppLocalizations l10n) =>
@@ -49,7 +51,7 @@ String alertMethodLabel(String raw, AppLocalizations l10n) =>
       'bark' => l10n.alert_method_bark,
       'webhook' => l10n.alert_method_webhook,
       'sms' => l10n.alert_method_sms,
-      _ => raw,
+      _ => _unknown(raw, l10n),
     };
 
 String alertLogStatusLabel(String raw, AppLocalizations l10n) =>
@@ -57,7 +59,7 @@ String alertLogStatusLabel(String raw, AppLocalizations l10n) =>
       'success' || 'pushsuccess' => l10n.alert_status_success,
       'failed' || 'pushfailed' => l10n.alert_status_failed,
       'pending' => l10n.alert_status_pending,
-      _ => raw,
+      _ => _unknown(raw, l10n),
     };
 
 String websiteTypeLabel(String raw, AppLocalizations l10n) =>
@@ -65,7 +67,7 @@ String websiteTypeLabel(String raw, AppLocalizations l10n) =>
       'static' => l10n.websites_static,
       'proxy' || 'reverse_proxy' => l10n.websites_proxy,
       'php' => l10n.websites_php,
-      _ => raw,
+      _ => _unknown(raw, l10n),
     };
 
 String sslStatusLabel(String raw, AppLocalizations l10n) =>
@@ -74,7 +76,7 @@ String sslStatusLabel(String raw, AppLocalizations l10n) =>
       'applied' || 'deployed' => l10n.websites_sslStatusApplied,
       'init' || 'pending' || 'processing' => l10n.websites_sslStatusPending,
       'error' || 'failed' => l10n.websites_sslStatusError,
-      _ => raw,
+      _ => _unknown(raw, l10n),
     };
 
 String sslProviderLabel(String raw, AppLocalizations l10n) =>
@@ -85,7 +87,7 @@ String sslProviderLabel(String raw, AppLocalizations l10n) =>
       'selfsigned' => l10n.websites_sslProviderSelfSigned,
       'manual' || 'upload' => l10n.websites_sslProviderManual,
       'frommaster' => l10n.websites_sslProviderFromMaster,
-      _ => raw,
+      _ => _unknown(raw, l10n),
     };
 
 String taskStatusLabel(String raw, AppLocalizations l10n) =>
@@ -95,7 +97,7 @@ String taskStatusLabel(String raw, AppLocalizations l10n) =>
       'pending' || 'waiting' || 'queued' => l10n.alert_status_pending,
       'running' || 'doing' => l10n.containers_running,
       'stopped' || 'exited' => l10n.containers_stopped,
-      _ => raw,
+      _ => _unknown(raw, l10n),
     };
 
 String cronjobTypeLabel(String raw, AppLocalizations l10n) =>
@@ -111,7 +113,7 @@ String cronjobTypeLabel(String raw, AppLocalizations l10n) =>
       'cleanlog' => l10n.cronjobs_typeCleanLog,
       'clean' => l10n.cronjobs_typeClean,
       'ntp' => l10n.cronjobs_typeNtp,
-      _ => raw,
+      _ => _unknown(raw, l10n),
     };
 
 String backupAccountTypeLabel(String raw, AppLocalizations l10n) =>
@@ -128,5 +130,14 @@ String backupAccountTypeLabel(String raw, AppLocalizations l10n) =>
       'upyun' => l10n.backups_typeUpyun,
       'aliyun' => l10n.backups_typeAliyun,
       'googledrive' => l10n.backups_typeGoogleDrive,
-      _ => raw,
+      _ => _unknown(raw, l10n),
     };
+
+/// 未覆盖的枚举值：上屏「未知」，debug 下打印原值方便补映射。
+String _unknown(String raw, AppLocalizations l10n) {
+  assert(() {
+    debugPrint('[enum_labels] unmapped value: $raw');
+    return true;
+  }());
+  return l10n.common_unknown;
+}

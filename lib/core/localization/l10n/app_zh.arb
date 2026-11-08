@@ -2514,5 +2514,13 @@
   "taskLog_executing": "执行中",
   "taskLog_expired": "该任务的日志已被清理",
   "taskLog_lines": "{count} 行",
-  "taskLog_finished": "已完成"
+  "taskLog_finished": "已完成",
+  "common_custom": "自定义",
+  "ai_channel_qqBot": "QQ 机器人",
+  "ai_channel_weixin": "微信",
+  "error_wsPreflightFailed": "实时连接建立失败",
+  "error_wsPreflightTimeout": "实时连接超时",
+  "runtimes_packageManager": "包管理器",
+  "websites_sslId": "SSL ID",
+  "ai_mcp_gatewayImage": "网关镜像"
 }

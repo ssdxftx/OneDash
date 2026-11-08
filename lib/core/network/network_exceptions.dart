@@ -15,9 +15,14 @@ sealed class AppNetworkException implements Exception {
   String toString() => '$runtimeType($statusCode): $message';
 }
 
+/// 网络层错误码，供 UI 层翻译为本地文案。
+enum NetworkErrorCode { wsPreflightFailed, wsPreflightTimeout }
+
 /// 网络不可达 / 超时 / DNS 失败等连接层错误。
 class NetworkConnectionException extends AppNetworkException {
-  const NetworkConnectionException(super.message);
+  const NetworkConnectionException(super.message, {this.code});
+
+  final NetworkErrorCode? code;
 }
 
 /// 401 或 MD5 鉴权失败。

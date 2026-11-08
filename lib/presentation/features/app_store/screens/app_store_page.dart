@@ -605,7 +605,7 @@ class _InstalledTab extends ConsumerWidget {
     return switch (status.toLowerCase()) {
       'running' => l10n.common_running,
       'stopped' || 'exited' || 'created' => l10n.common_stopped,
-      _ => status,
+      _ => l10n.common_unknown,
     };
   }
 

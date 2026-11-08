@@ -235,7 +235,7 @@ mixin _AiMcpActions on ConsumerState<AiPage> {
                   SplitListTile(title: l10n.ai_mcp_url, value: detail.baseUrl),
                 if (detail.gatewayImage.isNotEmpty)
                   SplitListTile(
-                    title: 'Gateway image',
+                    title: l10n.ai_mcp_gatewayImage,
                     value: detail.gatewayImage,
                   ),
                 if (detail.environments.isNotEmpty)

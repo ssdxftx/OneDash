@@ -325,7 +325,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
     return switch (status.toLowerCase()) {
       'running' => l10n.websites_running,
       'stopped' => l10n.websites_stopped,
-      _ => status,
+      _ => l10n.common_unknown,
     };
   }
 
@@ -1186,7 +1186,7 @@ class _WebsiteCard extends StatelessWidget {
     return switch (status.toLowerCase()) {
       'running' => l10n.websites_running,
       'stopped' => l10n.websites_stopped,
-      _ => status,
+      _ => l10n.common_unknown,
     };
   }
 

@@ -51,6 +51,19 @@ ErrorViewData mapError(Object error, AppLocalizations l10n) {
     );
   }
   if (error is NetworkConnectionException) {
+    if (error.code != null) {
+      return ErrorViewData(
+        icon: TablerIcons.cloud_off,
+        title: l10n.error_network_title,
+        message: switch (error.code!) {
+          NetworkErrorCode.wsPreflightFailed => l10n.error_wsPreflightFailed,
+          NetworkErrorCode.wsPreflightTimeout => l10n.error_wsPreflightTimeout,
+        },
+        detail: raw,
+        actionLabel: l10n.common_retry,
+        kind: ErrorKind.network,
+      );
+    }
     final isCertificate =
         raw.toLowerCase().contains('certificate') ||
         raw.toLowerCase().contains('handshake') ||

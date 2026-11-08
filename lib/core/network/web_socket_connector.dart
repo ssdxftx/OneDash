@@ -91,9 +91,15 @@ Future<void> checkAppWebSocketAuth(
       }
     }
   } on SocketException {
-    throw const NetworkConnectionException('WebSocket preflight failed');
+    throw const NetworkConnectionException(
+      'WebSocket preflight failed',
+      code: NetworkErrorCode.wsPreflightFailed,
+    );
   } on TimeoutException {
-    throw const NetworkConnectionException('WebSocket preflight timed out');
+    throw const NetworkConnectionException(
+      'WebSocket preflight timed out',
+      code: NetworkErrorCode.wsPreflightTimeout,
+    );
   } finally {
     client.close(force: true);
   }

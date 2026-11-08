@@ -144,13 +144,19 @@ class _AcmeTab extends ConsumerWidget {
             DropdownButtonFormField<String>(
               initialValue: type,
               decoration: InputDecoration(labelText: l10n.websites_acmeType),
-              items: const [
-                DropdownMenuItem(
+              items: [
+                const DropdownMenuItem(
                   value: 'letsencrypt',
                   child: Text('Let\'s Encrypt'),
                 ),
-                DropdownMenuItem(value: 'zerossl', child: Text('ZeroSSL')),
-                DropdownMenuItem(value: 'custom', child: Text('Custom')),
+                const DropdownMenuItem(
+                  value: 'zerossl',
+                  child: Text('ZeroSSL'),
+                ),
+                DropdownMenuItem(
+                  value: 'custom',
+                  child: Text(l10n.common_custom),
+                ),
               ],
               onChanged: (value) {
                 if (value != null) setState(() => type = value);
@@ -226,13 +232,19 @@ class _AcmeTab extends ConsumerWidget {
             DropdownButtonFormField<String>(
               initialValue: type,
               decoration: InputDecoration(labelText: l10n.websites_acmeType),
-              items: const [
-                DropdownMenuItem(
+              items: [
+                const DropdownMenuItem(
                   value: 'letsencrypt',
                   child: Text('Let\'s Encrypt'),
                 ),
-                DropdownMenuItem(value: 'zerossl', child: Text('ZeroSSL')),
-                DropdownMenuItem(value: 'custom', child: Text('Custom')),
+                const DropdownMenuItem(
+                  value: 'zerossl',
+                  child: Text('ZeroSSL'),
+                ),
+                DropdownMenuItem(
+                  value: 'custom',
+                  child: Text(l10n.common_custom),
+                ),
               ],
               onChanged: (value) {
                 if (value != null) setState(() => type = value);
@@ -826,7 +838,7 @@ class _CaTab extends ConsumerWidget {
                   title: l10n.websites_keyType,
                   value: detail.keyType,
                 ),
-                SplitListTile(title: 'SSL ID', value: detail.sslId),
+                SplitListTile(title: l10n.websites_sslId, value: detail.sslId),
               ],
             ),
           ],

@@ -6196,4 +6196,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get taskLog_finished => 'Finished';
+
+  @override
+  String get common_custom => 'Custom';
+
+  @override
+  String get ai_channel_qqBot => 'QQ Bot';
+
+  @override
+  String get ai_channel_weixin => 'Weixin';
+
+  @override
+  String get error_wsPreflightFailed =>
+      'Failed to establish realtime connection';
+
+  @override
+  String get error_wsPreflightTimeout => 'Realtime connection timed out';
+
+  @override
+  String get runtimes_packageManager => 'Package manager';
+
+  @override
+  String get websites_sslId => 'SSL ID';
+
+  @override
+  String get ai_mcp_gatewayImage => 'Gateway image';
 }

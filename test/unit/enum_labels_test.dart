@@ -5,31 +5,37 @@ import 'package:onedash/presentation/common/formatters/enum_labels.dart';
 void main() {
   final l10n = AppLocalizationsEn();
 
-  test('alert type labels are localized and unknown values pass through', () {
-    expect(alertTypeLabel('CPU', l10n), 'CPU');
-    expect(alertTypeLabel('memory', l10n), 'Memory');
-    expect(alertTypeLabel('custom', l10n), 'custom');
-  });
+  test(
+    'alert type labels are localized and unknown values fall back to Unknown',
+    () {
+      expect(alertTypeLabel('CPU', l10n), 'CPU');
+      expect(alertTypeLabel('memory', l10n), 'Memory');
+      expect(alertTypeLabel('custom', l10n), 'Unknown');
+    },
+  );
 
   test('alert method labels cover aliases', () {
     expect(alertMethodLabel('wecom', l10n), 'WeCom');
     expect(alertMethodLabel('smtp', l10n), 'Email');
-    expect(alertMethodLabel('unknown-channel', l10n), 'unknown-channel');
+    expect(alertMethodLabel('unknown-channel', l10n), 'Unknown');
   });
 
   test('alert log status labels cover push results', () {
     expect(alertLogStatusLabel('Failed', l10n), 'Failed');
     expect(alertLogStatusLabel('PushSuccess', l10n), 'Success');
-    expect(alertLogStatusLabel('Mystery', l10n), 'Mystery');
+    expect(alertLogStatusLabel('Mystery', l10n), 'Unknown');
   });
 
-  test('SSL providers are localized and unknown values pass through', () {
-    expect(sslProviderLabel('dnsAccount', l10n), 'DNS account');
-    expect(sslProviderLabel('selfSigned', l10n), 'Self-signed');
-    expect(sslProviderLabel('manual', l10n), 'Uploaded');
-    expect(sslProviderLabel('upload', l10n), 'Uploaded');
-    expect(sslProviderLabel('custom', l10n), 'custom');
-  });
+  test(
+    'SSL providers are localized and unknown values fall back to Unknown',
+    () {
+      expect(sslProviderLabel('dnsAccount', l10n), 'DNS account');
+      expect(sslProviderLabel('selfSigned', l10n), 'Self-signed');
+      expect(sslProviderLabel('manual', l10n), 'Uploaded');
+      expect(sslProviderLabel('upload', l10n), 'Uploaded');
+      expect(sslProviderLabel('custom', l10n), 'Unknown');
+    },
+  );
 
   test('backup account types are localized', () {
     expect(backupAccountTypeLabel('LOCAL', l10n), 'Local');
@@ -39,7 +45,7 @@ void main() {
     expect(backupAccountTypeLabel('upyun', l10n), 'UPYUN');
     expect(backupAccountTypeLabel('aliyun', l10n), 'Aliyun Drive');
     expect(backupAccountTypeLabel('GoogleDrive', l10n), 'Google Drive');
-    expect(backupAccountTypeLabel('custom', l10n), 'custom');
+    expect(backupAccountTypeLabel('custom', l10n), 'Unknown');
   });
 
   test('backup account types match the panel contract', () {
@@ -61,17 +67,22 @@ void main() {
     expect(canonicalBackupAccountType('unknown'), 'S3');
   });
 
-  test('cronjob types are localized with raw fallback', () {
+  test('cronjob types are localized with Unknown fallback', () {
     expect(cronjobTypeLabel('shell', l10n), 'Shell script');
     expect(cronjobTypeLabel('Website', l10n), 'Back up website');
     expect(cronjobTypeLabel('snapshot', l10n), 'Snapshot');
-    expect(cronjobTypeLabel('custom', l10n), 'custom');
+    expect(cronjobTypeLabel('custom', l10n), 'Unknown');
+  });
+
+  test('unmapped enum values are not shown raw', () {
+    expect(alertTypeLabel('weird_status', l10n), 'Unknown');
+    expect(websiteTypeLabel('weird_type', l10n), 'Unknown');
   });
 
   test('task status labels cover snapshot and backup states', () {
     expect(taskStatusLabel('Success', l10n), 'Success');
     expect(taskStatusLabel('failed', l10n), 'Failed');
     expect(taskStatusLabel('running', l10n), 'Running');
-    expect(taskStatusLabel('Mystery', l10n), 'Mystery');
+    expect(taskStatusLabel('Mystery', l10n), 'Unknown');
   });
 }

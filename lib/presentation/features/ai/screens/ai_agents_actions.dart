@@ -617,14 +617,14 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
     final channel = await showSelectionMenu<String>(
       context,
       title: l10n.ai_agent_channel_delete,
-      options: const [
-        SelectionOption(value: 'feishu', label: 'Feishu'),
-        SelectionOption(value: 'telegram', label: 'Telegram'),
-        SelectionOption(value: 'discord', label: 'Discord'),
-        SelectionOption(value: 'wecom', label: 'WeCom'),
-        SelectionOption(value: 'dingtalk', label: 'DingTalk'),
-        SelectionOption(value: 'qqbot', label: 'QQ Bot'),
-        SelectionOption(value: 'weixin', label: 'Weixin'),
+      options: [
+        SelectionOption(value: 'feishu', label: l10n.alert_method_feishu),
+        const SelectionOption(value: 'telegram', label: 'Telegram'),
+        const SelectionOption(value: 'discord', label: 'Discord'),
+        SelectionOption(value: 'wecom', label: l10n.alert_method_wecom),
+        SelectionOption(value: 'dingtalk', label: l10n.alert_method_dingtalk),
+        SelectionOption(value: 'qqbot', label: l10n.ai_channel_qqBot),
+        SelectionOption(value: 'weixin', label: l10n.ai_channel_weixin),
       ],
     );
     if (channel == null || !mounted) return;
@@ -651,12 +651,12 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
     final channel = await showSelectionMenu<String>(
       context,
       title: l10n.ai_agent_channel_config,
-      options: const [
-        SelectionOption(value: 'telegram', label: 'Telegram'),
-        SelectionOption(value: 'discord', label: 'Discord'),
-        SelectionOption(value: 'wecom', label: 'WeCom'),
-        SelectionOption(value: 'dingtalk', label: 'DingTalk'),
-        SelectionOption(value: 'qqbot', label: 'QQ Bot'),
+      options: [
+        const SelectionOption(value: 'telegram', label: 'Telegram'),
+        const SelectionOption(value: 'discord', label: 'Discord'),
+        SelectionOption(value: 'wecom', label: l10n.alert_method_wecom),
+        SelectionOption(value: 'dingtalk', label: l10n.alert_method_dingtalk),
+        SelectionOption(value: 'qqbot', label: l10n.ai_channel_qqBot),
       ],
     );
     if (channel == null || !mounted) return;

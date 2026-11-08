@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -33,7 +32,6 @@ import '../../presentation/features/host/screens/host_page.dart';
 import '../../presentation/features/files/screens/file_tools_page.dart';
 import '../../presentation/features/files/screens/files_page.dart';
 import '../../presentation/features/firewall/screens/firewall_page.dart';
-import '../../presentation/features/gallery/screens/gallery_page.dart';
 import '../../presentation/features/log/screens/log_hub_page.dart';
 import '../../presentation/features/more/screens/more_page.dart';
 import '../../presentation/features/panel_settings/screens/panel_settings_page.dart';
@@ -108,12 +106,6 @@ final appRouter = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       pageBuilder: (context, state) =>
           slidePage(state, const AppSettingsPage()),
-    ),
-    GoRoute(
-      path: '/dev/gallery',
-      parentNavigatorKey: _rootNavigatorKey,
-      redirect: (context, state) => kDebugMode ? null : '/',
-      pageBuilder: (context, state) => fadePage(state, const GalleryPage()),
     ),
     GoRoute(
       path: '/s/:id',

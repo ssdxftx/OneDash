@@ -6062,4 +6062,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get taskLog_finished => '已完成';
+
+  @override
+  String get common_custom => '自定义';
+
+  @override
+  String get ai_channel_qqBot => 'QQ 机器人';
+
+  @override
+  String get ai_channel_weixin => '微信';
+
+  @override
+  String get error_wsPreflightFailed => '实时连接建立失败';
+
+  @override
+  String get error_wsPreflightTimeout => '实时连接超时';
+
+  @override
+  String get runtimes_packageManager => '包管理器';
+
+  @override
+  String get websites_sslId => 'SSL ID';
+
+  @override
+  String get ai_mcp_gatewayImage => '网关镜像';
 }

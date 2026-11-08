@@ -719,7 +719,7 @@ class _NodeModulesTabState extends ConsumerState<_NodeModulesTab> {
               Expanded(
                 child: DropdownButtonFormField<String>(
                   initialValue: _packageManager,
-                  decoration: const InputDecoration(labelText: 'Package'),
+                  decoration: InputDecoration(labelText: l10n.runtimes_packageManager),
                   items: const [
                     DropdownMenuItem(value: 'npm', child: Text('npm')),
                     DropdownMenuItem(value: 'yarn', child: Text('yarn')),

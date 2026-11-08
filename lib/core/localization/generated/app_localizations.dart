@@ -11803,6 +11803,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Finished'**
   String get taskLog_finished;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get common_custom;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'QQ Bot'**
+  String get ai_channel_qqBot;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Weixin'**
+  String get ai_channel_weixin;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to establish realtime connection'**
+  String get error_wsPreflightFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Realtime connection timed out'**
+  String get error_wsPreflightTimeout;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Package manager'**
+  String get runtimes_packageManager;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'SSL ID'**
+  String get websites_sslId;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Gateway image'**
+  String get ai_mcp_gatewayImage;
 }
 
 class _AppLocalizationsDelegate

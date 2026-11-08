@@ -164,14 +164,23 @@ Future<void> _restoreFromFile(BuildContext context, WidgetRef ref) async {
           DropdownButtonFormField<String>(
             initialValue: type,
             decoration: InputDecoration(labelText: l10n.backups_type),
-            items: const [
-              DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
-              DropdownMenuItem(value: 'postgresql', child: Text('PostgreSQL')),
-              DropdownMenuItem(value: 'mongodb', child: Text('MongoDB')),
-              DropdownMenuItem(value: 'redis', child: Text('Redis')),
-              DropdownMenuItem(value: 'app', child: Text('App')),
-              DropdownMenuItem(value: 'website', child: Text('Website')),
-              DropdownMenuItem(value: 'container', child: Text('Container')),
+            items: [
+              const DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
+              const DropdownMenuItem(
+                value: 'postgresql',
+                child: Text('PostgreSQL'),
+              ),
+              const DropdownMenuItem(value: 'mongodb', child: Text('MongoDB')),
+              const DropdownMenuItem(value: 'redis', child: Text('Redis')),
+              DropdownMenuItem(value: 'app', child: Text(l10n.backups_tabApps)),
+              DropdownMenuItem(
+                value: 'website',
+                child: Text(l10n.backups_tabWebsites),
+              ),
+              DropdownMenuItem(
+                value: 'container',
+                child: Text(l10n.containers_title),
+              ),
             ],
             onChanged: (value) {
               if (value != null) setState(() => type = value);

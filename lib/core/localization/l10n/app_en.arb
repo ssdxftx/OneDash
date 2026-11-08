@@ -8154,5 +8154,21 @@
     }
   },
   "taskLog_finished": "Finished",
-  "@taskLog_finished": {"description": "OneDash UI text."}
+  "@taskLog_finished": {"description": "OneDash UI text."},
+  "common_custom": "Custom",
+  "@common_custom": {"description": "OneDash UI text."},
+  "ai_channel_qqBot": "QQ Bot",
+  "@ai_channel_qqBot": {"description": "OneDash UI text."},
+  "ai_channel_weixin": "Weixin",
+  "@ai_channel_weixin": {"description": "OneDash UI text."},
+  "error_wsPreflightFailed": "Failed to establish realtime connection",
+  "@error_wsPreflightFailed": {"description": "OneDash UI text."},
+  "error_wsPreflightTimeout": "Realtime connection timed out",
+  "@error_wsPreflightTimeout": {"description": "OneDash UI text."},
+  "runtimes_packageManager": "Package manager",
+  "@runtimes_packageManager": {"description": "OneDash UI text."},
+  "websites_sslId": "SSL ID",
+  "@websites_sslId": {"description": "OneDash UI text."},
+  "ai_mcp_gatewayImage": "Gateway image",
+  "@ai_mcp_gatewayImage": {"description": "OneDash UI text."}
 }
