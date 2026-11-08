@@ -97,9 +97,7 @@ abstract final class AppTheme {
       ),
       menuButtonTheme: const MenuButtonThemeData(
         style: ButtonStyle(
-          minimumSize: WidgetStatePropertyAll(
-            Size(0, AppTokens.menuRowHeight),
-          ),
+          minimumSize: WidgetStatePropertyAll(Size(0, AppTokens.menuRowHeight)),
           maximumSize: WidgetStatePropertyAll(
             Size(double.infinity, double.infinity),
           ),
