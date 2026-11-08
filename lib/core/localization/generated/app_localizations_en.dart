@@ -5480,6 +5480,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get files_recycleDisabled => 'Recycle bin is off';
 
   @override
+  String get dashboard_resourceUsage => 'Resource usage';
+
+  @override
+  String get dashboard_swap => 'Swap';
+
+  @override
+  String get dashboard_realtimeSpeed => 'Live speed';
+
+  @override
+  String get dashboard_diskIo => 'Disk I/O';
+
+  @override
+  String get dashboard_read => 'Read';
+
+  @override
+  String get dashboard_write => 'Write';
+
+  @override
+  String get dashboard_latency => 'Latency';
+
+  @override
+  String get dashboard_partitions => 'Disk partitions';
+
+  @override
+  String get dashboard_hostDetails => 'Host details';
+
+  @override
+  String dashboard_coreThreads(int physical, int logical) {
+    return '$physical cores / $logical threads';
+  }
+
+  @override
+  String dashboard_latencyValue(String value) {
+    return '$value ms/op';
+  }
+
+  @override
   String get dashboard_monitorOptions => 'Monitor devices';
 
   @override

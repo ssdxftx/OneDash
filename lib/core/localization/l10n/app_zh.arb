@@ -1792,6 +1792,17 @@
   "@files_recycleDisabled": {
     "description": "回收站关闭状态"
   },
+  "dashboard_resourceUsage": "资源占用",
+  "dashboard_swap": "Swap",
+  "dashboard_realtimeSpeed": "实时速率",
+  "dashboard_diskIo": "磁盘 I/O",
+  "dashboard_read": "读取",
+  "dashboard_write": "写入",
+  "dashboard_latency": "延迟",
+  "dashboard_partitions": "磁盘分区",
+  "dashboard_hostDetails": "主机详情",
+  "dashboard_coreThreads": "{physical} 核 / {logical} 线程",
+  "dashboard_latencyValue": "{value} ms/op",
   "dashboard_monitorOptions": "监控设备",
   "@dashboard_monitorOptions": {
     "description": "监控设备选择"

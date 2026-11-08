@@ -6,6 +6,14 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/repository_providers.dart';
 import '../../../../domain/entities/dashboard.dart';
 
+class SpeedSample {
+  const SpeedSample({required this.time, required this.up, required this.down});
+
+  final DateTime time;
+  final double up;
+  final double down;
+}
+
 class OverviewState {
   const OverviewState({
     required this.dashboard,
@@ -13,7 +21,11 @@ class OverviewState {
     required this.memoryHistory,
     required this.netUpHistory,
     required this.netDownHistory,
+    required this.speedHistory,
     required this.lastUpdated,
+    this.readBytesPerSecond = 0,
+    this.writeBytesPerSecond = 0,
+    this.latencyMs = 0,
     this.stale = false,
   });
 
@@ -22,7 +34,11 @@ class OverviewState {
   final List<double> memoryHistory;
   final List<double> netUpHistory;
   final List<double> netDownHistory;
+  final List<SpeedSample> speedHistory;
   final DateTime lastUpdated;
+  final double readBytesPerSecond;
+  final double writeBytesPerSecond;
+  final double latencyMs;
   final bool stale;
 
   OverviewState copyWith({
@@ -31,7 +47,11 @@ class OverviewState {
     List<double>? memoryHistory,
     List<double>? netUpHistory,
     List<double>? netDownHistory,
+    List<SpeedSample>? speedHistory,
     DateTime? lastUpdated,
+    double? readBytesPerSecond,
+    double? writeBytesPerSecond,
+    double? latencyMs,
     bool? stale,
   }) {
     return OverviewState(
@@ -40,7 +60,11 @@ class OverviewState {
       memoryHistory: memoryHistory ?? this.memoryHistory,
       netUpHistory: netUpHistory ?? this.netUpHistory,
       netDownHistory: netDownHistory ?? this.netDownHistory,
+      speedHistory: speedHistory ?? this.speedHistory,
       lastUpdated: lastUpdated ?? this.lastUpdated,
+      readBytesPerSecond: readBytesPerSecond ?? this.readBytesPerSecond,
+      writeBytesPerSecond: writeBytesPerSecond ?? this.writeBytesPerSecond,
+      latencyMs: latencyMs ?? this.latencyMs,
       stale: stale ?? this.stale,
     );
   }
@@ -85,6 +109,8 @@ class OverviewController
   int _failureCount = 0;
   int? _lastSent;
   int? _lastRecv;
+  int? _lastRead;
+  int? _lastWrite;
   DateTime? _lastTickAt;
 
   @override
@@ -103,14 +129,25 @@ class OverviewController
     );
     _lastSent = dashboard.current.netBytesSent;
     _lastRecv = dashboard.current.netBytesRecv;
-    _lastTickAt = DateTime.now();
+    _lastRead = dashboard.current.ioReadBytes;
+    _lastWrite = dashboard.current.ioWriteBytes;
+    final now = DateTime.now();
+    _lastTickAt = now;
     return OverviewState(
       dashboard: dashboard,
       cpuHistory: [dashboard.current.cpuUsedPercent],
       memoryHistory: [dashboard.current.memoryUsedPercent],
       netUpHistory: const [0],
       netDownHistory: const [0],
-      lastUpdated: DateTime.now(),
+      speedHistory: [
+        for (var second = 60; second >= 1; second--)
+          SpeedSample(
+            time: now.subtract(Duration(seconds: second)),
+            up: 0,
+            down: 0,
+          ),
+      ],
+      lastUpdated: now,
     );
   }
 
@@ -162,8 +199,21 @@ class OverviewController
       final downRate = _lastRecv == null || elapsed <= 0
           ? 0.0
           : ((recv - _lastRecv!).clamp(0, 1 << 62) / elapsed);
+      final read = latest.ioReadBytes;
+      final write = latest.ioWriteBytes;
+      final readRate = _lastRead == null || elapsed <= 0
+          ? 0.0
+          : ((read - _lastRead!).clamp(0, 1 << 62) / elapsed);
+      final writeRate = _lastWrite == null || elapsed <= 0
+          ? 0.0
+          : ((write - _lastWrite!).clamp(0, 1 << 62) / elapsed);
+      final latency = latest.ioCount <= 0
+          ? 0.0
+          : (latest.ioReadTime + latest.ioWriteTime) / latest.ioCount;
       _lastSent = sent;
       _lastRecv = recv;
+      _lastRead = read;
+      _lastWrite = write;
       _lastTickAt = now;
       _failureCount = 0;
 
@@ -171,6 +221,10 @@ class OverviewController
       final memory = _append(current.memoryHistory, latest.memoryUsedPercent);
       final netUp = _append(current.netUpHistory, upRate);
       final netDown = _append(current.netDownHistory, downRate);
+      final speed = _appendSpeed(
+        current.speedHistory,
+        SpeedSample(time: now, up: upRate, down: downRate),
+      );
       state = AsyncData(
         current.copyWith(
           dashboard: Dashboard(base: current.dashboard.base, current: latest),
@@ -178,6 +232,10 @@ class OverviewController
           memoryHistory: memory,
           netUpHistory: netUp,
           netDownHistory: netDown,
+          speedHistory: speed,
+          readBytesPerSecond: readRate,
+          writeBytesPerSecond: writeRate,
+          latencyMs: latency,
           lastUpdated: now,
           stale: false,
         ),
@@ -206,6 +264,13 @@ class OverviewController
     if (next.length > AppTokens.chartHistoryPoints) {
       next.removeRange(0, next.length - AppTokens.chartHistoryPoints);
     }
+    return next;
+  }
+
+  List<SpeedSample> _appendSpeed(List<SpeedSample> source, SpeedSample sample) {
+    final next = List<SpeedSample>.of(source)..add(sample);
+    final cutoff = sample.time.subtract(const Duration(seconds: 65));
+    next.removeWhere((item) => item.time.isBefore(cutoff));
     return next;
   }
 }

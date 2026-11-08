@@ -10424,6 +10424,72 @@ abstract class AppLocalizations {
   /// **'Recycle bin is off'**
   String get files_recycleDisabled;
 
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Resource usage'**
+  String get dashboard_resourceUsage;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap'**
+  String get dashboard_swap;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Live speed'**
+  String get dashboard_realtimeSpeed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk I/O'**
+  String get dashboard_diskIo;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get dashboard_read;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Write'**
+  String get dashboard_write;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Latency'**
+  String get dashboard_latency;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk partitions'**
+  String get dashboard_partitions;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Host details'**
+  String get dashboard_hostDetails;
+
+  /// Physical and logical CPU counts.
+  ///
+  /// In en, this message translates to:
+  /// **'{physical} cores / {logical} threads'**
+  String dashboard_coreThreads(int physical, int logical);
+
+  /// Disk latency per operation.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} ms/op'**
+  String dashboard_latencyValue(String value);
+
   /// Title for monitor device selection.
   ///
   /// In en, this message translates to:

@@ -5353,6 +5353,43 @@ class AppLocalizationsZh extends AppLocalizations {
   String get files_recycleDisabled => '回收站已关闭';
 
   @override
+  String get dashboard_resourceUsage => '资源占用';
+
+  @override
+  String get dashboard_swap => 'Swap';
+
+  @override
+  String get dashboard_realtimeSpeed => '实时速率';
+
+  @override
+  String get dashboard_diskIo => '磁盘 I/O';
+
+  @override
+  String get dashboard_read => '读取';
+
+  @override
+  String get dashboard_write => '写入';
+
+  @override
+  String get dashboard_latency => '延迟';
+
+  @override
+  String get dashboard_partitions => '磁盘分区';
+
+  @override
+  String get dashboard_hostDetails => '主机详情';
+
+  @override
+  String dashboard_coreThreads(int physical, int logical) {
+    return '$physical 核 / $logical 线程';
+  }
+
+  @override
+  String dashboard_latencyValue(String value) {
+    return '$value ms/op';
+  }
+
+  @override
   String get dashboard_monitorOptions => '监控设备';
 
   @override

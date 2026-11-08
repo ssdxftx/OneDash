@@ -7315,6 +7315,63 @@
   "@files_recycleDisabled": {
     "description": "Recycle bin disabled status."
   },
+  "dashboard_resourceUsage": "Resource usage",
+  "@dashboard_resourceUsage": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_swap": "Swap",
+  "@dashboard_swap": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_realtimeSpeed": "Live speed",
+  "@dashboard_realtimeSpeed": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_diskIo": "Disk I/O",
+  "@dashboard_diskIo": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_read": "Read",
+  "@dashboard_read": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_write": "Write",
+  "@dashboard_write": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_latency": "Latency",
+  "@dashboard_latency": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_partitions": "Disk partitions",
+  "@dashboard_partitions": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_hostDetails": "Host details",
+  "@dashboard_hostDetails": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_coreThreads": "{physical} cores / {logical} threads",
+  "@dashboard_coreThreads": {
+    "description": "Physical and logical CPU counts.",
+    "placeholders": {
+      "physical": {
+        "type": "int"
+      },
+      "logical": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_latencyValue": "{value} ms/op",
+  "@dashboard_latencyValue": {
+    "description": "Disk latency per operation.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "dashboard_monitorOptions": "Monitor devices",
   "@dashboard_monitorOptions": {
     "description": "Title for monitor device selection."
