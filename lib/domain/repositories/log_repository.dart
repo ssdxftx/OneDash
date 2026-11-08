@@ -3,6 +3,7 @@ import '../../data/dto/log/login_log_dto.dart';
 import '../../data/dto/log/operation_log_dto.dart';
 import '../../data/dto/log/ssh_log_dto.dart';
 import '../../data/dto/log/task_log_dto.dart';
+import '../../data/dto/common/task_log_dto.dart' as log_file;
 
 /// 日志审计数据仓库接口。
 abstract interface class LogRepository {
@@ -42,4 +43,7 @@ abstract interface class LogRepository {
   });
 
   Future<String> exportSshLogs({String info, String status});
+
+  /// 按 taskID 读取任务日志全文。
+  Future<log_file.TaskLogDto> readTaskLog(String taskID);
 }

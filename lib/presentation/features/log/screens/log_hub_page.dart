@@ -13,13 +13,13 @@ import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
+import '../../../common/components/task_log_sheet.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../models/login_log_item.dart';
 import '../models/operation_log_item.dart';
 import '../models/ssh_log_item.dart';
-import '../models/task_log_item.dart';
 import '../providers/log_providers.dart';
 import '../widgets/log_row_parts.dart';
 import '../widgets/login_log_row.dart';
@@ -414,7 +414,6 @@ class _TaskLogTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final logs = ref.watch(taskLogsProvider);
     return AsyncStateView(
       value: logs,
@@ -427,47 +426,17 @@ class _TaskLogTab extends ConsumerWidget {
         itemCount: items.length,
         itemBuilder: (context, i) => TaskLogRow(
           item: items[i],
-          onTap: () => _showTaskDetail(context, items[i], l10n),
+          onTap: () => showTaskLogSheet(
+            context,
+            title: items[i].name,
+            taskID: items[i].id,
+            reader: (taskID) async {
+              final repository = await ref.read(logRepositoryProvider.future);
+              return repository.readTaskLog(taskID);
+            },
+            onFinished: () => ref.invalidate(taskLogsProvider),
+          ),
         ),
-      ),
-    );
-  }
-
-  void _showTaskDetail(
-    BuildContext context,
-    TaskLogItem item,
-    AppLocalizations l10n,
-  ) {
-    final tone = item.isExecuting
-        ? context.appColors.warning
-        : (item.isSuccess
-              ? context.appColors.success
-              : context.appColors.danger);
-    showAppSheet<void>(
-      context: context,
-      builder: (sheetContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          LogDetailHeader(
-            title: item.name,
-            statusLabel: item.isExecuting
-                ? l10n.taskLog_executing
-                : (item.isSuccess ? l10n.common_success : l10n.common_failed),
-            tone: tone,
-            time: formatLogTime(item.createdAt),
-            icon: TablerIcons.list_check,
-          ),
-          if (item.operate.trim().isNotEmpty)
-            LogDetailField(label: l10n.logs_request, value: item.operate),
-          if (item.errorMsg.trim().isNotEmpty)
-            LogDetailField(label: l10n.error_details, value: item.errorMsg),
-          const SizedBox(height: AppTokens.s16),
-          SecondaryButton(
-            label: AppLocalizations.of(sheetContext).action_close,
-            onPressed: () => Navigator.of(sheetContext).pop(),
-          ),
-        ],
       ),
     );
   }

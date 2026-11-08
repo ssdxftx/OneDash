@@ -4,8 +4,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../core/network/dio_client_provider.dart';
 import '../../domain/repositories/log_repository.dart';
 import '../../presentation/features/server_detail/providers/active_server_provider.dart';
+import '../api/file_api.dart';
 import '../api/log_api.dart';
 import '../dto/common/page_result.dart';
+import '../dto/common/task_log_dto.dart' as log_file;
 import '../dto/log/login_log_dto.dart';
 import '../dto/log/operation_log_dto.dart';
 import '../dto/log/ssh_log_dto.dart';
@@ -15,9 +17,10 @@ part 'log_repository_impl.g.dart';
 
 /// [LogRepository] 的默认实现。
 class LogRepositoryImpl implements LogRepository {
-  LogRepositoryImpl(this._api);
+  LogRepositoryImpl(this._api, this._fileApi);
 
   final LogApi _api;
+  final FileApi _fileApi;
 
   @override
   Future<PageResult<OperationLogDto>> searchOperationLogs({
@@ -86,6 +89,16 @@ class LogRepositoryImpl implements LogRepository {
   @override
   Future<String> exportSshLogs({String info = '', String status = 'All'}) =>
       _api.exportSshLogs(info: info, status: status);
+
+  @override
+  Future<log_file.TaskLogDto> readTaskLog(String taskID) =>
+      _fileApi.readFile<log_file.TaskLogDto>(
+        id: 0,
+        type: 'task',
+        name: '',
+        taskID: taskID,
+        fromJson: log_file.TaskLogDto.fromJson,
+      );
 }
 
 /// 基于当前激活服务器的日志仓库 Provider。
@@ -93,5 +106,5 @@ class LogRepositoryImpl implements LogRepository {
 Future<LogRepository> logRepository(Ref ref) async {
   final serverId = ref.watch(activeServerIdProvider);
   final client = await ref.watch(dioClientProvider(serverId).future);
-  return LogRepositoryImpl(LogApi(client));
+  return LogRepositoryImpl(LogApi(client), FileApi(client));
 }
