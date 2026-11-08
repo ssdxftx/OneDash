@@ -37,7 +37,11 @@ class OperationLogItem {
   );
 
   /// 标题三级回退：中文动作名 → 英文动作名 → HTTP 方法 + 路径。
-  String get title => '${method.toUpperCase()} $path';
+  String get title {
+    if (detailZH.trim().isNotEmpty) return detailZH.trim();
+    if (detailEN.trim().isNotEmpty) return detailEN.trim();
+    return '${method.toUpperCase()} $path';
+  }
 
   bool get isSuccess => status.toLowerCase() == 'success';
 }
