@@ -95,6 +95,20 @@ abstract final class AppTheme {
         centerTitle: false,
         titleTextStyle: textTheme.titleLarge?.copyWith(color: scheme.onSurface),
       ),
+      menuButtonTheme: const MenuButtonThemeData(
+        style: ButtonStyle(
+          minimumSize: WidgetStatePropertyAll(
+            Size(0, AppTokens.menuRowHeight),
+          ),
+          maximumSize: WidgetStatePropertyAll(
+            Size(double.infinity, double.infinity),
+          ),
+          padding: WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: AppTokens.s12, vertical: 0),
+          ),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      ),
       navigationBarTheme: NavigationBarThemeData(
         height: 72,
         backgroundColor: scheme.surface,

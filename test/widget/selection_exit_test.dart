@@ -87,7 +87,8 @@ class _FakeContainerRepository implements ContainerRepository {
   }
 
   @override
-  Future<List<ContainerResourceStatsDto>> getContainerResourceStats() async => [];
+  Future<List<ContainerResourceStatsDto>> getContainerResourceStats() async =>
+      [];
 
   @override
   Future<DockerStatusDto> getDockerStatus() async =>
@@ -171,6 +172,78 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('已选 1 项'), findsNothing);
     expect(container.read(bottomNavSuppressedProvider), isFalse);
+  });
+
+  testWidgets('website module menu rows are 40 high and 220 wide', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          websiteRepositoryProvider.overrideWith(
+            (ref) async => _FakeWebsiteRepository(),
+          ),
+          serverRepositoryProvider.overrideWithValue(_FakeServerRepository()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.build(Brightness.light),
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const WebsitesPage(serverId: 1),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(TablerIcons.dots));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    final row = tester.getSize(find.byType(MenuItemButton).at(1));
+    expect(row.height, closeTo(40, 0.5));
+    expect(row.width, closeTo(220, 0.5));
+  });
+
+  testWidgets('website module menu fits 320dp at 1.5x text', (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          websiteRepositoryProvider.overrideWith(
+            (ref) async => _FakeWebsiteRepository(),
+          ),
+          serverRepositoryProvider.overrideWithValue(_FakeServerRepository()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.build(Brightness.light),
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: const TextScaler.linear(1.5)),
+            child: child!,
+          ),
+          home: const WebsitesPage(serverId: 1),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(TablerIcons.dots));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(MenuItemButton), findsWidgets);
   });
 
   testWidgets('container list exits selection with X and back', (tester) async {

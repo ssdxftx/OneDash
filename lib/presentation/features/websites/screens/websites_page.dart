@@ -332,7 +332,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
   Widget _moduleMenu(BuildContext context, AppLocalizations l10n) {
     return MenuAnchor(
       controller: _menuController,
-      alignmentOffset: const Offset(-220, 8),
+      alignmentOffset: const Offset(-172, 8),
       style: MenuStyle(
         backgroundColor: WidgetStatePropertyAll(
           context.scheme.surfaceContainer,
@@ -383,7 +383,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
               'stream',
             ),
           ],
-          child: _menuRow(context, TablerIcons.plus, l10n.websites_create),
+          child: _menuRow(
+            context,
+            TablerIcons.plus,
+            l10n.websites_create,
+            width: 160,
+          ),
         ),
         _item(
           context,
@@ -467,6 +472,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
             context,
             TablerIcons.settings_cog,
             l10n.websites_openRestyService,
+            width: 160,
           ),
         ),
       ],
@@ -484,9 +490,10 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
     IconData icon,
     String title, {
     String? subtitle,
+    double width = 196,
   }) {
     return SizedBox(
-      width: 220,
+      width: width,
       child: Row(
         children: [
           Icon(icon, size: 18),
