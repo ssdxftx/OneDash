@@ -18,6 +18,7 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/search_field.dart';
+import '../../../common/components/selection_app_bar.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
@@ -54,10 +55,10 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
 
   void _toggle(String name) {
     setState(() {
-      _selecting = true;
       if (!_selected.remove(name)) _selected.add(name);
+      _selecting = _selected.isNotEmpty;
     });
-    ref.read(bottomNavSuppressedProvider.notifier).state = true;
+    ref.read(bottomNavSuppressedProvider.notifier).state = _selecting;
   }
 
   void _clearSelection() {
@@ -145,291 +146,306 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
     final total = containers.valueOrNull?.items.length;
     final docker = ref.watch(dockerStatusProvider);
 
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            AppBarLarge(
-              title: l10n.containers_title,
-              subtitle: [
-                if (server != null) server.displayName,
-                if (total != null) l10n.containers_count(total),
-              ].join(' · '),
-              onTitleTap: () => showServerSwitcher(
-                context,
-                ref,
-                currentServerId: widget.serverId,
-              ),
-              actions: [
-                AppIconButton(
-                  icon: TablerIcons.refresh,
-                  tooltip: l10n.action_refresh,
-                  onPressed: () =>
-                      ref.read(containersProvider.notifier).refresh(),
-                ),
-                AppIconButton(
-                  icon: _searching ? TablerIcons.x : TablerIcons.search,
-                  tooltip: l10n.action_search,
-                  onPressed: () {
-                    setState(() {
-                      _searching = !_searching;
-                      if (!_searching) {
-                        _clearSelection();
-                        _searchController.clear();
-                        ref.read(containersProvider.notifier).search('');
-                      }
-                    });
-                  },
-                ),
-                AppIconButton(
-                  icon: TablerIcons.dots,
-                  tooltip: l10n.action_more,
-                  onPressed: () async {
-                    final value = await showSelectionMenu<String>(
-                      context,
-                      options: [
-                        SelectionOption(
-                          label: _selectionMode
-                              ? l10n.files_cancelSelection
-                              : l10n.files_selectAll,
-                          value: 'select',
-                          icon: _selectionMode
-                              ? TablerIcons.square_x
-                              : TablerIcons.checkbox,
-                        ),
-                        SelectionOption(
-                          label: l10n.containers_dockerSettings,
-                          value: 'docker',
-                          icon: TablerIcons.brand_docker,
-                        ),
-                        SelectionOption(
-                          label: l10n.containers_resources,
-                          value: 'resources',
-                          icon: TablerIcons.chart_pie,
-                        ),
-                        SelectionOption(
-                          label: l10n.containers_prune,
-                          value: 'prune',
-                          icon: TablerIcons.eraser,
-                        ),
-                      ],
-                    );
-                    if (!context.mounted || value == null) return;
-                    if (value == 'select') {
-                      setState(() {
-                        if (_selectionMode) {
-                          _clearSelection();
-                        } else {
-                          _selecting = true;
-                          final items = ref
-                              .read(containersProvider)
-                              .valueOrNull
-                              ?.items;
-                          _selected.addAll(
-                            (items ?? const [])
-                                .where((item) => !item.isFromCompose)
-                                .map((item) => item.name),
-                          );
-                        }
-                      });
-                      ref.read(bottomNavSuppressedProvider.notifier).state =
-                          _selectionMode;
-                    } else if (value == 'docker') {
-                      await context.push(
-                        '/s/${widget.serverId}/containers/docker',
-                      );
-                    } else if (value == 'resources') {
-                      await context.push(
-                        '/s/${widget.serverId}/containers/resources',
-                      );
-                    } else if (value == 'prune') {
-                      await _prune();
-                    }
-                  },
-                ),
-                AppIconButton(
-                  icon: TablerIcons.plus,
-                  tooltip: l10n.containers_create,
-                  onPressed: () =>
-                      context.push('/s/${widget.serverId}/containers/create'),
-                ),
-              ],
-            ),
-            AnimatedSize(
-              duration: context.motion(AppTokens.dBase),
-              curve: AppTokens.curveBase,
-              alignment: Alignment.topCenter,
-              child: _searching
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.pagePadding,
-                        vertical: AppTokens.s8,
-                      ),
-                      child: SearchField(
-                        controller: _searchController,
-                        autofocus: true,
-                        onChanged: (value) {
-                          _clearSelection();
-                          _searchDebouncer(() {
-                            ref.read(containersProvider.notifier).search(value);
-                          }, delay: const Duration(milliseconds: 300));
-                        },
-                      ),
-                    )
-                  : const SizedBox(width: double.infinity),
-            ),
-            if (docker.valueOrNull != null && !docker.value!.isAvailable)
-              Container(
-                width: double.infinity,
-                margin: EdgeInsets.symmetric(horizontal: context.pagePadding),
-                padding: const EdgeInsets.all(AppTokens.s12),
-                decoration: BoxDecoration(
-                  color: context.appColors.warning.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(AppTokens.rMd),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      TablerIcons.alert_triangle,
-                      size: AppTokens.iconList,
-                      color: context.appColors.warning,
+    return PopScope(
+      canPop: !_selectionMode,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _selectionMode) _clearSelection();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              if (_selectionMode)
+                SelectionAppBar(
+                  selectedCount: _selected.length,
+                  onCancel: _clearSelection,
+                )
+              else
+                AppBarLarge(
+                  title: l10n.containers_title,
+                  subtitle: [
+                    if (server != null) server.displayName,
+                    if (total != null) l10n.containers_count(total),
+                  ].join(' · '),
+                  onTitleTap: () => showServerSwitcher(
+                    context,
+                    ref,
+                    currentServerId: widget.serverId,
+                  ),
+                  actions: [
+                    AppIconButton(
+                      icon: TablerIcons.refresh,
+                      tooltip: l10n.action_refresh,
+                      onPressed: () =>
+                          ref.read(containersProvider.notifier).refresh(),
                     ),
-                    const SizedBox(width: AppTokens.s8),
-                    Expanded(
-                      child: Text(
-                        l10n.containers_dockerNotRunningShort,
-                        style: AppTextStyles.bodyS.copyWith(
-                          color: context.appColors.warning,
-                        ),
+                    AppIconButton(
+                      icon: _searching ? TablerIcons.x : TablerIcons.search,
+                      tooltip: l10n.action_search,
+                      onPressed: () {
+                        setState(() {
+                          _searching = !_searching;
+                          if (!_searching) {
+                            _clearSelection();
+                            _searchController.clear();
+                            ref.read(containersProvider.notifier).search('');
+                          }
+                        });
+                      },
+                    ),
+                    AppIconButton(
+                      icon: TablerIcons.dots,
+                      tooltip: l10n.action_more,
+                      onPressed: () async {
+                        final value = await showSelectionMenu<String>(
+                          context,
+                          options: [
+                            SelectionOption(
+                              label: _selectionMode
+                                  ? l10n.files_cancelSelection
+                                  : l10n.files_selectAll,
+                              value: 'select',
+                              icon: _selectionMode
+                                  ? TablerIcons.square_x
+                                  : TablerIcons.checkbox,
+                            ),
+                            SelectionOption(
+                              label: l10n.containers_dockerSettings,
+                              value: 'docker',
+                              icon: TablerIcons.brand_docker,
+                            ),
+                            SelectionOption(
+                              label: l10n.containers_resources,
+                              value: 'resources',
+                              icon: TablerIcons.chart_pie,
+                            ),
+                            SelectionOption(
+                              label: l10n.containers_prune,
+                              value: 'prune',
+                              icon: TablerIcons.eraser,
+                            ),
+                          ],
+                        );
+                        if (!context.mounted || value == null) return;
+                        if (value == 'select') {
+                          setState(() {
+                            if (_selectionMode) {
+                              _clearSelection();
+                            } else {
+                              _selecting = true;
+                              final items = ref
+                                  .read(containersProvider)
+                                  .valueOrNull
+                                  ?.items;
+                              _selected.addAll(
+                                (items ?? const [])
+                                    .where((item) => !item.isFromCompose)
+                                    .map((item) => item.name),
+                              );
+                            }
+                          });
+                        } else if (value == 'docker') {
+                          await context.push(
+                            '/s/${widget.serverId}/containers/docker',
+                          );
+                        } else if (value == 'resources') {
+                          await context.push(
+                            '/s/${widget.serverId}/containers/resources',
+                          );
+                        } else if (value == 'prune') {
+                          await _prune();
+                        }
+                      },
+                    ),
+                    AppIconButton(
+                      icon: TablerIcons.plus,
+                      tooltip: l10n.containers_create,
+                      onPressed: () => context.push(
+                        '/s/${widget.serverId}/containers/create',
                       ),
                     ),
                   ],
                 ),
+              AnimatedSize(
+                duration: context.motion(AppTokens.dBase),
+                curve: AppTokens.curveBase,
+                alignment: Alignment.topCenter,
+                child: _searching
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.pagePadding,
+                          vertical: AppTokens.s8,
+                        ),
+                        child: SearchField(
+                          controller: _searchController,
+                          autofocus: true,
+                          onChanged: (value) {
+                            _clearSelection();
+                            _searchDebouncer(() {
+                              ref
+                                  .read(containersProvider.notifier)
+                                  .search(value);
+                            }, delay: const Duration(milliseconds: 300));
+                          },
+                        ),
+                      )
+                    : const SizedBox(width: double.infinity),
               ),
-            AppFilterChips<String>(
-              options: _filters,
-              labelOf: (value) => _label(value, l10n),
-              selected: {_filter},
-              onChanged: (selection) {
-                if (selection.isEmpty) return;
-                setState(() {
-                  _filter = selection.first;
-                  _clearSelection();
-                });
-                ref.read(containersProvider.notifier).setFilter(_filter);
-              },
-            ),
-            Expanded(
-              child: AsyncStateView(
-                value: containers,
-                contentKey: (_filter, _searchController.text),
-                onRetry: () => ref.read(containersProvider.notifier).refresh(),
-                loading: const SkeletonList(itemCount: 8, itemHeight: 60),
-                isEmpty: (state) => state.items.isEmpty,
-                empty: RefreshableEmptyState(
-                  onRefresh: () =>
-                      ref.read(containersProvider.notifier).refresh(),
-                  child: EmptyState(
-                    icon: TablerIcons.box,
-                    title: l10n.containers_empty_title,
-                    message: l10n.containers_empty_message,
-                    actionLabel: l10n.containers_create,
-                    onAction: () =>
-                        context.push('/s/${widget.serverId}/containers/create'),
+              if (docker.valueOrNull != null && !docker.value!.isAvailable)
+                Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.symmetric(horizontal: context.pagePadding),
+                  padding: const EdgeInsets.all(AppTokens.s12),
+                  decoration: BoxDecoration(
+                    color: context.appColors.warning.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(AppTokens.rMd),
                   ),
-                ),
-                builder: (state) {
-                  stopEntryAnimation(state.items.isNotEmpty);
-                  return RefreshIndicator(
-                    onRefresh: () =>
-                        ref.read(containersProvider.notifier).refresh(),
-                    child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.fromLTRB(
-                        context.pagePadding,
-                        AppTokens.s8,
-                        context.pagePadding,
-                        AppTokens.bottomNavClearance +
-                            MediaQuery.paddingOf(context).bottom,
-                      ),
-                      itemCount: state.items.length,
-                      itemBuilder: (context, index) {
-                        final item = state.items[index];
-                        final stats = state.stats[item.containerID];
-                        return RemovableListItem(
-                          key: ValueKey('container-${item.name}'),
-                          removing: _removing.contains(item.name),
-                          animateIn: entryAnimationEnabled,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: AppTokens.s12,
-                            ),
-                            child: _ContainerCard(
-                              item: item,
-                              cpu: stats?.cpuPercent,
-                              memory: stats == null
-                                  ? null
-                                  : formatBytes(stats.memoryUsage.toInt()),
-                              selected: _selected.contains(item.name),
-                              selectable: !item.isFromCompose,
-                              selectionMode: _selectionMode,
-                              onTap: _selectionMode
-                                  ? () {
-                                      if (!item.isFromCompose) {
-                                        _toggle(item.name);
-                                      }
-                                    }
-                                  : () => _showActions(item),
-                              onLongPress: () {
-                                if (!item.isFromCompose) _toggle(item.name);
-                              },
-                              onToggle: () => _operateQuick(
-                                item,
-                                item.state.toLowerCase() == 'running'
-                                    ? 'stop'
-                                    : 'start',
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: AnimatedSize(
-        duration: context.motion(AppTokens.dBase),
-        curve: AppTokens.curveBase,
-        alignment: Alignment.bottomCenter,
-        child: _selectionMode
-            ? SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppTokens.s16),
                   child: Row(
                     children: [
+                      Icon(
+                        TablerIcons.alert_triangle,
+                        size: AppTokens.iconList,
+                        color: context.appColors.warning,
+                      ),
+                      const SizedBox(width: AppTokens.s8),
                       Expanded(
                         child: Text(
-                          l10n.files_selectCount(_selected.length),
-                          style: AppTextStyles.bodyM,
+                          l10n.containers_dockerNotRunningShort,
+                          style: AppTextStyles.bodyS.copyWith(
+                            color: context.appColors.warning,
+                          ),
                         ),
-                      ),
-                      DangerButton(
-                        expanded: false,
-                        icon: TablerIcons.trash,
-                        label: l10n.action_delete,
-                        onPressed: _batchDelete,
                       ),
                     ],
                   ),
                 ),
-              )
-            : const SizedBox(width: double.infinity),
+              AppFilterChips<String>(
+                options: _filters,
+                labelOf: (value) => _label(value, l10n),
+                selected: {_filter},
+                onChanged: (selection) {
+                  if (selection.isEmpty) return;
+                  setState(() {
+                    _filter = selection.first;
+                    _clearSelection();
+                  });
+                  ref.read(containersProvider.notifier).setFilter(_filter);
+                },
+              ),
+              Expanded(
+                child: AsyncStateView(
+                  value: containers,
+                  contentKey: (_filter, _searchController.text),
+                  onRetry: () =>
+                      ref.read(containersProvider.notifier).refresh(),
+                  loading: const SkeletonList(itemCount: 8, itemHeight: 60),
+                  isEmpty: (state) => state.items.isEmpty,
+                  empty: RefreshableEmptyState(
+                    onRefresh: () =>
+                        ref.read(containersProvider.notifier).refresh(),
+                    child: EmptyState(
+                      icon: TablerIcons.box,
+                      title: l10n.containers_empty_title,
+                      message: l10n.containers_empty_message,
+                      actionLabel: l10n.containers_create,
+                      onAction: () => context.push(
+                        '/s/${widget.serverId}/containers/create',
+                      ),
+                    ),
+                  ),
+                  builder: (state) {
+                    stopEntryAnimation(state.items.isNotEmpty);
+                    return RefreshIndicator(
+                      onRefresh: () =>
+                          ref.read(containersProvider.notifier).refresh(),
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.fromLTRB(
+                          context.pagePadding,
+                          AppTokens.s8,
+                          context.pagePadding,
+                          AppTokens.bottomNavClearance +
+                              MediaQuery.paddingOf(context).bottom,
+                        ),
+                        itemCount: state.items.length,
+                        itemBuilder: (context, index) {
+                          final item = state.items[index];
+                          final stats = state.stats[item.containerID];
+                          return RemovableListItem(
+                            key: ValueKey('container-${item.name}'),
+                            removing: _removing.contains(item.name),
+                            animateIn: entryAnimationEnabled,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppTokens.s12,
+                              ),
+                              child: _ContainerCard(
+                                item: item,
+                                cpu: stats?.cpuPercent,
+                                memory: stats == null
+                                    ? null
+                                    : formatBytes(stats.memoryUsage.toInt()),
+                                selected: _selected.contains(item.name),
+                                selectable: !item.isFromCompose,
+                                selectionMode: _selectionMode,
+                                onTap: _selectionMode
+                                    ? () {
+                                        if (!item.isFromCompose) {
+                                          _toggle(item.name);
+                                        }
+                                      }
+                                    : () => _showActions(item),
+                                onLongPress: () {
+                                  if (!item.isFromCompose) _toggle(item.name);
+                                },
+                                onToggle: () => _operateQuick(
+                                  item,
+                                  item.state.toLowerCase() == 'running'
+                                      ? 'stop'
+                                      : 'start',
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: AnimatedSize(
+          duration: context.motion(AppTokens.dBase),
+          curve: AppTokens.curveBase,
+          alignment: Alignment.bottomCenter,
+          child: _selectionMode
+              ? SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppTokens.s16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.files_selectCount(_selected.length),
+                            style: AppTextStyles.bodyM,
+                          ),
+                        ),
+                        DangerButton(
+                          expanded: false,
+                          icon: TablerIcons.trash,
+                          label: l10n.action_delete,
+                          onPressed: _batchDelete,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
+        ),
       ),
     );
   }
