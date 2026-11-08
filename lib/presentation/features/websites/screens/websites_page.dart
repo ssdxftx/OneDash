@@ -20,6 +20,7 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/search_field.dart';
+import '../../../common/components/selection_app_bar.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/sheet_title.dart';
 import '../../../common/components/skeleton.dart';
@@ -71,10 +72,10 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
 
   void _toggle(WebsiteDto site) {
     setState(() {
-      _selecting = true;
       if (!_selected.remove(site.id)) _selected.add(site.id);
+      _selecting = _selected.isNotEmpty;
     });
-    ref.read(bottomNavSuppressedProvider.notifier).state = true;
+    ref.read(bottomNavSuppressedProvider.notifier).state = _selecting;
   }
 
   void _clearSelection() {
@@ -150,160 +151,172 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
     final websites = ref.watch(websitesProvider);
     final total = websites.valueOrNull?.total;
 
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            AppBarLarge(
-              title: l10n.websites_title,
-              subtitle: [
-                if (server != null) server.displayName,
-                if (total != null) l10n.websites_count(total),
-              ].join(' · '),
-              onTitleTap: () => showServerSwitcher(
-                context,
-                ref,
-                currentServerId: widget.serverId,
-              ),
-              actions: [_moduleMenu(context, l10n)],
-            ),
-            AnimatedSize(
-              duration: context.motion(AppTokens.dBase),
-              curve: AppTokens.curveBase,
-              alignment: Alignment.topCenter,
-              child: _searching
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.pagePadding,
-                        vertical: AppTokens.s8,
-                      ),
-                      child: SearchField(
-                        controller: _searchController,
-                        hint: l10n.action_search,
-                        autofocus: true,
-                        onChanged: (value) {
-                          _clearSelection();
-                          _debouncer(() {
-                            ref.read(websitesProvider.notifier).search(value);
-                          }, delay: const Duration(milliseconds: 300));
-                        },
-                      ),
-                    )
-                  : const SizedBox(width: double.infinity),
-            ),
-            AppFilterChips<String>(
-              options: _filters,
-              labelOf: (value) => _filterLabel(value, l10n),
-              selected: {_selectedFilter},
-              onChanged: (selection) {
-                if (selection.isEmpty) return;
-                setState(() {
-                  _selectedFilter = selection.first;
-                  _clearSelection();
-                });
-                ref.read(websitesProvider.notifier).setType(selection.first);
-              },
-            ),
-            Expanded(
-              child: AsyncStateView(
-                value: websites,
-                contentKey: (_selectedFilter, _searchController.text),
-                onRetry: () => ref.read(websitesProvider.notifier).refresh(),
-                loading: const SkeletonList(itemCount: 8),
-                isEmpty: (result) => result.items.isEmpty,
-                empty: RefreshableEmptyState(
-                  onRefresh: () =>
-                      ref.read(websitesProvider.notifier).refresh(),
-                  child: EmptyState(
-                    icon: TablerIcons.world,
-                    title: l10n.websites_empty_title,
-                    message: l10n.websites_empty_message,
-                    actionLabel: l10n.websites_create,
-                    onAction: _menuController.open,
+    return PopScope(
+      canPop: !_selectionMode,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _selectionMode) _clearSelection();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              if (_selectionMode)
+                SelectionAppBar(
+                  selectedCount: _selected.length,
+                  onCancel: _clearSelection,
+                )
+              else
+                AppBarLarge(
+                  title: l10n.websites_title,
+                  subtitle: [
+                    if (server != null) server.displayName,
+                    if (total != null) l10n.websites_count(total),
+                  ].join(' · '),
+                  onTitleTap: () => showServerSwitcher(
+                    context,
+                    ref,
+                    currentServerId: widget.serverId,
                   ),
+                  actions: [_moduleMenu(context, l10n)],
                 ),
-                builder: (result) {
-                  stopEntryAnimation(result.items.isNotEmpty);
-                  return RefreshIndicator(
-                    onRefresh: () =>
-                        ref.read(websitesProvider.notifier).refresh(),
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: (notification) {
-                        if (notification.metrics.extentAfter < 400) {
-                          ref.read(websitesProvider.notifier).loadMore();
-                        }
-                        return false;
-                      },
-                      child: ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: EdgeInsets.fromLTRB(
-                          context.pagePadding,
-                          AppTokens.s8,
-                          context.pagePadding,
-                          AppTokens.bottomNavClearance +
-                              MediaQuery.paddingOf(context).bottom,
+              AnimatedSize(
+                duration: context.motion(AppTokens.dBase),
+                curve: AppTokens.curveBase,
+                alignment: Alignment.topCenter,
+                child: _searching
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.pagePadding,
+                          vertical: AppTokens.s8,
                         ),
-                        itemCount: result.items.length,
-                        itemBuilder: (context, index) {
-                          final site = result.items[index];
-                          return RemovableListItem(
-                            key: ValueKey('website-${site.id}'),
-                            removing: _removing.contains(site.id),
-                            animateIn: entryAnimationEnabled,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                bottom: AppTokens.s12,
-                              ),
-                              child: _WebsiteCard(
-                                site: site,
-                                selected: _selected.contains(site.id),
-                                selectionMode: _selectionMode,
-                                onTap: _selectionMode
-                                    ? () => _toggle(site)
-                                    : () => _showSiteActions(site),
-                                onLongPress: () => _toggle(site),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  );
+                        child: SearchField(
+                          controller: _searchController,
+                          hint: l10n.action_search,
+                          autofocus: true,
+                          onChanged: (value) {
+                            _clearSelection();
+                            _debouncer(() {
+                              ref.read(websitesProvider.notifier).search(value);
+                            }, delay: const Duration(milliseconds: 300));
+                          },
+                        ),
+                      )
+                    : const SizedBox(width: double.infinity),
+              ),
+              AppFilterChips<String>(
+                options: _filters,
+                labelOf: (value) => _filterLabel(value, l10n),
+                selected: {_selectedFilter},
+                onChanged: (selection) {
+                  if (selection.isEmpty) return;
+                  setState(() {
+                    _selectedFilter = selection.first;
+                    _clearSelection();
+                  });
+                  ref.read(websitesProvider.notifier).setType(selection.first);
                 },
               ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: AnimatedSize(
-        duration: context.motion(AppTokens.dBase),
-        curve: AppTokens.curveBase,
-        alignment: Alignment.bottomCenter,
-        child: _selectionMode
-            ? SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppTokens.s16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          l10n.files_selectCount(_selected.length),
-                          style: AppTextStyles.bodyM,
+              Expanded(
+                child: AsyncStateView(
+                  value: websites,
+                  contentKey: (_selectedFilter, _searchController.text),
+                  onRetry: () => ref.read(websitesProvider.notifier).refresh(),
+                  loading: const SkeletonList(itemCount: 8),
+                  isEmpty: (result) => result.items.isEmpty,
+                  empty: RefreshableEmptyState(
+                    onRefresh: () =>
+                        ref.read(websitesProvider.notifier).refresh(),
+                    child: EmptyState(
+                      icon: TablerIcons.world,
+                      title: l10n.websites_empty_title,
+                      message: l10n.websites_empty_message,
+                      actionLabel: l10n.websites_create,
+                      onAction: _menuController.open,
+                    ),
+                  ),
+                  builder: (result) {
+                    stopEntryAnimation(result.items.isNotEmpty);
+                    return RefreshIndicator(
+                      onRefresh: () =>
+                          ref.read(websitesProvider.notifier).refresh(),
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: (notification) {
+                          if (notification.metrics.extentAfter < 400) {
+                            ref.read(websitesProvider.notifier).loadMore();
+                          }
+                          return false;
+                        },
+                        child: ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.fromLTRB(
+                            context.pagePadding,
+                            AppTokens.s8,
+                            context.pagePadding,
+                            AppTokens.bottomNavClearance +
+                                MediaQuery.paddingOf(context).bottom,
+                          ),
+                          itemCount: result.items.length,
+                          itemBuilder: (context, index) {
+                            final site = result.items[index];
+                            return RemovableListItem(
+                              key: ValueKey('website-${site.id}'),
+                              removing: _removing.contains(site.id),
+                              animateIn: entryAnimationEnabled,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppTokens.s12,
+                                ),
+                                child: _WebsiteCard(
+                                  site: site,
+                                  selected: _selected.contains(site.id),
+                                  selectionMode: _selectionMode,
+                                  onTap: _selectionMode
+                                      ? () => _toggle(site)
+                                      : () => _showSiteActions(site),
+                                  onLongPress: () => _toggle(site),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                      DangerButton(
-                        expanded: false,
-                        icon: TablerIcons.trash,
-                        label: l10n.action_delete,
-                        onPressed: _batchDelete,
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              )
-            : const SizedBox(width: double.infinity),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: AnimatedSize(
+          duration: context.motion(AppTokens.dBase),
+          curve: AppTokens.curveBase,
+          alignment: Alignment.bottomCenter,
+          child: _selectionMode
+              ? SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppTokens.s16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.files_selectCount(_selected.length),
+                            style: AppTextStyles.bodyM,
+                          ),
+                        ),
+                        DangerButton(
+                          expanded: false,
+                          icon: TablerIcons.trash,
+                          label: l10n.action_delete,
+                          onPressed: _batchDelete,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
+        ),
       ),
     );
   }
@@ -399,8 +412,6 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                 _selected.addAll((items ?? const []).map((site) => site.id));
               }
             });
-            ref.read(bottomNavSuppressedProvider.notifier).state =
-                _selectionMode;
           },
         ),
         _item(
