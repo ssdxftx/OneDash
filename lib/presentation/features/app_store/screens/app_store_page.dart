@@ -10,6 +10,7 @@ import '../../../../core/utils/debouncer.dart';
 import '../../../../data/dto/app/app_catalog_dto.dart';
 import '../../../../data/dto/app/app_installed_dto.dart';
 import '../../../common/components/action_sheet.dart';
+import '../../../common/formatters/status_labels.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_icon.dart';
 import '../../../common/components/task_progress_sheet.dart';
@@ -419,7 +420,7 @@ class _InstalledTab extends ConsumerWidget {
           title: app.displayName,
           subtitle: '${app.version} · ${app.httpPort}',
           trailing: ActionSheetStatusPill(
-            label: _statusLabel(app.status, l10n),
+            label: appStatusLabel(app.status, l10n),
             color: running ? colors.success : colors.info,
           ),
         ),
@@ -599,14 +600,6 @@ class _InstalledTab extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _statusLabel(String status, AppLocalizations l10n) {
-    return switch (status.toLowerCase()) {
-      'running' => l10n.common_running,
-      'stopped' || 'exited' || 'created' => l10n.common_stopped,
-      _ => l10n.common_unknown,
-    };
   }
 
   @override

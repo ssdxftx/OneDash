@@ -6195,9 +6195,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get taskLog_finished => 'Finished';
-
-  @override
   String get common_custom => 'Custom';
 
   @override
@@ -6221,4 +6218,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ai_mcp_gatewayImage => 'Gateway image';
+
+  @override
+  String get common_installing => 'Installing';
+
+  @override
+  String get common_restarting => 'Restarting';
+
+  @override
+  String get common_paused => 'Paused';
+
+  @override
+  String get common_abnormal => 'Abnormal';
+
+  @override
+  String get logs_authMode => 'Auth method';
+
+  @override
+  String get logs_message => 'Error message';
 }

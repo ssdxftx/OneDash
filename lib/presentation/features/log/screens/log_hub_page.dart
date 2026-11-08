@@ -11,9 +11,9 @@ import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
-import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/task_log_sheet.dart';
+import '../../../common/formatters/status_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -22,6 +22,7 @@ import '../models/operation_log_item.dart';
 import '../models/ssh_log_item.dart';
 import '../providers/log_providers.dart';
 import '../widgets/log_row_parts.dart';
+import '../widgets/log_row_skeleton.dart';
 import '../widgets/login_log_row.dart';
 import '../widgets/operation_log_row.dart';
 import '../widgets/ssh_log_row.dart';
@@ -201,12 +202,6 @@ extension on LogHubPage {
   }
 }
 
-Widget _logSkeleton() => const SkeletonList(
-  itemCount: 8,
-  itemHeight: 104,
-  padding: EdgeInsets.all(AppTokens.s16),
-);
-
 Widget _emptyState(BuildContext context) {
   final l10n = AppLocalizations.of(context);
   return EmptyState(
@@ -226,7 +221,7 @@ class _OperationLogTab extends ConsumerWidget {
     return AsyncStateView(
       value: logs,
       onRetry: () => ref.invalidate(operationLogsProvider),
-      loading: _logSkeleton(),
+      loading: const LogRowSkeletonList(style: LogSkeletonStyle.operation),
       isEmpty: (items) => items.isEmpty,
       empty: _emptyState(context),
       builder: (items) => ListView.builder(
@@ -265,9 +260,12 @@ class _OperationLogTab extends ConsumerWidget {
           LogDetailField(label: l10n.logs_method, value: item.method),
           LogDetailField(label: l10n.logs_path, value: item.path),
           LogDetailField(label: l10n.logs_source, value: item.source),
-          LogDetailField(label: l10n.logs_status, value: item.status),
+          LogDetailField(
+            label: l10n.logs_status,
+            value: item.isSuccess ? l10n.common_success : l10n.common_failed,
+          ),
           if (item.message.trim().isNotEmpty)
-            LogDetailField(label: l10n.logs_request, value: item.message),
+            LogDetailField(label: l10n.logs_message, value: item.message),
           const SizedBox(height: AppTokens.s16),
           SecondaryButton(
             label: AppLocalizations.of(sheetContext).action_close,
@@ -289,7 +287,7 @@ class _LoginLogTab extends ConsumerWidget {
     return AsyncStateView(
       value: logs,
       onRetry: () => ref.invalidate(loginLogsProvider),
-      loading: _logSkeleton(),
+      loading: const LogRowSkeletonList(style: LogSkeletonStyle.login),
       isEmpty: (items) => items.isEmpty,
       empty: _emptyState(context),
       builder: (items) => ListView.builder(
@@ -326,13 +324,12 @@ class _LoginLogTab extends ConsumerWidget {
             time: formatLogTime(item.createdAt),
             icon: TablerIcons.login,
           ),
-          LogDetailField(label: l10n.logs_ip, value: item.ip),
           if (item.hasLocation)
             LogDetailField(label: l10n.logs_address, value: item.address),
           if (item.hasDevice)
             LogDetailField(label: l10n.logs_device, value: item.deviceLabel),
           if (item.message.trim().isNotEmpty)
-            LogDetailField(label: l10n.logs_request, value: item.message),
+            LogDetailField(label: l10n.logs_message, value: item.message),
           const SizedBox(height: AppTokens.s16),
           SecondaryButton(
             label: AppLocalizations.of(sheetContext).action_close,
@@ -354,7 +351,7 @@ class _SshLogTab extends ConsumerWidget {
     return AsyncStateView(
       value: logs,
       onRetry: () => ref.invalidate(sshLogsProvider),
-      loading: _logSkeleton(),
+      loading: const LogRowSkeletonList(style: LogSkeletonStyle.ssh),
       isEmpty: (items) => items.isEmpty,
       empty: _emptyState(context),
       builder: (items) => ListView.builder(
@@ -395,9 +392,12 @@ class _SshLogTab extends ConsumerWidget {
           if (item.hasArea)
             LogDetailField(label: l10n.logs_address, value: item.area),
           if (item.authMode.isNotEmpty)
-            LogDetailField(label: l10n.logs_method, value: item.authMode),
+            LogDetailField(
+              label: l10n.logs_authMode,
+              value: sshAuthModeLabel(item.authMode, l10n),
+            ),
           if (item.message.trim().isNotEmpty)
-            LogDetailField(label: l10n.logs_request, value: item.message),
+            LogDetailField(label: l10n.logs_message, value: item.message),
           const SizedBox(height: AppTokens.s16),
           SecondaryButton(
             label: AppLocalizations.of(sheetContext).action_close,
@@ -418,7 +418,7 @@ class _TaskLogTab extends ConsumerWidget {
     return AsyncStateView(
       value: logs,
       onRetry: () => ref.invalidate(taskLogsProvider),
-      loading: _logSkeleton(),
+      loading: const LogRowSkeletonList(style: LogSkeletonStyle.task),
       isEmpty: (items) => items.isEmpty,
       empty: _emptyState(context),
       builder: (items) => ListView.builder(

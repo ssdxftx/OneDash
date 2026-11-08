@@ -8153,8 +8153,6 @@
       }
     }
   },
-  "taskLog_finished": "Finished",
-  "@taskLog_finished": {"description": "OneDash UI text."},
   "common_custom": "Custom",
   "@common_custom": {"description": "OneDash UI text."},
   "ai_channel_qqBot": "QQ Bot",
@@ -8170,5 +8168,17 @@
   "websites_sslId": "SSL ID",
   "@websites_sslId": {"description": "OneDash UI text."},
   "ai_mcp_gatewayImage": "Gateway image",
-  "@ai_mcp_gatewayImage": {"description": "OneDash UI text."}
+  "@ai_mcp_gatewayImage": {"description": "OneDash UI text."},
+  "common_installing": "Installing",
+  "@common_installing": {"description": "OneDash UI text."},
+  "common_restarting": "Restarting",
+  "@common_restarting": {"description": "OneDash UI text."},
+  "common_paused": "Paused",
+  "@common_paused": {"description": "OneDash UI text."},
+  "common_abnormal": "Abnormal",
+  "@common_abnormal": {"description": "OneDash UI text."},
+  "logs_authMode": "Auth method",
+  "@logs_authMode": {"description": "OneDash UI text."},
+  "logs_message": "Error message",
+  "@logs_message": {"description": "OneDash UI text."}
 }

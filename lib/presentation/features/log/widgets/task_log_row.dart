@@ -36,7 +36,9 @@ class TaskLogRow extends StatelessWidget {
               tone: tone,
               icon: item.isExecuting
                   ? TablerIcons.clock_play
-                  : TablerIcons.list_check,
+                  : (item.isSuccess
+                        ? TablerIcons.list_check
+                        : TablerIcons.playlist_x),
             ),
             const SizedBox(width: AppTokens.s12),
             Expanded(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onedash/core/localization/generated/app_localizations.dart';
@@ -71,6 +73,7 @@ void main() {
     expect(find.text('step 1'), findsOneWidget);
     expect(find.text('step 2'), findsOneWidget);
     expect(find.text('成功'), findsOneWidget);
+    expect(find.text('2 行'), findsOneWidget);
     expect(finished, 1);
 
     await tester.tap(find.text('关闭'));
@@ -108,6 +111,30 @@ void main() {
 
     await tester.pump(const Duration(seconds: 4));
     expect(calls, 2);
+
+    await tester.tap(find.text('关闭'));
+    await tester.pump(const Duration(milliseconds: 600));
+  });
+
+  testWidgets('上一次请求未返回时定时器不叠加并发请求', (tester) async {
+    final first = Completer<TaskLogDto>();
+    var calls = 0;
+    await _openSheet(tester, (_) {
+      calls++;
+      return first.future;
+    });
+
+    expect(calls, 1);
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump();
+    expect(calls, 1);
+
+    first.complete(
+      _log(end: true, status: 'Success', lines: const ['done'], total: 1),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('done'), findsOneWidget);
 
     await tester.tap(find.text('关闭'));
     await tester.pump(const Duration(milliseconds: 600));

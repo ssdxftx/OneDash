@@ -5,9 +5,12 @@ import 'package:onedash/core/theme/app_theme.dart';
 import 'package:onedash/presentation/features/log/models/login_log_item.dart';
 import 'package:onedash/presentation/features/log/models/operation_log_item.dart';
 import 'package:onedash/presentation/features/log/models/ssh_log_item.dart';
+import 'package:onedash/presentation/features/log/models/task_log_item.dart';
 import 'package:onedash/presentation/features/log/widgets/login_log_row.dart';
 import 'package:onedash/presentation/features/log/widgets/operation_log_row.dart';
 import 'package:onedash/presentation/features/log/widgets/ssh_log_row.dart';
+import 'package:onedash/presentation/features/log/widgets/task_log_row.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 Future<void> _pump(
   WidgetTester tester,
@@ -124,7 +127,29 @@ void main() {
     expect(find.text('root@203.0.113.8'), findsOneWidget);
     expect(find.text('中国 广东 深圳'), findsOneWidget);
     expect(find.text('password'), findsOneWidget);
-    expect(find.text('22'), findsOneWidget);
+    expect(find.text(':22'), findsOneWidget);
     expect(find.text('auth failed'), findsOneWidget);
+  });
+
+  testWidgets('任务失败行使用列表叉号图标而非对勾', (tester) async {
+    final item = TaskLogItem(
+      id: '1',
+      name: '应用安装',
+      operate: 'install',
+      status: 'Failed',
+      errorMsg: 'install failed',
+      currentStep: '',
+      createdAt: DateTime(2026, 11, 8, 15, 31, 1),
+      endAt: DateTime(2026, 11, 8, 15, 32, 1),
+    );
+    await _pump(tester, TaskLogRow(item: item));
+
+    final icon = tester.widget<Icon>(
+      find
+          .descendant(of: find.byType(TaskLogRow), matching: find.byType(Icon))
+          .first,
+    );
+    expect(icon.icon, TablerIcons.playlist_x);
+    expect(find.text('install failed'), findsOneWidget);
   });
 }

@@ -62,7 +62,8 @@ class SshLogRow extends StatelessWidget {
                         MetaInfo(icon: TablerIcons.map_pin, text: item.area),
                       if (item.authMode.isNotEmpty)
                         SourceChip(label: item.authMode),
-                      if (item.port.isNotEmpty) SourceChip(label: item.port),
+                      if (item.port.isNotEmpty)
+                        SourceChip(label: ':${item.port}'),
                       MetaInfo(
                         icon: TablerIcons.clock,
                         text: formatLogTime(item.date),

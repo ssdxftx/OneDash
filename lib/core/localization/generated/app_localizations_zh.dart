@@ -6061,9 +6061,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get taskLog_finished => '已完成';
-
-  @override
   String get common_custom => '自定义';
 
   @override
@@ -6086,4 +6083,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get ai_mcp_gatewayImage => '网关镜像';
+
+  @override
+  String get common_installing => '安装中';
+
+  @override
+  String get common_restarting => '重启中';
+
+  @override
+  String get common_paused => '已暂停';
+
+  @override
+  String get common_abnormal => '异常';
+
+  @override
+  String get logs_authMode => '认证方式';
+
+  @override
+  String get logs_message => '错误信息';
 }

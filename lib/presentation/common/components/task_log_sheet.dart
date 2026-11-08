@@ -61,6 +61,7 @@ class _TaskLogSheetState extends State<_TaskLogSheet> {
   bool _loading = true;
   bool _executing = true;
   bool _finishedNotified = false;
+  bool _inflight = false;
 
   @override
   void initState() {
@@ -76,6 +77,8 @@ class _TaskLogSheetState extends State<_TaskLogSheet> {
   }
 
   Future<void> _load() async {
+    if (_inflight) return;
+    _inflight = true;
     try {
       final log = await widget.reader(widget.taskID);
       if (!mounted) return;
@@ -103,6 +106,8 @@ class _TaskLogSheetState extends State<_TaskLogSheet> {
         _loading = false;
         _executing = false;
       });
+    } finally {
+      _inflight = false;
     }
   }
 
@@ -131,6 +136,7 @@ class _TaskLogSheetState extends State<_TaskLogSheet> {
     final log = _log;
     final busy = _loading || _executing;
     final failed = (log?.taskStatus ?? '').toLowerCase() == 'failed';
+    final error = _error == null ? null : mapError(_error!, l10n);
     final statusTone = _executing
         ? context.appColors.warning
         : (failed ? context.appColors.danger : context.appColors.success);
@@ -175,6 +181,18 @@ class _TaskLogSheetState extends State<_TaskLogSheet> {
                     : (failed ? l10n.common_failed : l10n.common_success),
                 tone: statusTone,
               ),
+              if ((log.totalLines > 0 ? log.totalLines : log.lines.length) >
+                  0) ...[
+                const SizedBox(width: AppTokens.s8),
+                Text(
+                  l10n.taskLog_lines(
+                    log.totalLines > 0 ? log.totalLines : log.lines.length,
+                  ),
+                  style: AppTextStyles.caption.copyWith(
+                    color: context.scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
               if (log.path.isNotEmpty) ...[
                 const SizedBox(width: AppTokens.s8),
                 Expanded(
@@ -192,13 +210,13 @@ class _TaskLogSheetState extends State<_TaskLogSheet> {
           ),
         ],
         const SizedBox(height: AppTokens.s16),
-        if (_error != null)
+        if (error != null)
           ErrorState(
             data: ErrorViewData(
               icon: TablerIcons.file_alert,
               title: l10n.taskLog_readFailedTitle,
-              message: mapError(_error!, l10n).message,
-              detail: mapError(_error!, l10n).detail,
+              message: error.message,
+              detail: error.detail,
               actionLabel: l10n.common_retry,
             ),
             onRetry: _retry,

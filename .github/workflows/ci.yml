@@ -33,6 +33,9 @@ jobs:
       - name: Check UI consistency
         run: python3 tool/check_ui_consistency.py
 
+      - name: Check hardcoded english
+        run: python3 tool/check_hardcoded_english.py
+
       - name: Analyze
         run: flutter analyze --fatal-infos
 

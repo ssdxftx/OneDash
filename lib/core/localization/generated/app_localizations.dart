@@ -11801,12 +11801,6 @@ abstract class AppLocalizations {
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
-  /// **'Finished'**
-  String get taskLog_finished;
-
-  /// OneDash UI text.
-  ///
-  /// In en, this message translates to:
   /// **'Custom'**
   String get common_custom;
 
@@ -11851,6 +11845,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gateway image'**
   String get ai_mcp_gatewayImage;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Installing'**
+  String get common_installing;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restarting'**
+  String get common_restarting;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get common_paused;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Abnormal'**
+  String get common_abnormal;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Auth method'**
+  String get logs_authMode;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Error message'**
+  String get logs_message;
 }
 
 class _AppLocalizationsDelegate
