@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -28,12 +29,13 @@ class AppIcon extends StatelessWidget {
   /// Loads binary icon data when [icon] is empty or a relative path.
   final Future<Uint8List> Function()? iconLoader;
 
-  static final Map<String, Uint8List?> _decoded = <String, Uint8List?>{};
-  static final Map<String, Future<Uint8List?>> _remote =
-      <String, Future<Uint8List?>>{};
+  static final LinkedHashMap<String, Uint8List?> _decoded =
+      LinkedHashMap<String, Uint8List?>();
+  static final LinkedHashMap<String, Future<Uint8List?>> _remote =
+      LinkedHashMap<String, Future<Uint8List?>>();
   static final Map<String, int> _failures = <String, int>{};
   static final Map<String, DateTime> _cooldownUntil = <String, DateTime>{};
-  static const int _decodeCacheLimit = 64;
+  static const int _decodeCacheLimit = 128;
   static const int _maxRetries = 2;
   static const Duration _retryCooldown = Duration(seconds: 30);
 
@@ -85,8 +87,10 @@ class AppIcon extends StatelessWidget {
     }
     final completer = Completer<Uint8List?>();
     final future = completer.future;
-    if (_remote.length >= _decodeCacheLimit) _remote.clear();
     _remote[key] = future;
+    while (_remote.length > _decodeCacheLimit) {
+      _remote.remove(_remote.keys.first);
+    }
     Future<Uint8List>.sync(iconLoader!)
         .then((bytes) {
           _failures.remove(key);
@@ -139,8 +143,10 @@ class AppIcon extends StatelessWidget {
     } on FormatException {
       bytes = null;
     }
-    if (_decoded.length >= _decodeCacheLimit) _decoded.clear();
     _decoded[raw] = bytes;
+    while (_decoded.length > _decodeCacheLimit) {
+      _decoded.remove(_decoded.keys.first);
+    }
     return bytes;
   }
 

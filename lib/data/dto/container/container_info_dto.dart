@@ -50,7 +50,7 @@ class ContainerInfoDto {
   final bool privileged;
   final bool autoRemove;
   final List<ContainerVolumeDto> volumes;
-  final List<String>? extraHosts;
+  final List<ContainerExtraHostDto>? extraHosts;
   final List<String> labels;
   final List<String> env;
   final String restartPolicy;
@@ -78,7 +78,7 @@ class ContainerInfoDto {
     'privileged': privileged,
     'autoRemove': autoRemove,
     'volumes': volumes.map((item) => item.toJson()).toList(),
-    'extraHosts': extraHosts ?? const [],
+    'extraHosts': extraHosts?.map((item) => item.toJson()).toList() ?? const [],
     'labels': labels,
     'env': env,
     'restartPolicy': restartPolicy,
@@ -127,7 +127,7 @@ class ContainerInfoDto {
               .toList() ??
           [],
       extraHosts: (json['extraHosts'] as List<dynamic>?)
-          ?.map((e) => e as String)
+          ?.map(ContainerExtraHostDto.fromJson)
           .toList(),
       labels:
           (json['labels'] as List<dynamic>?)
@@ -148,12 +148,22 @@ class ContainerNetworkDto {
     required this.ipv4,
     required this.ipv6,
     required this.macAddr,
+    this.links = const [],
+    this.aliases = const [],
+    this.driverOpts = const {},
+    this.gwPriority = 0,
+    this.linkLocalIPs = const [],
   });
 
   final String network;
   final String ipv4;
   final String ipv6;
   final String macAddr;
+  final List<String> links;
+  final List<String> aliases;
+  final Map<String, String> driverOpts;
+  final int gwPriority;
+  final List<String> linkLocalIPs;
 
   factory ContainerNetworkDto.fromJson(Map<String, dynamic> json) {
     return ContainerNetworkDto(
@@ -161,6 +171,18 @@ class ContainerNetworkDto {
       ipv4: json['ipv4'] as String? ?? '',
       ipv6: json['ipv6'] as String? ?? '',
       macAddr: json['macAddr'] as String? ?? '',
+      links: (json['links'] as List?)?.map((e) => '$e').toList() ?? const [],
+      aliases:
+          (json['aliases'] as List?)?.map((e) => '$e').toList() ?? const [],
+      driverOpts:
+          (json['driverOpts'] as Map?)?.map(
+            (key, value) => MapEntry('$key', '$value'),
+          ) ??
+          const {},
+      gwPriority: (json['gwPriority'] as num?)?.toInt() ?? 0,
+      linkLocalIPs:
+          (json['linkLocalIPs'] as List?)?.map((e) => '$e').toList() ??
+          const [],
     );
   }
 
@@ -169,6 +191,11 @@ class ContainerNetworkDto {
     'ipv4': ipv4,
     'ipv6': ipv6,
     'macAddr': macAddr,
+    'links': links,
+    'aliases': aliases,
+    'driverOpts': driverOpts,
+    'gwPriority': gwPriority,
+    'linkLocalIPs': linkLocalIPs,
   };
 }
 
@@ -234,4 +261,29 @@ class ContainerVolumeDto {
     'mode': mode,
     'shared': shared,
   };
+}
+
+class ContainerExtraHostDto {
+  const ContainerExtraHostDto({required this.hostname, required this.ip});
+
+  final String hostname;
+  final String ip;
+
+  factory ContainerExtraHostDto.fromJson(Object? raw) {
+    if (raw is Map) {
+      return ContainerExtraHostDto(
+        hostname: '${raw['hostname'] ?? ''}',
+        ip: '${raw['ip'] ?? ''}',
+      );
+    }
+    final text = '$raw';
+    final index = text.lastIndexOf(':');
+    if (index <= 0) return ContainerExtraHostDto(hostname: text, ip: '');
+    return ContainerExtraHostDto(
+      hostname: text.substring(0, index),
+      ip: text.substring(index + 1),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'hostname': hostname, 'ip': ip};
 }

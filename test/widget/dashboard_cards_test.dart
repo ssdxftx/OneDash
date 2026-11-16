@@ -126,7 +126,8 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(_app(width: 390, height: 1800));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(tester.takeException(), isNull);
     expect(find.text('资源占用'), findsOneWidget);
@@ -144,7 +145,8 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(_app(width: 320, height: 2400, scale: 1.5));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(tester.takeException(), isNull);
     expect(find.text('资源占用'), findsOneWidget);

@@ -11,6 +11,16 @@ import '../../../core/theme/tokens.dart';
 class SimpleMarkdown extends StatelessWidget {
   const SimpleMarkdown({super.key, required this.data});
 
+  static final _heading = RegExp(r'^#{1,6}\s');
+  static final _horizontalRule = RegExp(r'^(-{3,}|\*{3,}|_{3,})$');
+  static final _quotePrefix = RegExp(r'^>\s?');
+  static final _listItem = RegExp(r'^([-*+]|\d+\.)\s+');
+  static final _inlineToken = RegExp(
+    r'(\*\*[^*]+\*\*|`[^`]+`|!\[[^\]]*\]\([^)]+\)|\[[^\]]+\]\([^)]+\))',
+  );
+  static final _imageToken = RegExp(r'!\[([^\]]*)\]\(([^)]+)\)');
+  static final _linkToken = RegExp(r'\[([^\]]+)\]\(([^)]+)\)');
+
   final String data;
 
   @override
@@ -44,7 +54,7 @@ class SimpleMarkdown extends StatelessWidget {
         blocks.add(_CodeBlock(language: language, lines: buffer));
         continue;
       }
-      if (RegExp(r'^#{1,6}\s').hasMatch(trimmed)) {
+      if (_heading.hasMatch(trimmed)) {
         final level = trimmed.indexOf(' ');
         blocks.add(
           Padding(
@@ -62,7 +72,7 @@ class SimpleMarkdown extends StatelessWidget {
         index++;
         continue;
       }
-      if (RegExp(r'^(-{3,}|\*{3,}|_{3,})$').hasMatch(trimmed)) {
+      if (_horizontalRule.hasMatch(trimmed)) {
         blocks.add(
           const Padding(
             padding: EdgeInsets.symmetric(vertical: AppTokens.s12),
@@ -75,7 +85,7 @@ class SimpleMarkdown extends StatelessWidget {
       if (trimmed.startsWith('>')) {
         final buffer = <String>[];
         while (index < lines.length && lines[index].trim().startsWith('>')) {
-          buffer.add(lines[index].trim().replaceFirst(RegExp(r'^>\s?'), ''));
+          buffer.add(lines[index].trim().replaceFirst(_quotePrefix, ''));
           index++;
         }
         blocks.add(
@@ -97,13 +107,13 @@ class SimpleMarkdown extends StatelessWidget {
         );
         continue;
       }
-      final bullet = RegExp(r'^([-*+]|\d+\.)\s+').firstMatch(trimmed);
+      final bullet = _listItem.firstMatch(trimmed);
       if (bullet != null) {
         final marker = bullet.group(1)!;
         final texts = <String>[];
         while (index < lines.length) {
           final current = lines[index].trim();
-          final match = RegExp(r'^([-*+]|\d+\.)\s+').firstMatch(current);
+          final match = _listItem.firstMatch(current);
           if (match == null) break;
           texts.add(current.substring(match.end));
           index++;
@@ -151,9 +161,9 @@ class SimpleMarkdown extends StatelessWidget {
         if (current.isEmpty ||
             current.startsWith('```') ||
             current.startsWith('>') ||
-            RegExp(r'^#{1,6}\s').hasMatch(current) ||
-            RegExp(r'^([-*+]|\d+\.)\s+').hasMatch(current) ||
-            RegExp(r'^(-{3,}|\*{3,}|_{3,})$').hasMatch(current)) {
+            _heading.hasMatch(current) ||
+            _listItem.hasMatch(current) ||
+            _horizontalRule.hasMatch(current)) {
           break;
         }
         paragraph.add(current);
@@ -184,11 +194,8 @@ class SimpleMarkdown extends StatelessWidget {
 
   Widget _inline(BuildContext context, String text, TextStyle style) {
     final spans = <InlineSpan>[];
-    final pattern = RegExp(
-      r'(\*\*[^*]+\*\*|`[^`]+`|!\[[^\]]*\]\([^)]+\)|\[[^\]]+\]\([^)]+\))',
-    );
     var cursor = 0;
-    for (final match in pattern.allMatches(text)) {
+    for (final match in _inlineToken.allMatches(text)) {
       if (match.start > cursor) {
         spans.add(TextSpan(text: text.substring(cursor, match.start)));
       }
@@ -208,7 +215,7 @@ class SimpleMarkdown extends StatelessWidget {
           ),
         );
       } else if (token.startsWith('![')) {
-        final image = RegExp(r'!\[([^\]]*)\]\(([^)]+)\)').firstMatch(token)!;
+        final image = _imageToken.firstMatch(token)!;
         final alt = image.group(1) ?? '';
         final url = image.group(2) ?? '';
         spans.add(
@@ -234,7 +241,7 @@ class SimpleMarkdown extends StatelessWidget {
           ),
         );
       } else {
-        final link = RegExp(r'\[([^\]]+)\]\(([^)]+)\)').firstMatch(token)!;
+        final link = _linkToken.firstMatch(token)!;
         spans.add(
           WidgetSpan(
             alignment: PlaceholderAlignment.baseline,

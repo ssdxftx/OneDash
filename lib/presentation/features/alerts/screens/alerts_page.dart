@@ -18,6 +18,7 @@ import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
+import '../../../common/components/section_header.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
@@ -560,10 +561,26 @@ class _AlertLogTab extends ConsumerWidget {
 final _alertConfigsProvider = FutureProvider.autoDispose<List<AlertConfigInfo>>(
   (ref) async {
     final repository = await ref.watch(alertRepositoryProvider.future);
-    return repository.getAlertConfigs();
+    final result = await repository.searchAlertConfigs(
+      const AlertConfigSearchReq(page: 1, pageSize: 100),
+    );
+    return result.items;
   },
   name: 'alertConfigsSettingsProvider',
 );
+
+final _clamTargetsProvider = FutureProvider.autoDispose<List<ClamAlertInfo>>((
+  ref,
+) async {
+  final repository = await ref.watch(alertRepositoryProvider.future);
+  return repository.listClams();
+}, name: 'clamAlertTargetsProvider');
+
+final _cronjobTargetsProvider =
+    FutureProvider.autoDispose<List<CronJobAlertInfo>>((ref) async {
+      final repository = await ref.watch(alertRepositoryProvider.future);
+      return repository.listAlertCronJobs();
+    }, name: 'cronjobAlertTargetsProvider');
 
 class _AlertSettingsTab extends ConsumerWidget {
   const _AlertSettingsTab();
@@ -632,6 +649,24 @@ class _AlertSettingsTab extends ConsumerWidget {
                             ],
                           ),
                         ),
+                        Switch(
+                          value: config.status == 'Enable',
+                          onChanged: (value) async {
+                            try {
+                              final repository = await ref.read(
+                                alertRepositoryProvider.future,
+                              );
+                              await repository.updateAlertConfigStatus(
+                                config.id,
+                                value ? 'Enable' : 'Disable',
+                              );
+                              ref.invalidate(_alertConfigsProvider);
+                            } catch (error) {
+                              if (!context.mounted) return;
+                              showErrorToast(context, error);
+                            }
+                          },
+                        ),
                         IconButton(
                           tooltip: l10n.alerts_testNotification,
                           icon: const Icon(TablerIcons.send),
@@ -651,6 +686,25 @@ class _AlertSettingsTab extends ConsumerWidget {
                 ),
             ],
           ),
+        ),
+        const SizedBox(height: AppTokens.s24),
+        SectionHeader(title: l10n.alerts_clamScans),
+        _AlertTargetList<ClamAlertInfo>(
+          provider: _clamTargetsProvider,
+          icon: TablerIcons.shield_check,
+          titleOf: (item) => item.name,
+          subtitleOf: (item) => item.path.isEmpty
+              ? item.status
+              : '${l10n.alerts_targetPath(item.path)} · ${item.status}',
+        ),
+        const SizedBox(height: AppTokens.s24),
+        SectionHeader(title: l10n.alerts_cronjobTargets),
+        _AlertTargetList<CronJobAlertInfo>(
+          provider: _cronjobTargetsProvider,
+          icon: TablerIcons.clock,
+          titleOf: (item) => item.name,
+          subtitleOf: (item) =>
+              '${l10n.alerts_targetType(item.type)} · ${item.status}',
         ),
       ],
     );
@@ -732,6 +786,8 @@ class _AlertSettingsTab extends ConsumerWidget {
           title: titleValue,
           config: contentValue,
           status: status ? 'Enable' : 'Disable',
+          displayName: current?.displayName ?? '',
+          revision: current?.revision,
         ),
       );
       ref.invalidate(_alertConfigsProvider);
@@ -807,5 +863,73 @@ class _AlertSettingsTab extends ConsumerWidget {
       if (!context.mounted) return;
       showErrorToast(context, error);
     }
+  }
+}
+
+class _AlertTargetList<T> extends ConsumerWidget {
+  const _AlertTargetList({
+    required this.provider,
+    required this.icon,
+    required this.titleOf,
+    required this.subtitleOf,
+  });
+
+  final AutoDisposeFutureProvider<List<T>> provider;
+  final IconData icon;
+  final String Function(T item) titleOf;
+  final String Function(T item) subtitleOf;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final targets = ref.watch(provider);
+    return AsyncStateView(
+      value: targets,
+      onRetry: () => ref.invalidate(provider),
+      loading: const SkeletonList(itemCount: 2),
+      isEmpty: (items) => items.isEmpty,
+      empty: EmptyState(
+        icon: TablerIcons.list_search,
+        title: l10n.alerts_targetsEmpty,
+        message: l10n.panelSettings_webPanelRequired,
+      ),
+      builder: (items) => Column(
+        children: [
+          for (final item in items)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppTokens.s8),
+              child: TonalCard(
+                child: Row(
+                  children: [
+                    Icon(icon, size: AppTokens.iconList),
+                    const SizedBox(width: AppTokens.s12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            titleOf(item),
+                            style: AppTextStyles.titleS,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            subtitleOf(item),
+                            style: AppTextStyles.caption.copyWith(
+                              color: context.scheme.onSurfaceVariant,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

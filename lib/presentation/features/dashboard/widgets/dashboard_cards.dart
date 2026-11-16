@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
@@ -20,24 +21,28 @@ List<Widget> buildDashboardCards({
   final current = dashboard.current;
   final disk = _primaryDisk(current.disks);
   return [
-    _ServerHeaderCard(dashboard: dashboard, state: state),
+    RepaintBoundary(
+      child: _ServerHeaderCard(dashboard: dashboard, state: state),
+    ),
     const SizedBox(height: AppTokens.s12),
-    _ResourceCard(current: current, disk: disk),
+    RepaintBoundary(
+      child: _ResourceCard(current: current, disk: disk),
+    ),
     const SizedBox(height: AppTokens.s12),
-    _NetworkTrafficCard(current: current),
+    RepaintBoundary(child: _NetworkTrafficCard(current: current)),
     const SizedBox(height: AppTokens.s12),
-    _SpeedChartCard(state: state),
+    RepaintBoundary(child: _SpeedChartCard(state: state)),
     const SizedBox(height: AppTokens.s12),
-    _DiskIoCard(state: state),
+    RepaintBoundary(child: _DiskIoCard(state: state)),
     if (current.disks.isNotEmpty) ...[
       const SizedBox(height: AppTokens.s12),
-      _DiskUsageCard(disks: current.disks),
+      RepaintBoundary(child: _DiskUsageCard(disks: current.disks)),
     ],
     const SizedBox(height: AppTokens.s12),
-    _HostDetailsCard(base: dashboard.base),
+    RepaintBoundary(child: _HostDetailsCard(base: dashboard.base)),
     if (current.topCpuItems.isNotEmpty || current.topMemItems.isNotEmpty) ...[
       const SizedBox(height: AppTokens.s12),
-      _ProcessCard(current: current),
+      RepaintBoundary(child: _ProcessCard(current: current)),
     ],
   ];
 }
@@ -586,14 +591,37 @@ class _TrafficRow extends StatelessWidget {
   }
 }
 
-class _SpeedChartCard extends StatelessWidget {
+class _SpeedChartCard extends StatefulWidget {
   const _SpeedChartCard({required this.state});
 
   final OverviewState state;
 
   @override
+  State<_SpeedChartCard> createState() => _SpeedChartCardState();
+}
+
+class _SpeedChartCardState extends State<_SpeedChartCard>
+    with SingleTickerProviderStateMixin {
+  final _now = ValueNotifier<DateTime>(DateTime.now());
+  late final Ticker _ticker;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = createTicker((_) => _now.value = DateTime.now())..start();
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    _now.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final state = widget.state;
     final latest = state.speedHistory.isEmpty
         ? SpeedSample(time: _epoch, up: 0, down: 0)
         : state.speedHistory.last;
@@ -634,18 +662,21 @@ class _SpeedChartCard extends StatelessWidget {
           ),
           SizedBox(
             height: 160,
-            child: CustomPaint(
-              painter: _SpeedChartPainter(
-                samples: state.speedHistory,
-                now: state.lastUpdated,
-                upColor: context.appColors.success,
-                downColor: context.appColors.chart2,
-                gridColor: context.scheme.outlineVariant,
-                labelColor: context.scheme.onSurfaceVariant.withValues(
-                  alpha: 0.6,
+            child: ValueListenableBuilder<DateTime>(
+              valueListenable: _now,
+              builder: (context, now, _) => CustomPaint(
+                painter: _SpeedChartPainter(
+                  samples: state.speedHistory,
+                  now: now,
+                  upColor: context.appColors.success,
+                  downColor: context.appColors.chart2,
+                  gridColor: context.scheme.outlineVariant,
+                  labelColor: context.scheme.onSurfaceVariant.withValues(
+                    alpha: 0.6,
+                  ),
                 ),
+                child: const SizedBox.expand(),
               ),
-              child: const SizedBox.expand(),
             ),
           ),
         ],
@@ -766,7 +797,7 @@ class _SpeedChartPainter extends CustomPainter {
   ) {
     final points = <Offset>[];
     for (final sample in samples) {
-      final diff = now.difference(sample.time).inSeconds;
+      final diff = now.difference(sample.time).inMilliseconds / 1000.0;
       if (diff > 62 || diff < -2) continue;
       final x = (1 - diff / 60) * size.width;
       final y = size.height * (1 - (value(sample) / scale).clamp(0, 1));

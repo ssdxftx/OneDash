@@ -19,12 +19,19 @@ class WebsitesController
   String _name = '';
   String _type = '';
   int _page = 1;
+  int _generation = 0;
   bool _loadingMore = false;
+  bool _disposed = false;
 
   bool get loadingMore => _loadingMore;
 
   @override
-  Future<PageResult<WebsiteDto>> build() => _fetch(page: 1);
+  Future<PageResult<WebsiteDto>> build() {
+    _disposed = false;
+    ref.onDispose(() => _disposed = true);
+    _generation++;
+    return _fetch(page: 1);
+  }
 
   Future<PageResult<WebsiteDto>> _fetch({required int page}) async {
     final repository = await ref.read(websiteRepositoryProvider.future);
@@ -34,29 +41,35 @@ class WebsitesController
   }
 
   Future<void> refresh() async {
+    final generation = ++_generation;
+    _page = 1;
     state = const AsyncLoading<PageResult<WebsiteDto>>().copyWithPrevious(
       state,
     );
-    state = await AsyncValue.guard(() => _fetch(page: 1));
-    _page = 1;
+    final result = await AsyncValue.guard(() => _fetch(page: 1));
+    if (!_disposed && generation == _generation) state = result;
   }
 
   Future<void> search(String value) async {
     _name = value.trim();
     _page = 1;
+    final generation = ++_generation;
     state = const AsyncLoading<PageResult<WebsiteDto>>().copyWithPrevious(
       state,
     );
-    state = await AsyncValue.guard(() => _fetch(page: 1));
+    final result = await AsyncValue.guard(() => _fetch(page: 1));
+    if (!_disposed && generation == _generation) state = result;
   }
 
   Future<void> setType(String type) async {
     _type = type;
     _page = 1;
+    final generation = ++_generation;
     state = const AsyncLoading<PageResult<WebsiteDto>>().copyWithPrevious(
       state,
     );
-    state = await AsyncValue.guard(() => _fetch(page: 1));
+    final result = await AsyncValue.guard(() => _fetch(page: 1));
+    if (!_disposed && generation == _generation) state = result;
   }
 
   Future<void> loadMore() async {
@@ -64,8 +77,10 @@ class WebsitesController
     if (current == null || _loadingMore) return;
     if (current.items.length >= current.total) return;
     _loadingMore = true;
+    final generation = _generation;
     try {
       final next = await _fetch(page: _page + 1);
+      if (_disposed || generation != _generation) return;
       _page++;
       state = AsyncData(
         PageResult<WebsiteDto>(
@@ -73,6 +88,8 @@ class WebsitesController
           items: [...current.items, ...next.items],
         ),
       );
+    } catch (_) {
+      if (!_disposed && generation == _generation) state = AsyncData(current);
     } finally {
       _loadingMore = false;
     }

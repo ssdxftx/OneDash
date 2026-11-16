@@ -24,6 +24,8 @@ Future<void> showTaskLogSheet(
   required String taskID,
   required TaskLogReader reader,
   VoidCallback? onFinished,
+  Future<void> Function()? onStop,
+  bool closeOnFinish = false,
 }) async {
   await showAppSheet<void>(
     context: context,
@@ -33,6 +35,8 @@ Future<void> showTaskLogSheet(
       taskID: taskID,
       reader: reader,
       onFinished: onFinished,
+      onStop: onStop,
+      closeOnFinish: closeOnFinish,
     ),
   );
 }
@@ -43,18 +47,23 @@ class _TaskLogSheet extends StatefulWidget {
     required this.taskID,
     required this.reader,
     this.onFinished,
+    this.onStop,
+    this.closeOnFinish = false,
   });
 
   final String title;
   final String taskID;
   final TaskLogReader reader;
   final VoidCallback? onFinished;
+  final Future<void> Function()? onStop;
+  final bool closeOnFinish;
 
   @override
   State<_TaskLogSheet> createState() => _TaskLogSheetState();
 }
 
-class _TaskLogSheetState extends State<_TaskLogSheet> {
+class _TaskLogSheetState extends State<_TaskLogSheet>
+    with WidgetsBindingObserver {
   Timer? _timer;
   TaskLogDto? _log;
   Object? _error;
@@ -66,14 +75,35 @@ class _TaskLogSheetState extends State<_TaskLogSheet> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _startTimer();
     _load();
-    _timer = Timer.periodic(const Duration(seconds: 2), (_) => _load());
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (_executing && _error == null && _timer == null) {
+        _startTimer();
+        _load();
+      }
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _timer?.cancel();
+      _timer = null;
+    }
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 2), (_) => _load());
   }
 
   Future<void> _load() async {
@@ -93,14 +123,21 @@ class _TaskLogSheetState extends State<_TaskLogSheet> {
       });
       if (!executing) {
         _timer?.cancel();
+        _timer = null;
         if (!_finishedNotified) {
           _finishedNotified = true;
           widget.onFinished?.call();
+          if (widget.closeOnFinish) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) Navigator.of(context).maybePop();
+            });
+          }
         }
       }
     } catch (error) {
       if (!mounted) return;
       _timer?.cancel();
+      _timer = null;
       setState(() {
         _error = error;
         _loading = false;
@@ -117,9 +154,23 @@ class _TaskLogSheetState extends State<_TaskLogSheet> {
       _loading = true;
       _executing = true;
     });
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 2), (_) => _load());
+    _startTimer();
     _load();
+  }
+
+  Future<void> _stop() async {
+    final stop = widget.onStop;
+    if (stop == null) return;
+    _timer?.cancel();
+    _timer = null;
+    try {
+      await stop();
+      if (!mounted) return;
+      Navigator.of(context).maybePop();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error);
+    }
   }
 
   Future<void> _copy() async {
@@ -157,6 +208,8 @@ class _TaskLogSheetState extends State<_TaskLogSheet> {
                 style: AppTextStyles.titleM,
               ),
             ),
+            if (busy && widget.onStop != null)
+              TextButton(onPressed: _stop, child: Text(l10n.action_stop)),
             if (busy)
               const SizedBox(
                 width: 18,

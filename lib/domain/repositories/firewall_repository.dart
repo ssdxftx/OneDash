@@ -53,6 +53,8 @@ abstract interface class FirewallRepository {
 
   Future<void> deleteWhitelist(FirewallWhitelistRule rule);
 
+  Future<void> updatePanelPort({required int oldPort, required int newPort});
+
   Future<FirewallBaseInfoDto> getForwardBase();
 
   Future<FirewallForwardPage> searchForwardRules({
@@ -73,6 +75,26 @@ abstract interface class FirewallRepository {
   Future<List<DockerGuardEndpoint>> getDockerEndpoints();
 
   Future<void> operateDockerGuard(String operation);
+
+  Future<void> upsertDockerPolicies(
+    List<Map<String, dynamic>> policies, {
+    bool import,
+  });
+
+  Future<void> deleteDockerPolicies(List<String> uuids);
+
+  Future<void> operateFamily({
+    required String subsystem,
+    required String backend,
+    required String family,
+    required String operation,
+  });
+
+  Future<void> operateFilterChain({
+    String name,
+    required String operation,
+    String taskID,
+  });
 
   Future<List<Map<String, dynamic>>> listRuleBackups();
 

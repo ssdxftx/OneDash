@@ -20,6 +20,18 @@ final gpuInfoProvider = FutureProvider.autoDispose<GpuInfoDto>((ref) async {
   return repository.loadGpuInfo();
 }, name: 'gpuInfoProvider');
 
+final modelGpuDevicesProvider =
+    FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
+      final repository = await ref.watch(aiRepositoryProvider.future);
+      return repository.getModelGpuDevices();
+    }, name: 'modelGpuDevicesProvider');
+
+final gpuGroupsProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+      final repository = await ref.watch(aiRepositoryProvider.future);
+      return repository.listGpuGroups();
+    }, name: 'gpuGroupsProvider');
+
 final mcpServersProvider = FutureProvider.autoDispose<PageResult<McpServerDto>>(
   (ref) async {
     final repository = await ref.watch(aiRepositoryProvider.future);
@@ -49,3 +61,13 @@ final aiProvidersProvider = FutureProvider.autoDispose<List<AiProviderDto>>((
   final repository = await ref.watch(aiRepositoryProvider.future);
   return repository.getProviders();
 }, name: 'aiProvidersProvider');
+
+final aiAccountCountsProvider = FutureProvider.autoDispose<Map<String, int>>((
+  ref,
+) async {
+  final repository = await ref.watch(aiRepositoryProvider.future);
+  final providers = await repository.getProviders();
+  return repository.countAccountsByProviders(
+    providers.map((item) => item.provider).toList(growable: false),
+  );
+}, name: 'aiAccountCountsProvider');

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/network/network_exceptions.dart';
@@ -91,10 +92,21 @@ class WebsiteDetailPage extends ConsumerWidget {
                       value: 'advanced',
                       icon: TablerIcons.adjustments,
                     ),
+                    if (site.type == 'stream')
+                      SelectionOption(
+                        label: l10n.websites_editStream,
+                        value: 'stream',
+                        icon: TablerIcons.arrows_split,
+                      ),
                     SelectionOption(
                       label: l10n.websites_certificateAccounts,
                       value: 'accounts',
                       icon: TablerIcons.certificate,
+                    ),
+                    SelectionOption(
+                      label: l10n.websites_clearLog,
+                      value: 'clear_logs',
+                      icon: TablerIcons.eraser,
                     ),
                     SelectionOption(
                       label: l10n.websites_delete,
@@ -121,6 +133,10 @@ class WebsiteDetailPage extends ConsumerWidget {
                       serverId: serverId,
                       websiteId: site.id,
                     );
+                  case 'stream':
+                    await _editStream(context, ref, site);
+                  case 'clear_logs':
+                    await _clearLogs(context, ref, site);
                   case 'accounts':
                     await context.push('/s/$serverId/websites/accounts');
                   case 'delete':
@@ -157,6 +173,138 @@ class WebsiteDetailPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _editStream(
+    BuildContext context,
+    WidgetRef ref,
+    WebsiteDto site,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final ports = TextEditingController(text: site.streamPorts);
+    var algorithm =
+        const ['roundrobin', 'least_conn', 'ip_hash'].contains(site.algorithm)
+        ? site.algorithm
+        : 'roundrobin';
+    var udp = site.udp;
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.websites_editStream,
+          saveLabel: l10n.action_save,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: ports,
+              label: l10n.websites_streamPorts,
+              hint: '8080,8081',
+            ),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: algorithm,
+              decoration: InputDecoration(
+                labelText: l10n.websites_streamAlgorithm,
+              ),
+              items: [
+                DropdownMenuItem(
+                  value: 'roundrobin',
+                  child: Text(l10n.websites_lbRoundRobin),
+                ),
+                DropdownMenuItem(
+                  value: 'least_conn',
+                  child: Text(l10n.websites_lbLeastConnections),
+                ),
+                DropdownMenuItem(
+                  value: 'ip_hash',
+                  child: Text(l10n.websites_lbIpHashShort),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => algorithm = value);
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.websites_streamUdp),
+              value: udp,
+              onChanged: (value) => setState(() => udp = value),
+            ),
+          ],
+        ),
+      ),
+    );
+    final streamPorts = ports.text.trim();
+    ports.dispose();
+    if (saved != true || !context.mounted) return;
+    if (streamPorts.isEmpty) {
+      AppToast.warning(context, l10n.websites_streamPorts);
+      return;
+    }
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.updateStreamConfig(
+        websiteId: site.id,
+        streamPorts: streamPorts,
+        name: site.primaryDomain,
+        algorithm: algorithm,
+        udp: udp,
+        servers: site.servers,
+      );
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_saved);
+      ref.invalidate(websiteDetailProvider(site.id));
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _clearLogs(
+    BuildContext context,
+    WidgetRef ref,
+    WebsiteDto site,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final type = await showSelectionMenu<WebsiteLogType>(
+      context,
+      title: l10n.websites_logType,
+      options: [
+        SelectionOption(
+          label: l10n.websites_accessLog,
+          value: WebsiteLogType.access,
+          icon: TablerIcons.file_text,
+        ),
+        SelectionOption(
+          label: l10n.websites_errorLog,
+          value: WebsiteLogType.error,
+          icon: TablerIcons.alert_triangle,
+        ),
+      ],
+    );
+    if (type == null || !context.mounted) return;
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.websites_clearLog,
+      message: site.primaryDomain,
+      confirmLabel: l10n.websites_clearLog,
+    );
+    if (!confirmed || !context.mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.operateWebsiteLog(
+        site.id,
+        type: type,
+        operate: 'delete',
+      );
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.panelSettings_logsCleared);
+      ref.invalidate(websiteDetailProvider(site.id));
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _operate(
@@ -277,7 +425,56 @@ class _ConfigTab extends ConsumerWidget {
           icon: const Icon(TablerIcons.database),
           label: Text(l10n.websites_changeDatabase),
         ),
-        const SizedBox(height: AppTokens.s24),
+        const SizedBox(height: AppTokens.s8),
+        OutlinedButton.icon(
+          onPressed: () => _crossSite(context, ref, site.id),
+          icon: const Icon(TablerIcons.arrows_exchange),
+          label: Text(l10n.websites_crossSite),
+        ),
+        const SizedBox(height: AppTokens.s8),
+        OutlinedButton.icon(
+          onPressed: () => _proxyCache(context, ref, site.id),
+          icon: const Icon(TablerIcons.database_cog),
+          label: Text(l10n.websites_proxyCache),
+        ),
+        const SizedBox(height: AppTokens.s8),
+        OutlinedButton.icon(
+          onPressed: () => _clearProxyCache(context, ref, site.id),
+          icon: const Icon(TablerIcons.eraser),
+          label: Text(l10n.websites_clearProxyCache),
+        ),
+        if (site.runtimeName.toLowerCase().contains('php')) ...[
+          const SizedBox(height: AppTokens.s8),
+          OutlinedButton.icon(
+            onPressed: () => _composer(context, ref, site.id),
+            icon: const Icon(TablerIcons.brand_php),
+            label: Text(l10n.websites_composer),
+          ),
+        ],
+        const SizedBox(height: AppTokens.s16),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.websites_defaultSite),
+          value: detail.defaultServer,
+          onChanged: detail.defaultServer
+              ? null
+              : (value) async {
+                  if (!value) return;
+                  try {
+                    final repository = await ref.read(
+                      websiteRepositoryProvider.future,
+                    );
+                    await repository.setDefaultWebsite(site.id);
+                    ref.invalidate(websiteDetailProvider(site.id));
+                    if (!context.mounted) return;
+                    AppToast.success(context, l10n.action_done);
+                  } catch (error) {
+                    if (!context.mounted) return;
+                    showErrorToast(context, error);
+                  }
+                },
+        ),
+        const SizedBox(height: AppTokens.s8),
         SplitListGroup(
           children: [
             _Row(label: l10n.websites_websiteAlias, value: detail.alias),
@@ -298,6 +495,213 @@ class _ConfigTab extends ConsumerWidget {
     );
   }
 
+  Future<void> _crossSite(
+    BuildContext context,
+    WidgetRef ref,
+    int websiteId,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final enable = await showSelectionMenu<bool>(
+      context,
+      title: l10n.websites_crossSite,
+      options: [
+        SelectionOption(
+          label: l10n.action_enable,
+          value: true,
+          icon: TablerIcons.check,
+        ),
+        SelectionOption(
+          label: l10n.action_disable,
+          value: false,
+          icon: TablerIcons.x,
+        ),
+      ],
+    );
+    if (enable == null || !context.mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.operateCrossSite(websiteId, enable: enable);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _proxyCache(
+    BuildContext context,
+    WidgetRef ref,
+    int websiteId,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final repository = await ref.read(websiteRepositoryProvider.future);
+    Map<String, dynamic> current = const {};
+    try {
+      current = await repository.getProxyCache(websiteId);
+    } catch (_) {
+      current = const {};
+    }
+    if (!context.mounted) return;
+    final limit = TextEditingController(text: '${current['cacheLimit'] ?? 10}');
+    final share = TextEditingController(text: '${current['shareCache'] ?? 5}');
+    final expire = TextEditingController(
+      text: '${current['cacheExpire'] ?? 1}',
+    );
+    var open = current['open'] == true;
+    final saved = await showAppSheet<Map<String, dynamic>>(
+      context: context,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setState) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.websites_proxyCache, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s12),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.action_enable),
+              value: open,
+              onChanged: (value) => setState(() => open = value),
+            ),
+            AppTextField(
+              controller: limit,
+              label: l10n.websites_cacheLimit,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: share,
+              label: l10n.websites_cacheShare,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: expire,
+              label: l10n.websites_cacheExpire,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: AppTokens.s16),
+            PrimaryButton(
+              label: l10n.action_save,
+              onPressed: () => Navigator.of(sheetContext).pop({
+                'websiteID': websiteId,
+                'open': open,
+                'cacheLimit': int.tryParse(limit.text.trim()) ?? 10,
+                'cacheLimitUnit': 'm',
+                'shareCache': int.tryParse(share.text.trim()) ?? 5,
+                'shareCacheUnit': 'm',
+                'cacheExpire': int.tryParse(expire.text.trim()) ?? 1,
+                'cacheExpireUnit': 'h',
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+    limit.dispose();
+    share.dispose();
+    expire.dispose();
+    if (saved == null || !context.mounted) return;
+    try {
+      await repository.updateProxyCache(saved);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _clearProxyCache(
+    BuildContext context,
+    WidgetRef ref,
+    int websiteId,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.websites_clearProxyCache,
+      message: l10n.action_confirm,
+      confirmLabel: l10n.action_confirm,
+    );
+    if (!confirmed || !context.mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.clearProxyCache(websiteId);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.websites_cacheCleared);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _composer(
+    BuildContext context,
+    WidgetRef ref,
+    int websiteId,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final command = TextEditingController();
+    final mirror = TextEditingController(
+      text: 'https://mirrors.aliyun.com/composer/',
+    );
+    final dir = TextEditingController();
+    final user = TextEditingController(text: 'www');
+    final saved = await showAppSheet<Map<String, dynamic>>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.websites_composer, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: command,
+            label: l10n.websites_composerCommand,
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: mirror, label: l10n.websites_composerMirror),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: dir, label: l10n.websites_composerDir),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(controller: user, label: l10n.websites_composerUser),
+          const SizedBox(height: AppTokens.s16),
+          PrimaryButton(
+            label: l10n.action_confirm,
+            onPressed: () {
+              if (command.text.trim().isEmpty) return;
+              Navigator.of(sheetContext).pop({
+                'command': command.text.trim(),
+                'extCommand': '',
+                'mirror': mirror.text.trim(),
+                'dir': dir.text.trim(),
+                'user': user.text.trim(),
+                'websiteID': websiteId,
+                'taskID': const Uuid().v4(),
+              });
+            },
+          ),
+        ],
+      ),
+    );
+    command.dispose();
+    mirror.dispose();
+    dir.dispose();
+    user.dispose();
+    if (saved == null || !context.mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.execComposer(saved);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _changeDatabase(
     BuildContext context,
     WidgetRef ref,
@@ -306,10 +710,15 @@ class _ConfigTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
-      final resources = await repository.getWebsiteResources(site.id);
-      final databases = await repository.getWebsiteDatabases();
+      final results = await Future.wait<Object>([
+        repository.getWebsiteResources(site.id),
+        repository.getWebsiteDatabases(),
+      ]);
+      final resources = results[0] as List<WebsiteResourceDto>;
+      final databases = results[1] as List<WebsiteDatabaseDto>;
       if (!context.mounted) return;
-      int selected = 0;
+      int selected = resources.isEmpty ? 0 : resources.first.resourceID;
+      if (!databases.any((db) => db.id == selected)) selected = 0;
       final saved = await showAppSheet<bool>(
         context: context,
         builder: (sheetContext) => StatefulBuilder(
@@ -489,8 +898,9 @@ class _DomainsTab extends ConsumerWidget {
                     children: [
                       Switch(
                         value: domain.ssl,
-                        onChanged: (value) =>
-                            _toggleSsl(context, ref, domain, value),
+                        onChanged: domain.port == 80
+                            ? (value) => _toggleSsl(context, ref, domain, value)
+                            : null,
                       ),
                       IconButton(
                         tooltip: l10n.websites_removeDomain,
@@ -541,8 +951,11 @@ class _DomainsTab extends ConsumerWidget {
     if (value == null || value.isEmpty) return;
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
+      final port = detail.domains.isEmpty || detail.domains.first.port <= 0
+          ? 80
+          : detail.domains.first.port;
       await repository.addDomains(detail.website.id, [
-        WebsiteDomainReq(domain: value),
+        WebsiteDomainReq(domain: value, port: port),
       ]);
       if (!context.mounted) return;
       AppToast.success(context, l10n.websites_domainAdded);
@@ -942,14 +1355,20 @@ class _ProxyTab extends ConsumerWidget {
       ),
     );
     final payload = {
-      'id': current?.id ?? 0,
-      'operate': current == null ? 'create' : 'update',
+      'id': detail.website.id,
+      'operate': current == null ? 'create' : 'edit',
       'name': name.text.trim(),
       'match': match.text.trim(),
       'proxyPass': pass.text.trim(),
       'proxyHost': host.text.trim(),
       'enable': enable,
       'cache': current?.cache ?? false,
+      'cacheTime': current?.cacheTime ?? 0,
+      'cacheUnit': current?.cacheUnit ?? '',
+      'serverCacheTime': current?.serverCacheTime ?? 0,
+      'serverCacheUnit': current?.serverCacheUnit ?? '',
+      'modifier': current?.modifier ?? '',
+      'replaces': current?.replaces ?? const <String, String>{},
       'sni': sni,
       'sslVerify': sslVerify,
       'proxySSLName': current?.proxySSLName ?? '',

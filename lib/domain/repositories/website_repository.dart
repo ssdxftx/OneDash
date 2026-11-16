@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../data/dto/cronjob/cronjob_form_data_dto.dart';
 import 'package:dio/dio.dart';
 
@@ -39,6 +41,29 @@ abstract interface class WebsiteRepository {
   /// 查询网站详情
   Future<WebsiteDetailDto> getWebsite(int id);
   Future<List<WebsiteOptionDto>> getWebsiteOptions();
+
+  /// 查询 OpenResty 模块列表。
+  Future<Map<String, dynamic>> getOpenRestyModules();
+
+  /// 新增、更新或删除 OpenResty 模块。
+  Future<void> updateOpenRestyModule(Map<String, dynamic> data);
+
+  /// 构建 OpenResty。
+  Future<void> buildOpenResty({
+    required String mirror,
+    required String taskID,
+    List<String> modules,
+    bool force,
+  });
+
+  /// 查询默认 HTTPS 配置。
+  Future<Map<String, dynamic>> getOpenRestyHttps();
+
+  /// 启用或关闭默认 HTTPS。
+  Future<void> updateOpenRestyHttps({
+    required String operate,
+    bool sslRejectHandshake,
+  });
 
   /// 查询 OpenResty 运行状态。
   Future<OpenRestyStatusDto> getOpenRestyStatus();
@@ -87,6 +112,49 @@ abstract interface class WebsiteRepository {
     bool forceDelete,
     bool deleteDB,
   });
+
+  /// 批量启动/停止网站
+  Future<void> batchOperateWebsites(List<int> ids, String operate);
+
+  /// 批量修改网站分组
+  Future<void> batchSetWebsiteGroup(List<int> ids, int groupId);
+
+  /// 批量绑定已有证书
+  Future<void> batchSetWebsiteHttps({
+    required List<int> ids,
+    required int sslId,
+  });
+
+  /// 迁移网站分组
+  Future<void> changeWebsiteGroup(int group, int newGroup);
+
+  /// 设为默认站点
+  Future<void> setDefaultWebsite(int websiteId);
+
+  /// 开启或关闭跨站访问
+  Future<void> operateCrossSite(int websiteId, {required bool enable});
+
+  /// 查询默认 HTML
+  Future<Map<String, dynamic>> getDefaultHtml(String type);
+
+  /// 更新默认 HTML
+  Future<void> updateDefaultHtml({
+    required String type,
+    required String content,
+    bool sync = true,
+  });
+
+  /// 查询代理缓存配置
+  Future<Map<String, dynamic>> getProxyCache(int websiteId);
+
+  /// 更新代理缓存配置
+  Future<void> updateProxyCache(Map<String, dynamic> request);
+
+  /// 清理代理缓存
+  Future<void> clearProxyCache(int websiteId);
+
+  /// 执行 Composer
+  Future<void> execComposer(Map<String, dynamic> request);
 
   /// 查询网站域名列表
   Future<List<WebsiteDomainDto>> listDomains(int websiteId);
@@ -197,6 +265,20 @@ abstract interface class WebsiteRepository {
   /// 删除模板输出。
   Future<void> deleteTemplateOutput(int id);
 
+  /// 按变量值预览模板生成的 HTML。
+  Future<String> previewTemplate({
+    required int templateID,
+    required Map<String, String> variableValues,
+  });
+
+  /// 查询模板输出详情。
+  Future<WebsiteTemplateOutputDto> getTemplateOutput(int id);
+
+  /// 创建网站前校验已安装应用。
+  Future<List<WebsitePreInstallCheckDto>> checkWebsiteInstall(
+    List<int> installIds,
+  );
+
   /// 查询负载均衡上游列表。
   Future<List<WebsiteLoadBalanceDto>> listLoadBalances(int websiteId);
 
@@ -208,6 +290,11 @@ abstract interface class WebsiteRepository {
 
   /// 删除负载均衡上游。
   Future<void> deleteLoadBalance(int websiteId, String name);
+  Future<void> updateLoadBalanceFile({
+    required int websiteId,
+    required String name,
+    required String content,
+  });
 
   /// 查询网站密码访问配置 (全局)
   Future<WebsiteAuthDto> getWebsiteAuth(int websiteId);
@@ -227,10 +314,26 @@ abstract interface class WebsiteRepository {
   /// 更新网站 Nginx 配置文件内容并重载
   Future<void> updateWebsiteConfig(int websiteId, String content);
 
+  /// 更新隧道网站转发配置
+  Future<void> updateStreamConfig({
+    required int websiteId,
+    required String streamPorts,
+    required String name,
+    required String algorithm,
+    required bool udp,
+    required List<dynamic> servers,
+  });
+
   /// 更新网站基础信息
   Future<void> updateWebsite(WebsiteUpdateReq req);
 
   /// 读取网站访问/错误日志
+  Future<WebsiteLogFileDto> searchWebsiteLog(
+    int websiteId,
+    WebsiteLogType type, {
+    int page,
+    int pageSize,
+  });
   Future<WebsiteLogFileDto> readWebsiteLog(
     int websiteId,
     WebsiteLogType type, {
@@ -309,8 +412,11 @@ abstract interface class WebsiteRepository {
   /// 查询 SSL 证书详情
   Future<SslManageDto> getSsl(int id);
 
-  /// 创建 SSL 证书
-  Future<void> createSsl(SslCreateReq req);
+  /// 推送证书到从节点
+  Future<void> pushSsl({required int id, required String nodes});
+
+  /// 创建 SSL 证书，返回新证书 ID
+  Future<int> createSsl(SslCreateReq req);
 
   /// 更新 SSL 证书
   Future<void> updateSsl(SslUpdateReq req);
@@ -396,6 +502,15 @@ abstract interface class WebsiteRepository {
 
   /// 创建自签 CA
   Future<void> createCa(CaCreateReq req);
+  Future<void> importCa({
+    required String name,
+    required String type,
+    String certificate,
+    String privateKey,
+    String certificatePath,
+    String privateKeyPath,
+  });
+  Future<void> uploadCa({required String fileName, required Uint8List bytes});
 
   /// 用 CA 签发证书
   Future<void> obtainCa(CaObtainReq req);

@@ -19,6 +19,7 @@ class AppInstalledDto {
     required this.favorite,
     required this.container,
     required this.serviceName,
+    this.sortOrder = 0,
   });
 
   final int id;
@@ -40,6 +41,7 @@ class AppInstalledDto {
   final bool favorite;
   final String container;
   final String serviceName;
+  final int sortOrder;
 
   String get displayName => appName.isNotEmpty ? appName : name;
 
@@ -64,6 +66,7 @@ class AppInstalledDto {
       favorite: favorite ?? this.favorite,
       container: container,
       serviceName: serviceName,
+      sortOrder: sortOrder,
     );
   }
 
@@ -96,6 +99,7 @@ class AppInstalledDto {
       favorite: json['favorite'] as bool? ?? false,
       container: json['container'] as String? ?? '',
       serviceName: serviceName,
+      sortOrder: json['sortOrder'] as int? ?? 0,
     );
   }
 }

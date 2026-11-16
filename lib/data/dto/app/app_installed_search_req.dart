@@ -5,7 +5,7 @@ class AppInstalledSearchReq {
     this.name = '',
     this.tags = const [],
     this.update = false,
-    this.sync = true,
+    this.sync = false,
   });
 
   final int page;

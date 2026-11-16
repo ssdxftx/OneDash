@@ -2,6 +2,7 @@ class WebsiteRedirectDto {
   const WebsiteRedirectDto({
     required this.websiteID,
     required this.name,
+    this.operate = 'create',
     this.domains = const [],
     this.keepPath = true,
     this.enable = false,
@@ -16,6 +17,7 @@ class WebsiteRedirectDto {
 
   final int websiteID;
   final String name;
+  final String operate;
   final List<String> domains;
   final bool keepPath;
   final bool enable;
@@ -31,6 +33,7 @@ class WebsiteRedirectDto {
     return WebsiteRedirectDto(
       websiteID: json['websiteID'] as int? ?? 0,
       name: json['name'] as String? ?? '',
+      operate: json['operate'] as String? ?? 'create',
       domains:
           (json['domains'] as List?)?.map((e) => e.toString()).toList() ??
           const [],
@@ -50,6 +53,7 @@ class WebsiteRedirectDto {
     return {
       'websiteID': websiteID,
       'name': name,
+      'operate': operate,
       'domains': domains,
       'keepPath': keepPath,
       'enable': enable,

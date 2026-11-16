@@ -6,7 +6,9 @@ import '../dto/common/page_result.dart';
 import '../dto/host/disk_dto.dart';
 import '../dto/host/host_diagnostics_dto.dart';
 import '../dto/host/ssh_cert_dto.dart';
+import '../dto/host/remote_host_dto.dart';
 import '../dto/host/ssh_info_dto.dart';
+import '../dto/host/ssh_log_dto.dart';
 
 /// 主机信息 API。
 ///
@@ -56,8 +58,8 @@ class HostApi {
       '/api/v2/hosts/monitor/search',
       data: {
         'param': param,
-        'startTime': startTime.toIso8601String(),
-        'endTime': endTime.toIso8601String(),
+        'startTime': startTime.toUtc().toIso8601String(),
+        'endTime': endTime.toUtc().toIso8601String(),
         'io': io,
         'network': network,
       },
@@ -70,6 +72,43 @@ class HostApi {
         .toList(growable: false);
   }
 
+  /// POST /api/v2/hosts/monitor/clean
+  Future<void> cleanMonitor({String type = 'host'}) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/monitor/clean',
+      data: {'type': type},
+    );
+  }
+
+  /// POST /api/v2/hosts/ssh/log — 分页查询 SSH 登录日志。
+  Future<PageResult<SshLogDto>> searchSshLogs(SshLogSearchReq req) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/ssh/log',
+      data: req.toJson(),
+    );
+    return PageResult<SshLogDto>.fromJson(
+      ApiResponseParser.map(resp),
+      SshLogDto.fromJson,
+    );
+  }
+
+  /// POST /api/v2/hosts/ssh/log/export — 导出当前筛选的 SSH 登录日志。
+  Future<String> exportSshLogs(SshLogSearchReq req) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/ssh/log/export',
+      data: req.toJson(),
+    );
+    return ApiResponseParser.primitive<String>(resp);
+  }
+
+  /// POST /api/v2/hosts/ssh/log/clean
+  Future<void> cleanSshLogs() async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/ssh/log/clean',
+      data: const {},
+    );
+  }
+
   /// POST /api/v2/hosts/test/byinfo
   Future<bool> testHostConnection(Map<String, dynamic> body) async {
     final resp = await _client.post<Map<String, dynamic>>(
@@ -77,6 +116,82 @@ class HostApi {
       data: body,
     );
     return resp.data?['data'] == true;
+  }
+
+  /// POST /api/v2/hosts/search — 分页查询远程主机。
+  Future<PageResult<RemoteHostDto>> searchRemoteHosts({
+    int page = 1,
+    int pageSize = 100,
+    int groupId = 0,
+    String info = '',
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/search',
+      data: {
+        'page': page,
+        'pageSize': pageSize,
+        'groupID': groupId,
+        'info': info,
+      },
+    );
+    return PageResult<RemoteHostDto>.fromJson(
+      ApiResponseParser.map(resp),
+      RemoteHostDto.fromJson,
+    );
+  }
+
+  /// POST /api/v2/hosts/tree — 查询远程主机分组树。
+  Future<List<RemoteHostTreeDto>> getRemoteHostTree({String info = ''}) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/tree',
+      data: {'info': info},
+    );
+    return ApiResponseParser.list(resp, RemoteHostTreeDto.fromJson);
+  }
+
+  /// POST /api/v2/hosts — 新增远程主机。
+  Future<void> createRemoteHost(Map<String, dynamic> body) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts',
+      data: body,
+    );
+    ApiResponseParser.ok(resp);
+  }
+
+  /// POST /api/v2/hosts/update — 更新远程主机。
+  Future<void> updateRemoteHost(Map<String, dynamic> body) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/update',
+      data: body,
+    );
+    ApiResponseParser.ok(resp);
+  }
+
+  /// POST /api/v2/hosts/del — 删除远程主机。
+  Future<void> deleteRemoteHosts(List<int> ids) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/del',
+      data: {'ids': ids},
+    );
+    ApiResponseParser.ok(resp);
+  }
+
+  /// POST /api/v2/hosts/test/byinfo — 使用连接信息测试远程主机。
+  Future<bool> testRemoteHost(Map<String, dynamic> body) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/test/byinfo',
+      data: body,
+    );
+    return ApiResponseParser.primitive<bool>(resp);
+  }
+
+  /// POST /api/v2/hosts/test/byid — 按 ID 测试远程主机。
+  Future<bool> testRemoteHostById(int id) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/test/byid',
+      data: {'id': id},
+    );
+    return ApiResponseParser.primitive<bool>(resp);
   }
 
   /// POST /api/v2/hosts/ssh/search

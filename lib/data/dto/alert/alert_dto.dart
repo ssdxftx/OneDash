@@ -73,7 +73,7 @@ class AlertSearchReq {
     this.status = '',
     this.method = '',
     this.orderBy = 'created_at',
-    this.order,
+    this.order = 'null',
   });
 
   final int page;
@@ -82,7 +82,7 @@ class AlertSearchReq {
   final String status;
   final String method;
   final String orderBy;
-  final String? order;
+  final String order;
 
   factory AlertSearchReq.fromJson(Map<String, dynamic> json) =>
       _$AlertSearchReqFromJson(json);
@@ -139,6 +139,8 @@ class AlertConfigInfo {
     this.title = '',
     this.config = '',
     this.status = '',
+    this.displayName = '',
+    this.revision,
     this.createdAt,
   });
 
@@ -147,6 +149,8 @@ class AlertConfigInfo {
   final String title;
   final String config;
   final String status;
+  final String displayName;
+  final String? revision;
   final String? createdAt;
 
   factory AlertConfigInfo.fromJson(Map<String, dynamic> json) =>
@@ -162,6 +166,8 @@ class AlertConfigUpdateReq {
     this.title = '',
     this.config = '',
     this.status = '',
+    this.displayName = '',
+    this.revision,
   });
 
   final int id;
@@ -169,6 +175,8 @@ class AlertConfigUpdateReq {
   final String title;
   final String config;
   final String status;
+  final String displayName;
+  final String? revision;
 
   factory AlertConfigUpdateReq.fromJson(Map<String, dynamic> json) =>
       _$AlertConfigUpdateReqFromJson(json);
@@ -200,4 +208,63 @@ class AlertConfigTestReq {
   factory AlertConfigTestReq.fromJson(Map<String, dynamic> json) =>
       _$AlertConfigTestReqFromJson(json);
   Map<String, dynamic> toJson() => _$AlertConfigTestReqToJson(this);
+}
+
+@JsonSerializable()
+class AlertConfigSearchReq {
+  const AlertConfigSearchReq({
+    required this.page,
+    required this.pageSize,
+    this.excludeTypes = const [],
+  });
+
+  final int page;
+  final int pageSize;
+  final List<String> excludeTypes;
+
+  factory AlertConfigSearchReq.fromJson(Map<String, dynamic> json) =>
+      _$AlertConfigSearchReqFromJson(json);
+  Map<String, dynamic> toJson() => _$AlertConfigSearchReqToJson(this);
+}
+
+@JsonSerializable()
+class ClamAlertInfo {
+  const ClamAlertInfo({
+    required this.id,
+    this.name = '',
+    this.status = '',
+    this.path = '',
+    this.createdAt,
+  });
+
+  final int id;
+  final String name;
+  final String status;
+  final String path;
+  final String? createdAt;
+
+  factory ClamAlertInfo.fromJson(Map<String, dynamic> json) =>
+      _$ClamAlertInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$ClamAlertInfoToJson(this);
+}
+
+@JsonSerializable()
+class CronJobAlertInfo {
+  const CronJobAlertInfo({
+    required this.id,
+    this.name = '',
+    this.status = '',
+    this.type = '',
+    this.createdAt,
+  });
+
+  final int id;
+  final String name;
+  final String status;
+  final String type;
+  final String? createdAt;
+
+  factory CronJobAlertInfo.fromJson(Map<String, dynamic> json) =>
+      _$CronJobAlertInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$CronJobAlertInfoToJson(this);
 }

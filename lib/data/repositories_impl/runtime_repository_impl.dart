@@ -34,12 +34,22 @@ class RuntimeRepositoryImpl implements RuntimeRepository {
   Future<void> updateRuntime(RuntimeCreateReq req) => _api.updateRuntime(req);
 
   @override
+  Future<List<Map<String, dynamic>>> checkRuntimeDelete(int id) =>
+      _api.checkRuntimeDelete(id);
+
+  @override
   Future<void> deleteRuntime(int id, {bool forceDelete = false}) =>
       _api.deleteRuntime(id, forceDelete: forceDelete);
 
   @override
-  Future<void> operateRuntime(int id, String operate) =>
-      _api.operateRuntime(id, operate);
+  Future<void> operateRuntime(int id, String operate) {
+    final mapped = switch (operate) {
+      'start' => 'up',
+      'stop' => 'down',
+      _ => operate,
+    };
+    return _api.operateRuntime(id, mapped);
+  }
 
   @override
   Future<void> syncRuntimes() => _api.syncRuntimes();
@@ -49,6 +59,72 @@ class RuntimeRepositoryImpl implements RuntimeRepository {
     final result = await _api.searchPhpExtensions();
     return result.items;
   }
+
+  @override
+  Future<Map<String, dynamic>> getPhpExtensionPreset(int id) =>
+      _api.getPhpExtensionPreset(id);
+
+  @override
+  Future<void> createPhpExtensionPreset({
+    required String name,
+    required String extensions,
+  }) => _api.createPhpExtensionPreset(name: name, extensions: extensions);
+
+  @override
+  Future<void> updatePhpExtensionPreset({
+    required int id,
+    required String extensions,
+  }) => _api.updatePhpExtensionPreset(id: id, extensions: extensions);
+
+  @override
+  Future<void> deletePhpExtensionPreset(int id) =>
+      _api.deletePhpExtensionPreset(id);
+
+  @override
+  Future<String> importPhpExtensionPreset({
+    required String name,
+    required String extensions,
+  }) => _api.importPhpExtensionPreset(name: name, extensions: extensions);
+
+  @override
+  Future<void> pushPhpExtensionPreset({
+    required int id,
+    required String sourceNode,
+    required List<String> targetNodes,
+    required String taskID,
+  }) => _api.pushPhpExtensionPreset(
+    id: id,
+    sourceNode: sourceNode,
+    targetNodes: targetNodes,
+    taskID: taskID,
+  );
+
+  @override
+  Future<void> updateRuntimeRemark(int id, String remark) =>
+      _api.updateRuntimeRemark(id, remark);
+
+  @override
+  Future<List<Map<String, dynamic>>> getSupervisorProcesses(int id) =>
+      _api.getSupervisorProcesses(id);
+
+  @override
+  Future<void> operateSupervisorProcess(int id, Map<String, dynamic> body) =>
+      _api.operateSupervisorProcess(id, body);
+
+  @override
+  Future<String> supervisorProcessFile({
+    required int id,
+    required String name,
+    required String operate,
+    required String file,
+    String content = '',
+  }) => _api.supervisorProcessFile(
+    id: id,
+    name: name,
+    operate: operate,
+    file: file,
+    content: content,
+  );
 
   @override
   Future<List<NodeScriptDto>> getNodeScripts(String codeDir) =>
@@ -76,6 +152,34 @@ class RuntimeRepositoryImpl implements RuntimeRepository {
   @override
   Future<void> updatePhpFile(int id, String type, String content) =>
       _api.updatePhpFile(id, type, content);
+
+  @override
+  Future<Map<String, dynamic>> getPhpConfig(int id) => _api.getPhpConfig(id);
+
+  @override
+  Future<void> updatePhpConfig({
+    required int id,
+    required String scope,
+    Map<String, String> params = const {},
+    List<String> disableFunctions = const [],
+    String uploadMaxSize = '',
+    String maxExecutionTime = '',
+  }) => _api.updatePhpConfig(
+    id: id,
+    scope: scope,
+    params: params,
+    disableFunctions: disableFunctions,
+    uploadMaxSize: uploadMaxSize,
+    maxExecutionTime: maxExecutionTime,
+  );
+
+  @override
+  Future<Map<String, dynamic>> getPhpContainer(int id) =>
+      _api.getPhpContainer(id);
+
+  @override
+  Future<void> updatePhpContainer(Map<String, dynamic> body) =>
+      _api.updatePhpContainer(body);
 
   @override
   Future<List<Map<String, dynamic>>> getFpmStatus(int id) =>

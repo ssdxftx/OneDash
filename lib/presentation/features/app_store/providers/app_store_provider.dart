@@ -13,38 +13,213 @@ import '../../../../data/dto/app/app_installed_search_req.dart';
 import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
 
-final appCatalogProvider = FutureProvider.autoDispose
-    .family<PageResult<AppCatalogDto>, String>((ref, query) {
-      return ref
-          .watch(appRepositoryProvider.future)
-          .then(
-            (repository) => repository.searchApps(
-              AppCatalogSearchReq(page: 1, pageSize: 100, name: query),
-            ),
-          );
-    }, name: 'appCatalogProvider');
+final appCatalogProvider = AsyncNotifierProvider.autoDispose
+    .family<AppCatalogController, PageResult<AppCatalogDto>, String>(
+      AppCatalogController.new,
+      name: 'appCatalogProvider',
+    );
+
+class AppCatalogController
+    extends AutoDisposeFamilyAsyncNotifier<PageResult<AppCatalogDto>, String> {
+  static const _pageSize = 100;
+
+  int _page = 1;
+  bool _loadingMore = false;
+  bool _disposed = false;
+
+  @override
+  Future<PageResult<AppCatalogDto>> build(String query) async {
+    _disposed = false;
+    _page = 1;
+    ref.onDispose(() => _disposed = true);
+    if (query.isEmpty) {
+      final link = ref.keepAlive();
+      final timer = Timer(const Duration(minutes: 5), link.close);
+      ref.onDispose(timer.cancel);
+    }
+    return _fetch(query, 1);
+  }
+
+  Future<PageResult<AppCatalogDto>> _fetch(String query, int page) async {
+    final repository = await ref.read(appRepositoryProvider.future);
+    return repository.searchApps(
+      AppCatalogSearchReq(page: page, pageSize: _pageSize, name: query),
+    );
+  }
+
+  Future<void> refresh() async {
+    _page = 1;
+    state = const AsyncLoading<PageResult<AppCatalogDto>>().copyWithPrevious(
+      state,
+    );
+    state = await AsyncValue.guard(() => _fetch(arg, 1));
+  }
+
+  Future<void> loadMore() async {
+    final current = state.valueOrNull;
+    if (current == null || _loadingMore) return;
+    if (current.items.length >= current.total) return;
+    _loadingMore = true;
+    try {
+      final next = await _fetch(arg, _page + 1);
+      if (_disposed) return;
+      _page++;
+      final latest = state.valueOrNull ?? current;
+      state = AsyncData(
+        PageResult<AppCatalogDto>(
+          total: next.total,
+          items: [...latest.items, ...next.items],
+        ),
+      );
+    } catch (_) {
+      if (!_disposed) state = AsyncData(current);
+    } finally {
+      _loadingMore = false;
+    }
+  }
+}
 
 final appTagsProvider = FutureProvider.autoDispose<List<AppTagDto>>((ref) {
+  final link = ref.keepAlive();
+  final timer = Timer(const Duration(minutes: 5), link.close);
+  ref.onDispose(timer.cancel);
   return ref
       .watch(appRepositoryProvider.future)
       .then((repository) => repository.listAppTags());
 }, name: 'appTagsProvider');
 
 final installedAppsProvider =
-    FutureProvider.autoDispose<PageResult<AppInstalledDto>>((ref) {
-      // 5 分钟内保留缓存：退出页面再进来不重拉，超过则正常销毁。
-      final link = ref.keepAlive();
-      final timer = Timer(const Duration(minutes: 5), link.close);
-      ref.onDispose(timer.cancel);
+    AsyncNotifierProvider.autoDispose<
+      InstalledAppsController,
+      PageResult<AppInstalledDto>
+    >(InstalledAppsController.new, name: 'installedAppsProvider');
 
-      return ref
-          .watch(appRepositoryProvider.future)
-          .then(
-            (repository) => repository.searchInstalledApps(
-              const AppInstalledSearchReq(page: 1, pageSize: 100),
-            ),
-          );
-    }, name: 'installedAppsProvider');
+class InstalledAppsController
+    extends AutoDisposeAsyncNotifier<PageResult<AppInstalledDto>> {
+  static const _pageSize = 100;
+
+  int _page = 1;
+  bool _loadingMore = false;
+  bool _disposed = false;
+
+  @override
+  Future<PageResult<AppInstalledDto>> build() async {
+    _disposed = false;
+    _page = 1;
+    ref.onDispose(() => _disposed = true);
+    final link = ref.keepAlive();
+    final timer = Timer(const Duration(minutes: 5), link.close);
+    ref.onDispose(timer.cancel);
+    return _fetch(1);
+  }
+
+  Future<PageResult<AppInstalledDto>> _fetch(int page) async {
+    final repository = await ref.read(appRepositoryProvider.future);
+    return repository.searchInstalledApps(
+      AppInstalledSearchReq(page: page, pageSize: _pageSize),
+    );
+  }
+
+  Future<void> refresh() async {
+    _page = 1;
+    state = const AsyncLoading<PageResult<AppInstalledDto>>().copyWithPrevious(
+      state,
+    );
+    state = await AsyncValue.guard(() => _fetch(1));
+  }
+
+  Future<void> loadMore() async {
+    final current = state.valueOrNull;
+    if (current == null || _loadingMore) return;
+    if (current.items.length >= current.total) return;
+    _loadingMore = true;
+    try {
+      final next = await _fetch(_page + 1);
+      if (_disposed) return;
+      _page++;
+      final latest = state.valueOrNull ?? current;
+      state = AsyncData(
+        PageResult<AppInstalledDto>(
+          total: next.total,
+          items: [...latest.items, ...next.items],
+        ),
+      );
+    } catch (_) {
+      if (!_disposed) state = AsyncData(current);
+    } finally {
+      _loadingMore = false;
+    }
+  }
+}
+
+final upgradableAppsProvider =
+    AsyncNotifierProvider.autoDispose<
+      UpgradableAppsController,
+      PageResult<AppInstalledDto>
+    >(UpgradableAppsController.new, name: 'upgradableAppsProvider');
+
+class UpgradableAppsController
+    extends AutoDisposeAsyncNotifier<PageResult<AppInstalledDto>> {
+  static const _pageSize = 100;
+
+  int _page = 1;
+  bool _loadingMore = false;
+  bool _disposed = false;
+
+  @override
+  Future<PageResult<AppInstalledDto>> build() async {
+    _disposed = false;
+    _page = 1;
+    ref.onDispose(() => _disposed = true);
+    final link = ref.keepAlive();
+    final timer = Timer(const Duration(minutes: 2), link.close);
+    ref.onDispose(timer.cancel);
+    return _fetch(1);
+  }
+
+  Future<PageResult<AppInstalledDto>> _fetch(int page) async {
+    final repository = await ref.read(appRepositoryProvider.future);
+    return repository.searchInstalledApps(
+      AppInstalledSearchReq(page: page, pageSize: _pageSize, update: true),
+    );
+  }
+
+  Future<void> refresh() async {
+    _page = 1;
+    state = const AsyncLoading<PageResult<AppInstalledDto>>().copyWithPrevious(
+      state,
+    );
+    state = await AsyncValue.guard(() => _fetch(1));
+  }
+
+  Future<void> loadMore() async {
+    final current = state.valueOrNull;
+    if (current == null || _loadingMore) return;
+    if (current.items.length >= current.total) return;
+    _loadingMore = true;
+    try {
+      final next = await _fetch(_page + 1);
+      if (_disposed) return;
+      _page++;
+      final latest = state.valueOrNull ?? current;
+      state = AsyncData(
+        PageResult<AppInstalledDto>(
+          total: next.total,
+          items: [...latest.items, ...next.items],
+        ),
+      );
+    } catch (_) {
+      if (!_disposed) state = AsyncData(current);
+    } finally {
+      _loadingMore = false;
+    }
+  }
+}
+
+void invalidateInstalledAppLists(WidgetRef ref) {
+  ref.invalidate(installedAppsProvider);
+  ref.invalidate(upgradableAppsProvider);
+}
 
 final appDetailProvider = FutureProvider.autoDispose
     .family<AppDetailDto, String>((ref, key) {
@@ -60,10 +235,19 @@ final installedInfoProvider = FutureProvider.autoDispose
           .then((repository) => repository.getInstalledInfo(id));
     }, name: 'installedInfoProvider');
 
+final ignoredAppsProvider = FutureProvider.autoDispose<List<AppIgnoredDto>>((
+  ref,
+) async {
+  final link = ref.keepAlive();
+  final timer = Timer(const Duration(seconds: 60), link.close);
+  ref.onDispose(timer.cancel);
+  final repository = await ref.watch(appRepositoryProvider.future);
+  return repository.getIgnoredApps();
+}, name: 'ignoredAppsProvider');
+
 final installedIgnoredProvider = FutureProvider.autoDispose
     .family<AppIgnoredDto?, int>((ref, installId) async {
-      final repository = await ref.watch(appRepositoryProvider.future);
-      final ignored = await repository.getIgnoredApps();
+      final ignored = await ref.watch(ignoredAppsProvider.future);
       for (final item in ignored) {
         if (item.appId == installId) return item;
       }

@@ -212,7 +212,7 @@ class SslCreateReq {
     'pushDir': pushDir,
     'execShell': execShell,
     'pushNode': pushNode,
-    'isIP': isIp,
+    'isIp': isIp,
     'disableCNAME': disableCNAME,
     'skipDNS': skipDNS,
     'nameserver1': nameserver1,
@@ -374,7 +374,6 @@ class CaDto {
     required this.province,
     required this.city,
     required this.keyType,
-    required this.sslId,
     this.certificate,
     this.privateKey,
   });
@@ -388,7 +387,6 @@ class CaDto {
   final String province;
   final String city;
   final String keyType;
-  final String sslId;
   final String? certificate;
   final String? privateKey;
 
@@ -399,11 +397,13 @@ class CaDto {
       commonName: json['commonName'] as String? ?? '',
       country: json['country'] as String? ?? '',
       organization: json['organization'] as String? ?? '',
-      organizationUnit: json['organizationUnit'] as String? ?? '',
+      organizationUnit:
+          json['organizationUnit'] as String? ??
+          json['organizationUint'] as String? ??
+          '',
       province: json['province'] as String? ?? '',
       city: json['city'] as String? ?? '',
       keyType: json['keyType'] as String? ?? '',
-      sslId: json['sslId'] as String? ?? '',
       certificate: json['certificate'] as String?,
       privateKey: json['privateKey'] as String?,
     );
@@ -436,7 +436,7 @@ class CaCreateReq {
     'commonName': commonName,
     'country': country,
     'organization': organization,
-    'organizationUnit': organizationUnit,
+    'organizationUint': organizationUnit,
     'province': province,
     'city': city,
     'keyType': keyType,

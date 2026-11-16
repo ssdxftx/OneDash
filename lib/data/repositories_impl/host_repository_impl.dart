@@ -4,9 +4,12 @@ import '../../core/network/dio_client_provider.dart';
 import '../../domain/repositories/host_repository.dart';
 import '../api/host_api.dart';
 import '../dto/host/disk_dto.dart';
+import '../dto/common/page_result.dart';
 import '../dto/host/host_diagnostics_dto.dart';
+import '../dto/host/remote_host_dto.dart';
 import '../dto/host/ssh_cert_dto.dart';
 import '../dto/host/ssh_info_dto.dart';
+import '../dto/host/ssh_log_dto.dart';
 
 class HostRepositoryImpl implements HostRepository {
   HostRepositoryImpl(this._api);
@@ -27,6 +30,20 @@ class HostRepositoryImpl implements HostRepository {
     required DateTime endTime,
   }) =>
       _api.searchMonitor(param: param, startTime: startTime, endTime: endTime);
+
+  @override
+  Future<void> cleanMonitor({String type = 'host'}) =>
+      _api.cleanMonitor(type: type);
+
+  @override
+  Future<void> cleanSshLogs() => _api.cleanSshLogs();
+
+  @override
+  Future<PageResult<SshLogDto>> searchSshLogs(SshLogSearchReq req) =>
+      _api.searchSshLogs(req);
+
+  @override
+  Future<String> exportSshLogs(SshLogSearchReq req) => _api.exportSshLogs(req);
 
   @override
   Future<SshInfoDto> getSshInfo() => _api.getSshInfo();
@@ -51,6 +68,41 @@ class HostRepositoryImpl implements HostRepository {
   @override
   Future<bool> testHostConnection(Map<String, dynamic> body) =>
       _api.testHostConnection(body);
+
+  @override
+  Future<PageResult<RemoteHostDto>> searchRemoteHosts({
+    int page = 1,
+    int pageSize = 100,
+    int groupId = 0,
+    String info = '',
+  }) => _api.searchRemoteHosts(
+    page: page,
+    pageSize: pageSize,
+    groupId: groupId,
+    info: info,
+  );
+
+  @override
+  Future<List<RemoteHostTreeDto>> getRemoteHostTree({String info = ''}) =>
+      _api.getRemoteHostTree(info: info);
+
+  @override
+  Future<void> createRemoteHost(Map<String, dynamic> body) =>
+      _api.createRemoteHost(body);
+
+  @override
+  Future<void> updateRemoteHost(Map<String, dynamic> body) =>
+      _api.updateRemoteHost(body);
+
+  @override
+  Future<void> deleteRemoteHosts(List<int> ids) => _api.deleteRemoteHosts(ids);
+
+  @override
+  Future<bool> testRemoteHost(Map<String, dynamic> body) =>
+      _api.testRemoteHost(body);
+
+  @override
+  Future<bool> testRemoteHostById(int id) => _api.testRemoteHostById(id);
 
   @override
   Future<List<SshCertDto>> searchSshCerts() async {

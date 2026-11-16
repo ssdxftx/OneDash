@@ -188,6 +188,240 @@ mixin _AiAccountsActions on ConsumerState<AiPage> {
     }
   }
 
+  Future<bool> _editAccountModel(
+    AiAccountDto account, {
+    Map<String, dynamic>? model,
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final idController = TextEditingController(text: '${model?['id'] ?? ''}');
+    final nameController = TextEditingController(
+      text: '${model?['name'] ?? ''}',
+    );
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: model == null ? l10n.ai_model_add : l10n.action_edit,
+          saveLabel: l10n.action_save,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: idController, label: l10n.ai_model_id),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: nameController, label: l10n.ai_model_name),
+          ],
+        ),
+      ),
+    );
+    final id = idController.text.trim();
+    final name = nameController.text.trim();
+    idController.dispose();
+    nameController.dispose();
+    if (saved != true || id.isEmpty || !mounted) return false;
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      if (model == null) {
+        await repository.createAccountModel(
+          accountId: account.id,
+          id: id,
+          name: name.isEmpty ? id : name,
+        );
+      } else {
+        await repository.updateAccountModel(
+          accountId: account.id,
+          id: id,
+          name: name.isEmpty ? id : name,
+        );
+      }
+      return true;
+    } catch (error) {
+      if (!mounted) return false;
+      showErrorToast(context, error);
+      return false;
+    }
+  }
+
+  Future<void> _manageModels(AiAccountDto account) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      var models = await repository.getAccountModels(account.id);
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.9,
+        builder: (sheetContext) => StatefulBuilder(
+          builder: (context, setSheetState) {
+            Future<void> reload() async {
+              final next = await repository.getAccountModels(account.id);
+              if (sheetContext.mounted) {
+                setSheetState(() => models = next);
+              }
+            }
+
+            Future<void> add() async {
+              if (await _editAccountModel(account)) {
+                await reload();
+              }
+            }
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.ai_account_models,
+                        style: AppTextStyles.titleL,
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: add,
+                      icon: const Icon(TablerIcons.plus, size: 18),
+                      label: Text(l10n.ai_model_add),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppTokens.s8),
+                if (models.isEmpty)
+                  Text(l10n.state_empty, style: AppTextStyles.bodyM)
+                else
+                  Flexible(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        for (final model in models)
+                          ListTile(
+                            onTap: () async {
+                              if (await _editAccountModel(
+                                account,
+                                model: model,
+                              )) {
+                                await reload();
+                              }
+                            },
+                            leading: Icon(
+                              model['isVerifyModel'] == true
+                                  ? TablerIcons.shield_check
+                                  : TablerIcons.cube,
+                            ),
+                            title: Text('${model['name'] ?? ''}'),
+                            subtitle: Text('${model['id'] ?? ''}'),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  tooltip: l10n.ai_model_verify,
+                                  icon: const Icon(TablerIcons.shield_check),
+                                  onPressed: () async {
+                                    final recordId = (model['recordId'] as num?)
+                                        ?.toInt();
+                                    if (recordId == null) return;
+                                    try {
+                                      await repository.setAccountVerifyModel(
+                                        accountId: account.id,
+                                        recordId: recordId,
+                                      );
+                                      await reload();
+                                    } catch (error) {
+                                      if (!sheetContext.mounted) return;
+                                      showErrorToast(sheetContext, error);
+                                    }
+                                  },
+                                ),
+                                IconButton(
+                                  tooltip: l10n.action_delete,
+                                  icon: Icon(
+                                    TablerIcons.trash,
+                                    color: sheetContext.appColors.danger,
+                                  ),
+                                  onPressed: () async {
+                                    final recordId = (model['recordId'] as num?)
+                                        ?.toInt();
+                                    if (recordId == null) return;
+                                    try {
+                                      await repository.deleteAccountModel(
+                                        accountId: account.id,
+                                        recordId: recordId,
+                                      );
+                                      await reload();
+                                    } catch (error) {
+                                      if (!sheetContext.mounted) return;
+                                      showErrorToast(sheetContext, error);
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      );
+      ref.invalidate(aiAccountsProvider);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _discoverModels(AiAccountDto account) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final models = await repository.discoverAgentAccountModels(
+        provider: account.provider,
+        baseURL: account.baseUrl,
+        apiKey: account.apiKey,
+        apiType: account.apiType,
+      );
+      if (!mounted) return;
+      if (models.isEmpty) {
+        AppToast.warning(context, l10n.ai_account_discover_empty);
+        return;
+      }
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.9,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.ai_account_discover_result('${models.length}'),
+              style: AppTextStyles.titleM,
+            ),
+            const SizedBox(height: AppTokens.s8),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final model in models)
+                    ListTile(
+                      dense: true,
+                      leading: const Icon(TablerIcons.cube),
+                      title: Text('${model['name'] ?? model['id'] ?? ''}'),
+                      subtitle: '${model['id'] ?? ''}'.isEmpty
+                          ? null
+                          : Text('${model['id']}'),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _showAccountActions(AiAccountDto account) async {
     final l10n = AppLocalizations.of(context);
     final value = await showSelectionMenu<String>(
@@ -200,6 +434,26 @@ mixin _AiAccountsActions on ConsumerState<AiPage> {
           icon: TablerIcons.edit,
         ),
         SelectionOption(
+          label: l10n.ai_account_models,
+          value: 'models',
+          icon: TablerIcons.list,
+        ),
+        SelectionOption(
+          label: l10n.ai_account_discover,
+          value: 'discover',
+          icon: TablerIcons.search,
+        ),
+        SelectionOption(
+          label: l10n.ai_account_verify,
+          value: 'verify',
+          icon: TablerIcons.shield_check,
+        ),
+        SelectionOption(
+          label: l10n.ai_chat_title,
+          value: 'chat',
+          icon: TablerIcons.message_chatbot,
+        ),
+        SelectionOption(
           label: l10n.action_delete,
           value: 'delete',
           icon: TablerIcons.trash,
@@ -208,8 +462,38 @@ mixin _AiAccountsActions on ConsumerState<AiPage> {
       ],
     );
     if (value == null || !mounted) return;
+    if (value == 'chat') {
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) =>
+              AiChatPage(accountId: account.id, accountName: account.name),
+        ),
+      );
+      return;
+    }
     if (value == 'edit') {
       await _editAccount(account);
+      return;
+    }
+    if (value == 'models') {
+      await _manageModels(account);
+      return;
+    }
+    if (value == 'discover') {
+      await _discoverModels(account);
+      return;
+    }
+    if (value == 'verify') {
+      try {
+        final repository = await ref.read(aiRepositoryProvider.future);
+        await repository.verifyAccount(id: account.id);
+        if (!mounted) return;
+        AppToast.success(context, l10n.action_done);
+        ref.invalidate(aiAccountsProvider);
+      } catch (error) {
+        if (!mounted) return;
+        showErrorToast(context, error);
+      }
       return;
     }
     final confirmed = await showConfirmSheet(

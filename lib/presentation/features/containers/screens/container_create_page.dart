@@ -263,18 +263,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
               'linkLocalIPs': <String>[],
             },
           ]
-        : initial.networks
-              .map(
-                (network) => {
-                  ...network.toJson(),
-                  'links': <String>[],
-                  'aliases': <String>[],
-                  'driverOpts': <String, String>{},
-                  'gwPriority': 0,
-                  'linkLocalIPs': <String>[],
-                },
-              )
-              .toList();
+        : initial.networks.map((network) => network.toJson()).toList();
     if (networks.isEmpty) {
       networks.add({
         'network': _network,
@@ -312,7 +301,9 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
       'nanoCPUs': cpu <= 0 ? 0 : cpu * 1000000000,
       'memory': memory <= 0 ? 0 : memory * 1024 * 1024,
       'volumes': volumes,
-      'extraHosts': initial?.extraHosts ?? <String>[],
+      'extraHosts':
+          initial?.extraHosts?.map((item) => item.toJson()).toList() ??
+          <Map<String, dynamic>>[],
       'privileged': _privileged,
       'autoRemove': _autoRemove,
       'labels': initial?.labels ?? <String>[],

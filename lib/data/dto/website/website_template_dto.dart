@@ -167,3 +167,29 @@ class WebsiteTemplateOutputDto {
     );
   }
 }
+
+/// `/websites/check` 返回项。
+class WebsitePreInstallCheckDto {
+  const WebsitePreInstallCheckDto({
+    this.appName = '',
+    this.name = '',
+    this.status = '',
+    this.version = '',
+  });
+
+  final String appName;
+  final String name;
+  final String status;
+  final String version;
+
+  bool get isRunning => status.toLowerCase() == 'running';
+
+  factory WebsitePreInstallCheckDto.fromJson(Map<String, dynamic> json) {
+    return WebsitePreInstallCheckDto(
+      appName: json['appName'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      status: json['status'] as String? ?? '',
+      version: json['version'] as String? ?? '',
+    );
+  }
+}

@@ -33,7 +33,6 @@ class ToolboxData {
 
 final _toolboxProvider = FutureProvider.autoDispose<ToolboxData>((ref) async {
   final repository = await ref.watch(toolboxRepositoryProvider.future);
-  final device = await repository.getDeviceBase();
   Future<Map<String, dynamic>> optional(
     Future<Map<String, dynamic>> future,
   ) async {
@@ -45,15 +44,16 @@ final _toolboxProvider = FutureProvider.autoDispose<ToolboxData>((ref) async {
   }
 
   final results = await Future.wait([
+    repository.getDeviceBase(),
     optional(repository.getFail2banBase()),
     optional(repository.getFtpBase()),
     optional(repository.getClamBase()),
   ]);
   return ToolboxData(
-    device: device,
-    fail2ban: results[0],
-    ftp: results[1],
-    clam: results[2],
+    device: results[0],
+    fail2ban: results[1],
+    ftp: results[2],
+    clam: results[3],
   );
 }, name: 'toolboxProvider');
 

@@ -57,8 +57,13 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
     required String database,
     int page = 1,
     int pageSize = 20,
-  }) =>
-      _api.searchDatabases(database: database, page: page, pageSize: pageSize);
+    String info = '',
+  }) => _api.searchDatabases(
+    database: database,
+    page: page,
+    pageSize: pageSize,
+    info: info,
+  );
 
   @override
   Future<Map<String, String>> getStatus({
@@ -71,10 +76,12 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
     required String database,
     int page = 1,
     int pageSize = 20,
+    String info = '',
   }) => _api.searchPgDatabases(
     database: database,
     page: page,
     pageSize: pageSize,
+    info: info,
   );
 
   @override
@@ -310,6 +317,9 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
   );
 
   @override
+  Future<bool> checkRedisCli() => _api.checkRedisCli();
+
+  @override
   Future<void> installRedisCli() => _api.installRedisCli();
 
   @override
@@ -317,10 +327,12 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
     required String database,
     int page = 1,
     int pageSize = 20,
+    String info = '',
   }) => _api.searchMongoDatabases(
     database: database,
     page: page,
     pageSize: pageSize,
+    info: info,
   );
 
   @override
@@ -447,6 +459,74 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
     required String username,
     required String host,
   }) => _api.deleteUser(database: database, username: username, host: host);
+
+  @override
+  Future<void> updateUser({
+    required String database,
+    required String username,
+    required String host,
+    required String newHost,
+    String description = '',
+  }) => _api.updateUser(
+    database: database,
+    username: username,
+    host: host,
+    newHost: newHost,
+    description: description,
+  );
+
+  @override
+  Future<void> saveUserPassword({
+    required String database,
+    required String username,
+    required String host,
+    required String password,
+  }) => _api.saveUserPassword(
+    database: database,
+    username: username,
+    host: host,
+    password: password,
+  );
+
+  @override
+  Future<Map<String, dynamic>> getGrantsSummary({
+    required String database,
+    required List<String> dbs,
+  }) => _api.getGrantsSummary(database: database, dbs: dbs);
+
+  @override
+  Future<void> updateDescription({
+    required int id,
+    required String type,
+    required String description,
+  }) => _api.updateDescription(id: id, type: type, description: description);
+
+  @override
+  Future<Map<String, dynamic>> getCommonInfo({
+    required String name,
+    required String type,
+  }) => _api.getCommonInfo(name: name, type: type);
+
+  @override
+  Future<void> loadMongoFromRemote({
+    required String database,
+    String from = 'remote',
+  }) => _api.loadMongoFromRemote(database: database, from: from);
+
+  @override
+  Future<void> changeMongoRootPassword({
+    required int id,
+    required String database,
+    required String password,
+    String from = 'local',
+    String type = 'mongodb',
+  }) => _api.changeMongoRootPassword(
+    id: id,
+    database: database,
+    password: password,
+    from: from,
+    type: type,
+  );
 
   @override
   Future<void> changeUserPassword({

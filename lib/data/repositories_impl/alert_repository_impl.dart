@@ -44,8 +44,24 @@ class AlertRepositoryImpl implements AlertRepository {
   Future<List<AlertConfigInfo>> getAlertConfigs() => _api.getAlertConfigs();
 
   @override
+  Future<PageResult<AlertConfigInfo>> searchAlertConfigs(
+    AlertConfigSearchReq req,
+  ) => _api.searchAlertConfigs(req);
+
+  @override
+  Future<List<ClamAlertInfo>> listClams() => _api.listClams();
+
+  @override
+  Future<List<CronJobAlertInfo>> listAlertCronJobs() =>
+      _api.listAlertCronJobs();
+
+  @override
   Future<void> updateAlertConfig(AlertConfigUpdateReq req) =>
       _api.updateAlertConfig(req);
+
+  @override
+  Future<void> updateAlertConfigStatus(int id, String status) =>
+      _api.updateAlertConfigStatus(id, status);
 
   @override
   Future<bool> testAlertConfig(AlertConfigTestReq req) =>

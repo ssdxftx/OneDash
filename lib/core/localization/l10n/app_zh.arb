@@ -57,6 +57,18 @@
   "settings_title": "设置",
   "settings_appearance_modeLight": "浅色",
   "settings_appearance_modeDark": "暗色",
+  "firewall_panelPort": "面板端口",
+  "@firewall_panelPort": {
+    "description": "OneDash UI text."
+  },
+  "firewall_portChanged": "端口已更新",
+  "@firewall_portChanged": {
+    "description": "OneDash UI text."
+  },
+  "firewall_newPort": "新端口",
+  "@firewall_newPort": {
+    "description": "OneDash UI text."
+  },
   "firewall_title": "防火墙",
   "firewall_port": "端口",
   "firewall_portPlaceholder": "80、8080-8090 或 80,443",
@@ -71,6 +83,34 @@
   "panelSettings_notSet": "未设置",
   "panelSettings_defaultAccessAddressPlaceholder": "请输入默认访问地址",
   "panelSettings_panelUsername": "面板用户名",
+  "panelSettings_apiKeyManagement": "独立 API Key",
+  "panelSettings_apiKeyManagementHint": "创建、查看和管理独立 API Key",
+  "panelSettings_apiKeyCreate": "新建 API Key",
+  "panelSettings_apiKeyName": "名称",
+  "panelSettings_apiKeyDescription": "描述",
+  "panelSettings_apiKeyIpWhiteList": "IP 白名单",
+  "panelSettings_apiKeyTrustedProxies": "可信代理",
+  "panelSettings_apiKeyValidity": "时间戳有效期（分钟）",
+  "panelSettings_apiKeyAllowAppBinding": "允许应用绑定",
+  "panelSettings_apiKeyReveal": "显示密钥",
+  "panelSettings_apiKeyEnable": "启用",
+  "panelSettings_apiKeyDisable": "停用",
+  "panelSettings_apiKeyRevoke": "吊销",
+  "panelSettings_apiKeyDelete": "删除",
+  "panelSettings_apiKeyEmpty": "暂无独立 API Key",
+  "panelSettings_apiKeyCreated": "API Key 已创建并复制",
+  "panelSettings_apiKeyRevokeConfirm": "吊销后无法恢复，确定继续？",
+  "panelSettings_apiKeyDeleteConfirm": "删除后无法恢复，确定继续？",
+  "panelSettings_apiKeyExpires": "过期时间",
+  "panelSettings_panelLogin": "面板登录",
+  "panelSettings_panelLoggedIn": "已登录，可管理密码、MFA、Passkey 和 API Key",
+  "panelSettings_panelNotLoggedIn": "未登录，密码、MFA、Passkey 和 API Key 管理需要面板会话",
+  "panelSettings_username": "用户名",
+  "panelSettings_password": "密码",
+  "panelSettings_login": "登录",
+  "panelSettings_loginRequired": "该操作需要先登录面板",
+  "panelSettings_captcha": "验证码",
+  "panelSettings_logout": "退出登录",
   "panelSettings_panelLoginPassword": "面板登录密码",
   "panelSettings_changePanelLoginPassword": "修改面板登录密码",
   "panelSettings_displaySettingsWebOnly": "显示设置（仅影响 Web 界面）",
@@ -278,6 +318,34 @@
   "files_delete": "删除",
   "files_rename": "重命名",
   "files_compress": "压缩",
+  "files_preview": "预览",
+  "@files_preview": {
+    "description": "OneDash UI text."
+  },
+  "files_directoryTree": "目录树",
+  "@files_directoryTree": {
+    "description": "OneDash UI text."
+  },
+  "files_remark": "备注",
+  "@files_remark": {
+    "description": "OneDash UI text."
+  },
+  "files_remarkSaved": "备注已保存",
+  "@files_remarkSaved": {
+    "description": "OneDash UI text."
+  },
+  "files_shareQr": "分享二维码",
+  "@files_shareQr": {
+    "description": "OneDash UI text."
+  },
+  "files_mounts": "系统挂载点",
+  "@files_mounts": {
+    "description": "OneDash UI text."
+  },
+  "files_mountPoint": "挂载点",
+  "@files_mountPoint": {
+    "description": "OneDash UI text."
+  },
   "files_share": "分享",
   "files_sort": "排序",
   "files_parent": "上一级",
@@ -290,6 +358,14 @@
   "websites_stopped": "已停止",
   "websites_static": "静态",
   "websites_proxy": "反向代理",
+  "websites_deployment": "应用",
+  "@websites_deployment": {
+    "description": "OneDash UI text."
+  },
+  "websites_subsite": "子站",
+  "@websites_subsite": {
+    "description": "OneDash UI text."
+  },
   "websites_php": "PHP",
   "websites_expire_days": "剩余 {days} 天",
   "containers_title": "容器",
@@ -426,6 +502,7 @@
   "files_extractToCurrent": "解压到当前目录",
   "files_imageTooLarge": "图片超过 30MB，请下载后查看",
   "files_downloadTooLarge": "文件超过 50MB，请使用网页版下载",
+  "files_downloadReady": "文件已准备好，可在分享面板中保存或分享",
   "files_savedTo": "已保存到 {path}",
   "files_itemCount": "{count} 项",
   "databases_deleteMessage": "该数据库将被永久删除。",
@@ -791,6 +868,18 @@
   "files_moreActions": "更多操作",
   "host_title": "主机",
   "host_monitor": "监控",
+  "host_cleanSshLog": "清理 SSH 登录日志",
+  "@host_cleanSshLog": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_cleanMonitor": "清理监控数据",
+  "@dashboard_cleanMonitor": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_cleanMonitorConfirm": "将删除已采集的监控数据，确认继续？",
+  "@dashboard_cleanMonitorConfirm": {
+    "description": "OneDash UI text."
+  },
   "host_ssh": "SSH",
   "host_range1h": "1 小时",
   "host_range6h": "6 小时",
@@ -870,6 +959,31 @@
   "runtime_maxSpare": "最大空闲进程",
   "host_disks": "磁盘",
   "host_diagnostics": "诊断",
+  "host_remoteHosts": "远程主机",
+  "host_addRemote": "添加远程主机",
+  "host_noRemote": "暂无远程主机",
+  "host_noRemoteHint": "添加远程主机后可在终端中连接。",
+  "host_remoteName": "名称",
+  "host_address": "地址",
+  "host_port": "端口",
+  "host_user": "用户名",
+  "host_authMode": "认证方式",
+  "host_authPassword": "密码",
+  "host_authKey": "密钥",
+  "host_password": "密码",
+  "host_privateKey": "私钥",
+  "host_passphrase": "私钥口令",
+  "host_rememberPassword": "记住密码",
+  "host_description": "描述",
+  "host_group": "分组",
+  "host_noGroup": "未分组",
+  "host_testConnection": "测试连接",
+  "host_connectionOk": "连接成功",
+  "host_connectionFailed": "连接失败",
+  "host_deleteRemote": "删除远程主机",
+  "host_deleteRemoteMessage": "确定删除 {name} 吗？",
+  "host_remoteSaved": "远程主机已保存",
+  "action_test": "测试",
   "host_diskSystem": "系统磁盘",
   "host_diskUnpartitioned": "未分区磁盘",
   "host_diskNormal": "数据磁盘",
@@ -958,7 +1072,7 @@
   "websites_templateUploaded": "模板已上传",
   "websites_templateFilePath": "模板包",
   "websites_templateRemark": "备注",
-  "websites_templateVariables": "变量",
+  "websites_templateVariables": "模板变量",
   "websites_templateAddVariable": "添加变量",
   "websites_templateVariableKey": "变量键",
   "websites_templateVariableLabel": "显示名称",
@@ -1038,6 +1152,38 @@
   "firewall_nativePermanent": "永久生效",
   "firewall_nativeLoad": "读取原生详情",
   "firewall_settingsBackendHint": "点击切换面板管理的防火墙后端",
+  "firewall_backendSystem": "系统规则",
+  "firewall_backendForwarding": "端口转发",
+  "firewall_backendDocker": "Docker 规则",
+  "firewall_advanced": "高级操作",
+  "firewall_familyOperation": "初始化或修复防火墙族",
+  "firewall_familyOperationHint": "对指定子系统和 IPv4/IPv6 族执行初始化、修复或绑定",
+  "firewall_filterChain": "基础链操作",
+  "firewall_filterChainHint": "初始化、绑定或解绑 1PANEL_BASIC 基础链",
+  "firewall_subsystem": "子系统",
+  "firewall_family": "协议族",
+  "firewall_operation": "操作",
+  "firewall_subsystemSystem": "系统规则",
+  "firewall_subsystemForwarding": "端口转发",
+  "firewall_subsystemDocker": "Docker 规则",
+  "firewall_operationInitialize": "初始化",
+  "firewall_operationRepair": "修复",
+  "firewall_operationBind": "绑定",
+  "firewall_filterInit": "初始化基础链",
+  "firewall_filterBind": "绑定基础链",
+  "firewall_filterUnbind": "解绑基础链",
+  "firewall_dockerPolicy": "端口防护策略",
+  "firewall_dockerPolicyHint": "为容器发布端口设置来源限制",
+  "firewall_dockerMode": "策略模式",
+  "firewall_dockerSources": "来源地址",
+  "firewall_dockerSourcesHint": "多个地址用逗号分隔",
+  "firewall_dockerPolicySaved": "端口防护策略已保存",
+  "firewall_dockerPolicyDeleted": "端口防护策略已删除",
+  "firewall_dockerModeDenySources": "拒绝指定来源",
+  "firewall_dockerModeAllowSources": "仅允许指定来源",
+  "firewall_dockerModeDenyAll": "拒绝全部来源",
+  "firewall_dockerModeAcceptSources": "接受指定来源",
+  "firewall_dockerModeAcceptAll": "接受全部来源",
   "host_sshCheckFailed": "本地 SSH 连通性检查失败，已取消保存。",
   "host_sshCheckAfterSave": "SSH 端口已保存，但本地连通性检查仍未通过，请确认新端口。",
   "containers_creating": "正在创建容器…",
@@ -1267,6 +1413,20 @@
   "files_startDownload": "开始下载",
   "files_moveCopy": "移动或复制",
   "files_batchPermission": "批量权限",
+  "files_convert": "格式转换",
+  "files_convertFormat": "输出格式",
+  "files_convertOutput": "输出目录",
+  "files_convertDeleteSource": "转换后删除源文件",
+  "files_convertStarted": "转换任务已提交",
+  "files_convertOnlyFiles": "只能转换文件，不能转换目录",
+  "files_convertNoFile": "请先选择要转换的文件",
+  "files_uploadRecords": "上传记录",
+  "files_noUploadRecords": "暂无上传记录",
+  "files_noUploadRecordsHint": "当前目录中的上传文件会显示在这里。",
+  "files_convertLogs": "转换记录",
+  "files_noConvertLogs": "暂无转换记录",
+  "files_noConvertLogsHint": "文件格式转换完成后会显示在这里。",
+  "files_removeDownloadRecord": "移除记录",
   "files_copyMode": "复制而非移动",
   "files_overwrite": "覆盖同名文件",
   "files_copy": "复制",
@@ -1285,6 +1445,14 @@
   "websites_limitConfigHint": "限制并发连接与速率",
   "websites_dirPermission": "目录权限",
   "websites_dirPermissionHint": "修改运行用户与用户组",
+  "action_enable": "启用",
+  "@action_enable": {
+    "description": "OneDash UI text."
+  },
+  "action_disable": "停用",
+  "@action_disable": {
+    "description": "OneDash UI text."
+  },
   "websites_enabled": "已启用",
   "websites_disabled": "已停用",
   "websites_indexFiles": "默认文档列表",
@@ -1292,6 +1460,130 @@
   "websites_perIp": "单 IP 并发",
   "websites_rateKb": "限速（KB/s）",
   "websites_owner": "用户",
+  "websites_batchActions": "批量操作",
+  "@websites_batchActions": {
+    "description": "OneDash UI text."
+  },
+  "websites_batchSuccess": "批量操作已完成",
+  "@websites_batchSuccess": {
+    "description": "OneDash UI text."
+  },
+  "websites_changeGroup": "修改分组",
+  "@websites_changeGroup": {
+    "description": "OneDash UI text."
+  },
+  "websites_bindSsl": "绑定证书",
+  "@websites_bindSsl": {
+    "description": "OneDash UI text."
+  },
+  "websites_selectGroup": "选择分组",
+  "@websites_selectGroup": {
+    "description": "OneDash UI text."
+  },
+  "websites_selectSsl": "选择证书",
+  "@websites_selectSsl": {
+    "description": "OneDash UI text."
+  },
+  "websites_defaultSite": "默认站点",
+  "@websites_defaultSite": {
+    "description": "OneDash UI text."
+  },
+  "websites_crossSite": "跨站访问",
+  "@websites_crossSite": {
+    "description": "OneDash UI text."
+  },
+  "websites_proxyCache": "代理缓存",
+  "@websites_proxyCache": {
+    "description": "OneDash UI text."
+  },
+  "websites_cacheLimit": "缓存上限",
+  "@websites_cacheLimit": {
+    "description": "OneDash UI text."
+  },
+  "websites_cacheShare": "共享缓存",
+  "@websites_cacheShare": {
+    "description": "OneDash UI text."
+  },
+  "websites_cacheExpire": "缓存过期",
+  "@websites_cacheExpire": {
+    "description": "OneDash UI text."
+  },
+  "websites_clearProxyCache": "清理代理缓存",
+  "@websites_clearProxyCache": {
+    "description": "OneDash UI text."
+  },
+  "websites_composer": "Composer",
+  "@websites_composer": {
+    "description": "OneDash UI text."
+  },
+  "websites_composerCommand": "命令",
+  "@websites_composerCommand": {
+    "description": "OneDash UI text."
+  },
+  "websites_composerMirror": "镜像地址",
+  "@websites_composerMirror": {
+    "description": "OneDash UI text."
+  },
+  "websites_composerDir": "执行目录",
+  "@websites_composerDir": {
+    "description": "OneDash UI text."
+  },
+  "websites_composerUser": "运行用户",
+  "@websites_composerUser": {
+    "description": "OneDash UI text."
+  },
+  "websites_cacheCleared": "代理缓存已清理",
+  "@websites_cacheCleared": {
+    "description": "OneDash UI text."
+  },
+  "websites_pushSsl": "推送到从节点",
+  "@websites_pushSsl": {
+    "description": "OneDash UI text."
+  },
+  "websites_nodes": "节点列表",
+  "@websites_nodes": {
+    "description": "OneDash UI text."
+  },
+  "websites_mergeGroup": "迁移到分组",
+  "@websites_mergeGroup": {
+    "description": "OneDash UI text."
+  },
+  "websites_defaultHtml": "默认页面",
+  "@websites_defaultHtml": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlType": "页面类型",
+  "@websites_htmlType": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlContent": "HTML 内容",
+  "@websites_htmlContent": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlSaved": "默认页面已保存",
+  "@websites_htmlSaved": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlIndex": "index.html",
+  "@websites_htmlIndex": {
+    "description": "OneDash UI text."
+  },
+  "websites_html404": "404.html",
+  "@websites_html404": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlPhp": "index.php",
+  "@websites_htmlPhp": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlDomain404": "domain404.html",
+  "@websites_htmlDomain404": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlStop": "stop/index.html",
+  "@websites_htmlStop": {
+    "description": "OneDash UI text."
+  },
   "websites_group": "用户组",
   "websites_accessAuth": "访问认证",
   "websites_username": "用户名",
@@ -1315,6 +1607,14 @@
   "websites_rewriteContent": "伪静态规则",
   "websites_addRedirect": "新增重定向",
   "websites_editRedirect": "编辑重定向",
+  "websites_deleteRedirect": "删除重定向",
+  "@websites_deleteRedirect": {
+    "description": "OneDash UI text."
+  },
+  "websites_redirectDeleted": "重定向已删除",
+  "@websites_redirectDeleted": {
+    "description": "OneDash UI text."
+  },
   "websites_redirectType": "类型",
   "websites_redirectDomain": "域名",
   "websites_redirectPath": "路径",
@@ -1468,6 +1768,8 @@
   "websites_acmeType": "ACME 类型",
   "websites_caDirUrl": "CA 目录地址",
   "websites_useProxy": "使用代理",
+  "websites_eabKid": "EAB Kid",
+  "websites_eabHmacKey": "EAB HmacKey",
   "websites_useEab": "使用 EAB",
   "websites_noAcme": "暂无 ACME 账号",
   "websites_noAcmeHint": "添加 ACME 账号以申请证书。",
@@ -1487,6 +1789,74 @@
   "apps_cancelIgnore": "取消忽略更新",
   "apps_notIgnored": "该应用未被忽略",
   "files_exactSize": "计算精确大小",
+  "containers_rename": "重命名",
+  "@containers_rename": {
+    "description": "OneDash UI text."
+  },
+  "containers_newName": "新名称",
+  "@containers_newName": {
+    "description": "OneDash UI text."
+  },
+  "containers_checkImageUpdates": "检查镜像更新",
+  "@containers_checkImageUpdates": {
+    "description": "OneDash UI text."
+  },
+  "containers_imageUpdatesDone": "镜像更新检查已启动",
+  "@containers_imageUpdatesDone": {
+    "description": "OneDash UI text."
+  },
+  "containers_searchRemote": "搜索远程镜像",
+  "@containers_searchRemote": {
+    "description": "OneDash UI text."
+  },
+  "containers_scheduleImageUpdates": "定时检查镜像更新",
+  "@containers_scheduleImageUpdates": {
+    "description": "OneDash UI text."
+  },
+  "containers_downloadLog": "下载日志",
+  "@containers_downloadLog": {
+    "description": "OneDash UI text."
+  },
+  "containers_fileBrowser": "容器文件",
+  "@containers_fileBrowser": {
+    "description": "OneDash UI text."
+  },
+  "containers_uploadFile": "上传文件",
+  "@containers_uploadFile": {
+    "description": "OneDash UI text."
+  },
+  "containers_fileContent": "文件内容",
+  "@containers_fileContent": {
+    "description": "OneDash UI text."
+  },
+  "containers_binaryFile": "二进制文件，无法预览",
+  "@containers_binaryFile": {
+    "description": "OneDash UI text."
+  },
+  "containers_parentDir": "上级目录",
+  "@containers_parentDir": {
+    "description": "OneDash UI text."
+  },
+  "containers_fileDeleted": "文件已删除",
+  "@containers_fileDeleted": {
+    "description": "OneDash UI text."
+  },
+  "containers_fileEmpty": "目录为空",
+  "@containers_fileEmpty": {
+    "description": "OneDash UI text."
+  },
+  "containers_composeEnv": "Compose 环境变量",
+  "@containers_composeEnv": {
+    "description": "OneDash UI text."
+  },
+  "containers_pinCompose": "置顶 Compose",
+  "@containers_pinCompose": {
+    "description": "OneDash UI text."
+  },
+  "containers_unpinCompose": "取消置顶",
+  "@containers_unpinCompose": {
+    "description": "OneDash UI text."
+  },
   "containers_cleanLogs": "清空容器日志",
   "containers_cleanLogsConfirm": "确定清空 {name} 的日志吗？",
   "backups_listBuckets": "列出存储桶",
@@ -1520,6 +1890,10 @@
   "backups_containerHint": "容器名称",
   "files_websiteRoot": "网站根目录",
   "files_pickOwner": "选择用户或用户组",
+  "panelSettings_apiConfigUnavailable": "当前 API Key 模式无法安全读取接口白名单，请到面板 Web 端修改。",
+  "@panelSettings_apiConfigUnavailable": {
+    "description": "OneDash UI text."
+  },
   "panelSettings_apiInterfaceToggleHint": "允许通过 API 访问面板",
   "panelSettings_restoreSnapshot": "恢复快照",
   "panelSettings_rollbackSnapshot": "回滚快照",
@@ -1548,6 +1922,138 @@
   "databases_connectionFailed": "连接失败",
   "databases_ssl": "使用 SSL",
   "files_checkExistence": "检查是否存在",
+  "panelSettings_closeMfa": "关闭双因素认证",
+  "@panelSettings_closeMfa": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_mfaClosed": "双因素认证已关闭",
+  "@panelSettings_mfaClosed": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_resetExpiredPassword": "密码过期重置",
+  "@panelSettings_resetExpiredPassword": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_passwordReset": "密码已重置",
+  "@panelSettings_passwordReset": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_commandLibrary": "命令库",
+  "@panelSettings_commandLibrary": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_add": "新建命令",
+  "@commandLibrary_add": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_name": "命令名称",
+  "@commandLibrary_name": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_command": "命令内容",
+  "@commandLibrary_command": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_empty": "暂无命令",
+  "@commandLibrary_empty": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_tree": "命令树",
+  "@commandLibrary_tree": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_import": "导入命令",
+  "@commandLibrary_import": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_export": "导出命令",
+  "@commandLibrary_export": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_imported": "命令已导入",
+  "@commandLibrary_imported": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_exported": "命令已导出",
+  "@commandLibrary_exported": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_importEmpty": "CSV 中没有可导入的命令",
+  "@commandLibrary_importEmpty": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_copied": "命令已复制",
+  "@commandLibrary_copied": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_run": "运行脚本",
+  "@scriptLibrary_run": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_groupManagement": "分组管理",
+  "@panelSettings_groupManagement": {
+    "description": "OneDash UI text."
+  },
+  "group_add": "新建分组",
+  "@group_add": {
+    "description": "OneDash UI text."
+  },
+  "group_name": "分组名称",
+  "@group_name": {
+    "description": "OneDash UI text."
+  },
+  "group_empty": "暂无分组",
+  "@group_empty": {
+    "description": "OneDash UI text."
+  },
+  "group_typeScript": "脚本",
+  "@group_typeScript": {
+    "description": "OneDash UI text."
+  },
+  "group_typeCommand": "命令",
+  "@group_typeCommand": {
+    "description": "OneDash UI text."
+  },
+  "group_typeCronjob": "计划任务",
+  "@group_typeCronjob": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_scriptLibrary": "脚本库",
+  "@panelSettings_scriptLibrary": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_add": "新建脚本",
+  "@scriptLibrary_add": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_name": "脚本名称",
+  "@scriptLibrary_name": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_description": "描述",
+  "@scriptLibrary_description": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_content": "脚本内容",
+  "@scriptLibrary_content": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_interactive": "交互式脚本",
+  "@scriptLibrary_interactive": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_sync": "同步脚本库",
+  "@scriptLibrary_sync": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_syncStarted": "同步任务已启动",
+  "@scriptLibrary_syncStarted": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_empty": "暂无脚本",
+  "@scriptLibrary_empty": {
+    "description": "OneDash UI text."
+  },
   "panelSettings_mfa": "双因素认证",
   "panelSettings_mfaHint": "绑定认证器应用",
   "panelSettings_mfaCode": "验证码",
@@ -1924,7 +2430,7 @@
   },
   "websites_privateKeyPath": "私钥路径",
   "@websites_privateKeyPath": {
-    "description": "私钥路径"
+    "description": "OneDash UI text."
   },
   "websites_status": "状态",
   "@websites_status": {
@@ -2232,6 +2738,26 @@
   "@ai_account_add": {
     "description": "添加模型账户"
   },
+  "ai_account_models": "模型管理",
+  "@ai_account_models": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_id": "模型 ID",
+  "@ai_model_id": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_verify": "设为验证模型",
+  "@ai_model_verify": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_verified": "验证模型",
+  "@ai_model_verified": {
+    "description": "OneDash UI text."
+  },
+  "ai_account_verify": "验证账号",
+  "@ai_account_verify": {
+    "description": "OneDash UI text."
+  },
   "ai_account_edit": "编辑模型账户",
   "@ai_account_edit": {
     "description": "编辑模型账户"
@@ -2391,7 +2917,7 @@
   },
   "ai_agent_streaming": "流式回复",
   "@ai_agent_streaming": {
-    "description": "流式回复"
+    "description": "OneDash UI text."
   },
   "ai_agent_thread_session": "话题会话",
   "@ai_agent_thread_session": {
@@ -2528,5 +3054,1449 @@
   "logs_authMode": "认证方式",
   "logs_message": "错误信息",
   "common_removing": "删除中",
-  "logs_result": "结果"
+  "logs_result": "结果",
+  "ai_agent_plugins": "插件管理",
+  "ai_agent_skills": "技能管理",
+  "ai_plugin_installed": "已安装插件",
+  "ai_plugin_market": "插件市场",
+  "ai_plugin_searchHint": "搜索插件",
+  "ai_plugin_enable": "启用",
+  "ai_plugin_disable": "停用",
+  "ai_plugin_version": "版本",
+  "ai_plugin_install": "安装",
+  "ai_plugin_empty": "暂无已安装插件",
+  "ai_plugin_noResults": "没有匹配的插件",
+  "ai_skill_installed": "已安装技能",
+  "ai_skill_market": "技能市场",
+  "ai_skill_searchHint": "搜索技能",
+  "ai_skill_source": "来源",
+  "ai_skill_install": "安装",
+  "ai_skill_uninstall": "卸载",
+  "ai_skill_empty": "暂无已安装技能",
+  "ai_skill_noResults": "没有匹配的技能",
+  "ai_model_syncAccount": "同步到账号",
+  "ai_model_recreate": "重新创建",
+  "ai_model_baseUrlType": "地址类型",
+  "ai_model_baseUrl": "基础地址",
+  "ai_gpu_monitor": "GPU 监控",
+  "ai_gpu_benchmark": "基准来源",
+  "ai_gpu_benchmarkEmpty": "暂无基准来源",
+  "ai_gpu_utilizationChart": "GPU 使用率",
+  "ai_gpu_memoryChart": "显存使用",
+  "ai_model_baseUrlContainer": "容器地址",
+  "ai_model_baseUrlLocalhost": "本机地址",
+  "ai_model_baseUrlSystemIp": "面板 IP",
+  "ai_model_baseUrlCustom": "自定义",
+  "ai_skill_sourceOfficial": "官方",
+  "ai_skill_sourceClawhubGlobal": "ClawHub 全球",
+  "ai_skill_sourceClawhubCn": "ClawHub 中国",
+  "ai_skill_sourceSkillhub": "SkillHub",
+  "ai_skill_sourceSkillsSh": "skills.sh",
+  "ai_skill_sourceLocalHub": "本地技能库",
+  "ai_vllm_monitor": "vLLM 监控",
+  "ai_vllm_app": "vLLM 应用",
+  "ai_vllm_noApps": "未找到 vLLM 应用",
+  "ai_vllm_samples": "样本数",
+  "ai_vllm_running": "运行中请求",
+  "ai_vllm_waiting": "等待请求",
+  "ai_vllm_cache": "缓存使用率",
+  "ai_agent_sessions": "对话会话",
+  "ai_session_rename": "重命名会话",
+  "ai_session_delete": "删除会话",
+  "ai_agent_batch": "批量操作",
+  "ai_batch_type": "应用类型",
+  "ai_batch_operate": "操作",
+  "ai_batch_start": "启动",
+  "ai_batch_stop": "停止",
+  "ai_batch_restart": "重启",
+  "ai_batch_delete": "删除",
+  "ai_batch_force": "强制删除",
+  "ai_batch_result": "成功 {success} 个，跳过 {skipped} 个",
+  "ai_agent_overview": "智能体概览",
+  "ai_vllm_clean": "清理监控数据",
+  "dashboard_nodeInfo": "节点信息",
+  "dashboard_quickJumps": "快速跳转",
+  "dashboard_manageQuick": "管理快速跳转与目录",
+  "dashboard_quickDirectories": "快捷目录",
+  "dashboard_quickDirectoryPath": "目录路径",
+  "dashboard_quickDirectoryAlias": "别名",
+  "dashboard_launcher": "应用启动器",
+  "dashboard_manageLauncher": "管理启动器",
+  "dashboard_topCpu": "CPU 占用排行",
+  "dashboard_topMem": "内存占用排行",
+  "dashboard_noData": "暂无数据",
+  "dashboard_appInstalled": "已安装",
+  "dashboard_appNotInstalled": "未安装",
+  "dashboard_addQuickDirectory": "添加快捷目录",
+  "dashboard_editQuickDirectory": "编辑快捷目录",
+  "files_openShare": "打开分享",
+  "backups_editDescription": "编辑描述",
+  "backups_snapshotFiles": "快照文件",
+  "backups_noSnapshotFiles": "暂无快照文件",
+  "cronjobs_nextRun": "下次执行",
+  "cronjobs_updateGroup": "修改分组",
+  "apps_checkUpdates": "检查商店更新",
+  "apps_storeCanUpdate": "应用商店有可用更新",
+  "apps_storeLatest": "应用商店已是最新",
+  "apps_editWebUi": "编辑 WebUI 地址",
+  "apps_webUi": "WebUI 地址",
+  "alerts_clamScans": "Clam 扫描",
+  "alerts_cronjobTargets": "计划任务",
+  "alerts_targetsEmpty": "暂无可关联的告警对象",
+  "alerts_targetPath": "路径：{path}",
+  "alerts_targetType": "类型：{type}",
+  "host_sshLogs": "SSH 登录日志",
+  "host_sshLogsHint": "查看并筛选 SSH 登录记录",
+  "host_sshLogInfo": "关键词",
+  "host_sshLogInfoHint": "用户名、IP 或消息",
+  "host_sshLogStatus": "状态",
+  "host_sshLogAll": "全部",
+  "host_sshLogSuccess": "成功",
+  "host_sshLogFailed": "失败",
+  "host_sshLogRange": "时间范围",
+  "host_sshLogDays": "{days} 天",
+  "host_sshLogEmpty": "没有符合条件的 SSH 登录日志",
+  "host_sshLogExport": "导出日志",
+  "host_sshLogExported": "日志已导出到 {path}",
+  "host_sshLogSearch": "查询",
+  "ai_batch_operation": "批量启停",
+  "ai_batch_install": "批量安装",
+  "ai_batch_upgrade": "批量升级",
+  "ai_batch_version": "目标版本",
+  "ai_batch_backup": "升级前备份",
+  "ai_batch_pullImage": "拉取镜像",
+  "ai_batch_port": "WebUI 端口",
+  "ai_batch_name": "名称（留空自动生成）",
+  "ai_agent_security": "安全配置",
+  "ai_agent_security_origins": "允许来源",
+  "ai_agent_security_hint": "多个来源用逗号分隔",
+  "ai_agent_config_file": "Agent 配置文件",
+  "ai_agent_config_file_hint": "直接编辑渠道配置文件",
+  "ai_domain": "AI 域名绑定",
+  "ai_domain_name": "域名",
+  "ai_domain_ssl": "SSL ID",
+  "ai_domain_website": "网站 ID",
+  "ai_domain_ipList": "允许 IP",
+  "ai_domain_hint": "多个 IP 用逗号分隔",
+  "ai_domain_noApp": "未找到已安装的 Ollama 应用",
+  "ai_domain_bound": "已绑定域名：{domain}",
+  "ai_domain_saved": "域名配置已保存",
+  "files_batchMove": "批量移动/复制",
+  "files_pickFromTree": "从目录树选择",
+  "vm_title": "虚拟机",
+  "vm_subtitle": "KVM 虚拟机管理",
+  "vm_environment": "运行环境",
+  "vm_envReady": "运行环境就绪",
+  "vm_envNotReady": "运行环境未就绪",
+  "vm_enable": "启用运行环境",
+  "vm_enabled": "运行环境已启用",
+  "vm_arch": "架构",
+  "vm_kvm": "KVM",
+  "vm_libvirt": "libvirt",
+  "vm_storage": "存储",
+  "vm_empty": "暂无虚拟机",
+  "vm_emptyHint": "创建虚拟机需要先启用 KVM 运行环境",
+  "vm_create": "新建虚拟机",
+  "vm_update": "编辑虚拟机",
+  "vm_name": "名称",
+  "vm_cpu": "CPU 核心",
+  "vm_memory": "内存（MB）",
+  "vm_disk": "磁盘（GB）",
+  "vm_network": "网络",
+  "vm_osType": "系统类型",
+  "vm_description": "描述",
+  "vm_start": "启动",
+  "vm_shutdown": "关机",
+  "vm_reboot": "重启",
+  "vm_destroy": "强制停止",
+  "vm_suspend": "挂起",
+  "vm_resume": "恢复",
+  "vm_delete": "删除虚拟机",
+  "vm_rename": "重命名",
+  "vm_newName": "新名称",
+  "vm_stats": "运行状态",
+  "vm_snapshots": "快照",
+  "vm_snapshotCreate": "创建快照",
+  "vm_snapshotName": "快照名称",
+  "vm_snapshotRecover": "恢复快照",
+  "vm_snapshotDelete": "删除快照",
+  "vm_snapshotEmpty": "暂无快照",
+  "vm_needEnv": "请先启用虚拟机运行环境",
+  "vm_confirmDelete": "删除虚拟机 {name}？",
+  "vm_forceDelete": "强制删除",
+  "vm_startAfterCreate": "创建后启动",
+  "vm_autoStart": "开机自启",
+  "vm_limit": "配额 {limit} 台",
+  "vm_osOther": "其他",
+  "vm_sync": "同步虚拟机",
+  "vm_storagePool": "存储池",
+  "vm_template": "模板（可选）",
+  "vm_osLinux": "Linux",
+  "vm_osWindows": "Windows",
+  "ai_account_discover": "发现模型",
+  "ai_account_discover_empty": "未发现可用模型",
+  "ai_account_discover_result": "发现 {count} 个模型",
+  "ai_channel_plugins": "渠道插件",
+  "ai_channel_installed": "已安装",
+  "ai_channel_notInstalled": "未安装",
+  "ai_channel_upgradable": "可升级到 {version}",
+  "ai_channel_install": "安装插件",
+  "ai_channel_upgrade": "升级插件",
+  "ai_channel_uninstall": "卸载插件",
+  "vm_resources": "资源管理",
+  "vm_networks": "网络",
+  "vm_storages": "存储",
+  "vm_templates": "模板",
+  "vm_isos": "ISO 镜像",
+  "vm_type": "类型",
+  "vm_path": "路径",
+  "vm_cidr": "网段",
+  "vm_gateway": "网关",
+  "vm_sourceInterface": "源网卡",
+  "vm_templateName": "模板名称",
+  "vm_sourceVm": "源虚拟机",
+  "vm_isoType": "镜像类型",
+  "vm_resourceEmpty": "暂无资源",
+  "vm_deleteResource": "删除 {name}？",
+  "vm_deleteFile": "同时删除文件",
+  "vm_isoImage": "ISO 镜像",
+  "vm_isoDisk": "磁盘",
+  "vm_netNat": "NAT",
+  "vm_netBridge": "桥接",
+  "vm_netMacvtap": "Macvtap",
+  "ai_channel_pairing": "配对审批",
+  "ai_channel_pairingCode": "配对码",
+  "ai_channel_pairingAccount": "账号 ID（可选）",
+  "ai_channel_pairingApproved": "配对已通过",
+  "ai_channel_feishu": "飞书",
+  "ai_channel_telegram": "Telegram",
+  "ai_channel_discord": "Discord",
+  "ai_channel_wecom": "企业微信",
+  "ai_channel_qqbot": "QQ 机器人",
+  "ai_channel_dingtalk": "钉钉",
+  "vm_console": "控制台",
+  "vm_consoleConnecting": "正在连接控制台…",
+  "vm_consoleFailed": "控制台连接失败",
+  "vm_consoleHint": "拖动操作鼠标，使用键盘输入",
+  "vm_consoleDisconnected": "控制台连接已断开",
+  "websites_clearLog": "清空日志",
+  "websites_logType": "日志类型",
+  "websites_lbEditFile": "编辑源文件",
+  "websites_lbFileHint": "直接编辑负载均衡配置内容",
+  "websites_streamPorts": "监听端口",
+  "websites_streamName": "上游名称",
+  "websites_streamAlgorithm": "调度算法",
+  "websites_streamServer": "后端地址",
+  "websites_streamUdp": "UDP 转发",
+  "websites_lbRoundRobin": "轮询",
+  "websites_lbLeastConnections": "最少连接",
+  "websites_lbIpHashShort": "IP 哈希",
+  "websites_parentWebsite": "父站点",
+  "websites_subsitePath": "子站目录",
+  "websites_deploymentApp": "部署应用",
+  "websites_templatePreview": "预览模板",
+  "websites_deploymentRunning": "应用运行正常，可创建站点",
+  "websites_deploymentStopped": "应用未运行，建议先启动应用",
+  "websites_templatePreviewResult": "预览结果",
+  "websites_templatePreviewFailed": "暂无预览结果",
+  "websites_templateOutputDetail": "输出详情",
+  "websites_templateOutputTemplate": "来源模板",
+  "websites_templateOutputVariables": "变量值",
+  "websites_templateOutputCreatedAt": "创建时间",
+  "websites_templateOutputPath": "输出路径",
+  "panelSettings_aiSettings": "AI 设置",
+  "panelSettings_aiSettingsHint": "终端与文件管理 AI 助手",
+  "panelSettings_terminalAi": "终端 AI",
+  "panelSettings_fileAi": "文件管理 AI",
+  "panelSettings_aiEnabled": "启用 AI",
+  "panelSettings_aiPrefix": "触发前缀",
+  "panelSettings_aiAccount": "AI 账号 ID",
+  "panelSettings_aiAccountHint": "输入已配置的 AI 账号 ID",
+  "panelSettings_aiRiskCommands": "风险命令提示词",
+  "panelSettings_aiRiskCommandsHint": "描述需要拦截的高风险命令",
+  "panelSettings_fileHistory": "文件历史",
+  "panelSettings_fileHistoryHint": "配置文件修改的历史版本与配额",
+  "panelSettings_fileHistoryEnable": "启用文件历史",
+  "panelSettings_fileHistoryMaxPerPath": "每路径保留数量",
+  "panelSettings_fileHistoryQuota": "磁盘配额（MB）",
+  "panelSettings_localSsh": "本地 SSH 连接",
+  "panelSettings_localSshHint": "面板所在主机的 SSH 登录信息",
+  "panelSettings_testConnection": "测试连接",
+  "panelSettings_sshCheckOk": "SSH 连接正常",
+  "panelSettings_sshRequired": "请填写地址和用户名",
+  "panelSettings_sshAddress": "地址",
+  "panelSettings_sshPort": "端口",
+  "panelSettings_sshUser": "用户名",
+  "panelSettings_sshAuthMode": "认证方式",
+  "panelSettings_sshAuthPassword": "密码",
+  "panelSettings_sshAuthKey": "密钥",
+  "panelSettings_sshPassword": "密码",
+  "panelSettings_sshPrivateKey": "私钥",
+  "panelSettings_sshPassPhrase": "私钥口令",
+  "panelSettings_defaultSshConn": "默认终端连接",
+  "panelSettings_defaultSshConnHint": "打开终端时默认使用的连接",
+  "panelSettings_defaultSshConnPlaceholder": "输入连接名称或地址",
+  "panelSettings_resetMenu": "恢复默认菜单",
+  "panelSettings_resetMenuHint": "将面板菜单恢复为默认显示",
+  "panelSettings_resetMenuConfirm": "确定要恢复默认菜单吗？",
+  "websites_openRestyModules": "OpenResty 模块",
+  "websites_openRestyModuleAdd": "添加模块",
+  "websites_openRestyModuleDelete": "删除模块",
+  "websites_openRestyModuleDeleteConfirm": "确定删除模块 {name} 吗？",
+  "websites_openRestyModuleEmpty": "暂无自定义模块",
+  "websites_openRestyModuleName": "模块名称",
+  "websites_openRestyModuleProvider": "来源",
+  "websites_openRestyModuleBuildMode": "构建方式",
+  "websites_openRestyModuleLoadOrder": "加载顺序",
+  "websites_openRestyModulePackages": "依赖包",
+  "websites_openRestyModuleParams": "编译参数",
+  "websites_openRestyModuleScript": "构建脚本",
+  "websites_openRestyBuild": "构建 OpenResty",
+  "websites_openRestyBuildHint": "选择模块并触发重新编译，任务在后台执行",
+  "websites_openRestyBuildModules": "参与构建的模块",
+  "websites_openRestyMirror": "下载镜像地址",
+  "websites_openRestyForce": "强制重新构建",
+  "websites_openRestyBuildSubmitted": "构建任务已提交",
+  "websites_openRestyHttps": "默认 HTTPS",
+  "websites_openRestyHttpsHint": "控制 OpenResty 默认站点的 HTTPS 行为",
+  "websites_openRestyHttpsReject": "拒绝未匹配的 SSL 握手",
+  "logs_systemServices": "系统服务日志",
+  "logs_systemFiles": "日志文件",
+  "logs_service": "服务",
+  "logs_serviceAll": "全部服务",
+  "logs_priority": "日志级别",
+  "logs_priorityAll": "全部级别",
+  "logs_keyword": "关键词",
+  "logs_loadMore": "加载更多",
+  "logs_noSystemLog": "暂无系统日志",
+  "toolbox_updateVirusDatabase": "更新病毒库",
+  "toolbox_updateVirusDatabaseHint": "获取最新的 ClamAV 病毒特征库",
+  "toolbox_enableScan": "启用扫描规则",
+  "toolbox_disableScan": "停用扫描规则",
+  "toolbox_clamConfigFile": "扫描配置文件",
+  "toolbox_ftpEdit": "编辑 FTP 账户",
+  "toolbox_ftpPasswordKeep": "留空表示不修改密码",
+  "toolbox_ftpStatus": "状态",
+  "toolbox_ftpService": "FTP 服务操作",
+  "toolbox_ftpStart": "启动",
+  "toolbox_ftpStop": "停止",
+  "toolbox_ftpRestart": "重启",
+  "toolbox_ftpReload": "重载",
+  "toolbox_ftpSync": "同步 FTP 账户",
+  "toolbox_ftpSyncDone": "FTP 账户已同步",
+  "toolbox_ftpLogs": "FTP 操作日志",
+  "toolbox_ftpLogEmpty": "暂无操作日志",
+  "toolbox_fail2banConfFile": "Fail2ban 配置文件",
+  "toolbox_fail2banConfFileHint": "按 jail 配置查看与整文件更新",
+  "panelSettings_panelUpgrade": "面板升级",
+  "panelSettings_panelUpgradeHint": "检查并安装 1Panel 新版本",
+  "panelSettings_upgradeAvailable": "发现新版本",
+  "panelSettings_upToDate": "已是最新版本",
+  "panelSettings_upgradeTo": "升级到 {version}",
+  "panelSettings_upgradeConfirm": "面板将升级到 {version}，升级期间服务会短暂中断。",
+  "panelSettings_upgradeSubmitted": "升级任务已提交",
+  "panelSettings_latestVersion": "最新版本",
+  "panelSettings_testVersion": "测试版本",
+  "panelSettings_releaseNotesTitle": "版本记录",
+  "panelSettings_newCount": "新增 {count}",
+  "panelSettings_fixCount": "修复 {count}",
+  "panelSettings_optimizationCount": "优化 {count}",
+  "backups_publicAccount": "面板级备份账号",
+  "backups_publicAccountHint": "账号保存在面板侧，可跨节点共享",
+  "panelSettings_sshCheckFailed": "SSH 连接失败",
+  "panelSettings_loadFailed": "设置加载失败，请重试",
+  "panelSettings_noReleaseNotes": "暂无版本说明",
+  "toolbox_ftpPasswordRequired": "请输入新的 FTP 密码",
+  "toolbox_loadFailed": "加载失败，请重试",
+  "toolbox_clamAdd": "新建扫描任务",
+  "websites_groupCreate": "新建分组",
+  "websites_groupMergeEmpty": "没有可合并的其他分组",
+  "websites_templateNameRequired": "请输入模板名称",
+  "websites_templateFileRequired": "请上传模板文件",
+  "websites_templateOutputNameRequired": "请输入输出名称",
+  "logs_loadFailed": "日志加载失败，请重试",
+  "host_sshLogLoadFailed": "SSH 日志加载失败",
+  "vm_forceStopConfirm": "强制停止 {name}？可能导致数据丢失。",
+  "vm_snapshotRecoverConfirm": "恢复到快照 {name}？当前状态将被替换。",
+  "vm_snapshotDeleteConfirm": "删除快照 {name}？",
+  "vm_statsCpu": "CPU",
+  "vm_statsMemory": "内存",
+  "vm_statsDisk": "磁盘读写",
+  "vm_statsNetwork": "网络收发",
+  "websites_openRestyHttpsLoadFailed": "HTTPS 配置加载失败",
+  "toolbox_ftpServiceConfirm": "操作会中断当前 FTP 连接，确定继续？",
+  "toolbox_fail2banStop": "停止 Fail2ban",
+  "toolbox_fail2banStopConfirm": "停止后将暂时失去暴力破解防护，确定继续？",
+  "panelMcp_title": "MCP",
+  "@panelMcp_title": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_subtitle": "面板 MCP 服务、凭据与调用记录",
+  "@panelMcp_subtitle": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_service": "MCP 服务",
+  "@panelMcp_service": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_notInstalled": "未安装",
+  "@panelMcp_notInstalled": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_installed": "已安装",
+  "@panelMcp_installed": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_ready": "就绪",
+  "@panelMcp_ready": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_serviceRunning": "服务运行中",
+  "@panelMcp_serviceRunning": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_serviceStopped": "服务已停止",
+  "@panelMcp_serviceStopped": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_install": "安装 MCP 服务",
+  "@panelMcp_install": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_start": "启动",
+  "@panelMcp_start": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_stop": "停止",
+  "@panelMcp_stop": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_restart": "重启",
+  "@panelMcp_restart": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_logs": "服务日志",
+  "@panelMcp_logs": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_settings": "运行设置",
+  "@panelMcp_settings": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_endpoint": "访问端点",
+  "@panelMcp_endpoint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_runtimeType": "运行类型",
+  "@panelMcp_runtimeType": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_dockerImage": "Docker 镜像",
+  "@panelMcp_dockerImage": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_listenPort": "监听端口",
+  "@panelMcp_listenPort": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_externalUrl": "外部地址",
+  "@panelMcp_externalUrl": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_accessPolicy": "访问策略",
+  "@panelMcp_accessPolicy": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_allowedIPs": "允许的 IP",
+  "@panelMcp_allowedIPs": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_allowedIPsHint": "每行一个 IP 或 CIDR",
+  "@panelMcp_allowedIPsHint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_saveSettings": "保存设置",
+  "@panelMcp_saveSettings": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_website": "网站绑定",
+  "@panelMcp_website": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_unbound": "未绑定",
+  "@panelMcp_unbound": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_bound": "已绑定",
+  "@panelMcp_bound": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_domain": "域名",
+  "@panelMcp_domain": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_enableSsl": "启用 SSL",
+  "@panelMcp_enableSsl": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_sslId": "SSL ID",
+  "@panelMcp_sslId": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_bindWebsite": "绑定网站",
+  "@panelMcp_bindWebsite": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_updateWebsite": "更新绑定",
+  "@panelMcp_updateWebsite": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_unbindWebsite": "解绑网站",
+  "@panelMcp_unbindWebsite": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_deleteWebsite": "同时删除关联网站",
+  "@panelMcp_deleteWebsite": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_unbindConfirm": "解绑 MCP 网站 {domain}？",
+  "@panelMcp_unbindConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "domain": {
+        "type": "String"
+      }
+    }
+  },
+  "panelMcp_credentials": "访问凭据",
+  "@panelMcp_credentials": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_createCredential": "创建凭据",
+  "@panelMcp_createCredential": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_editCredential": "编辑凭据",
+  "@panelMcp_editCredential": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_credentialName": "凭据名称",
+  "@panelMcp_credentialName": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_credentialDescription": "描述",
+  "@panelMcp_credentialDescription": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_expiresAt": "过期时间（ISO 8601，可留空）",
+  "@panelMcp_expiresAt": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_tools": "允许的工具",
+  "@panelMcp_tools": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_nodes": "节点",
+  "@panelMcp_nodes": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_noCredentials": "暂无 MCP 凭据",
+  "@panelMcp_noCredentials": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_noInvocations": "暂无 MCP 调用记录",
+  "@panelMcp_noInvocations": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_invocations": "调用记录",
+  "@panelMcp_invocations": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_tool": "工具",
+  "@panelMcp_tool": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_credential": "凭据",
+  "@panelMcp_credential": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_revealToken": "查看令牌",
+  "@panelMcp_revealToken": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_rotateToken": "轮换令牌",
+  "@panelMcp_rotateToken": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_exportCredential": "导出接入文档",
+  "@panelMcp_exportCredential": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_revoke": "撤销",
+  "@panelMcp_revoke": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_revokeConfirm": "撤销凭据 {name}？",
+  "@panelMcp_revokeConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "panelMcp_deleteConfirm": "删除凭据 {name}？",
+  "@panelMcp_deleteConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "panelMcp_tokenTitle": "MCP 令牌",
+  "@panelMcp_tokenTitle": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_tokenHint": "请立即复制令牌，之后不会再次显示。",
+  "@panelMcp_tokenHint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_exportTitle": "接入文档",
+  "@panelMcp_exportTitle": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_exportClient": "客户端",
+  "@panelMcp_exportClient": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_exportClientHint": "例如 claude、cursor、vscode",
+  "@panelMcp_exportClientHint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_catalog": "工具目录",
+  "@panelMcp_catalog": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_catalogHint": "当前面板可用的工具",
+  "@panelMcp_catalogHint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_serviceConfirm": "操作 MCP 服务：{operation}？",
+  "@panelMcp_serviceConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      }
+    }
+  },
+  "panelMcp_requiredFields": "请填写必填项",
+  "@panelMcp_requiredFields": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_status": "状态",
+  "@panelMcp_status": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_reason": "原因",
+  "@panelMcp_reason": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_noNodes": "暂无节点",
+  "@panelMcp_noNodes": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_operationCompleted": "操作完成",
+  "@panelMcp_operationCompleted": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_loadFailed": "MCP 数据加载失败",
+  "@panelMcp_loadFailed": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_createSuccess": "凭据已创建",
+  "@panelMcp_createSuccess": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_revision": "版本",
+  "@panelMcp_revision": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_pending": "待处理请求：{operation}",
+  "@panelMcp_pending": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      }
+    }
+  },
+  "panelMcp_sslHint": "启用 SSL 时必填",
+  "@panelMcp_sslHint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_websiteState": "网站状态",
+  "@panelMcp_websiteState": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_installing": "正在安装 MCP 服务",
+  "@panelMcp_installing": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_taskId": "任务 ID",
+  "@panelMcp_taskId": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_saved": "MCP 设置已保存",
+  "@panelMcp_saved": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_toolsCount": "{count} 个工具",
+  "@panelMcp_toolsCount": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "panelMcp_tokenCopied": "令牌已复制",
+  "@panelMcp_tokenCopied": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroups": "GPU 分组",
+  "@ai_gpuGroups": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupsEmpty": "暂无 GPU 分组",
+  "@ai_gpuGroupsEmpty": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupAdd": "添加 GPU 分组",
+  "@ai_gpuGroupAdd": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupEdit": "编辑 GPU 分组",
+  "@ai_gpuGroupEdit": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupName": "分组名称",
+  "@ai_gpuGroupName": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupDescription": "描述",
+  "@ai_gpuGroupDescription": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupImageType": "GPU 类型",
+  "@ai_gpuGroupImageType": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupDevices": "GPU 设备",
+  "@ai_gpuGroupDevices": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupCapabilities": "能力（逗号分隔）",
+  "@ai_gpuGroupCapabilities": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupDeleteConfirm": "删除 GPU 分组 {name}？",
+  "@ai_gpuGroupDeleteConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_gpuUsage": "GPU 占用检查",
+  "@ai_gpuUsage": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuUsageCompose": "Docker Compose",
+  "@ai_gpuUsageCompose": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuUsageEnv": "环境变量",
+  "@ai_gpuUsageEnv": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuUsageResult": "GPU 占用结果",
+  "@ai_gpuUsageResult": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuUsageWarnings": "警告",
+  "@ai_gpuUsageWarnings": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuUsagePossible": "可部署方案",
+  "@ai_gpuUsagePossible": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_title": "模型对话",
+  "@ai_chat_title": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_model": "模型",
+  "@ai_chat_model": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_input": "消息",
+  "@ai_chat_input": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_send": "发送",
+  "@ai_chat_send": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_empty": "发送消息测试该模型",
+  "@ai_chat_empty": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_failed": "对话失败",
+  "@ai_chat_failed": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_stop": "停止",
+  "@ai_chat_stop": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_noModels": "该账号未配置模型",
+  "@ai_chat_noModels": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherConfig": "其他配置",
+  "@ai_agent_otherConfig": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherTimezone": "用户时区",
+  "@ai_agent_otherTimezone": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherBrowser": "启用浏览器",
+  "@ai_agent_otherBrowser": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherNpm": "NPM 源",
+  "@ai_agent_otherNpm": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherUsername": "面板用户名",
+  "@ai_agent_otherUsername": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherPassword": "面板密码",
+  "@ai_agent_otherPassword": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_markdown": "Markdown 文件",
+  "@ai_agent_markdown": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_markdownEmpty": "暂无 Markdown 文件",
+  "@ai_agent_markdownEmpty": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_markdownContent": "内容",
+  "@ai_agent_markdownContent": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_batchSkill": "批量安装技能",
+  "@ai_agent_batchSkill": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_skillName": "技能名称",
+  "@ai_agent_skillName": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_skillPackage": "安装包路径",
+  "@ai_agent_skillPackage": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_feishuSwitch": "切换飞书插件",
+  "@ai_agent_feishuSwitch": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_groupScope": "群会话范围",
+  "@ai_agent_groupScope": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_requireMention": "需要提及",
+  "@ai_agent_requireMention": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_deleteResources": "与该智能体关联的资源",
+  "@ai_agent_deleteResources": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_noDeleteResources": "无关联资源",
+  "@ai_agent_noDeleteResources": {
+    "description": "OneDash UI text."
+  },
+  "databases_editUser": "编辑用户",
+  "@databases_editUser": {
+    "description": "OneDash UI text."
+  },
+  "databases_savePassword": "仅保存密码",
+  "@databases_savePassword": {
+    "description": "OneDash UI text."
+  },
+  "databases_grantsSummary": "授权汇总",
+  "@databases_grantsSummary": {
+    "description": "OneDash UI text."
+  },
+  "databases_commonInfo": "实例信息",
+  "@databases_commonInfo": {
+    "description": "OneDash UI text."
+  },
+  "databases_editDescription": "编辑描述",
+  "@databases_editDescription": {
+    "description": "OneDash UI text."
+  },
+  "databases_rootPassword": "Root 密码",
+  "@databases_rootPassword": {
+    "description": "OneDash UI text."
+  },
+  "vm_resizeDisk": "扩容磁盘",
+  "@vm_resizeDisk": {
+    "description": "OneDash UI text."
+  },
+  "vm_diskTarget": "磁盘标识",
+  "@vm_diskTarget": {
+    "description": "OneDash UI text."
+  },
+  "vm_diskSizeNew": "新容量（GiB）",
+  "@vm_diskSizeNew": {
+    "description": "OneDash UI text."
+  },
+  "vm_healthCheck": "健康检查",
+  "@vm_healthCheck": {
+    "description": "OneDash UI text."
+  },
+  "vm_healthPass": "通过",
+  "@vm_healthPass": {
+    "description": "OneDash UI text."
+  },
+  "vm_healthWarn": "警告",
+  "@vm_healthWarn": {
+    "description": "OneDash UI text."
+  },
+  "vm_healthFail": "失败",
+  "@vm_healthFail": {
+    "description": "OneDash UI text."
+  },
+  "vm_orphans": "孤立资源",
+  "@vm_orphans": {
+    "description": "OneDash UI text."
+  },
+  "vm_orphansEmpty": "暂无孤立资源",
+  "@vm_orphansEmpty": {
+    "description": "OneDash UI text."
+  },
+  "vm_orphansScan": "扫描孤立资源",
+  "@vm_orphansScan": {
+    "description": "OneDash UI text."
+  },
+  "vm_orphansClean": "清理所选",
+  "@vm_orphansClean": {
+    "description": "OneDash UI text."
+  },
+  "vm_cleanConfirm": "删除 {count} 个孤立资源？",
+  "@vm_cleanConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "runtime_phpConfig": "PHP 配置",
+  "@runtime_phpConfig": {
+    "description": "OneDash UI text."
+  },
+  "runtime_phpParams": "PHP 参数（JSON）",
+  "@runtime_phpParams": {
+    "description": "OneDash UI text."
+  },
+  "runtime_disableFunctions": "禁用函数",
+  "@runtime_disableFunctions": {
+    "description": "OneDash UI text."
+  },
+  "runtime_uploadMaxSize": "上传限制",
+  "@runtime_uploadMaxSize": {
+    "description": "OneDash UI text."
+  },
+  "runtime_maxExecutionTime": "最大执行时间",
+  "@runtime_maxExecutionTime": {
+    "description": "OneDash UI text."
+  },
+  "runtime_container": "PHP 容器",
+  "@runtime_container": {
+    "description": "OneDash UI text."
+  },
+  "runtime_containerName": "容器名称",
+  "@runtime_containerName": {
+    "description": "OneDash UI text."
+  },
+  "runtime_exposedPorts": "暴露端口（JSON）",
+  "@runtime_exposedPorts": {
+    "description": "OneDash UI text."
+  },
+  "runtime_environments": "环境变量（JSON）",
+  "@runtime_environments": {
+    "description": "OneDash UI text."
+  },
+  "runtime_volumes": "挂载卷（JSON）",
+  "@runtime_volumes": {
+    "description": "OneDash UI text."
+  },
+  "runtime_extraHosts": "额外主机（JSON）",
+  "@runtime_extraHosts": {
+    "description": "OneDash UI text."
+  },
+  "runtime_jsonHint": "请输入有效的 JSON 数组",
+  "@runtime_jsonHint": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_hosts": "Hosts 文件",
+  "@toolbox_hosts": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_hostsEdit": "编辑 Hosts 文件",
+  "@toolbox_hostsEdit": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_password": "Root 密码",
+  "@toolbox_password": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_passwordChanged": "Root 密码已更新",
+  "@toolbox_passwordChanged": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_dnsCheck": "测试 DNS 解析",
+  "@toolbox_dnsCheck": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_dnsOk": "DNS 解析正常",
+  "@toolbox_dnsOk": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_dnsFail": "DNS 解析失败",
+  "@toolbox_dnsFail": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_systemClean": "清理系统垃圾",
+  "@toolbox_systemClean": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_systemCleanConfirm": "清理扫描到的垃圾文件？",
+  "@toolbox_systemCleanConfirm": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_users": "系统用户",
+  "@toolbox_users": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_addHost": "添加 Host 记录",
+  "@toolbox_addHost": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_accessInherit": "继承",
+  "@panelMcp_accessInherit": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_accessAll": "全部",
+  "@panelMcp_accessAll": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_accessRestricted": "受限",
+  "@panelMcp_accessRestricted": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuTypeNvidia": "NVIDIA",
+  "@ai_gpuTypeNvidia": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuTypeIntel": "Intel",
+  "@ai_gpuTypeIntel": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuTypeAscend": "Ascend",
+  "@ai_gpuTypeAscend": {
+    "description": "OneDash UI text."
+  },
+  "apps_linkedResources": "关联资源",
+  "@apps_linkedResources": {
+    "description": "OneDash UI text."
+  },
+  "files_wgetDetails": "下载详情",
+  "@files_wgetDetails": {
+    "description": "OneDash UI text."
+  },
+  "files_wgetProgress": "进度：{percent}%",
+  "@files_wgetProgress": {
+    "description": "OneDash UI text."
+  },
+  "files_wgetWaiting": "等待下载进度...",
+  "@files_wgetWaiting": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetNew": "新建扩展预设",
+  "@runtime_presetNew": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetName": "预设名称",
+  "@runtime_presetName": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetExtensions": "扩展列表",
+  "@runtime_presetExtensions": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetExtensionsHint": "多个扩展用逗号分隔，例如 redis,opcache",
+  "@runtime_presetExtensionsHint": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetImport": "导入扩展预设",
+  "@runtime_presetImport": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetImported": "扩展预设已导入",
+  "@runtime_presetImported": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetSkipped": "预设已存在且内容一致，已跳过",
+  "@runtime_presetSkipped": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetPush": "推送预设",
+  "@runtime_presetPush": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetSourceNode": "源节点",
+  "@runtime_presetSourceNode": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetTargetNodes": "目标节点",
+  "@runtime_presetTargetNodes": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetNodesHint": "多个节点用逗号分隔",
+  "@runtime_presetNodesHint": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetDeleteConfirm": "删除扩展预设“{name}”？",
+  "@runtime_presetDeleteConfirm": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetPushed": "推送任务已提交",
+  "@runtime_presetPushed": {
+    "description": "OneDash UI text."
+  },
+  "runtime_supervisor": "进程守护",
+  "@runtime_supervisor": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoSearch": "搜索 ISO",
+  "@vm_isoSearch": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoSearchHint": "名称关键字",
+  "@vm_isoSearchHint": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoCreateRecord": "新增镜像记录",
+  "@vm_isoCreateRecord": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoImport": "从路径导入",
+  "@vm_isoImport": {
+    "description": "OneDash UI text."
+  },
+  "vm_networkInterfaces": "网络接口",
+  "@vm_networkInterfaces": {
+    "description": "OneDash UI text."
+  },
+  "apps_sort": "已安装应用排序",
+  "@apps_sort": {
+    "description": "OneDash UI text."
+  },
+  "apps_sortHint": "数值越小越靠前",
+  "@apps_sortHint": {
+    "description": "OneDash UI text."
+  },
+  "apps_defaultConfig": "默认配置",
+  "@apps_defaultConfig": {
+    "description": "OneDash UI text."
+  },
+  "apps_defaultConfigEmpty": "暂无默认配置",
+  "@apps_defaultConfigEmpty": {
+    "description": "OneDash UI text."
+  },
+  "databases_redisCliInstalled": "redis-cli 已安装",
+  "@databases_redisCliInstalled": {
+    "description": "OneDash UI text."
+  },
+  "databases_redisCliMissing": "redis-cli 未安装，远程 Redis 终端不可用",
+  "@databases_redisCliMissing": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_export": "导出计划任务",
+  "@cronjobs_export": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_import": "导入计划任务",
+  "@cronjobs_import": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_exported": "计划任务已导出",
+  "@cronjobs_exported": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_imported": "计划任务已导入",
+  "@cronjobs_imported": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_importEmpty": "文件中没有可导入的计划任务",
+  "@cronjobs_importEmpty": {
+    "description": "OneDash UI text."
+  },
+  "websites_importCa": "导入 CA",
+  "@websites_importCa": {
+    "description": "OneDash UI text."
+  },
+  "websites_uploadCa": "上传 CA 压缩包",
+  "@websites_uploadCa": {
+    "description": "OneDash UI text."
+  },
+  "websites_caName": "CA 名称",
+  "@websites_caName": {
+    "description": "OneDash UI text."
+  },
+  "websites_importType": "导入方式",
+  "@websites_importType": {
+    "description": "OneDash UI text."
+  },
+  "websites_importPaste": "粘贴证书",
+  "@websites_importPaste": {
+    "description": "OneDash UI text."
+  },
+  "websites_importLocal": "服务器文件",
+  "@websites_importLocal": {
+    "description": "OneDash UI text."
+  },
+  "websites_certificatePath": "证书路径",
+  "@websites_certificatePath": {
+    "description": "OneDash UI text."
+  },
+  "ai_accountCountLabel": "{name}：{count}",
+  "@ai_accountCountLabel": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "panelSettings_proxy": "服务器代理",
+  "@panelSettings_proxy": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyHint": "配置面板访问外网使用的 HTTP/HTTPS/SOCKS5 代理",
+  "@panelSettings_proxyHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyType": "代理类型",
+  "@panelSettings_proxyType": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyHttp": "HTTP",
+  "@panelSettings_proxyHttp": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyHttps": "HTTPS",
+  "@panelSettings_proxyHttps": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxySocks5": "SOCKS5",
+  "@panelSettings_proxySocks5": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyClose": "关闭代理",
+  "@panelSettings_proxyClose": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyUrl": "代理地址",
+  "@panelSettings_proxyUrl": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyUrlHint": "例如 127.0.0.1 或 proxy.example.com",
+  "@panelSettings_proxyUrlHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyPort": "代理端口",
+  "@panelSettings_proxyPort": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyUser": "代理用户名",
+  "@panelSettings_proxyUser": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyPassword": "代理密码",
+  "@panelSettings_proxyPassword": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyPasswordHint": "留空会清除已保存的代理密码",
+  "@panelSettings_proxyPasswordHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyDocker": "同时代理 Docker",
+  "@panelSettings_proxyDocker": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyRestartDocker": "应用后重启 Docker",
+  "@panelSettings_proxyRestartDocker": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyRequired": "请填写代理地址和端口",
+  "@panelSettings_proxyRequired": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_downloadPreference": "下载偏好",
+  "@panelSettings_downloadPreference": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_downloadPreferenceHint": "选择下载文件时使用的文件名",
+  "@panelSettings_downloadPreferenceHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_useServerFilename": "使用服务器文件名",
+  "@panelSettings_useServerFilename": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_useServerFilenameHint": "开启后优先使用服务器返回的原始文件名",
+  "@panelSettings_useServerFilenameHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_downloadSsl": "下载面板证书",
+  "@panelSettings_downloadSsl": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_downloadSslHint": "导出面板自签 SSL 证书以便信任",
+  "@panelSettings_downloadSslHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalAppearance": "终端外观",
+  "@panelSettings_terminalAppearance": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalAppearanceHint": "调整面板 Web 终端的字体、颜色与光标",
+  "@panelSettings_terminalAppearanceHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalBehavior": "终端行为",
+  "@panelSettings_terminalBehavior": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_showTerminalButton": "显示终端按钮",
+  "@panelSettings_showTerminalButton": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_showTerminalButtonHint": "在面板中显示快速打开终端的入口",
+  "@panelSettings_showTerminalButtonHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_cursorBlink": "光标闪烁",
+  "@panelSettings_cursorBlink": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_cursorStyle": "光标样式",
+  "@panelSettings_cursorStyle": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_cursorBlock": "方块",
+  "@panelSettings_cursorBlock": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_cursorUnderline": "下划线",
+  "@panelSettings_cursorUnderline": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_cursorBar": "竖线",
+  "@panelSettings_cursorBar": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_scrollback": "回滚行数",
+  "@panelSettings_scrollback": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_scrollSensitivity": "滚动灵敏度",
+  "@panelSettings_scrollSensitivity": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalTypography": "字体排版",
+  "@panelSettings_terminalTypography": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fontFamily": "字体",
+  "@panelSettings_fontFamily": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fontFamilyHint": "留空使用面板默认字体",
+  "@panelSettings_fontFamilyHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fontSize": "字号",
+  "@panelSettings_fontSize": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_lineHeight": "行高",
+  "@panelSettings_lineHeight": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_letterSpacing": "字间距",
+  "@panelSettings_letterSpacing": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalColors": "颜色",
+  "@panelSettings_terminalColors": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_backgroundColor": "背景色",
+  "@panelSettings_backgroundColor": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_foregroundColor": "前景色",
+  "@panelSettings_foregroundColor": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_colorHint": "支持十六进制颜色，如 #1e1e1e",
+  "@panelSettings_colorHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_registerPasskey": "在浏览器中注册",
+  "@panelSettings_registerPasskey": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_registerPasskeyHint": "通行密钥绑定当前域名，请在面板网页中完成注册",
+  "@panelSettings_registerPasskeyHint": {
+    "description": "OneDash UI text."
+  },
+  "host_sshTerminal": "SSH 终端",
+  "@host_sshTerminal": {
+    "description": "Open an SSH terminal to a remote host."
+  },
+  "websites_editStream": "编辑隧道",
+  "@websites_editStream": {
+    "description": "Edit stream website forwarding settings."
+  },
+  "cronjobs_pickScript": "从脚本库选择",
+  "@cronjobs_pickScript": {
+    "description": "Pick a shell script from the script library."
+  }
 }

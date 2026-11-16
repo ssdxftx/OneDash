@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -61,6 +63,40 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
       _websiteApi.getWebsiteOptions();
 
   @override
+  Future<Map<String, dynamic>> getOpenRestyModules() =>
+      _websiteApi.getOpenRestyModules();
+
+  @override
+  Future<void> updateOpenRestyModule(Map<String, dynamic> data) =>
+      _websiteApi.updateOpenRestyModule(data);
+
+  @override
+  Future<void> buildOpenResty({
+    required String mirror,
+    required String taskID,
+    List<String> modules = const [],
+    bool force = false,
+  }) => _websiteApi.buildOpenResty(
+    mirror: mirror,
+    taskID: taskID,
+    modules: modules,
+    force: force,
+  );
+
+  @override
+  Future<Map<String, dynamic>> getOpenRestyHttps() =>
+      _websiteApi.getOpenRestyHttps();
+
+  @override
+  Future<void> updateOpenRestyHttps({
+    required String operate,
+    bool sslRejectHandshake = false,
+  }) => _websiteApi.updateOpenRestyHttps(
+    operate: operate,
+    sslRejectHandshake: sslRejectHandshake,
+  );
+
+  @override
   Future<OpenRestyStatusDto> getOpenRestyStatus() =>
       _websiteApi.getOpenRestyStatus();
 
@@ -97,16 +133,19 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
 
   @override
   Future<WebsiteCreateMetadata> getCreateMetadata() async {
-    final rootDir = await _fileApi.getWebsiteRootDir();
-    final groups = await _groupApi.searchGroups(type: 'website');
-    return WebsiteCreateMetadata(websiteRootDir: rootDir, groups: groups);
+    final results = await Future.wait<Object>([
+      _fileApi.getWebsiteRootDir(),
+      _groupApi.searchGroups(type: 'website'),
+    ]);
+    return WebsiteCreateMetadata(
+      websiteRootDir: results[0] as String,
+      groups: results[1] as List<WebsiteGroupDto>,
+    );
   }
 
   @override
-  Future<List<WebsiteAcmeAccountDto>> searchAcmeAccounts() async {
-    final accounts = await _websiteApi.searchAcmeAccounts();
-    return [const WebsiteAcmeAccountDto.manual(), ...accounts];
-  }
+  Future<List<WebsiteAcmeAccountDto>> searchAcmeAccounts() =>
+      _websiteApi.searchAcmeAccounts();
 
   @override
   Future<void> createWebsite(WebsiteCreateReq req) =>
@@ -130,6 +169,59 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
     forceDelete: forceDelete,
     deleteDB: deleteDB,
   );
+
+  @override
+  Future<void> batchOperateWebsites(List<int> ids, String operate) =>
+      _websiteApi.batchOperateWebsites(ids, operate);
+
+  @override
+  Future<void> batchSetWebsiteGroup(List<int> ids, int groupId) =>
+      _websiteApi.batchSetWebsiteGroup(ids, groupId);
+
+  @override
+  Future<void> batchSetWebsiteHttps({
+    required List<int> ids,
+    required int sslId,
+  }) => _websiteApi.batchSetWebsiteHttps(ids: ids, sslId: sslId);
+
+  @override
+  Future<void> changeWebsiteGroup(int group, int newGroup) =>
+      _websiteApi.changeWebsiteGroup(group, newGroup);
+
+  @override
+  Future<void> setDefaultWebsite(int websiteId) =>
+      _websiteApi.setDefaultWebsite(websiteId);
+
+  @override
+  Future<void> operateCrossSite(int websiteId, {required bool enable}) =>
+      _websiteApi.operateCrossSite(websiteId, enable: enable);
+
+  @override
+  Future<Map<String, dynamic>> getDefaultHtml(String type) =>
+      _websiteApi.getDefaultHtml(type);
+
+  @override
+  Future<void> updateDefaultHtml({
+    required String type,
+    required String content,
+    bool sync = true,
+  }) => _websiteApi.updateDefaultHtml(type: type, content: content, sync: sync);
+
+  @override
+  Future<Map<String, dynamic>> getProxyCache(int websiteId) =>
+      _websiteApi.getProxyCache(websiteId);
+
+  @override
+  Future<void> updateProxyCache(Map<String, dynamic> request) =>
+      _websiteApi.updateProxyCache(request);
+
+  @override
+  Future<void> clearProxyCache(int websiteId) =>
+      _websiteApi.clearProxyCache(websiteId);
+
+  @override
+  Future<void> execComposer(Map<String, dynamic> request) =>
+      _websiteApi.execComposer(request);
 
   @override
   Future<List<WebsiteDomainDto>> listDomains(int websiteId) =>
@@ -280,6 +372,24 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
       _websiteApi.deleteTemplateOutput(id);
 
   @override
+  Future<String> previewTemplate({
+    required int templateID,
+    required Map<String, String> variableValues,
+  }) => _websiteApi.previewTemplate(
+    templateID: templateID,
+    variableValues: variableValues,
+  );
+
+  @override
+  Future<WebsiteTemplateOutputDto> getTemplateOutput(int id) =>
+      _websiteApi.getTemplateOutput(id);
+
+  @override
+  Future<List<WebsitePreInstallCheckDto>> checkWebsiteInstall(
+    List<int> installIds,
+  ) => _websiteApi.checkWebsiteInstall(installIds);
+
+  @override
   Future<List<WebsiteLoadBalanceDto>> listLoadBalances(int websiteId) =>
       _websiteApi.listLoadBalances(websiteId);
 
@@ -290,6 +400,17 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
   @override
   Future<void> updateLoadBalance(WebsiteLoadBalanceReq req) =>
       _websiteApi.updateLoadBalance(req);
+
+  @override
+  Future<void> updateLoadBalanceFile({
+    required int websiteId,
+    required String name,
+    required String content,
+  }) => _websiteApi.updateLoadBalanceFile(
+    websiteId: websiteId,
+    name: name,
+    content: content,
+  );
 
   @override
   Future<void> deleteLoadBalance(int websiteId, String name) =>
@@ -320,8 +441,38 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
       _websiteApi.updateWebsiteConfig(websiteId, content);
 
   @override
+  Future<void> updateStreamConfig({
+    required int websiteId,
+    required String streamPorts,
+    required String name,
+    required String algorithm,
+    required bool udp,
+    required List<dynamic> servers,
+  }) => _websiteApi.updateStreamConfig(
+    websiteId: websiteId,
+    streamPorts: streamPorts,
+    name: name,
+    algorithm: algorithm,
+    udp: udp,
+    servers: servers,
+  );
+
+  @override
   Future<void> updateWebsite(WebsiteUpdateReq req) =>
       _websiteApi.updateWebsite(req);
+
+  @override
+  Future<WebsiteLogFileDto> searchWebsiteLog(
+    int websiteId,
+    WebsiteLogType type, {
+    int page = 1,
+    int pageSize = 500,
+  }) => _websiteApi.searchWebsiteLog(
+    websiteId,
+    type: type,
+    page: page,
+    pageSize: pageSize,
+  );
 
   @override
   Future<WebsiteLogFileDto> readWebsiteLog(
@@ -424,10 +575,14 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
       _websiteApi.searchSsl(req);
 
   @override
+  Future<void> pushSsl({required int id, required String nodes}) =>
+      _websiteApi.pushSsl(id: id, nodes: nodes);
+
+  @override
   Future<SslManageDto> getSsl(int id) => _websiteApi.getSsl(id);
 
   @override
-  Future<void> createSsl(SslCreateReq req) => _websiteApi.createSsl(req);
+  Future<int> createSsl(SslCreateReq req) => _websiteApi.createSsl(req);
 
   @override
   Future<void> updateSsl(SslUpdateReq req) => _websiteApi.updateSsl(req);
@@ -532,6 +687,27 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
 
   @override
   Future<void> createCa(CaCreateReq req) => _websiteApi.createCa(req);
+
+  @override
+  Future<void> importCa({
+    required String name,
+    required String type,
+    String certificate = '',
+    String privateKey = '',
+    String certificatePath = '',
+    String privateKeyPath = '',
+  }) => _websiteApi.importCa(
+    name: name,
+    type: type,
+    certificate: certificate,
+    privateKey: privateKey,
+    certificatePath: certificatePath,
+    privateKeyPath: privateKeyPath,
+  );
+
+  @override
+  Future<void> uploadCa({required String fileName, required Uint8List bytes}) =>
+      _websiteApi.uploadCa(fileName: fileName, bytes: bytes);
 
   @override
   Future<void> obtainCa(CaObtainReq req) => _websiteApi.obtainCa(req);

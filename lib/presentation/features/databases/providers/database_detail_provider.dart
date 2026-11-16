@@ -27,16 +27,19 @@ final databaseDetailProvider = FutureProvider.autoDispose
           database: key.instance,
           page: 1,
           pageSize: 100,
+          info: key.name,
         ),
         'mongodb' => await repository.searchMongoDatabases(
           database: key.instance,
           page: 1,
           pageSize: 100,
+          info: key.name,
         ),
         _ => await repository.searchDatabases(
           database: key.instance,
           page: 1,
           pageSize: 100,
+          info: key.name,
         ),
       };
       DatabaseSearchItemDto? item;
@@ -49,27 +52,27 @@ final databaseDetailProvider = FutureProvider.autoDispose
       if (item == null) {
         throw const RecordNotFoundException();
       }
-      Map<String, dynamic> connection = const {};
-      try {
-        connection = await repository.getConnInfo(
-          type: key.type,
-          name: key.instance,
-        );
-      } catch (_) {
-        // 部分数据库类型不提供连接信息，保留空映射。
-      }
-      var remote = false;
-      try {
-        remote = await repository.getRemoteAccess(
-          type: key.type,
-          name: key.instance,
-        );
-      } catch (_) {
-        // 忽略不支持远程访问的类型。
-      }
+      final extras = await Future.wait<Object>([
+        _optional(
+          repository.getConnInfo(type: key.type, name: key.instance),
+          const <String, dynamic>{},
+        ),
+        _optional(
+          repository.getRemoteAccess(type: key.type, name: key.instance),
+          false,
+        ),
+      ]);
       return DatabaseDetailState(
         item: item,
-        connection: connection,
-        remoteAccess: remote,
+        connection: extras[0] as Map<String, dynamic>,
+        remoteAccess: extras[1] as bool,
       );
     }, name: 'databaseDetailProvider');
+
+Future<T> _optional<T>(Future<T> future, T fallback) async {
+  try {
+    return await future;
+  } catch (_) {
+    return fallback;
+  }
+}

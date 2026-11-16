@@ -27,10 +27,25 @@ class ProcessRepositoryImpl implements ProcessRepository {
       name: (json['Name'] ?? json['name'] ?? '').toString(),
       user: (json['User'] ?? json['user'] ?? '').toString(),
       command: (json['Cmd'] ?? json['cmd'] ?? json['Command'] ?? '').toString(),
-      port: (json['Port'] ?? json['port'] ?? '').toString(),
-      protocol: (json['Protocol'] ?? json['protocol'] ?? '').toString(),
+      port: _ports(json['Port'] ?? json['port']),
+      protocol: _protocol(json['Protocol'] ?? json['protocol']),
       address: (json['Address'] ?? json['address'] ?? '').toString(),
     );
+  }
+
+  static String _ports(Object? raw) {
+    if (raw is Map) return raw.keys.map((key) => '$key').join(', ');
+    if (raw is List) return raw.map((item) => '$item').join(', ');
+    return raw?.toString() ?? '';
+  }
+
+  static String _protocol(Object? raw) {
+    final value = raw is num ? raw.toInt() : int.tryParse('$raw');
+    return switch (value) {
+      6 => 'TCP',
+      17 => 'UDP',
+      _ => raw?.toString() ?? '',
+    };
   }
 }
 

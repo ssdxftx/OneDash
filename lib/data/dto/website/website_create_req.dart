@@ -11,7 +11,9 @@ class WebsiteCreateReq {
     this.proxyType = 'tcp',
     this.port = 9000,
     this.appType = 'installed',
+    this.appInstallID = 0,
     this.runtimeID = 0,
+    this.parentWebsiteID = 0,
     this.siteDir = '',
     this.taskID = '',
     this.enableSSL = false,
@@ -44,7 +46,9 @@ class WebsiteCreateReq {
   final String proxyType;
   final int port;
   final String appType;
+  final int appInstallID;
   final int runtimeID;
+  final int parentWebsiteID;
   final String siteDir;
   final String taskID;
   final bool enableSSL;
@@ -78,27 +82,24 @@ class WebsiteCreateReq {
       'domains': domains.map((e) => e.toJson()).toList(),
       'port': port,
       'appType': appType,
-      'appinstall': const {
-        'appId': 0,
+      'appInstallID': appInstallID,
+      'appInstall': const {
         'name': '',
-        'appDetailId': 0,
+        'appDetailID': 0,
         'params': <String, dynamic>{},
-        'version': '',
-        'appkey': '',
         'advanced': false,
         'cpuQuota': 0,
         'memoryLimit': 0,
         'memoryUnit': 'MB',
         'containerName': '',
         'allowPort': false,
-        'format': 'utf8mb4',
-        'collation': '',
       },
       'proxyType': proxyType,
       'proxyProtocol': 'http://',
       'proxyAddress': '',
       'runtimeType': 'php',
       'runtimeID': runtimeID,
+      'parentWebsiteID': parentWebsiteID,
       'taskID': taskID,
       'createDb': createDb,
       'dbName': dbName,

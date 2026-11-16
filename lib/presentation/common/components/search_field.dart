@@ -28,15 +28,24 @@ class _SearchFieldState extends State<SearchField> {
   late final TextEditingController _controller =
       widget.controller ?? TextEditingController();
   bool _ownsController = false;
+  bool _hasText = false;
 
   @override
   void initState() {
     super.initState();
     _ownsController = widget.controller == null;
+    _hasText = _controller.text.isNotEmpty;
+    _controller.addListener(_handleControllerChanged);
+  }
+
+  void _handleControllerChanged() {
+    final hasText = _controller.text.isNotEmpty;
+    if (hasText != _hasText) setState(() => _hasText = hasText);
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_handleControllerChanged);
     if (_ownsController) _controller.dispose();
     super.dispose();
   }
@@ -51,10 +60,7 @@ class _SearchFieldState extends State<SearchField> {
         controller: _controller,
         autofocus: widget.autofocus,
         textInputAction: TextInputAction.search,
-        onChanged: (value) {
-          setState(() {});
-          widget.onChanged?.call(value);
-        },
+        onChanged: widget.onChanged,
         onSubmitted: widget.onSubmitted,
         style: AppTextStyles.bodyM,
         decoration: InputDecoration(
@@ -63,14 +69,13 @@ class _SearchFieldState extends State<SearchField> {
           fillColor: scheme.surfaceContainer,
           contentPadding: EdgeInsets.zero,
           prefixIcon: const Icon(TablerIcons.search, size: AppTokens.iconList),
-          suffixIcon: _controller.text.isEmpty
+          suffixIcon: !_hasText
               ? null
               : IconButton(
                   tooltip: AppLocalizations.of(context).action_clear,
                   icon: const Icon(TablerIcons.x, size: AppTokens.iconList),
                   onPressed: () {
                     _controller.clear();
-                    setState(() {});
                     widget.onChanged?.call('');
                   },
                 ),

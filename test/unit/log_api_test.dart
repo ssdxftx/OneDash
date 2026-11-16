@@ -64,11 +64,19 @@ void main() {
     expect(adapter.bodies.single['info'], 'root');
   });
 
+  test('登录日志搜索使用 1Panel 的 info 字段', () async {
+    await api.searchLoginLogs(info: '10.0.0.1');
+    expect(adapter.bodies.single['info'], '10.0.0.1');
+    expect(adapter.bodies.single.containsKey('ip'), isFalse);
+  });
+
   test('SSH 导出空 status 兜底为 All', () async {
     client.raw.httpClientAdapter = _RecordingAdapter(data: '/tmp/ssh.csv');
     adapter = client.raw.httpClientAdapter as _RecordingAdapter;
     await api.exportSshLogs(status: '');
     expect(adapter.paths.single, '/api/v2/hosts/ssh/log/export');
     expect(adapter.bodies.single['Status'], 'All');
+    expect(adapter.bodies.single['page'], 1);
+    expect(adapter.bodies.single['pageSize'], 100000);
   });
 }

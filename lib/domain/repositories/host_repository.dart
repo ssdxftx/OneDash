@@ -1,7 +1,10 @@
+import '../../data/dto/common/page_result.dart';
 import '../../data/dto/host/disk_dto.dart';
 import '../../data/dto/host/host_diagnostics_dto.dart';
+import '../../data/dto/host/remote_host_dto.dart';
 import '../../data/dto/host/ssh_cert_dto.dart';
 import '../../data/dto/host/ssh_info_dto.dart';
+import '../../data/dto/host/ssh_log_dto.dart';
 
 abstract interface class HostRepository {
   Future<Map<String, dynamic>> getMonitorSetting();
@@ -17,8 +20,30 @@ abstract interface class HostRepository {
   Future<void> updateSsh(String key, String newValue);
   Future<bool> checkLocalSshConnection();
   Future<void> operateSsh(String operation);
+
+  /// 清理监控数据。
+  Future<void> cleanMonitor({String type = 'host'});
+
+  /// 清理 SSH 登录日志。
+  Future<void> cleanSshLogs();
+  Future<PageResult<SshLogDto>> searchSshLogs(SshLogSearchReq req);
+  Future<String> exportSshLogs(SshLogSearchReq req);
+
   Future<bool> testHostConnection(Map<String, dynamic> body);
   Future<List<SshCertDto>> searchSshCerts();
+
+  Future<PageResult<RemoteHostDto>> searchRemoteHosts({
+    int page,
+    int pageSize,
+    int groupId,
+    String info,
+  });
+  Future<List<RemoteHostTreeDto>> getRemoteHostTree({String info});
+  Future<void> createRemoteHost(Map<String, dynamic> body);
+  Future<void> updateRemoteHost(Map<String, dynamic> body);
+  Future<void> deleteRemoteHosts(List<int> ids);
+  Future<bool> testRemoteHost(Map<String, dynamic> body);
+  Future<bool> testRemoteHostById(int id);
   Future<void> createSshCert(SshCertOperateReq req);
 
   /// 同步面板中的 SSH 密钥。

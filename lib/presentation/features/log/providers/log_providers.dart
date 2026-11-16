@@ -27,7 +27,7 @@ final loginLogsProvider = FutureProvider.autoDispose<List<LoginLogItem>>((
   final page = await repository.searchLoginLogs(
     page: 1,
     pageSize: 50,
-    ip: '',
+    info: '',
     status: '',
   );
   return page.items.map(LoginLogItem.fromDto).toList(growable: false);

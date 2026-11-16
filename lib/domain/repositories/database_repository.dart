@@ -22,11 +22,13 @@ abstract interface class DatabaseRepository {
     required String database,
     int page,
     int pageSize,
+    String info,
   });
   Future<PageResult<DatabaseSearchItemDto>> searchPgDatabases({
     required String database,
     int page,
     int pageSize,
+    String info,
   });
   Future<void> loadPgFromRemote({required String database});
   Future<Map<String, String>> getStatus({
@@ -145,12 +147,14 @@ abstract interface class DatabaseRepository {
     required String database,
     required String save,
   });
+  Future<bool> checkRedisCli();
   Future<void> installRedisCli();
 
   Future<PageResult<DatabaseSearchItemDto>> searchMongoDatabases({
     required String database,
     int page,
     int pageSize,
+    String info,
   });
   Future<void> createMongoDatabase(Map<String, dynamic> body);
   Future<void> deletePgDatabase({
@@ -209,6 +213,40 @@ abstract interface class DatabaseRepository {
     required String database,
     required String username,
     required String host,
+  });
+  Future<void> updateUser({
+    required String database,
+    required String username,
+    required String host,
+    required String newHost,
+    String description,
+  });
+  Future<void> saveUserPassword({
+    required String database,
+    required String username,
+    required String host,
+    required String password,
+  });
+  Future<Map<String, dynamic>> getGrantsSummary({
+    required String database,
+    required List<String> dbs,
+  });
+  Future<void> updateDescription({
+    required int id,
+    required String type,
+    required String description,
+  });
+  Future<Map<String, dynamic>> getCommonInfo({
+    required String name,
+    required String type,
+  });
+  Future<void> loadMongoFromRemote({required String database, String from});
+  Future<void> changeMongoRootPassword({
+    required int id,
+    required String database,
+    required String password,
+    String from,
+    String type,
   });
   Future<void> changeUserPassword({
     required String database,

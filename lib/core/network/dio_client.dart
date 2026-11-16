@@ -4,10 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 
 import '../utils/app_logger.dart';
+import 'api_compatibility.dart';
 import 'app_user_agent.dart';
 import 'interceptors/api_envelope_interceptor.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
+import 'panel_session.dart';
 import 'network_exceptions.dart';
 
 /// 基于 Dio 的 HTTP 客户端封装。
@@ -23,7 +25,8 @@ class DioClient {
     Duration requestTimeout = _defaultRequestTimeout,
     Map<String, String> customHeaders = const {},
     required String userAgent,
-    bool allowInsecureConnections = false,
+    this.allowInsecureConnections = false,
+    PanelSession? panelSession,
   }) : _dio = Dio(
          _baseOptions(
            baseUrl,
@@ -32,11 +35,14 @@ class DioClient {
            userAgent: userAgent,
          ),
        ),
-       _auth = AuthInterceptor(apiKey) {
+       _auth = AuthInterceptor(apiKey, panelSession) {
     _dio.httpClientAdapter = IOHttpClientAdapter(
       createHttpClient: () {
         final client = HttpClient();
         client.badCertificateCallback = (_, _, _) => allowInsecureConnections;
+        client.maxConnectionsPerHost = 8;
+        client.idleTimeout = const Duration(seconds: 30);
+        client.autoUncompress = true;
         return client;
       },
     );
@@ -50,17 +56,32 @@ class DioClient {
 
   static const _tag = 'network.client';
   static const _defaultRequestTimeout = Duration(seconds: 60);
+  static const _maxConnectTimeout = Duration(seconds: 10);
 
   final Dio _dio;
   final AuthInterceptor _auth;
+  final bool allowInsecureConnections;
 
   Dio get raw => _dio;
+
+  String get baseUrl => _dio.options.baseUrl;
+
+  String get apiKey => _auth.apiKey;
 
   /// 切换 API Key（不重建实例）。
   void updateApiKey(String apiKey) => _auth.updateApiKey(apiKey);
 
+  /// 更新面板登录会话（不重建实例）。
+  void updateSession(PanelSession? session) => _auth.updateSession(session);
+
+  /// 当前面板登录会话。
+  PanelSession? get session => _auth.session;
+
   /// 关闭底层连接池。
-  void dispose() => _dio.close(force: true);
+  void dispose() {
+    ApiCompatibility.clearScope(this);
+    _dio.close(force: true);
+  }
 
   Future<Response<T>> get<T>(
     String path, {
@@ -126,6 +147,24 @@ class DioClient {
     );
   }
 
+  /// 以流式响应发送 POST 请求，用于 SSE（Server-Sent Events）。
+  Future<Response<ResponseBody>> postStream(
+    String path, {
+    Object? data,
+    Options? options,
+  }) {
+    return _run(
+      () => _dio.post<ResponseBody>(
+        path,
+        data: data,
+        options: (options ?? Options()).copyWith(
+          responseType: ResponseType.stream,
+          headers: {...?options?.headers, 'Accept': 'text/event-stream'},
+        ),
+      ),
+    );
+  }
+
   /// 多部分表单上传，支持进度回调和取消。
   Future<Response<T>> postMultipart<T>(
     String path, {
@@ -176,7 +215,9 @@ class DioClient {
 
     return BaseOptions(
       baseUrl: normalizedUrl,
-      connectTimeout: requestTimeout,
+      connectTimeout: requestTimeout < _maxConnectTimeout
+          ? requestTimeout
+          : _maxConnectTimeout,
       sendTimeout: requestTimeout,
       receiveTimeout: requestTimeout,
       headers: _headers(customHeaders, userAgent),

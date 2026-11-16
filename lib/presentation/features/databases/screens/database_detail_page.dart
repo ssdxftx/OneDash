@@ -112,6 +112,26 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
                   ],
                 ),
               ),
+              const SizedBox(height: AppTokens.s16),
+              SplitListGroup(
+                children: [
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.notes),
+                    title: l10n.databases_description,
+                    subtitle: state.item.description.isEmpty
+                        ? l10n.panelSettings_notSet
+                        : state.item.description,
+                    trailing: const Icon(TablerIcons.pencil),
+                    onTap: () => _editDescription(state),
+                  ),
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.info_circle),
+                    title: l10n.databases_commonInfo,
+                    trailing: const Icon(TablerIcons.chevron_right),
+                    onTap: () => _showCommonInfo(state),
+                  ),
+                ],
+              ),
               const SizedBox(height: AppTokens.s24),
               SplitListGroup(
                 children: [
@@ -144,25 +164,26 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
                 ],
               ),
               const SizedBox(height: AppTokens.s24),
-              SwitchListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppTokens.s8,
-                ),
-                title: Text(
-                  l10n.databases_remoteAccess,
-                  style: AppTextStyles.bodyM,
-                ),
-                subtitle: Text(
-                  state.remoteAccess
-                      ? l10n.databases_enabled
-                      : l10n.databases_disabled,
-                  style: AppTextStyles.bodyS.copyWith(
-                    color: context.scheme.onSurfaceVariant,
+              if (widget.type == 'mysql' || widget.type == 'mariadb')
+                SwitchListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppTokens.s8,
                   ),
+                  title: Text(
+                    l10n.databases_remoteAccess,
+                    style: AppTextStyles.bodyM,
+                  ),
+                  subtitle: Text(
+                    state.remoteAccess
+                        ? l10n.databases_enabled
+                        : l10n.databases_disabled,
+                    style: AppTextStyles.bodyS.copyWith(
+                      color: context.scheme.onSurfaceVariant,
+                    ),
+                  ),
+                  value: state.remoteAccess,
+                  onChanged: _setRemoteAccess,
                 ),
-                value: state.remoteAccess,
-                onChanged: _setRemoteAccess,
-              ),
               const SizedBox(height: AppTokens.s16),
               Row(
                 children: [
@@ -183,6 +204,14 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
                   ),
                 ],
               ),
+              if (widget.type == 'mongodb') ...[
+                const SizedBox(height: AppTokens.s12),
+                OutlinedButton.icon(
+                  onPressed: () => _changeRootPassword(state),
+                  icon: const Icon(TablerIcons.key),
+                  label: Text(l10n.databases_rootPassword),
+                ),
+              ],
               const SizedBox(height: AppTokens.s12),
               OutlinedButton.icon(
                 onPressed: _delete,
@@ -247,6 +276,122 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
     final value = state.connection[key];
     if (value != null && '$value'.isNotEmpty) return '$value';
     return null;
+  }
+
+  Future<void> _editDescription(DatabaseDetailState state) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController(text: state.item.description);
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.databases_editDescription,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.databases_description,
+              maxLines: 3,
+            ),
+          ],
+        ),
+      ),
+    );
+    final value = controller.text.trim();
+    controller.dispose();
+    if (confirmed != true || !mounted) return;
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      await repository.updateDescription(
+        id: state.item.id,
+        type: widget.type,
+        description: value,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(databaseDetailProvider(_key));
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showCommonInfo(DatabaseDetailState state) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      final info = await repository.getCommonInfo(
+        name: widget.instance,
+        type: widget.type,
+      );
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.databases_commonInfo, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s12),
+            if (info.isEmpty)
+              EmptyState(
+                compact: true,
+                icon: TablerIcons.database,
+                title: l10n.state_empty,
+              )
+            else
+              SplitListGroup(
+                children: [
+                  for (final entry in info.entries)
+                    SplitListTile(title: entry.key, value: '${entry.value}'),
+                ],
+              ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _changeRootPassword(DatabaseDetailState state) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController();
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.databases_rootPassword,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.databases_newPassword,
+              obscure: true,
+              autofocus: true,
+            ),
+          ],
+        ),
+      ),
+    );
+    final value = controller.text;
+    controller.dispose();
+    if (confirmed != true || value.isEmpty || !mounted) return;
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      await repository.changeMongoRootPassword(
+        id: state.item.id,
+        database: widget.instance,
+        password: value,
+        from: _from,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.databases_passwordChanged);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _showStatus(DatabaseDetailState state) async {

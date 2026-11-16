@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -43,16 +45,50 @@ class ContainersPage extends ConsumerStatefulWidget {
 }
 
 class _ContainersPageState extends ConsumerState<ContainersPage>
-    with EntryAnimation<ContainersPage> {
+    with EntryAnimation<ContainersPage>, WidgetsBindingObserver {
   final _searchController = TextEditingController();
   final _searchDebouncer = Debouncer();
   bool _searching = false;
   bool _selecting = false;
+  bool _branchActive = true;
+  bool _foreground = true;
   String _filter = 'all';
   final Set<String> _selected = {};
   final Set<String> _removing = {};
+  Timer? _pollTimer;
 
   bool get _selectionMode => _selecting;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _branchActive = TickerMode.valuesOf(context).enabled;
+    _syncPolling();
+  }
+
+  void _syncPolling() {
+    if (!_branchActive || !_foreground) {
+      _pollTimer?.cancel();
+      _pollTimer = null;
+      return;
+    }
+    _pollTimer ??= Timer.periodic(
+      AppTokens.containerListPoll,
+      (_) => ref.read(containersProvider.notifier).poll(),
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _foreground = state == AppLifecycleState.resumed;
+    _syncPolling();
+  }
 
   void _toggle(String name) {
     setState(() {
@@ -125,6 +161,8 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _pollTimer?.cancel();
     _searchDebouncer.dispose();
     _searchController.dispose();
     super.dispose();
@@ -144,7 +182,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
     final l10n = AppLocalizations.of(context);
     final server = ref.watch(serverByIdProvider(widget.serverId)).valueOrNull;
     final containers = ref.watch(containersProvider);
-    final total = containers.valueOrNull?.items.length;
+    final total = containers.valueOrNull?.total;
     final docker = ref.watch(dockerStatusProvider);
 
     return PopScope(
@@ -360,56 +398,68 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
                     return RefreshIndicator(
                       onRefresh: () =>
                           ref.read(containersProvider.notifier).refresh(),
-                      child: ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: EdgeInsets.fromLTRB(
-                          context.pagePadding,
-                          AppTokens.s8,
-                          context.pagePadding,
-                          AppTokens.bottomNavClearance +
-                              MediaQuery.paddingOf(context).bottom,
-                        ),
-                        itemCount: state.items.length,
-                        itemBuilder: (context, index) {
-                          final item = state.items[index];
-                          final stats = state.stats[item.containerID];
-                          return RemovableListItem(
-                            key: ValueKey('container-${item.name}'),
-                            removing: _removing.contains(item.name),
-                            animateIn: entryAnimationEnabled,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                bottom: AppTokens.s12,
-                              ),
-                              child: _ContainerCard(
-                                item: item,
-                                cpu: stats?.cpuPercent,
-                                memory: stats == null
-                                    ? null
-                                    : formatBytes(stats.memoryUsage.toInt()),
-                                selected: _selected.contains(item.name),
-                                selectable: !item.isFromCompose,
-                                selectionMode: _selectionMode,
-                                onTap: _selectionMode
-                                    ? () {
-                                        if (!item.isFromCompose) {
-                                          _toggle(item.name);
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: (notification) {
+                          if (notification.metrics.extentAfter < 400) {
+                            ref.read(containersProvider.notifier).loadMore();
+                          }
+                          return false;
+                        },
+                        child: ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.fromLTRB(
+                            context.pagePadding,
+                            AppTokens.s8,
+                            context.pagePadding,
+                            AppTokens.bottomNavClearance +
+                                MediaQuery.paddingOf(context).bottom,
+                          ),
+                          itemCount: state.items.length,
+                          itemBuilder: (context, index) {
+                            final item = state.items[index];
+                            final stats = state.stats[item.containerID];
+                            return RemovableListItem(
+                              key: ValueKey('container-${item.name}'),
+                              removing: _removing.contains(item.name),
+                              animateIn:
+                                  entryAnimationEnabled &&
+                                  index < AppTokens.listEntryAnimationLimit,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppTokens.s12,
+                                ),
+                                child: _ContainerCard(
+                                  item: item,
+                                  cpu: stats?.cpuPercent,
+                                  memory: stats == null
+                                      ? null
+                                      : formatBytes(stats.memoryUsage.toInt()),
+                                  selected: _selected.contains(item.name),
+                                  selectable: !item.isFromCompose,
+                                  selectionMode: _selectionMode,
+                                  onTap: _selectionMode
+                                      ? () {
+                                          if (!item.isFromCompose) {
+                                            _toggle(item.name);
+                                          }
                                         }
-                                      }
-                                    : () => _showActions(item),
-                                onLongPress: () {
-                                  if (!item.isFromCompose) _toggle(item.name);
-                                },
-                                onToggle: () => _operateQuick(
-                                  item,
-                                  item.state.toLowerCase() == 'running'
-                                      ? 'stop'
-                                      : 'start',
+                                      : () => _showActions(item),
+                                  onLongPress: () {
+                                    if (!item.isFromCompose) {
+                                      _toggle(item.name);
+                                    }
+                                  },
+                                  onToggle: () => _operateQuick(
+                                    item,
+                                    item.state.toLowerCase() == 'running'
+                                        ? 'stop'
+                                        : 'start',
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     );
                   },

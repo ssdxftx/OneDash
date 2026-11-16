@@ -401,7 +401,7 @@ class WebsiteSslManagePage extends ConsumerWidget {
         primaryDomain: target,
         otherDomains: '',
         provider: 'http',
-        keyType: 'P256',
+        keyType: 'EC256',
         description: note,
         dir: '',
         shell: '',
@@ -419,15 +419,6 @@ class WebsiteSslManagePage extends ConsumerWidget {
         nameserver2: '',
       );
       await repository.createSsl(created);
-      final page = await repository.searchSsl({'page': 1, 'pageSize': 100});
-      SslManageDto? cert;
-      for (final item in page.items) {
-        if (item.primaryDomain == target) {
-          cert = item;
-          break;
-        }
-      }
-      if (cert != null) await repository.obtainSsl(cert.id);
       ref.invalidate(_sslListProvider);
       if (!context.mounted) return;
       AppToast.success(context, l10n.websites_sslRequested);
@@ -464,7 +455,7 @@ class WebsiteSslManagePage extends ConsumerWidget {
                   _showDetail(context, ref, cert);
                 },
               ),
-              if (domain.trim().isNotEmpty)
+              if (websiteId > 0 && domain.trim().isNotEmpty)
                 SplitListTile(
                   leading: const Icon(TablerIcons.shield_check),
                   title: l10n.websites_bindExistingCertificate,
@@ -472,6 +463,15 @@ class WebsiteSslManagePage extends ConsumerWidget {
                   onTap: () {
                     Navigator.of(sheetContext).pop();
                     _bind(context, ref, cert);
+                  },
+                ),
+              if (cert.status == 'init' || cert.status == 'applyError')
+                SplitListTile(
+                  leading: const Icon(TablerIcons.refresh),
+                  title: l10n.websites_applySsl,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _obtain(context, ref, cert);
                   },
                 ),
               SplitListTile(
@@ -488,6 +488,14 @@ class WebsiteSslManagePage extends ConsumerWidget {
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   _checkDns(context, ref, cert);
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.send),
+                title: l10n.websites_pushSsl,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _push(context, ref, cert);
                 },
               ),
               SplitListTile(
@@ -512,6 +520,43 @@ class WebsiteSslManagePage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _push(
+    BuildContext context,
+    WidgetRef ref,
+    SslManageDto cert,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController();
+    final nodes = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_pushSsl,
+          saveLabel: l10n.action_confirm,
+          onSave: () async {
+            final value = controller.text.trim();
+            if (value.isEmpty) return;
+            Navigator.of(pageContext).pop(value);
+          },
+          children: [
+            AppTextField(controller: controller, label: l10n.websites_nodes),
+          ],
+        ),
+      ),
+    );
+
+    if (nodes == null || !context.mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.pushSsl(id: cert.id, nodes: nodes);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _showDetail(
@@ -604,6 +649,7 @@ class WebsiteSslManagePage extends ConsumerWidget {
     SslManageDto cert,
   ) async {
     final l10n = AppLocalizations.of(context);
+    if (websiteId <= 0) return;
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
       final https = await repository.getWebsiteHttps(websiteId);
@@ -613,7 +659,7 @@ class WebsiteSslManagePage extends ConsumerWidget {
           websiteId: websiteId,
           sslId: cert.id,
           acmeAccountId: cert.acmeAccountId,
-          type: cert.type,
+          type: 'existed',
           https: https,
         ),
       );
@@ -621,6 +667,24 @@ class WebsiteSslManagePage extends ConsumerWidget {
       ref.invalidate(_sslListProvider);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _obtain(
+    BuildContext context,
+    WidgetRef ref,
+    SslManageDto cert,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.obtainSsl(cert.id);
+      ref.invalidate(_sslListProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.websites_sslRequested);
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);

@@ -140,6 +140,12 @@ class InstalledAppPage extends ConsumerWidget {
                         InstalledAppActions.upgrade(context, ref, app!),
                   ),
                 SplitListTile(
+                  leading: const Icon(TablerIcons.link),
+                  title: l10n.apps_editWebUi,
+                  onTap: () =>
+                      InstalledAppActions.editWebUi(context, ref, app!),
+                ),
+                SplitListTile(
                   leading: const Icon(TablerIcons.adjustments),
                   title: l10n.apps_editParams,
                   subtitle: app.version,
@@ -159,6 +165,12 @@ class InstalledAppPage extends ConsumerWidget {
                   subtitle: app.container,
                   onTap: () =>
                       InstalledAppActions.showConnInfo(context, ref, app!),
+                ),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.file_settings),
+                  title: l10n.apps_defaultConfig,
+                  onTap: () =>
+                      InstalledAppActions.showDefaultConfig(context, ref, app!),
                 ),
                 SplitListTile(
                   leading: const Icon(TablerIcons.bell_off),

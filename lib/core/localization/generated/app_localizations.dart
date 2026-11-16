@@ -440,6 +440,24 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get settings_appearance_modeDark;
 
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel port'**
+  String get firewall_panelPort;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Port updated'**
+  String get firewall_portChanged;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New port'**
+  String get firewall_newPort;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:
@@ -523,6 +541,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Panel Username'**
   String get panelSettings_panelUsername;
+
+  /// Independent API key management.
+  ///
+  /// In en, this message translates to:
+  /// **'Independent API keys'**
+  String get panelSettings_apiKeyManagement;
+
+  /// Independent API key management hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create, view and manage independent API keys.'**
+  String get panelSettings_apiKeyManagementHint;
+
+  /// Create independent API key.
+  ///
+  /// In en, this message translates to:
+  /// **'Create API key'**
+  String get panelSettings_apiKeyCreate;
+
+  /// API key name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get panelSettings_apiKeyName;
+
+  /// API key description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get panelSettings_apiKeyDescription;
+
+  /// API key IP allowlist.
+  ///
+  /// In en, this message translates to:
+  /// **'IP allowlist'**
+  String get panelSettings_apiKeyIpWhiteList;
+
+  /// API key trusted proxies.
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted proxies'**
+  String get panelSettings_apiKeyTrustedProxies;
+
+  /// API key timestamp validity.
+  ///
+  /// In en, this message translates to:
+  /// **'Timestamp validity (minutes)'**
+  String get panelSettings_apiKeyValidity;
+
+  /// API key app binding.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow app binding'**
+  String get panelSettings_apiKeyAllowAppBinding;
+
+  /// Reveal API key.
+  ///
+  /// In en, this message translates to:
+  /// **'Reveal key'**
+  String get panelSettings_apiKeyReveal;
+
+  /// Enable API key.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get panelSettings_apiKeyEnable;
+
+  /// Disable API key.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable'**
+  String get panelSettings_apiKeyDisable;
+
+  /// Revoke API key.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke'**
+  String get panelSettings_apiKeyRevoke;
+
+  /// Delete API key.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get panelSettings_apiKeyDelete;
+
+  /// Empty API key list.
+  ///
+  /// In en, this message translates to:
+  /// **'No independent API keys'**
+  String get panelSettings_apiKeyEmpty;
+
+  /// API key created.
+  ///
+  /// In en, this message translates to:
+  /// **'API key created and copied'**
+  String get panelSettings_apiKeyCreated;
+
+  /// Revoke API key confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke cannot be undone. Continue?'**
+  String get panelSettings_apiKeyRevokeConfirm;
+
+  /// Delete API key confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete cannot be undone. Continue?'**
+  String get panelSettings_apiKeyDeleteConfirm;
+
+  /// API key expiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires'**
+  String get panelSettings_apiKeyExpires;
+
+  /// Panel login entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel login'**
+  String get panelSettings_panelLogin;
+
+  /// Panel session active.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in. Password, MFA, Passkey and API Key management are available.'**
+  String get panelSettings_panelLoggedIn;
+
+  /// Panel session missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Not signed in. Password, MFA, Passkey and API Key management require a panel session.'**
+  String get panelSettings_panelNotLoggedIn;
+
+  /// Panel login username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get panelSettings_username;
+
+  /// Panel login password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get panelSettings_password;
+
+  /// Panel login action.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get panelSettings_login;
+
+  /// Session required hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to the panel first.'**
+  String get panelSettings_loginRequired;
+
+  /// Login captcha label.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code'**
+  String get panelSettings_captcha;
+
+  /// Panel logout action.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get panelSettings_logout;
 
   /// Panel login password setting title.
   ///
@@ -1766,6 +1952,48 @@ abstract class AppLocalizations {
   /// **'Compress'**
   String get files_compress;
 
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get files_preview;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Directory tree'**
+  String get files_directoryTree;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Remark'**
+  String get files_remark;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Remark saved'**
+  String get files_remarkSaved;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Share QR code'**
+  String get files_shareQr;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'System mounts'**
+  String get files_mounts;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount point'**
+  String get files_mountPoint;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:
@@ -1837,6 +2065,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reverse proxy'**
   String get websites_proxy;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Application'**
+  String get websites_deployment;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Subsite'**
+  String get websites_subsite;
 
   /// OneDash UI string
   ///
@@ -2653,6 +2893,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'File exceeds 50 MB. Use the web version to download.'**
   String get files_downloadTooLarge;
+
+  /// Download ready in share sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'File is ready. Save or share it from the share sheet.'**
+  String get files_downloadReady;
 
   /// Download saved location.
   ///
@@ -4778,6 +5024,24 @@ abstract class AppLocalizations {
   /// **'Monitoring'**
   String get host_monitor;
 
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean SSH logs'**
+  String get host_cleanSshLog;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean monitor data'**
+  String get dashboard_cleanMonitor;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Collected monitoring data will be deleted. Continue?'**
+  String get dashboard_cleanMonitorConfirm;
+
   /// SSH tab title.
   ///
   /// In en, this message translates to:
@@ -5251,6 +5515,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Diagnostics'**
   String get host_diagnostics;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote hosts'**
+  String get host_remoteHosts;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Add remote host'**
+  String get host_addRemote;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No remote hosts'**
+  String get host_noRemote;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote hosts can be used from the terminal.'**
+  String get host_noRemoteHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get host_remoteName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get host_address;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get host_port;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get host_user;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication'**
+  String get host_authMode;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get host_authPassword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Private key'**
+  String get host_authKey;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get host_password;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Private key'**
+  String get host_privateKey;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Key passphrase'**
+  String get host_passphrase;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember password'**
+  String get host_rememberPassword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get host_description;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get host_group;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No group'**
+  String get host_noGroup;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Test connection'**
+  String get host_testConnection;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection succeeded'**
+  String get host_connectionOk;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection failed'**
+  String get host_connectionFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete remote host'**
+  String get host_deleteRemote;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}?'**
+  String host_deleteRemoteMessage(String name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote host saved'**
+  String get host_remoteSaved;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Test'**
+  String get action_test;
 
   /// System disk section title.
   ///
@@ -5780,10 +6194,10 @@ abstract class AppLocalizations {
   /// **'Remark'**
   String get websites_templateRemark;
 
-  /// Website template variables.
+  /// OneDash UI text.
   ///
   /// In en, this message translates to:
-  /// **'Variables'**
+  /// **'Template variables'**
   String get websites_templateVariables;
 
   /// Add a template variable.
@@ -6259,6 +6673,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap to switch the managed backend'**
   String get firewall_settingsBackendHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'System rules'**
+  String get firewall_backendSystem;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Port forwarding'**
+  String get firewall_backendForwarding;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Docker rules'**
+  String get firewall_backendDocker;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced actions'**
+  String get firewall_advanced;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Initialize or repair firewall family'**
+  String get firewall_familyOperation;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Initialize, repair or bind a subsystem for IPv4 or IPv6'**
+  String get firewall_familyOperationHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Base chain operations'**
+  String get firewall_filterChain;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Initialize, bind or unbind the 1PANEL_BASIC chain'**
+  String get firewall_filterChainHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Subsystem'**
+  String get firewall_subsystem;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get firewall_family;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation'**
+  String get firewall_operation;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'System rules'**
+  String get firewall_subsystemSystem;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Port forwarding'**
+  String get firewall_subsystemForwarding;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Docker rules'**
+  String get firewall_subsystemDocker;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Initialize'**
+  String get firewall_operationInitialize;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair'**
+  String get firewall_operationRepair;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind'**
+  String get firewall_operationBind;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Initialize base chain'**
+  String get firewall_filterInit;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind base chain'**
+  String get firewall_filterBind;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Unbind base chain'**
+  String get firewall_filterUnbind;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Port guard policy'**
+  String get firewall_dockerPolicy;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restrict sources for a published container port'**
+  String get firewall_dockerPolicyHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Policy mode'**
+  String get firewall_dockerMode;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Source addresses'**
+  String get firewall_dockerSources;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate multiple addresses with commas'**
+  String get firewall_dockerSourcesHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Port guard policy saved'**
+  String get firewall_dockerPolicySaved;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Port guard policy deleted'**
+  String get firewall_dockerPolicyDeleted;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Deny specified sources'**
+  String get firewall_dockerModeDenySources;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow only specified sources'**
+  String get firewall_dockerModeAllowSources;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Deny all sources'**
+  String get firewall_dockerModeDenyAll;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept specified sources'**
+  String get firewall_dockerModeAcceptSources;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept all sources'**
+  String get firewall_dockerModeAcceptAll;
 
   /// Shown when pre-save SSH connectivity check fails.
   ///
@@ -7637,6 +8243,90 @@ abstract class AppLocalizations {
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
+  /// **'Convert format'**
+  String get files_convert;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Output format'**
+  String get files_convertFormat;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Output directory'**
+  String get files_convertOutput;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete source files after conversion'**
+  String get files_convertDeleteSource;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversion task submitted'**
+  String get files_convertStarted;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Only files can be converted, not directories'**
+  String get files_convertOnlyFiles;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Select files to convert first'**
+  String get files_convertNoFile;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload records'**
+  String get files_uploadRecords;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No upload records'**
+  String get files_noUploadRecords;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded files in the current directory appear here.'**
+  String get files_noUploadRecordsHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversion records'**
+  String get files_convertLogs;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No conversion records'**
+  String get files_noConvertLogs;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed file conversions appear here.'**
+  String get files_noConvertLogsHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove record'**
+  String get files_removeDownloadRecord;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
   /// **'Copy instead of move'**
   String get files_copyMode;
 
@@ -7745,6 +8435,18 @@ abstract class AppLocalizations {
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
+  /// **'Enable'**
+  String get action_enable;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable'**
+  String get action_disable;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
   /// **'Enabled'**
   String get websites_enabled;
 
@@ -7783,6 +8485,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'User'**
   String get websites_owner;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch actions'**
+  String get websites_batchActions;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch operation completed'**
+  String get websites_batchSuccess;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Change group'**
+  String get websites_changeGroup;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind certificate'**
+  String get websites_bindSsl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Select group'**
+  String get websites_selectGroup;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Select certificate'**
+  String get websites_selectSsl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Default site'**
+  String get websites_defaultSite;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Cross-site access'**
+  String get websites_crossSite;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy cache'**
+  String get websites_proxyCache;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache limit'**
+  String get websites_cacheLimit;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared cache'**
+  String get websites_cacheShare;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache expiry'**
+  String get websites_cacheExpire;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear proxy cache'**
+  String get websites_clearProxyCache;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Composer'**
+  String get websites_composer;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Command'**
+  String get websites_composerCommand;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Mirror'**
+  String get websites_composerMirror;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Working directory'**
+  String get websites_composerDir;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Run as user'**
+  String get websites_composerUser;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy cache cleared'**
+  String get websites_cacheCleared;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Push to nodes'**
+  String get websites_pushSsl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Nodes'**
+  String get websites_nodes;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to group'**
+  String get websites_mergeGroup;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Default pages'**
+  String get websites_defaultHtml;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Page type'**
+  String get websites_htmlType;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'HTML content'**
+  String get websites_htmlContent;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Default page saved'**
+  String get websites_htmlSaved;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'index.html'**
+  String get websites_htmlIndex;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'404.html'**
+  String get websites_html404;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'index.php'**
+  String get websites_htmlPhp;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'domain404.html'**
+  String get websites_htmlDomain404;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'stop/index.html'**
+  String get websites_htmlStop;
 
   /// OneDash UI text.
   ///
@@ -7921,6 +8809,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit redirect'**
   String get websites_editRedirect;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete redirect'**
+  String get websites_deleteRedirect;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Redirect deleted'**
+  String get websites_redirectDeleted;
 
   /// OneDash UI text.
   ///
@@ -8840,6 +9740,18 @@ abstract class AppLocalizations {
   /// **'Use proxy'**
   String get websites_useProxy;
 
+  /// ACME EAB key identifier.
+  ///
+  /// In en, this message translates to:
+  /// **'EAB Kid'**
+  String get websites_eabKid;
+
+  /// ACME EAB HMAC key.
+  ///
+  /// In en, this message translates to:
+  /// **'EAB HmacKey'**
+  String get websites_eabHmacKey;
+
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
@@ -8953,6 +9865,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Calculate exact size'**
   String get files_exactSize;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get containers_rename;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New name'**
+  String get containers_newName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Check image updates'**
+  String get containers_checkImageUpdates;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Image update check started'**
+  String get containers_imageUpdatesDone;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Search remote images'**
+  String get containers_searchRemote;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule image update checks'**
+  String get containers_scheduleImageUpdates;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Download logs'**
+  String get containers_downloadLog;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Container files'**
+  String get containers_fileBrowser;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload file'**
+  String get containers_uploadFile;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'File content'**
+  String get containers_fileContent;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Binary file, cannot preview'**
+  String get containers_binaryFile;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent directory'**
+  String get containers_parentDir;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'File deleted'**
+  String get containers_fileDeleted;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Directory is empty'**
+  String get containers_fileEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Compose environment'**
+  String get containers_composeEnv;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin compose'**
+  String get containers_pinCompose;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin compose'**
+  String get containers_unpinCompose;
 
   /// OneDash UI text.
   ///
@@ -9155,6 +10169,12 @@ abstract class AppLocalizations {
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
+  /// **'The API Key mode cannot safely read the API whitelist. Update it in the panel web UI.'**
+  String get panelSettings_apiConfigUnavailable;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
   /// **'Allow API access for this panel'**
   String get panelSettings_apiInterfaceToggleHint;
 
@@ -9319,6 +10339,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verify existence'**
   String get files_checkExistence;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Close MFA'**
+  String get panelSettings_closeMfa;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'MFA closed'**
+  String get panelSettings_mfaClosed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset expired password'**
+  String get panelSettings_resetExpiredPassword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset'**
+  String get panelSettings_passwordReset;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Command library'**
+  String get panelSettings_commandLibrary;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New command'**
+  String get commandLibrary_add;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Command name'**
+  String get commandLibrary_name;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Command'**
+  String get commandLibrary_command;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No commands'**
+  String get commandLibrary_empty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Command tree'**
+  String get commandLibrary_tree;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Import commands'**
+  String get commandLibrary_import;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Export commands'**
+  String get commandLibrary_export;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Commands imported'**
+  String get commandLibrary_imported;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Commands exported'**
+  String get commandLibrary_exported;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No importable commands in CSV'**
+  String get commandLibrary_importEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Command copied'**
+  String get commandLibrary_copied;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Run script'**
+  String get scriptLibrary_run;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Group management'**
+  String get panelSettings_groupManagement;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New group'**
+  String get group_add;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get group_name;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No groups'**
+  String get group_empty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Script'**
+  String get group_typeScript;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Command'**
+  String get group_typeCommand;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Cronjob'**
+  String get group_typeCronjob;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Script library'**
+  String get panelSettings_scriptLibrary;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New script'**
+  String get scriptLibrary_add;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Script name'**
+  String get scriptLibrary_name;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get scriptLibrary_description;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Script content'**
+  String get scriptLibrary_content;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Interactive script'**
+  String get scriptLibrary_interactive;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync scripts'**
+  String get scriptLibrary_sync;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync task started'**
+  String get scriptLibrary_syncStarted;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No scripts'**
+  String get scriptLibrary_empty;
 
   /// OneDash UI text.
   ///
@@ -10652,7 +11870,7 @@ abstract class AppLocalizations {
   /// **'Certificate path'**
   String get websites_certPath;
 
-  /// Private key path
+  /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'Private key path'**
@@ -11102,6 +12320,36 @@ abstract class AppLocalizations {
   /// **'Add model account'**
   String get ai_account_add;
 
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Models'**
+  String get ai_account_models;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Model ID'**
+  String get ai_model_id;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as verification model'**
+  String get ai_model_verify;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification model'**
+  String get ai_model_verified;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify account'**
+  String get ai_account_verify;
+
   /// Edit model account
   ///
   /// In en, this message translates to:
@@ -11330,10 +12578,10 @@ abstract class AppLocalizations {
   /// **'Require mention'**
   String get ai_agent_require_mention;
 
-  /// Streaming
+  /// OneDash UI text.
   ///
   /// In en, this message translates to:
-  /// **'Streaming'**
+  /// **'Streaming replies'**
   String get ai_agent_streaming;
 
   /// Thread session
@@ -11887,6 +13135,3774 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Result'**
   String get logs_result;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Plugins'**
+  String get ai_agent_plugins;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Skills'**
+  String get ai_agent_skills;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed plugins'**
+  String get ai_plugin_installed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Plugin marketplace'**
+  String get ai_plugin_market;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Search plugins'**
+  String get ai_plugin_searchHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get ai_plugin_enable;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable'**
+  String get ai_plugin_disable;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get ai_plugin_version;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get ai_plugin_install;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No installed plugins'**
+  String get ai_plugin_empty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching plugins'**
+  String get ai_plugin_noResults;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed skills'**
+  String get ai_skill_installed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Skill marketplace'**
+  String get ai_skill_market;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Search skills'**
+  String get ai_skill_searchHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get ai_skill_source;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get ai_skill_install;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Uninstall'**
+  String get ai_skill_uninstall;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No installed skills'**
+  String get ai_skill_empty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching skills'**
+  String get ai_skill_noResults;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync to account'**
+  String get ai_model_syncAccount;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Recreate'**
+  String get ai_model_recreate;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Address type'**
+  String get ai_model_baseUrlType;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Base URL'**
+  String get ai_model_baseUrl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU monitor'**
+  String get ai_gpu_monitor;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Benchmark sources'**
+  String get ai_gpu_benchmark;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No benchmark sources'**
+  String get ai_gpu_benchmarkEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU utilization'**
+  String get ai_gpu_utilizationChart;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory usage'**
+  String get ai_gpu_memoryChart;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Container'**
+  String get ai_model_baseUrlContainer;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Localhost'**
+  String get ai_model_baseUrlLocalhost;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel IP'**
+  String get ai_model_baseUrlSystemIp;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get ai_model_baseUrlCustom;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Official'**
+  String get ai_skill_sourceOfficial;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'ClawHub global'**
+  String get ai_skill_sourceClawhubGlobal;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'ClawHub China'**
+  String get ai_skill_sourceClawhubCn;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'SkillHub'**
+  String get ai_skill_sourceSkillhub;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'skills.sh'**
+  String get ai_skill_sourceSkillsSh;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Local skill hub'**
+  String get ai_skill_sourceLocalHub;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'vLLM monitor'**
+  String get ai_vllm_monitor;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'vLLM app'**
+  String get ai_vllm_app;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No vLLM apps found'**
+  String get ai_vllm_noApps;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Samples'**
+  String get ai_vllm_samples;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Running requests'**
+  String get ai_vllm_running;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting requests'**
+  String get ai_vllm_waiting;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache usage'**
+  String get ai_vllm_cache;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat sessions'**
+  String get ai_agent_sessions;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename session'**
+  String get ai_session_rename;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete session'**
+  String get ai_session_delete;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch operations'**
+  String get ai_agent_batch;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'App type'**
+  String get ai_batch_type;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation'**
+  String get ai_batch_operate;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get ai_batch_start;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get ai_batch_stop;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get ai_batch_restart;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get ai_batch_delete;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Force delete'**
+  String get ai_batch_force;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Succeeded {success}, skipped {skipped}'**
+  String ai_batch_result(int success, int skipped);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Agent overview'**
+  String get ai_agent_overview;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean monitor data'**
+  String get ai_vllm_clean;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Node info'**
+  String get dashboard_nodeInfo;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick jumps'**
+  String get dashboard_quickJumps;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage quick jumps and directories'**
+  String get dashboard_manageQuick;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick directories'**
+  String get dashboard_quickDirectories;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Directory path'**
+  String get dashboard_quickDirectoryPath;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Alias'**
+  String get dashboard_quickDirectoryAlias;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'App launcher'**
+  String get dashboard_launcher;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage launcher'**
+  String get dashboard_manageLauncher;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Top CPU processes'**
+  String get dashboard_topCpu;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Top memory processes'**
+  String get dashboard_topMem;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get dashboard_noData;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get dashboard_appInstalled;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Not installed'**
+  String get dashboard_appNotInstalled;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Add quick directory'**
+  String get dashboard_addQuickDirectory;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit quick directory'**
+  String get dashboard_editQuickDirectory;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Open share'**
+  String get files_openShare;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit description'**
+  String get backups_editDescription;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot files'**
+  String get backups_snapshotFiles;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No snapshot files'**
+  String get backups_noSnapshotFiles;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Next run'**
+  String get cronjobs_nextRun;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Change group'**
+  String get cronjobs_updateGroup;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Check store updates'**
+  String get apps_checkUpdates;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'App store update available'**
+  String get apps_storeCanUpdate;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'App store is up to date'**
+  String get apps_storeLatest;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit WebUI URL'**
+  String get apps_editWebUi;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'WebUI URL'**
+  String get apps_webUi;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Clam scans'**
+  String get alerts_clamScans;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Cron jobs'**
+  String get alerts_cronjobTargets;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No alert targets available'**
+  String get alerts_targetsEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Path: {path}'**
+  String alerts_targetPath(String path);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Type: {type}'**
+  String alerts_targetType(String type);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH login logs'**
+  String get host_sshLogs;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'View and filter SSH login records'**
+  String get host_sshLogsHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyword'**
+  String get host_sshLogInfo;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'User, IP or message'**
+  String get host_sshLogInfoHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get host_sshLogStatus;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get host_sshLogAll;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get host_sshLogSuccess;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get host_sshLogFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Time range'**
+  String get host_sshLogRange;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String host_sshLogDays(String days);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No SSH login logs match the filters'**
+  String get host_sshLogEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Export logs'**
+  String get host_sshLogExport;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs exported to {path}'**
+  String host_sshLogExported(String path);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get host_sshLogSearch;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch operate'**
+  String get ai_batch_operation;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch install'**
+  String get ai_batch_install;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch upgrade'**
+  String get ai_batch_upgrade;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Target version'**
+  String get ai_batch_version;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup before upgrade'**
+  String get ai_batch_backup;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull image'**
+  String get ai_batch_pullImage;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'WebUI port'**
+  String get ai_batch_port;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Name (auto when empty)'**
+  String get ai_batch_name;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Security config'**
+  String get ai_agent_security;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed origins'**
+  String get ai_agent_security_origins;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate multiple origins with commas'**
+  String get ai_agent_security_hint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Agent config file'**
+  String get ai_agent_config_file;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit the channel config file directly'**
+  String get ai_agent_config_file_hint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'AI domain binding'**
+  String get ai_domain;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Domain'**
+  String get ai_domain_name;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'SSL ID'**
+  String get ai_domain_ssl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Website ID'**
+  String get ai_domain_website;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed IPs'**
+  String get ai_domain_ipList;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate multiple IPs with commas'**
+  String get ai_domain_hint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No installed Ollama app found'**
+  String get ai_domain_noApp;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bound domain: {domain}'**
+  String ai_domain_bound(String domain);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Domain settings saved'**
+  String get ai_domain_saved;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch move/copy'**
+  String get files_batchMove;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from directory tree'**
+  String get files_pickFromTree;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual machines'**
+  String get vm_title;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'KVM virtual machine management'**
+  String get vm_subtitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime environment'**
+  String get vm_environment;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime environment ready'**
+  String get vm_envReady;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime environment not ready'**
+  String get vm_envNotReady;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable runtime environment'**
+  String get vm_enable;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime environment enabled'**
+  String get vm_enabled;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Architecture'**
+  String get vm_arch;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'KVM'**
+  String get vm_kvm;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'libvirt'**
+  String get vm_libvirt;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage'**
+  String get vm_storage;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No virtual machines'**
+  String get vm_empty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable the KVM runtime environment before creating a VM'**
+  String get vm_emptyHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New virtual machine'**
+  String get vm_create;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit virtual machine'**
+  String get vm_update;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get vm_name;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU cores'**
+  String get vm_cpu;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory (MB)'**
+  String get vm_memory;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk (GB)'**
+  String get vm_disk;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get vm_network;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'OS type'**
+  String get vm_osType;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get vm_description;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get vm_start;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Shut down'**
+  String get vm_shutdown;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Reboot'**
+  String get vm_reboot;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Force stop'**
+  String get vm_destroy;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend'**
+  String get vm_suspend;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get vm_resume;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete virtual machine'**
+  String get vm_delete;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get vm_rename;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New name'**
+  String get vm_newName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime status'**
+  String get vm_stats;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshots'**
+  String get vm_snapshots;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Create snapshot'**
+  String get vm_snapshotCreate;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot name'**
+  String get vm_snapshotName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover snapshot'**
+  String get vm_snapshotRecover;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete snapshot'**
+  String get vm_snapshotDelete;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No snapshots'**
+  String get vm_snapshotEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable the VM runtime environment first'**
+  String get vm_needEnv;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete virtual machine {name}?'**
+  String vm_confirmDelete(String name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Force delete'**
+  String get vm_forceDelete;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Start after creation'**
+  String get vm_startAfterCreate;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Start on boot'**
+  String get vm_autoStart;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Quota {limit} VMs'**
+  String vm_limit(String limit);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get vm_osOther;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync virtual machines'**
+  String get vm_sync;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage pool'**
+  String get vm_storagePool;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Template (optional)'**
+  String get vm_template;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Linux'**
+  String get vm_osLinux;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Windows'**
+  String get vm_osWindows;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover models'**
+  String get ai_account_discover;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No models found'**
+  String get ai_account_discover_empty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Found {count} models'**
+  String ai_account_discover_result(String count);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel plugins'**
+  String get ai_channel_plugins;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get ai_channel_installed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Not installed'**
+  String get ai_channel_notInstalled;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to {version}'**
+  String ai_channel_upgradable(String version);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Install plugin'**
+  String get ai_channel_install;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade plugin'**
+  String get ai_channel_upgrade;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Uninstall plugin'**
+  String get ai_channel_uninstall;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Resources'**
+  String get vm_resources;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Networks'**
+  String get vm_networks;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Storages'**
+  String get vm_storages;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Templates'**
+  String get vm_templates;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'ISO images'**
+  String get vm_isos;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get vm_type;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Path'**
+  String get vm_path;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'CIDR'**
+  String get vm_cidr;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Gateway'**
+  String get vm_gateway;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Source interface'**
+  String get vm_sourceInterface;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Template name'**
+  String get vm_templateName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Source virtual machine'**
+  String get vm_sourceVm;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Image type'**
+  String get vm_isoType;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No resources'**
+  String get vm_resourceEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}?'**
+  String vm_deleteResource(String name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete file as well'**
+  String get vm_deleteFile;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'ISO image'**
+  String get vm_isoImage;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk'**
+  String get vm_isoDisk;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'NAT'**
+  String get vm_netNat;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bridge'**
+  String get vm_netBridge;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Macvtap'**
+  String get vm_netMacvtap;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve pairing'**
+  String get ai_channel_pairing;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing code'**
+  String get ai_channel_pairingCode;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Account ID (optional)'**
+  String get ai_channel_pairingAccount;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing approved'**
+  String get ai_channel_pairingApproved;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Feishu'**
+  String get ai_channel_feishu;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Telegram'**
+  String get ai_channel_telegram;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Discord'**
+  String get ai_channel_discord;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'WeCom'**
+  String get ai_channel_wecom;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'QQBot'**
+  String get ai_channel_qqbot;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'DingTalk'**
+  String get ai_channel_dingtalk;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Console'**
+  String get vm_console;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to console…'**
+  String get vm_consoleConnecting;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Console connection failed'**
+  String get vm_consoleFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to move the pointer, use the keyboard to type'**
+  String get vm_consoleHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Console disconnected'**
+  String get vm_consoleDisconnected;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear logs'**
+  String get websites_clearLog;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Log type'**
+  String get websites_logType;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit source file'**
+  String get websites_lbEditFile;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit the load balance configuration directly'**
+  String get websites_lbFileHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen ports'**
+  String get websites_streamPorts;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Upstream name'**
+  String get websites_streamName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Algorithm'**
+  String get websites_streamAlgorithm;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Backend address'**
+  String get websites_streamServer;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'UDP forwarding'**
+  String get websites_streamUdp;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Round robin'**
+  String get websites_lbRoundRobin;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Least connections'**
+  String get websites_lbLeastConnections;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'IP hash'**
+  String get websites_lbIpHashShort;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent website'**
+  String get websites_parentWebsite;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Subsite directory'**
+  String get websites_subsitePath;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Application'**
+  String get websites_deploymentApp;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview template'**
+  String get websites_templatePreview;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Application is running and ready'**
+  String get websites_deploymentRunning;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Application is stopped; start it first'**
+  String get websites_deploymentStopped;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview result'**
+  String get websites_templatePreviewResult;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No preview available'**
+  String get websites_templatePreviewFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Output detail'**
+  String get websites_templateOutputDetail;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Template'**
+  String get websites_templateOutputTemplate;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Variable values'**
+  String get websites_templateOutputVariables;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Created at'**
+  String get websites_templateOutputCreatedAt;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Output path'**
+  String get websites_templateOutputPath;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'AI settings'**
+  String get panelSettings_aiSettings;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal and file management AI assistant'**
+  String get panelSettings_aiSettingsHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal AI'**
+  String get panelSettings_terminalAi;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'File AI'**
+  String get panelSettings_fileAi;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable AI'**
+  String get panelSettings_aiEnabled;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Trigger prefix'**
+  String get panelSettings_aiPrefix;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'AI account ID'**
+  String get panelSettings_aiAccount;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a configured AI account ID'**
+  String get panelSettings_aiAccountHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Risk command prompt'**
+  String get panelSettings_aiRiskCommands;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe risky commands to block'**
+  String get panelSettings_aiRiskCommandsHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'File history'**
+  String get panelSettings_fileHistory;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Revision history and quota for configuration files'**
+  String get panelSettings_fileHistoryHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable file history'**
+  String get panelSettings_fileHistoryEnable;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Revisions per path'**
+  String get panelSettings_fileHistoryMaxPerPath;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk quota (MB)'**
+  String get panelSettings_fileHistoryQuota;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Local SSH connection'**
+  String get panelSettings_localSsh;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH credentials for the panel host'**
+  String get panelSettings_localSshHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Test connection'**
+  String get panelSettings_testConnection;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH connection is healthy'**
+  String get panelSettings_sshCheckOk;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Address and user are required'**
+  String get panelSettings_sshRequired;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get panelSettings_sshAddress;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get panelSettings_sshPort;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get panelSettings_sshUser;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication'**
+  String get panelSettings_sshAuthMode;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get panelSettings_sshAuthPassword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Key'**
+  String get panelSettings_sshAuthKey;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get panelSettings_sshPassword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Private key'**
+  String get panelSettings_sshPrivateKey;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Key passphrase'**
+  String get panelSettings_sshPassPhrase;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Default terminal connection'**
+  String get panelSettings_defaultSshConn;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection used when opening the terminal'**
+  String get panelSettings_defaultSshConnHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a connection name or address'**
+  String get panelSettings_defaultSshConnPlaceholder;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore default menu'**
+  String get panelSettings_resetMenu;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore the panel menu to default visibility'**
+  String get panelSettings_resetMenuHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore the default menu?'**
+  String get panelSettings_resetMenuConfirm;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'OpenResty modules'**
+  String get websites_openRestyModules;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Add module'**
+  String get websites_openRestyModuleAdd;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete module'**
+  String get websites_openRestyModuleDelete;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete module {name}?'**
+  String websites_openRestyModuleDeleteConfirm(Object name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No custom modules'**
+  String get websites_openRestyModuleEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Module name'**
+  String get websites_openRestyModuleName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get websites_openRestyModuleProvider;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Build mode'**
+  String get websites_openRestyModuleBuildMode;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Load order'**
+  String get websites_openRestyModuleLoadOrder;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Packages'**
+  String get websites_openRestyModulePackages;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Build parameters'**
+  String get websites_openRestyModuleParams;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Build script'**
+  String get websites_openRestyModuleScript;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Build OpenResty'**
+  String get websites_openRestyBuild;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Select modules and rebuild in the background'**
+  String get websites_openRestyBuildHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Modules to build'**
+  String get websites_openRestyBuildModules;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Download mirror'**
+  String get websites_openRestyMirror;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Force rebuild'**
+  String get websites_openRestyForce;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Build task submitted'**
+  String get websites_openRestyBuildSubmitted;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Default HTTPS'**
+  String get websites_openRestyHttps;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Control HTTPS behavior for the default site'**
+  String get websites_openRestyHttpsHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject unmatched SSL handshakes'**
+  String get websites_openRestyHttpsReject;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'System service logs'**
+  String get logs_systemServices;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Log files'**
+  String get logs_systemFiles;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get logs_service;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'All services'**
+  String get logs_serviceAll;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get logs_priority;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'All priorities'**
+  String get logs_priorityAll;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyword'**
+  String get logs_keyword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get logs_loadMore;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No system logs'**
+  String get logs_noSystemLog;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Update virus database'**
+  String get toolbox_updateVirusDatabase;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch the latest ClamAV signatures'**
+  String get toolbox_updateVirusDatabaseHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable scan rule'**
+  String get toolbox_enableScan;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable scan rule'**
+  String get toolbox_disableScan;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan configuration file'**
+  String get toolbox_clamConfigFile;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit FTP account'**
+  String get toolbox_ftpEdit;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to keep the current password'**
+  String get toolbox_ftpPasswordKeep;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get toolbox_ftpStatus;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'FTP service actions'**
+  String get toolbox_ftpService;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get toolbox_ftpStart;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get toolbox_ftpStop;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get toolbox_ftpRestart;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload'**
+  String get toolbox_ftpReload;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync FTP accounts'**
+  String get toolbox_ftpSync;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'FTP accounts synced'**
+  String get toolbox_ftpSyncDone;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'FTP operation logs'**
+  String get toolbox_ftpLogs;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No operation logs'**
+  String get toolbox_ftpLogEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Fail2ban configuration file'**
+  String get toolbox_fail2banConfFile;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'View and update the full jail configuration'**
+  String get toolbox_fail2banConfFileHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel upgrade'**
+  String get panelSettings_panelUpgrade;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for and install 1Panel updates'**
+  String get panelSettings_panelUpgradeHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New version available'**
+  String get panelSettings_upgradeAvailable;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Already up to date'**
+  String get panelSettings_upToDate;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to {version}'**
+  String panelSettings_upgradeTo(Object version);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'The panel will upgrade to {version}. Services restart briefly.'**
+  String panelSettings_upgradeConfirm(Object version);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade task submitted'**
+  String get panelSettings_upgradeSubmitted;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest version'**
+  String get panelSettings_latestVersion;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Test version'**
+  String get panelSettings_testVersion;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Release history'**
+  String get panelSettings_releaseNotesTitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new'**
+  String panelSettings_newCount(Object count);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} fixes'**
+  String panelSettings_fixCount(Object count);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} optimizations'**
+  String panelSettings_optimizationCount(Object count);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel-level backup account'**
+  String get backups_publicAccount;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored on the panel and shared across nodes'**
+  String get backups_publicAccountHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH connection failed'**
+  String get panelSettings_sshCheckFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load settings. Please retry.'**
+  String get panelSettings_loadFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No release notes yet'**
+  String get panelSettings_noReleaseNotes;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a new FTP password'**
+  String get toolbox_ftpPasswordRequired;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load. Please retry.'**
+  String get toolbox_loadFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New scan task'**
+  String get toolbox_clamAdd;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New group'**
+  String get websites_groupCreate;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No other group to merge into'**
+  String get websites_groupMergeEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a template name'**
+  String get websites_templateNameRequired;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload the template file'**
+  String get websites_templateFileRequired;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an output name'**
+  String get websites_templateOutputNameRequired;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load logs. Please retry.'**
+  String get logs_loadFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load SSH logs'**
+  String get host_sshLogLoadFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Force stop {name}? Data loss is possible.'**
+  String vm_forceStopConfirm(Object name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore snapshot {name}? The current state will be replaced.'**
+  String vm_snapshotRecoverConfirm(Object name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete snapshot {name}?'**
+  String vm_snapshotDeleteConfirm(Object name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU'**
+  String get vm_statsCpu;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get vm_statsMemory;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk R/W'**
+  String get vm_statsDisk;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Network RX/TX'**
+  String get vm_statsNetwork;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load HTTPS settings'**
+  String get websites_openRestyHttpsLoadFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'This interrupts active FTP connections. Continue?'**
+  String get toolbox_ftpServiceConfirm;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop Fail2ban'**
+  String get toolbox_fail2banStop;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Brute-force protection stops until restarted. Continue?'**
+  String get toolbox_fail2banStopConfirm;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP'**
+  String get panelMcp_title;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Panel MCP service, credentials and invocations'**
+  String get panelMcp_subtitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP service'**
+  String get panelMcp_service;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Not installed'**
+  String get panelMcp_notInstalled;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get panelMcp_installed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get panelMcp_ready;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Service running'**
+  String get panelMcp_serviceRunning;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Service stopped'**
+  String get panelMcp_serviceStopped;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Install MCP service'**
+  String get panelMcp_install;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get panelMcp_start;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get panelMcp_stop;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get panelMcp_restart;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Service logs'**
+  String get panelMcp_logs;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime settings'**
+  String get panelMcp_settings;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Endpoint'**
+  String get panelMcp_endpoint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime type'**
+  String get panelMcp_runtimeType;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Docker image'**
+  String get panelMcp_dockerImage;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen port'**
+  String get panelMcp_listenPort;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'External URL'**
+  String get panelMcp_externalUrl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Access policy'**
+  String get panelMcp_accessPolicy;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed IPs'**
+  String get panelMcp_allowedIPs;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'One IP or CIDR per line'**
+  String get panelMcp_allowedIPsHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Save settings'**
+  String get panelMcp_saveSettings;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Website binding'**
+  String get panelMcp_website;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Unbound'**
+  String get panelMcp_unbound;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bound'**
+  String get panelMcp_bound;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Domain'**
+  String get panelMcp_domain;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable SSL'**
+  String get panelMcp_enableSsl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'SSL ID'**
+  String get panelMcp_sslId;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind website'**
+  String get panelMcp_bindWebsite;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Update binding'**
+  String get panelMcp_updateWebsite;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Unbind website'**
+  String get panelMcp_unbindWebsite;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete linked website'**
+  String get panelMcp_deleteWebsite;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Unbind MCP website {domain}?'**
+  String panelMcp_unbindConfirm(String domain);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Credentials'**
+  String get panelMcp_credentials;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Create credential'**
+  String get panelMcp_createCredential;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit credential'**
+  String get panelMcp_editCredential;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential name'**
+  String get panelMcp_credentialName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get panelMcp_credentialDescription;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires at (ISO 8601, optional)'**
+  String get panelMcp_expiresAt;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed tools'**
+  String get panelMcp_tools;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Nodes'**
+  String get panelMcp_nodes;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No MCP credentials'**
+  String get panelMcp_noCredentials;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No MCP invocations'**
+  String get panelMcp_noInvocations;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Invocations'**
+  String get panelMcp_invocations;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Tool'**
+  String get panelMcp_tool;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential'**
+  String get panelMcp_credential;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Reveal token'**
+  String get panelMcp_revealToken;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate token'**
+  String get panelMcp_rotateToken;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Export enrollment'**
+  String get panelMcp_exportCredential;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke'**
+  String get panelMcp_revoke;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke credential {name}?'**
+  String panelMcp_revokeConfirm(String name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete credential {name}?'**
+  String panelMcp_deleteConfirm(String name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP token'**
+  String get panelMcp_tokenTitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy this token now. It will not be shown again.'**
+  String get panelMcp_tokenHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enrollment document'**
+  String get panelMcp_exportTitle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Client'**
+  String get panelMcp_exportClient;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'For example: claude, cursor, vscode'**
+  String get panelMcp_exportClientHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Tool catalog'**
+  String get panelMcp_catalog;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools available to this panel'**
+  String get panelMcp_catalogHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Operate MCP service: {operation}?'**
+  String panelMcp_serviceConfirm(String operation);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in required fields'**
+  String get panelMcp_requiredFields;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get panelMcp_status;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get panelMcp_reason;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No nodes'**
+  String get panelMcp_noNodes;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation completed'**
+  String get panelMcp_operationCompleted;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load MCP data'**
+  String get panelMcp_loadFailed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential created'**
+  String get panelMcp_createSuccess;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Revision'**
+  String get panelMcp_revision;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending request: {operation}'**
+  String panelMcp_pending(String operation);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Required when SSL is enabled'**
+  String get panelMcp_sslHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Website state'**
+  String get panelMcp_websiteState;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Installing MCP service'**
+  String get panelMcp_installing;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Task ID'**
+  String get panelMcp_taskId;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP settings saved'**
+  String get panelMcp_saved;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} tools'**
+  String panelMcp_toolsCount(int count);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Token copied'**
+  String get panelMcp_tokenCopied;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU groups'**
+  String get ai_gpuGroups;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No GPU groups'**
+  String get ai_gpuGroupsEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Add GPU group'**
+  String get ai_gpuGroupAdd;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit GPU group'**
+  String get ai_gpuGroupEdit;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get ai_gpuGroupName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get ai_gpuGroupDescription;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU type'**
+  String get ai_gpuGroupImageType;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU devices'**
+  String get ai_gpuGroupDevices;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Capabilities (comma separated)'**
+  String get ai_gpuGroupCapabilities;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete GPU group {name}?'**
+  String ai_gpuGroupDeleteConfirm(String name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU usage check'**
+  String get ai_gpuUsage;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Docker Compose'**
+  String get ai_gpuUsageCompose;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Environment variables'**
+  String get ai_gpuUsageEnv;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'GPU usage result'**
+  String get ai_gpuUsageResult;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Warnings'**
+  String get ai_gpuUsageWarnings;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible deployments'**
+  String get ai_gpuUsagePossible;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Model chat'**
+  String get ai_chat_title;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get ai_chat_model;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get ai_chat_input;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get ai_chat_send;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a message to test this model'**
+  String get ai_chat_empty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat failed'**
+  String get ai_chat_failed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get ai_chat_stop;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No models configured for this account'**
+  String get ai_chat_noModels;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Other configuration'**
+  String get ai_agent_otherConfig;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'User timezone'**
+  String get ai_agent_otherTimezone;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable browser'**
+  String get ai_agent_otherBrowser;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'NPM registry'**
+  String get ai_agent_otherNpm;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard username'**
+  String get ai_agent_otherUsername;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard password'**
+  String get ai_agent_otherPassword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Markdown files'**
+  String get ai_agent_markdown;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No markdown files'**
+  String get ai_agent_markdownEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get ai_agent_markdownContent;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch install skill'**
+  String get ai_agent_batchSkill;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Skill name'**
+  String get ai_agent_skillName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Package path'**
+  String get ai_agent_skillPackage;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Feishu plugin'**
+  String get ai_agent_feishuSwitch;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Group session scope'**
+  String get ai_agent_groupScope;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Require mention'**
+  String get ai_agent_requireMention;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Resources linked to this agent'**
+  String get ai_agent_deleteResources;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No linked resources'**
+  String get ai_agent_noDeleteResources;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit user'**
+  String get databases_editUser;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Save password locally'**
+  String get databases_savePassword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant summary'**
+  String get databases_grantsSummary;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Instance information'**
+  String get databases_commonInfo;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit description'**
+  String get databases_editDescription;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Root password'**
+  String get databases_rootPassword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Resize disk'**
+  String get vm_resizeDisk;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk target'**
+  String get vm_diskTarget;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New size (GiB)'**
+  String get vm_diskSizeNew;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Health check'**
+  String get vm_healthCheck;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed'**
+  String get vm_healthPass;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Warnings'**
+  String get vm_healthWarn;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get vm_healthFail;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Orphan resources'**
+  String get vm_orphans;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No orphan resources'**
+  String get vm_orphansEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan orphan resources'**
+  String get vm_orphansScan;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean selected'**
+  String get vm_orphansClean;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} orphan resources?'**
+  String vm_cleanConfirm(int count);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'PHP configuration'**
+  String get runtime_phpConfig;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'PHP parameters (JSON)'**
+  String get runtime_phpParams;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled functions'**
+  String get runtime_disableFunctions;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload limit'**
+  String get runtime_uploadMaxSize;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Max execution time'**
+  String get runtime_maxExecutionTime;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'PHP container'**
+  String get runtime_container;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Container name'**
+  String get runtime_containerName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Exposed ports (JSON)'**
+  String get runtime_exposedPorts;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Environment variables (JSON)'**
+  String get runtime_environments;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Volumes (JSON)'**
+  String get runtime_volumes;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra hosts (JSON)'**
+  String get runtime_extraHosts;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid JSON array'**
+  String get runtime_jsonHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Hosts file'**
+  String get toolbox_hosts;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit hosts file'**
+  String get toolbox_hostsEdit;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Root password'**
+  String get toolbox_password;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Root password updated'**
+  String get toolbox_passwordChanged;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Test DNS resolution'**
+  String get toolbox_dnsCheck;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'DNS resolution works'**
+  String get toolbox_dnsOk;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'DNS resolution failed'**
+  String get toolbox_dnsFail;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean system junk'**
+  String get toolbox_systemClean;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean scanned junk files?'**
+  String get toolbox_systemCleanConfirm;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'System users'**
+  String get toolbox_users;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Add host entry'**
+  String get toolbox_addHost;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Inherit'**
+  String get panelMcp_accessInherit;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get panelMcp_accessAll;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restricted'**
+  String get panelMcp_accessRestricted;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'NVIDIA'**
+  String get ai_gpuTypeNvidia;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Intel'**
+  String get ai_gpuTypeIntel;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Ascend'**
+  String get ai_gpuTypeAscend;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked resources'**
+  String get apps_linkedResources;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Download details'**
+  String get files_wgetDetails;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress: {percent}%'**
+  String files_wgetProgress(Object percent);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for download progress...'**
+  String get files_wgetWaiting;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'New extension preset'**
+  String get runtime_presetNew;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset name'**
+  String get runtime_presetName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Extensions'**
+  String get runtime_presetExtensions;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate extensions with commas, e.g. redis,opcache'**
+  String get runtime_presetExtensionsHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Import extension preset'**
+  String get runtime_presetImport;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Extension preset imported'**
+  String get runtime_presetImported;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset already exists with the same content'**
+  String get runtime_presetSkipped;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Push preset'**
+  String get runtime_presetPush;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Source node'**
+  String get runtime_presetSourceNode;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Target nodes'**
+  String get runtime_presetTargetNodes;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate nodes with commas'**
+  String get runtime_presetNodesHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete extension preset \"{name}\"?'**
+  String runtime_presetDeleteConfirm(Object name);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Push task submitted'**
+  String get runtime_presetPushed;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Supervisor'**
+  String get runtime_supervisor;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Search ISO'**
+  String get vm_isoSearch;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Name keyword'**
+  String get vm_isoSearchHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Add image record'**
+  String get vm_isoCreateRecord;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from path'**
+  String get vm_isoImport;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Network interfaces'**
+  String get vm_networkInterfaces;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed app order'**
+  String get apps_sort;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Smaller values appear first'**
+  String get apps_sortHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Default config'**
+  String get apps_defaultConfig;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No default config'**
+  String get apps_defaultConfigEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'redis-cli is installed'**
+  String get databases_redisCliInstalled;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'redis-cli is missing; remote Redis terminal is unavailable'**
+  String get databases_redisCliMissing;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Export cron jobs'**
+  String get cronjobs_export;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Import cron jobs'**
+  String get cronjobs_import;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Cron jobs exported'**
+  String get cronjobs_exported;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Cron jobs imported'**
+  String get cronjobs_imported;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No cron jobs found in the file'**
+  String get cronjobs_importEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Import CA'**
+  String get websites_importCa;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload CA archive'**
+  String get websites_uploadCa;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'CA name'**
+  String get websites_caName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Import type'**
+  String get websites_importType;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste certificate'**
+  String get websites_importPaste;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Server files'**
+  String get websites_importLocal;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Certificate path'**
+  String get websites_certificatePath;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {count}'**
+  String ai_accountCountLabel(String name, int count);
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Server proxy'**
+  String get panelSettings_proxy;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure HTTP/HTTPS/SOCKS5 proxy for outbound panel traffic'**
+  String get panelSettings_proxyHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy type'**
+  String get panelSettings_proxyType;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTP'**
+  String get panelSettings_proxyHttp;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTPS'**
+  String get panelSettings_proxyHttps;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'SOCKS5'**
+  String get panelSettings_proxySocks5;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable proxy'**
+  String get panelSettings_proxyClose;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy host'**
+  String get panelSettings_proxyUrl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 127.0.0.1 or proxy.example.com'**
+  String get panelSettings_proxyUrlHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy port'**
+  String get panelSettings_proxyPort;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy user'**
+  String get panelSettings_proxyUser;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy password'**
+  String get panelSettings_proxyPassword;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to clear the saved proxy password'**
+  String get panelSettings_proxyPasswordHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy Docker too'**
+  String get panelSettings_proxyDocker;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart Docker after applying'**
+  String get panelSettings_proxyRestartDocker;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter proxy host and port'**
+  String get panelSettings_proxyRequired;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Download preference'**
+  String get panelSettings_downloadPreference;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the filename used when downloading files'**
+  String get panelSettings_downloadPreferenceHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Use server filename'**
+  String get panelSettings_useServerFilename;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Prefer the original filename returned by the server'**
+  String get panelSettings_useServerFilenameHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Download panel certificate'**
+  String get panelSettings_downloadSsl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Export the panel self-signed SSL certificate for trust'**
+  String get panelSettings_downloadSslHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal appearance'**
+  String get panelSettings_terminalAppearance;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust the font, colors and cursor of the panel web terminal'**
+  String get panelSettings_terminalAppearanceHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal behavior'**
+  String get panelSettings_terminalBehavior;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Show terminal button'**
+  String get panelSettings_showTerminalButton;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Show a shortcut to open the terminal in the panel'**
+  String get panelSettings_showTerminalButtonHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Blinking cursor'**
+  String get panelSettings_cursorBlink;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Cursor style'**
+  String get panelSettings_cursorStyle;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get panelSettings_cursorBlock;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Underline'**
+  String get panelSettings_cursorUnderline;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bar'**
+  String get panelSettings_cursorBar;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrollback lines'**
+  String get panelSettings_scrollback;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll sensitivity'**
+  String get panelSettings_scrollSensitivity;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Typography'**
+  String get panelSettings_terminalTypography;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Font family'**
+  String get panelSettings_fontFamily;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to use the panel default font'**
+  String get panelSettings_fontFamilyHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Font size'**
+  String get panelSettings_fontSize;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Line height'**
+  String get panelSettings_lineHeight;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Letter spacing'**
+  String get panelSettings_letterSpacing;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Colors'**
+  String get panelSettings_terminalColors;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Background color'**
+  String get panelSettings_backgroundColor;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Foreground color'**
+  String get panelSettings_foregroundColor;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Hex color such as #1e1e1e'**
+  String get panelSettings_colorHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Register in browser'**
+  String get panelSettings_registerPasskey;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys bind to the current domain, so finish registration in the panel web page'**
+  String get panelSettings_registerPasskeyHint;
+
+  /// Open an SSH terminal to a remote host.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH terminal'**
+  String get host_sshTerminal;
+
+  /// Edit stream website forwarding settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit tunnel'**
+  String get websites_editStream;
+
+  /// Pick a shell script from the script library.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from library'**
+  String get cronjobs_pickScript;
 }
 
 class _AppLocalizationsDelegate

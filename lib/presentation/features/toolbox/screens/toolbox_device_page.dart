@@ -10,6 +10,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/toolbox_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
@@ -97,7 +98,14 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
               SplitListTile(
                 title: l10n.toolbox_hostname,
                 subtitle: displayValue(context, _base['hostname']?.toString()),
+                trailing: const Icon(TablerIcons.edit),
+                onTap: _editHostname,
               ),
+              if (_base['user'] != null)
+                SplitListTile(
+                  title: l10n.toolbox_users,
+                  subtitle: '${_base['user']}',
+                ),
             ],
           ),
           const SizedBox(height: AppTokens.s24),
@@ -116,6 +124,31 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
                   subtitle:
                       '${formatBytes(swap['size'])} · ${swap['used'] ?? ''}',
                 ),
+              SplitListTile(
+                title: l10n.toolbox_dnsCheck,
+                trailing: const Icon(TablerIcons.activity),
+                onTap: () => _checkDns(dns),
+              ),
+              SplitListTile(
+                title: l10n.toolbox_hosts,
+                trailing: const Icon(TablerIcons.edit),
+                onTap: _editHosts,
+              ),
+              SplitListTile(
+                title: l10n.toolbox_addHost,
+                trailing: const Icon(TablerIcons.plus),
+                onTap: _addHost,
+              ),
+              SplitListTile(
+                title: l10n.toolbox_password,
+                trailing: const Icon(TablerIcons.key),
+                onTap: _changePassword,
+              ),
+              SplitListTile(
+                title: l10n.toolbox_systemClean,
+                trailing: const Icon(TablerIcons.trash),
+                onTap: _cleanSystem,
+              ),
             ],
           ),
           const SizedBox(height: AppTokens.s16),
@@ -127,6 +160,195 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
         ],
       ),
     );
+  }
+
+  Future<void> _editHostname() async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController(
+      text: '${_base['hostname'] ?? ''}',
+    );
+    final value = await pushFormPage<String>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.toolbox_hostname,
+          onSave: () async => Navigator.of(pageContext).pop(controller.text),
+          children: [AppTextField(controller: controller, autofocus: true)],
+        ),
+      ),
+    );
+    controller.dispose();
+    final next = value?.trim() ?? '';
+    if (next.isEmpty) return;
+    await _saveConf('Hostname', next);
+  }
+
+  Future<void> _editHosts() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      final content = await repository.loadDeviceConf('Hosts');
+      if (!mounted) return;
+      final controller = TextEditingController(text: content);
+      final confirmed = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.toolbox_hostsEdit,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [AppTextField(controller: controller, maxLines: 16)],
+          ),
+        ),
+      );
+      final file = controller.text;
+      controller.dispose();
+      if (confirmed != true || !mounted) return;
+      await repository.updateDeviceByFile(name: 'Hosts', file: file);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      unawaited(_load());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _addHost() async {
+    final l10n = AppLocalizations.of(context);
+    final ip = TextEditingController();
+    final host = TextEditingController();
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.toolbox_addHost,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: ip,
+              label: 'IP',
+              keyboardType: TextInputType.url,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: host, label: l10n.toolbox_hostname),
+          ],
+        ),
+      ),
+    );
+    final ipValue = ip.text.trim();
+    final hostValue = host.text.trim();
+    ip.dispose();
+    host.dispose();
+    if (confirmed != true || ipValue.isEmpty || hostValue.isEmpty) return;
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      await repository.updateDeviceHosts([
+        {'ip': ipValue, 'host': hostValue},
+      ]);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      unawaited(_load());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _changePassword() async {
+    final l10n = AppLocalizations.of(context);
+    final user = '${_base['user'] ?? 'root'}';
+    final controller = TextEditingController();
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.toolbox_password,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.toolbox_password,
+              obscure: true,
+              autofocus: true,
+            ),
+          ],
+        ),
+      ),
+    );
+    final value = controller.text;
+    controller.dispose();
+    if (confirmed != true || value.isEmpty || !mounted) return;
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      await repository.updateDevicePassword(user: user, password: value);
+      if (!mounted) return;
+      AppToast.success(context, l10n.toolbox_passwordChanged);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _checkDns(String dns) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      final ok = await repository.checkDns(value: dns);
+      if (!mounted) return;
+      if (ok) {
+        AppToast.success(context, l10n.toolbox_dnsOk);
+      } else {
+        AppToast.warning(context, l10n.toolbox_dnsFail);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _cleanSystem() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      final scan = await repository.scanClean();
+      if (!mounted) return;
+      final items = <Map<String, dynamic>>[];
+      for (final group in const [
+        'systemClean',
+        'backupClean',
+        'uploadClean',
+        'downloadClean',
+        'systemLogClean',
+        'containerClean',
+      ]) {
+        final children = scan[group];
+        if (children is! List) continue;
+        for (final item in children.whereType<Map>()) {
+          items.add({
+            'treeType': '${item['type'] ?? ''}',
+            'name': '${item['name'] ?? ''}',
+            'size': item['size'] ?? 0,
+          });
+        }
+      }
+      if (items.isEmpty) {
+        AppToast.success(context, l10n.vm_orphansEmpty);
+        return;
+      }
+      final confirmed = await showConfirmSheet(
+        context,
+        title: l10n.toolbox_systemClean,
+        message: l10n.toolbox_systemCleanConfirm,
+        confirmLabel: l10n.action_clear,
+      );
+      if (!confirmed || !mounted) return;
+      await repository.cleanSystem(items);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _editTimezone() async {

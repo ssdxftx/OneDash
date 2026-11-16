@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 import 'server_edit_page.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
@@ -22,138 +25,216 @@ import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
+import '../../server_detail/providers/active_server_provider.dart';
 import '../providers/servers_provider.dart';
 import '../../settings/providers/app_settings_provider.dart';
 
-class ServersPage extends ConsumerWidget {
+class ServersPage extends ConsumerStatefulWidget {
   const ServersPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ServersPage> createState() => _ServersPageState();
+}
+
+class _ServersPageState extends ConsumerState<ServersPage>
+    with WidgetsBindingObserver {
+  Timer? _healthTimer;
+  bool _visible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  void _setVisible(bool visible) {
+    if (_visible == visible) return;
+    _visible = visible;
+    _syncTimer();
+  }
+
+  void _syncTimer() {
+    if (!_visible) {
+      _healthTimer?.cancel();
+      _healthTimer = null;
+      return;
+    }
+    _healthTimer ??= Timer.periodic(
+      AppTokens.serverHealthPoll,
+      (_) => _refreshHealth(),
+    );
+  }
+
+  void _refreshHealth() {
+    if (!_visible || !mounted) return;
+    final items = ref.read(serversProvider).valueOrNull;
+    if (items == null || items.isEmpty) return;
+    for (final server in items) {
+      ref.invalidate(serverHealthProvider(server.id));
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _syncTimer();
+    } else {
+      _healthTimer?.cancel();
+      _healthTimer = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _healthTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final servers = ref.watch(serversProvider);
     final lastId = ref.watch(lastServerIdProvider);
 
     return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            AppBarLarge(
-              title: l10n.servers_title,
-              actions: [
-                AppIconButton(
-                  icon: TablerIcons.arrows_sort,
-                  tooltip: l10n.servers_reorder,
-                  onPressed: () async {
-                    final items = servers.valueOrNull;
-                    if (items == null || items.length < 2) return;
-                    await _reorder(context, ref, items);
-                  },
-                ),
-                AppIconButton(
-                  icon: TablerIcons.settings,
-                  tooltip: l10n.settings_title,
-                  onPressed: () => context.push('/settings'),
-                ),
-                AppIconButton(
-                  icon: TablerIcons.plus,
-                  tooltip: l10n.servers_add,
-                  onPressed: () => context.push('/servers/add'),
-                ),
-              ],
-            ),
-            Expanded(
-              child: AsyncStateView<List<Server>>(
-                value: servers,
-                onRetry: () => ref.read(serversProvider.notifier).refresh(),
-                loading: const Padding(
-                  padding: EdgeInsets.all(AppTokens.s16),
-                  child: Column(
-                    children: [
-                      SkeletonCard(height: 168),
-                      SkeletonCard(height: 168),
-                    ],
+      body: VisibilityDetector(
+        key: const Key('servers-page'),
+        onVisibilityChanged: (info) => _setVisible(info.visibleFraction > 0.5),
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              AppBarLarge(
+                title: l10n.servers_title,
+                actions: [
+                  AppIconButton(
+                    icon: TablerIcons.arrows_sort,
+                    tooltip: l10n.servers_reorder,
+                    onPressed: () async {
+                      final items = servers.valueOrNull;
+                      if (items == null || items.length < 2) return;
+                      await _reorder(context, ref, items);
+                    },
                   ),
-                ),
-                isEmpty: (items) => items.isEmpty,
-                empty: _EmptyServers(onAdd: () => context.push('/servers/add')),
-                builder: (items) => RefreshIndicator(
-                  onRefresh: () async {
-                    await ref.read(serversProvider.notifier).refresh();
-                    for (final server in items) {
-                      ref.invalidate(serverHealthProvider(server.id));
-                    }
-                  },
-                  child: CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      if (items.isNotEmpty) ...[
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(
-                              AppTokens.s20,
-                              AppTokens.s8,
-                              AppTokens.s20,
-                              AppTokens.s8,
-                            ),
-                            child: SectionHeader(
-                              title: l10n.servers_sectionConnected,
-                              subtitle: l10n.servers_count(items.length),
+                  AppIconButton(
+                    icon: TablerIcons.settings,
+                    tooltip: l10n.settings_title,
+                    onPressed: () => context.push('/settings'),
+                  ),
+                  AppIconButton(
+                    icon: TablerIcons.plus,
+                    tooltip: l10n.servers_add,
+                    onPressed: () => context.push('/servers/add'),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: AsyncStateView<List<Server>>(
+                  value: servers,
+                  onRetry: () => ref.read(serversProvider.notifier).refresh(),
+                  loading: const Padding(
+                    padding: EdgeInsets.all(AppTokens.s16),
+                    child: Column(
+                      children: [
+                        SkeletonCard(height: 168),
+                        SkeletonCard(height: 168),
+                      ],
+                    ),
+                  ),
+                  isEmpty: (items) => items.isEmpty,
+                  empty: _EmptyServers(
+                    onAdd: () => context.push('/servers/add'),
+                  ),
+                  builder: (items) => RefreshIndicator(
+                    onRefresh: () async {
+                      await ref.read(serversProvider.notifier).refresh();
+                      for (final server in items) {
+                        ref.invalidate(serverHealthProvider(server.id));
+                      }
+                    },
+                    child: CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        if (items.isNotEmpty) ...[
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                AppTokens.s20,
+                                AppTokens.s8,
+                                AppTokens.s20,
+                                AppTokens.s8,
+                              ),
+                              child: SectionHeader(
+                                title: l10n.servers_sectionConnected,
+                                subtitle: l10n.servers_count(items.length),
+                              ),
                             ),
                           ),
-                        ),
-                        SliverPadding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.pagePadding,
-                          ),
-                          sliver: SliverList.builder(
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              final server = items[index];
-                              return Padding(
-                                padding: const EdgeInsets.only(
-                                  bottom: AppTokens.s12,
-                                ),
-                                child: _ServerCard(
-                                  server: server,
-                                  isCurrent: server.id == lastId,
-                                  onEdit: () => context.push(
-                                    '/servers/${server.id}/edit',
+                          SliverPadding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.pagePadding,
+                            ),
+                            sliver: SliverList.builder(
+                              itemCount: items.length,
+                              itemBuilder: (context, index) {
+                                final server = items[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: AppTokens.s12,
                                   ),
-                                  onTap: () async {
-                                    final haptics =
-                                        ref
-                                            .read(appSettingsControllerProvider)
-                                            .valueOrNull
-                                            ?.hapticsEnabled ??
-                                        true;
-                                    if (haptics) {
-                                      await HapticFeedback.selectionClick();
-                                    }
-                                    await ref
-                                        .read(serversProvider.notifier)
-                                        .touch(server.id);
-                                    if (!context.mounted) return;
-                                    context.go('/s/${server.id}/overview');
-                                  },
-                                  onLongPress: () =>
-                                      _showServerActions(context, ref, server),
-                                ),
-                              );
-                            },
+                                  child: _ServerCard(
+                                    server: server,
+                                    isCurrent: server.id == lastId,
+                                    onEdit: () => context.push(
+                                      '/servers/${server.id}/edit',
+                                    ),
+                                    onTap: () async {
+                                      final haptics =
+                                          ref
+                                              .read(
+                                                appSettingsControllerProvider,
+                                              )
+                                              .valueOrNull
+                                              ?.hapticsEnabled ??
+                                          true;
+                                      if (haptics) {
+                                        await HapticFeedback.selectionClick();
+                                      }
+                                      await ref
+                                          .read(serversProvider.notifier)
+                                          .touch(server.id);
+                                      ref
+                                              .read(
+                                                activeServerIdStateProvider
+                                                    .notifier,
+                                              )
+                                              .state =
+                                          server.id;
+                                      if (!context.mounted) return;
+                                      context.go('/s/${server.id}/overview');
+                                    },
+                                    onLongPress: () => _showServerActions(
+                                      context,
+                                      ref,
+                                      server,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
+                        ],
+                        const SliverToBoxAdapter(
+                          child: SizedBox(height: AppTokens.s32),
                         ),
                       ],
-                      const SliverToBoxAdapter(
-                        child: SizedBox(height: AppTokens.s32),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// `/hosts/ssh/cert/search` 列表项 DTO（对应 Go `dto.RootCert`）。
 class SshCertDto {
   const SshCertDto({
@@ -67,10 +69,12 @@ class SshCertOperateReq {
       'name': name,
       'encryptionMode': encryptionMode,
       if (mode.isNotEmpty) 'mode': mode,
-      if (passPhrase.isNotEmpty) 'passPhrase': passPhrase,
-      if (publicKey.isNotEmpty) 'publicKey': publicKey,
-      if (privateKey.isNotEmpty) 'privateKey': privateKey,
+      if (passPhrase.isNotEmpty) 'passPhrase': _encode(passPhrase),
+      if (publicKey.isNotEmpty) 'publicKey': _encode(publicKey),
+      if (privateKey.isNotEmpty) 'privateKey': _encode(privateKey),
       if (description.isNotEmpty) 'description': description,
     };
   }
+
+  static String _encode(String value) => base64Encode(utf8.encode(value));
 }

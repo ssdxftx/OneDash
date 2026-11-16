@@ -202,10 +202,12 @@ class DatabaseAdvancedTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     try {
       final repository = await ref.read(databaseRepositoryProvider.future);
-      final status = await repository.getRedisStatus(
-        type: type,
-        name: instance,
-      );
+      final results = await Future.wait<Object>([
+        repository.getRedisStatus(type: type, name: instance),
+        repository.checkRedisCli(),
+      ]);
+      final status = results[0] as Map<String, String>;
+      final cliInstalled = results[1] as bool;
       if (!context.mounted) return;
       await showAppSheet<void>(
         context: context,
@@ -224,19 +226,32 @@ class DatabaseAdvancedTab extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppTokens.s8),
-            SecondaryButton(
-              label: l10n.databases_installRedisCli,
-              onPressed: () async {
-                try {
-                  await repository.installRedisCli();
-                  if (!context.mounted) return;
-                  AppToast.success(context, l10n.action_done);
-                } catch (error) {
-                  if (!context.mounted) return;
-                  showErrorToast(context, error);
-                }
-              },
+            Text(
+              cliInstalled
+                  ? l10n.databases_redisCliInstalled
+                  : l10n.databases_redisCliMissing,
+              style: AppTextStyles.bodyS.copyWith(
+                color: cliInstalled
+                    ? context.appColors.success
+                    : context.appColors.warning,
+              ),
             ),
+            if (!cliInstalled) ...[
+              const SizedBox(height: AppTokens.s8),
+              SecondaryButton(
+                label: l10n.databases_installRedisCli,
+                onPressed: () async {
+                  try {
+                    await repository.installRedisCli();
+                    if (!context.mounted) return;
+                    AppToast.success(context, l10n.action_done);
+                  } catch (error) {
+                    if (!context.mounted) return;
+                    showErrorToast(context, error);
+                  }
+                },
+              ),
+            ],
           ],
         ),
       );

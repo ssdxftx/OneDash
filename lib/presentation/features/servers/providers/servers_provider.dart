@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/storage/storage_service.dart';
@@ -48,7 +50,7 @@ class ServersController extends AsyncNotifier<List<Server>> {
     }
     await ref.read(storageServiceProvider).setString('last_server_id', '$id');
     ref.invalidate(lastServerIdProvider);
-    if (shouldPersist) await refresh();
+    if (shouldPersist) unawaited(refresh());
   }
 }
 
@@ -74,6 +76,9 @@ class ServerHealth {
 
 final serverHealthProvider = FutureProvider.autoDispose
     .family<ServerHealth, int>((ref, serverId) async {
+      final link = ref.keepAlive();
+      final timer = Timer(const Duration(seconds: 30), link.close);
+      ref.onDispose(timer.cancel);
       final stopwatch = Stopwatch()..start();
       try {
         final repository = await ref.watch(

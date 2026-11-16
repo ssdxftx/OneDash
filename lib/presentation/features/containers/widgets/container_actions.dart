@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
@@ -24,6 +27,7 @@ import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../screens/container_create_page.dart';
 import '../screens/container_detail_page.dart';
+import '../screens/container_files_page.dart';
 import 'container_log_page.dart';
 
 Future<void> showContainerActions(
@@ -103,12 +107,35 @@ class _ContainerActionsBody extends StatelessWidget {
               },
             ),
             ActionSheetRow(
+              icon: TablerIcons.folder,
+              iconColor: context.scheme.onSurfaceVariant,
+              title: l10n.containers_fileBrowser,
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(hostContext).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        ContainerFilesPage(containerName: item.name),
+                  ),
+                );
+              },
+            ),
+            ActionSheetRow(
               icon: TablerIcons.file_text,
               iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_viewLogs,
               onTap: () {
                 Navigator.of(context).pop();
                 _showLogs(hostContext, ref, item.name);
+              },
+            ),
+            ActionSheetRow(
+              icon: TablerIcons.download,
+              iconColor: context.scheme.onSurfaceVariant,
+              title: l10n.containers_downloadLog,
+              onTap: () {
+                Navigator.of(context).pop();
+                _downloadLog(hostContext, ref, item);
               },
             ),
             ActionSheetRow(
@@ -232,6 +259,15 @@ class _ContainerActionsBody extends StatelessWidget {
               ),
             ),
             ActionSheetRow(
+              icon: TablerIcons.forms,
+              iconColor: context.scheme.onSurfaceVariant,
+              title: l10n.containers_rename,
+              onTap: () {
+                Navigator.of(context).pop();
+                _rename(hostContext, ref, item, onChanged);
+              },
+            ),
+            ActionSheetRow(
               icon: TablerIcons.arrow_up_circle,
               iconColor: context.scheme.onSurfaceVariant,
               title: l10n.containers_upgrade,
@@ -335,6 +371,52 @@ Future<void> _remove(
     onChanged,
     beforeRefresh: onRemoving == null ? null : () => onRemoving(item.name),
   );
+}
+
+Future<void> _downloadLog(
+  BuildContext context,
+  WidgetRef ref,
+  ContainerItemDto item,
+) async {
+  try {
+    final repository = await ref.read(containerRepositoryProvider.future);
+    final bytes = await repository.downloadLog(container: item.name);
+    final tempDir = await getTemporaryDirectory();
+    final safeName = item.name.replaceAll(RegExp(r'[/\\:*?"<>|]'), '_');
+    final path = '${tempDir.path}/onedash_$safeName.log';
+    await File(path).writeAsBytes(bytes, flush: true);
+    if (!context.mounted) return;
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(path, name: '$safeName.log')]),
+    );
+  } catch (error) {
+    if (!context.mounted) return;
+    showErrorToast(context, error);
+  }
+}
+
+Future<void> _rename(
+  BuildContext context,
+  WidgetRef ref,
+  ContainerItemDto item,
+  Future<void> Function() onChanged,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final newName = await showAppSheet<String>(
+    context: context,
+    builder: (sheetContext) => _RenameSheet(initial: item.name),
+  );
+  if (newName == null || !context.mounted) return;
+  try {
+    final repository = await ref.read(containerRepositoryProvider.future);
+    await repository.renameContainer(name: item.name, newName: newName);
+    await onChanged();
+    if (!context.mounted) return;
+    AppToast.success(context, l10n.action_done);
+  } catch (error) {
+    if (!context.mounted) return;
+    showErrorToast(context, error);
+  }
 }
 
 Future<void> _upgrade(
@@ -719,7 +801,7 @@ class _ContainerMonitorSheetState extends ConsumerState<_ContainerMonitorSheet>
 
   void _startTimer() {
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 4), (_) => _load());
+    _timer = Timer.periodic(AppTokens.containerStatsPoll, (_) => _load());
   }
 
   @override
@@ -800,31 +882,84 @@ class _ContainerMonitorSheetState extends ConsumerState<_ContainerMonitorSheet>
               ),
               SplitListTile(
                 title: l10n.dashboard_memory,
-                value: formatBytes(stats.memory),
+                value: formatBytes(stats.memory * 1024 * 1024),
               ),
               SplitListTile(
                 title: l10n.containers_cache,
-                value: formatBytes(stats.cache),
+                value: formatBytes(stats.cache * 1024 * 1024),
               ),
               SplitListTile(
                 title: l10n.containers_diskRead,
-                value: formatBytes(stats.ioRead),
+                value: formatBytes(stats.ioRead * 1024 * 1024),
               ),
               SplitListTile(
                 title: l10n.containers_diskWrite,
-                value: formatBytes(stats.ioWrite),
+                value: formatBytes(stats.ioWrite * 1024 * 1024),
               ),
               SplitListTile(
                 title: l10n.containers_networkRX,
-                value: formatBytes(stats.networkRX),
+                value: formatBytes(stats.networkRX * 1024),
               ),
               SplitListTile(
                 title: l10n.containers_networkTX,
-                value: formatBytes(stats.networkTX),
+                value: formatBytes(stats.networkTX * 1024),
               ),
             ],
           ),
       ],
+    );
+  }
+}
+
+class _RenameSheet extends StatefulWidget {
+  const _RenameSheet({required this.initial});
+
+  final String initial;
+
+  @override
+  State<_RenameSheet> createState() => _RenameSheetState();
+}
+
+class _RenameSheetState extends State<_RenameSheet> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initial,
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.containers_rename, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          AppTextField(
+            controller: _controller,
+            label: l10n.containers_newName,
+            autofocus: true,
+          ),
+          const SizedBox(height: AppTokens.s20),
+          PrimaryButton(
+            label: l10n.action_confirm,
+            onPressed: () {
+              final value = _controller.text.trim();
+              if (value.isEmpty || value == widget.initial) return;
+              Navigator.of(context).pop(value);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

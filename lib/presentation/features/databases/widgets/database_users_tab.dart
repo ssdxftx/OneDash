@@ -118,6 +118,12 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
             ),
             if (_isMysql)
               TextButton.icon(
+                onPressed: _showGrantSummary,
+                icon: const Icon(TablerIcons.shield_check),
+                label: Text(l10n.databases_grantsSummary),
+              ),
+            if (_isMysql)
+              TextButton.icon(
                 onPressed: _addMysqlUser,
                 icon: const Icon(TablerIcons.plus, size: AppTokens.iconList),
                 label: Text(l10n.databases_addUser),
@@ -177,9 +183,19 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
             context,
             options: [
               SelectionOption(
+                label: l10n.databases_editUser,
+                value: 'edit',
+                icon: TablerIcons.edit,
+              ),
+              SelectionOption(
                 label: l10n.databases_changePassword,
                 value: 'password',
                 icon: TablerIcons.key,
+              ),
+              SelectionOption(
+                label: l10n.databases_savePassword,
+                value: 'save_password',
+                icon: TablerIcons.database,
               ),
               SelectionOption(
                 label: l10n.databases_grant,
@@ -201,8 +217,12 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
           );
           if (value == null || !context.mounted) return;
           switch (value) {
+            case 'edit':
+              await _editUser(username, host, description);
             case 'password':
               await _changeUserPassword(username, host);
+            case 'save_password':
+              await _saveUserPassword(username, host);
             case 'grant':
               await _grant(username, host);
             case 'revoke':
@@ -410,6 +430,152 @@ class _DatabaseUsersTabState extends ConsumerState<DatabaseUsersTab> {
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
       unawaited(_reload());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _editUser(
+    String username,
+    String host,
+    String description,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final newHost = TextEditingController(text: host);
+    final note = TextEditingController(text: description);
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.databases_editUser,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: newHost,
+              label: l10n.databases_host,
+              autofocus: true,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: note, label: l10n.databases_description),
+          ],
+        ),
+      ),
+    );
+    final hostValue = newHost.text.trim();
+    final noteValue = note.text.trim();
+    newHost.dispose();
+    note.dispose();
+    if (confirmed != true || hostValue.isEmpty || !mounted) return;
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      await repository.updateUser(
+        database: widget.instance,
+        username: username,
+        host: host,
+        newHost: hostValue,
+        description: noteValue,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      unawaited(_reload());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _saveUserPassword(String username, String host) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController();
+    final confirmed = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.databases_savePassword,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.databases_password,
+              obscure: true,
+              autofocus: true,
+            ),
+          ],
+        ),
+      ),
+    );
+    final value = controller.text;
+    controller.dispose();
+    if (confirmed != true || value.isEmpty || !mounted) return;
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      await repository.saveUserPassword(
+        database: widget.instance,
+        username: username,
+        host: host,
+        password: value,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showGrantSummary() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      final summary = await repository.getGrantsSummary(
+        database: widget.instance,
+        dbs: [widget.item.name],
+      );
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.databases_grantsSummary, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s12),
+            if (summary.isEmpty)
+              Text(
+                l10n.databases_noUsers,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: sheetContext.scheme.onSurfaceVariant,
+                ),
+              )
+            else
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    for (final entry in summary.entries)
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(entry.key),
+                        subtitle: Text(
+                          entry.value is List
+                              ? (entry.value as List)
+                                    .whereType<Map>()
+                                    .map(
+                                      (item) =>
+                                          '${item['username'] ?? item['user'] ?? item['name'] ?? ''}',
+                                    )
+                                    .where((value) => value.isNotEmpty)
+                                    .join(' · ')
+                              : '${entry.value}',
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      );
     } catch (error) {
       if (!mounted) return;
       showErrorToast(context, error);

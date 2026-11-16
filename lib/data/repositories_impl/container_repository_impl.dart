@@ -24,6 +24,7 @@ import '../dto/common/task_log_dto.dart';
 import '../dto/container/image_dtos.dart';
 import '../dto/container/network_dtos.dart';
 import '../dto/common/page_result.dart';
+import '../dto/container/container_file_dto.dart';
 
 part 'container_repository_impl.g.dart';
 
@@ -118,8 +119,9 @@ class ContainerRepositoryImpl implements ContainerRepository {
   );
 
   @override
-  Future<List<ContainerResourceStatsDto>> getContainerResourceStats() =>
-      _containerApi.getContainerResourceStats();
+  Future<List<ContainerResourceStatsDto>> getContainerResourceStats({
+    List<String>? ids,
+  }) => _containerApi.getContainerResourceStats(ids: ids);
 
   @override
   Future<ContainerStatsDto> getContainerStats(String containerId) =>
@@ -197,6 +199,108 @@ class ContainerRepositoryImpl implements ContainerRepository {
   Future<List<ContainerOptionDto>> getVolumes() => _containerApi.getVolumes();
 
   @override
+  Future<List<ContainerFileDto>> listContainerFiles({
+    required String containerId,
+    String path = '/',
+  }) => _containerApi.listContainerFiles(containerId: containerId, path: path);
+
+  @override
+  Future<ContainerFileContentDto> getContainerFileContent({
+    required String containerId,
+    required String path,
+  }) => _containerApi.getContainerFileContent(
+    containerId: containerId,
+    path: path,
+  );
+
+  @override
+  Future<int> getContainerFileSize({
+    required String containerId,
+    required String path,
+  }) =>
+      _containerApi.getContainerFileSize(containerId: containerId, path: path);
+
+  @override
+  Future<void> deleteContainerFiles({
+    required String containerId,
+    required List<String> paths,
+  }) => _containerApi.deleteContainerFiles(
+    containerId: containerId,
+    paths: paths,
+  );
+
+  @override
+  Future<void> uploadContainerFile({
+    required String containerId,
+    required String path,
+    required String filePath,
+    void Function(int sent, int total)? onSendProgress,
+  }) => _containerApi.uploadContainerFile(
+    containerId: containerId,
+    path: path,
+    filePath: filePath,
+    onSendProgress: onSendProgress,
+  );
+
+  @override
+  Future<List<int>> downloadContainerFile({
+    required String containerId,
+    required String path,
+  }) =>
+      _containerApi.downloadContainerFile(containerId: containerId, path: path);
+
+  @override
+  Future<void> renameContainer({
+    required String name,
+    required String newName,
+  }) => _containerApi.renameContainer(name: name, newName: newName);
+
+  @override
+  Future<Map<String, dynamic>> searchVolumes({
+    String info = '',
+    int page = 1,
+    int pageSize = 20,
+  }) => _containerApi.searchVolumes(info: info, page: page, pageSize: pageSize);
+
+  @override
+  Future<Map<String, dynamic>> searchRemoteImages({
+    required String query,
+    int page = 1,
+    int pageSize = 20,
+  }) => _containerApi.searchRemoteImages(
+    query: query,
+    page: page,
+    pageSize: pageSize,
+  );
+
+  @override
+  Future<Map<String, dynamic>> getImageUpdateStatus() =>
+      _containerApi.getImageUpdateStatus();
+
+  @override
+  Future<Map<String, dynamic>> checkImageUpdates() =>
+      _containerApi.checkImageUpdates();
+
+  @override
+  Future<Map<String, dynamic>> setImageUpdateSchedule(bool enabled) =>
+      _containerApi.setImageUpdateSchedule(enabled);
+
+  @override
+  Future<List<int>> downloadLog({
+    required String container,
+    String since = '',
+    int tail = 1000,
+    bool timestamp = false,
+    String containerType = '',
+  }) => _containerApi.downloadLog(
+    container: container,
+    since: since,
+    tail: tail,
+    timestamp: timestamp,
+    containerType: containerType,
+  );
+
+  @override
   Future<void> deleteVolumes(List<String> names) =>
       _containerApi.deleteVolumes(names);
 
@@ -253,6 +357,14 @@ class ContainerRepositoryImpl implements ContainerRepository {
     isPinned: isPinned,
     description: description,
   );
+
+  @override
+  Future<List<String>> loadComposeEnv(String path) =>
+      _containerApi.loadComposeEnv(path);
+
+  @override
+  Future<void> setComposePin({required String name, required bool isPinned}) =>
+      _containerApi.setComposePin(name: name, isPinned: isPinned);
 
   @override
   Future<ContainerComposeSearchDto> searchCompose({

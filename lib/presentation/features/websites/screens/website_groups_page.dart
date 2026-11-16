@@ -10,8 +10,8 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
-import '../../../common/components/buttons.dart';
 import '../../../common/components/sheet_title.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
@@ -57,20 +57,25 @@ class WebsiteGroupsPage extends ConsumerWidget {
             onAction: () => _openEditor(context, ref),
           );
         }
-        return ListView(
-          padding: EdgeInsets.all(context.pagePadding),
-          children: [
-            SplitListGroup(
-              children: [
-                for (final group in items)
-                  WebsiteGroupTile(
-                    group: group,
-                    onEdit: () => _openEditor(context, ref, group: group),
-                    onDelete: () => _delete(context, ref, group),
-                  ),
-              ],
-            ),
-          ],
+        return RefreshIndicator(
+          onRefresh: () async => ref.invalidate(_groupsProvider),
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.all(context.pagePadding),
+            children: [
+              SplitListGroup(
+                children: [
+                  for (final group in items)
+                    WebsiteGroupTile(
+                      group: group,
+                      onEdit: () => _openEditor(context, ref, group: group),
+                      onDelete: () => _delete(context, ref, group),
+                      onMerge: () => _merge(context, ref, group, items),
+                    ),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );
@@ -81,7 +86,14 @@ class WebsiteGroupsPage extends ConsumerWidget {
           SheetTitle(
             title: l10n.websites_groupManagement,
             onClose: () => Navigator.of(context).pop(),
-            actions: [create],
+            actions: [
+              AppIconButton(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () => ref.invalidate(_groupsProvider),
+              ),
+              create,
+            ],
           ),
           const SizedBox(height: AppTokens.s8),
           Expanded(child: body),
@@ -92,6 +104,11 @@ class WebsiteGroupsPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.websites_groupManagement,
         actions: [
+          AppIconButton(
+            icon: TablerIcons.refresh,
+            tooltip: l10n.action_refresh,
+            onPressed: () => ref.invalidate(_groupsProvider),
+          ),
           AppIconButton(
             icon: TablerIcons.plus,
             tooltip: l10n.action_create,
@@ -108,9 +125,9 @@ class WebsiteGroupsPage extends ConsumerWidget {
     WidgetRef ref, {
     WebsiteGroupDto? group,
   }) async {
-    final result = await showAppSheet<WebsiteGroupDto>(
-      context: context,
-      builder: (context) => _GroupEditorSheet(group: group),
+    final result = await pushFormPage<WebsiteGroupDto>(
+      context,
+      _GroupEditorSheet(group: group),
     );
     if (result == null || !context.mounted) return;
     final l10n = AppLocalizations.of(context);
@@ -125,6 +142,47 @@ class WebsiteGroupsPage extends ConsumerWidget {
         if (!context.mounted) return;
         AppToast.success(context, l10n.websites_groupUpdated);
       }
+      ref.invalidate(_groupsProvider);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _merge(
+    BuildContext context,
+    WidgetRef ref,
+    WebsiteGroupDto group,
+    List<WebsiteGroupDto> groups,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final candidates = [
+      for (final item in groups)
+        if (item.id != group.id) item,
+    ];
+    if (candidates.isEmpty) {
+      AppToast.show(context, l10n.websites_groupMergeEmpty);
+      return;
+    }
+    final target = await showSelectionMenu<WebsiteGroupDto>(
+      context,
+      title: l10n.websites_mergeGroup,
+      options: [
+        for (final item in groups)
+          if (item.id != group.id)
+            SelectionOption(
+              label: item.name,
+              value: item,
+              icon: TablerIcons.folder,
+            ),
+      ],
+    );
+    if (target == null || !context.mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.changeWebsiteGroup(group.id, target.id);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
       ref.invalidate(_groupsProvider);
     } catch (error) {
       if (!context.mounted) return;
@@ -201,17 +259,12 @@ class _GroupEditorSheetState extends State<_GroupEditorSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SimpleFormPage(
+      title: widget.group == null
+          ? l10n.websites_groupCreate
+          : l10n.common_edit,
+      onSave: () async => _submit(),
       children: [
-        Text(
-          widget.group == null
-              ? l10n.websites_groupManagement
-              : l10n.common_edit,
-          style: AppTextStyles.titleL,
-        ),
-        const SizedBox(height: AppTokens.s16),
         AppTextField(
           controller: _name,
           label: l10n.websites_groupName,
@@ -228,21 +281,6 @@ class _GroupEditorSheetState extends State<_GroupEditorSheet> {
           value: _isDefault,
           onChanged: (value) => setState(() => _isDefault = value),
         ),
-        const SizedBox(height: AppTokens.s16),
-        Row(
-          children: [
-            Expanded(
-              child: SecondaryButton(
-                label: l10n.action_cancel,
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-            const SizedBox(width: AppTokens.s12),
-            Expanded(
-              child: PrimaryButton(label: l10n.action_save, onPressed: _submit),
-            ),
-          ],
-        ),
       ],
     );
   }
@@ -254,11 +292,13 @@ class WebsiteGroupTile extends StatelessWidget {
     required this.group,
     required this.onEdit,
     required this.onDelete,
+    this.onMerge,
   });
 
   final WebsiteGroupDto group;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback? onMerge;
 
   @override
   Widget build(BuildContext context) {
@@ -272,6 +312,12 @@ class WebsiteGroupTile extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (onMerge != null)
+            IconButton(
+              tooltip: l10n.websites_mergeGroup,
+              onPressed: onMerge,
+              icon: const Icon(TablerIcons.arrows_join),
+            ),
           IconButton(
             tooltip: l10n.common_edit,
             onPressed: onEdit,

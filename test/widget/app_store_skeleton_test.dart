@@ -18,6 +18,24 @@ import 'package:onedash/presentation/features/app_store/providers/app_store_prov
 import 'package:onedash/presentation/features/app_store/screens/app_store_page.dart';
 import 'package:onedash/presentation/features/servers/providers/servers_provider.dart';
 
+class _FakeInstalledAppsController extends InstalledAppsController {
+  _FakeInstalledAppsController(this.result);
+
+  final Future<PageResult<AppInstalledDto>> result;
+
+  @override
+  Future<PageResult<AppInstalledDto>> build() => result;
+}
+
+class _FakeCatalogController extends AppCatalogController {
+  _FakeCatalogController(this.result);
+
+  final Future<PageResult<AppCatalogDto>> result;
+
+  @override
+  Future<PageResult<AppCatalogDto>> build(String query) => result;
+}
+
 class _FakeAppRepository implements AppRepository {
   _FakeAppRepository(this.result);
 
@@ -104,7 +122,9 @@ void main() {
             ..host = '127.0.0.1'
             ..port = 1,
         ),
-        installedAppsProvider.overrideWith((ref) => completer.future),
+        installedAppsProvider.overrideWith(
+          () => _FakeInstalledAppsController(completer.future),
+        ),
       ],
     );
     await _pumpPage(tester, container: container);
@@ -132,7 +152,9 @@ void main() {
             ..port = 1,
         ),
         appTagsProvider.overrideWith((ref) async => const []),
-        appCatalogProvider.overrideWith((ref, query) => completer.future),
+        appCatalogProvider.overrideWith(
+          () => _FakeCatalogController(completer.future),
+        ),
       ],
     );
 

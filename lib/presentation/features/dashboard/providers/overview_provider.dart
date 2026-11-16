@@ -102,6 +102,8 @@ final overviewProvider = AsyncNotifierProvider.autoDispose
 
 class OverviewController
     extends AutoDisposeFamilyAsyncNotifier<OverviewState, int> {
+  static const _minPointInterval = Duration(milliseconds: 500);
+
   Timer? _timer;
   bool _visible = false;
   bool _disposed = false;
@@ -119,10 +121,16 @@ class OverviewController
       _disposed = true;
       _timer?.cancel();
     });
-    final repository = await ref.watch(
-      dashboardRepositoryForServerProvider(serverId).future,
+    await ref.watch(dashboardRepositoryForServerProvider(serverId).future);
+    ref.watch(overviewSelectionProvider(serverId));
+    return _loadInitial();
+  }
+
+  Future<OverviewState> _loadInitial() async {
+    final repository = await ref.read(
+      dashboardRepositoryForServerProvider(arg).future,
     );
-    final selection = ref.watch(overviewSelectionProvider(serverId));
+    final selection = ref.read(overviewSelectionProvider(arg));
     final dashboard = await repository.getDashboardSnapshot(
       ioOption: selection.io,
       netOption: selection.net,
@@ -131,6 +139,7 @@ class OverviewController
     _lastRecv = dashboard.current.netBytesRecv;
     _lastRead = dashboard.current.ioReadBytes;
     _lastWrite = dashboard.current.ioWriteBytes;
+    _failureCount = 0;
     final now = DateTime.now();
     _lastTickAt = now;
     return OverviewState(
@@ -163,6 +172,14 @@ class OverviewController
   }
 
   Future<void> refresh() async {
+    if (state.valueOrNull == null) {
+      state = const AsyncLoading<OverviewState>().copyWithPrevious(state);
+      final result = await AsyncValue.guard(_loadInitial);
+      if (_disposed) return;
+      state = result;
+      if (state.hasValue) _schedule(Duration.zero);
+      return;
+    }
     await _tick(manual: true);
   }
 
@@ -175,7 +192,12 @@ class OverviewController
   Future<void> _tick({bool manual = false}) async {
     if (_disposed || (!_visible && !manual) || _tickInFlight) return;
     final current = state.valueOrNull;
-    if (current == null) return;
+    if (current == null) {
+      if (state.isLoading) {
+        _schedule(const Duration(milliseconds: 500));
+      }
+      return;
+    }
     _tickInFlight = true;
     try {
       final repository = await ref.read(
@@ -210,6 +232,18 @@ class OverviewController
       final latency = latest.ioCount <= 0
           ? 0.0
           : (latest.ioReadTime + latest.ioWriteTime) / latest.ioCount;
+      if (_lastTickAt != null &&
+          now.difference(_lastTickAt!) < _minPointInterval) {
+        state = AsyncData(
+          current.copyWith(
+            dashboard: Dashboard(base: current.dashboard.base, current: latest),
+            lastUpdated: now,
+            stale: false,
+          ),
+        );
+        _schedule(AppTokens.dashboardPoll);
+        return;
+      }
       _lastSent = sent;
       _lastRecv = recv;
       _lastRead = read;
@@ -240,7 +274,7 @@ class OverviewController
           stale: false,
         ),
       );
-      _schedule(const Duration(seconds: 3));
+      _schedule(AppTokens.dashboardPoll);
     } catch (error) {
       if (_disposed) return;
       _failureCount++;

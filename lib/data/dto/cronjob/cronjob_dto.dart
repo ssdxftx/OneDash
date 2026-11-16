@@ -19,6 +19,7 @@ class CronjobDto {
     required this.alertCount,
     required this.alertTitle,
     required this.alertMethod,
+    required this.alertTriggerMode,
     required this.lastRecordStatus,
     required this.lastRecordTime,
     required this.createdAt,
@@ -64,6 +65,7 @@ class CronjobDto {
   final int alertCount;
   final String alertTitle;
   final String alertMethod;
+  final String alertTriggerMode;
   final String lastRecordStatus;
   final String lastRecordTime;
   final String createdAt;
@@ -110,6 +112,7 @@ class CronjobDto {
       alertCount: json['alertCount'] as int? ?? 0,
       alertTitle: json['alertTitle'] as String? ?? '',
       alertMethod: json['alertMethod'] as String? ?? '',
+      alertTriggerMode: json['alertTriggerMode'] as String? ?? '',
       lastRecordStatus: json['lastRecordStatus'] as String? ?? '',
       lastRecordTime: json['lastRecordTime'] as String? ?? '',
       createdAt: json['createdAt'] as String? ?? '',
@@ -179,6 +182,10 @@ class CronjobCreateReq {
     this.args,
     this.scopes,
     this.snapshotRule,
+    this.alertCount,
+    this.alertTitle,
+    this.alertMethod,
+    this.alertTriggerMode,
   });
 
   final int? id;
@@ -212,6 +219,10 @@ class CronjobCreateReq {
   final String? args;
   final List<String>? scopes;
   final SnapshotRuleDto? snapshotRule;
+  final int? alertCount;
+  final String? alertTitle;
+  final String? alertMethod;
+  final String? alertTriggerMode;
 
   Map<String, dynamic> toJson() => {
     if (id != null) 'id': id,
@@ -245,6 +256,10 @@ class CronjobCreateReq {
     if (args != null) 'args': args,
     if (snapshotRule != null) 'snapshotRule': snapshotRule!.toJson(),
     if (scopes != null) 'scopes': scopes,
+    if (alertCount != null) 'alertCount': alertCount,
+    if (alertTitle != null) 'alertTitle': alertTitle,
+    if (alertMethod != null) 'alertMethod': alertMethod,
+    if (alertTriggerMode != null) 'alertTriggerMode': alertTriggerMode,
   };
 }
 

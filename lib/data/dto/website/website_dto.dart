@@ -17,6 +17,10 @@ class WebsiteDto {
     required this.websiteRuntimeType,
     required this.dbID,
     required this.dbType,
+    this.streamPorts = '',
+    this.algorithm = '',
+    this.udp = false,
+    this.servers = const [],
   });
 
   final int id;
@@ -35,6 +39,10 @@ class WebsiteDto {
   final String websiteRuntimeType;
   final int dbID;
   final String dbType;
+  final String streamPorts;
+  final String algorithm;
+  final bool udp;
+  final List<dynamic> servers;
 
   factory WebsiteDto.fromJson(Map<String, dynamic> json) {
     return WebsiteDto(
@@ -54,6 +62,10 @@ class WebsiteDto {
       websiteRuntimeType: json['runtimeType'] as String? ?? '',
       dbID: json['dbID'] as int? ?? 0,
       dbType: json['dbType'] as String? ?? '',
+      streamPorts: json['streamPorts'] as String? ?? '',
+      algorithm: json['algorithm'] as String? ?? '',
+      udp: json['udp'] as bool? ?? false,
+      servers: json['servers'] as List? ?? const [],
     );
   }
 }

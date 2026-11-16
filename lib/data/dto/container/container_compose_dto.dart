@@ -36,6 +36,7 @@ class ContainerComposeDto {
     required this.path,
     this.containers,
     this.env,
+    this.isPinned = false,
   });
 
   factory ContainerComposeDto.fromJson(Map<String, dynamic> json) {
@@ -70,6 +71,7 @@ class ContainerComposeDto {
       path: _stringValue(json['path']),
       containers: containers,
       env: _envValue(json['env']),
+      isPinned: json['isPinned'] as bool? ?? false,
     );
   }
 
@@ -84,6 +86,7 @@ class ContainerComposeDto {
   final String path;
   final List<ContainerComposeItemDto>? containers;
   final String? env;
+  final bool isPinned;
 
   Map<String, dynamic> toJson() => {
     'name': name,
@@ -97,6 +100,7 @@ class ContainerComposeDto {
     'path': path,
     'containers': containers?.map((e) => e.toJson()).toList(),
     'env': env,
+    'isPinned': isPinned,
   };
 }
 

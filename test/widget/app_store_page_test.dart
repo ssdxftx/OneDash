@@ -9,6 +9,15 @@ import 'package:onedash/presentation/common/components/action_sheet.dart';
 import 'package:onedash/presentation/features/app_store/providers/app_store_provider.dart';
 import 'package:onedash/presentation/features/app_store/screens/app_store_page.dart';
 
+class _FakeInstalledAppsController extends InstalledAppsController {
+  _FakeInstalledAppsController(this.result);
+
+  final Future<PageResult<AppInstalledDto>> result;
+
+  @override
+  Future<PageResult<AppInstalledDto>> build() => result;
+}
+
 void main() {
   const pixel =
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk'
@@ -42,7 +51,9 @@ void main() {
         ProviderScope(
           overrides: [
             installedAppsProvider.overrideWith(
-              (ref) async => const PageResult(total: 1, items: [app]),
+              () => _FakeInstalledAppsController(
+                Future.value(const PageResult(total: 1, items: [app])),
+              ),
             ),
             installedIgnoredProvider(
               1,

@@ -108,6 +108,10 @@ class FirewallRepositoryImpl implements FirewallRepository {
       _api.deleteWhitelist(rule);
 
   @override
+  Future<void> updatePanelPort({required int oldPort, required int newPort}) =>
+      _api.updatePanelPort(oldPort: oldPort, newPort: newPort);
+
+  @override
   Future<FirewallBaseInfoDto> getForwardBase() => _api.getForwardBase();
 
   @override
@@ -136,6 +140,37 @@ class FirewallRepositoryImpl implements FirewallRepository {
   @override
   Future<void> operateDockerGuard(String operation) =>
       _api.operateDockerGuard(operation);
+
+  @override
+  Future<void> upsertDockerPolicies(
+    List<Map<String, dynamic>> policies, {
+    bool import = false,
+  }) => _api.upsertDockerPolicies(policies, import: import);
+
+  @override
+  Future<void> deleteDockerPolicies(List<String> uuids) =>
+      _api.deleteDockerPolicies(uuids);
+
+  @override
+  Future<void> operateFamily({
+    required String subsystem,
+    required String backend,
+    required String family,
+    required String operation,
+  }) => _api.operateFamily(
+    subsystem: subsystem,
+    backend: backend,
+    family: family,
+    operation: operation,
+  );
+
+  @override
+  Future<void> operateFilterChain({
+    String name = '1PANEL_BASIC',
+    required String operation,
+    String taskID = '',
+  }) =>
+      _api.operateFilterChain(name: name, operation: operation, taskID: taskID);
 
   @override
   Future<List<Map<String, dynamic>>> listRuleBackups() =>

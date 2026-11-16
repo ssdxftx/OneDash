@@ -15,6 +15,7 @@ import '../../data/dto/common/task_log_dto.dart';
 import '../../data/dto/container/image_dtos.dart';
 import '../../data/dto/container/network_dtos.dart';
 import '../../data/dto/common/page_result.dart';
+import '../../data/dto/container/container_file_dto.dart';
 
 /// 容器管理数据仓库接口。
 abstract interface class ContainerRepository {
@@ -74,7 +75,9 @@ abstract interface class ContainerRepository {
   });
 
   /// 获取容器资源统计列表。
-  Future<List<ContainerResourceStatsDto>> getContainerResourceStats();
+  Future<List<ContainerResourceStatsDto>> getContainerResourceStats({
+    List<String>? ids,
+  });
 
   /// 获取单个容器实时监控数据。
   Future<ContainerStatsDto> getContainerStats(String containerId);
@@ -129,6 +132,79 @@ abstract interface class ContainerRepository {
   /// 批量删除挂载卷。
   Future<void> deleteVolumes(List<String> names);
 
+  /// 列出容器内目录。
+  Future<List<ContainerFileDto>> listContainerFiles({
+    required String containerId,
+    String path = '/',
+  });
+
+  /// 读取容器内文件内容。
+  Future<ContainerFileContentDto> getContainerFileContent({
+    required String containerId,
+    required String path,
+  });
+
+  /// 获取容器内文件大小。
+  Future<int> getContainerFileSize({
+    required String containerId,
+    required String path,
+  });
+
+  /// 删除容器内文件。
+  Future<void> deleteContainerFiles({
+    required String containerId,
+    required List<String> paths,
+  });
+
+  /// 上传文件到容器。
+  Future<void> uploadContainerFile({
+    required String containerId,
+    required String path,
+    required String filePath,
+    void Function(int sent, int total)? onSendProgress,
+  });
+
+  /// 下载容器内文件。
+  Future<List<int>> downloadContainerFile({
+    required String containerId,
+    required String path,
+  });
+
+  /// 重命名容器。
+  Future<void> renameContainer({required String name, required String newName});
+
+  /// 分页搜索存储卷。
+  Future<Map<String, dynamic>> searchVolumes({
+    String info = '',
+    int page = 1,
+    int pageSize = 20,
+  });
+
+  /// 远程镜像搜索。
+  Future<Map<String, dynamic>> searchRemoteImages({
+    required String query,
+    int page = 1,
+    int pageSize = 20,
+  });
+
+  /// 获取镜像更新检查状态。
+  Future<Map<String, dynamic>> getImageUpdateStatus();
+
+  /// 触发镜像更新检查。
+  Future<Map<String, dynamic>> checkImageUpdates();
+
+  /// 设置镜像更新定时检查。
+  Future<Map<String, dynamic>> setImageUpdateSchedule(bool enabled);
+
+  /// 下载容器日志。
+  Future<List<int>> downloadLog({
+    required String container,
+    String since = '',
+    int tail = 1000,
+    bool timestamp = false,
+    String containerType = '',
+  });
+
   /// 获取全部镜像信息。
   Future<List<ContainerOptionDto>> getImages();
 
@@ -166,6 +242,12 @@ abstract interface class ContainerRepository {
     required bool isPinned,
     required String description,
   });
+
+  /// 读取 Compose 环境变量。
+  Future<List<String>> loadComposeEnv(String path);
+
+  /// 设置 Compose 置顶状态。
+  Future<void> setComposePin({required String name, required bool isPinned});
 
   /// 搜索编排 (Compose)。
   Future<ContainerComposeSearchDto> searchCompose({

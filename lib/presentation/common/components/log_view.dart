@@ -12,12 +12,14 @@ class LogBuffer {
 
   final int capacity;
   final ListQueue<String> _lines = ListQueue<String>();
+  List<String>? _snapshot;
 
-  List<String> get lines => List.unmodifiable(_lines);
+  List<String> get lines => _snapshot ??= List.unmodifiable(_lines);
   int get length => _lines.length;
   bool get isEmpty => _lines.isEmpty;
 
   void add(String line) {
+    _snapshot = null;
     _lines.addLast(line);
     while (_lines.length > capacity) {
       _lines.removeFirst();
@@ -30,9 +32,13 @@ class LogBuffer {
     }
   }
 
-  void clear() => _lines.clear();
+  void clear() {
+    _snapshot = null;
+    _lines.clear();
+  }
 
   void replaceAll(Iterable<String> lines) {
+    _snapshot = null;
     _lines.clear();
     addAll(lines);
   }

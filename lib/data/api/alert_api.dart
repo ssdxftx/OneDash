@@ -1,5 +1,6 @@
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/network/network_exceptions.dart';
 import '../dto/alert/alert_dto.dart';
 import '../dto/common/page_result.dart';
 
@@ -65,6 +66,44 @@ class AlertApi {
     await _client.post('/api/v2/alert/logs/clean');
   }
 
+  /// 分页搜索告警通知配置。
+  /// POST /api/v2/alert/config/search
+  Future<PageResult<AlertConfigInfo>> searchAlertConfigs(
+    AlertConfigSearchReq req,
+  ) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/alert/config/search',
+      data: req.toJson(),
+    );
+    return PageResult<AlertConfigInfo>.fromJson(
+      ApiResponseParser.map(resp),
+      AlertConfigInfo.fromJson,
+    );
+  }
+
+  /// 获取 Clam 扫描列表。
+  /// GET /api/v2/alert/clams/list
+  Future<List<ClamAlertInfo>> listClams() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/alert/clams/list',
+    );
+    return ApiResponseParser.list(resp, ClamAlertInfo.fromJson);
+  }
+
+  /// 获取计划任务告警列表。
+  /// POST /api/v2/alert/cronjob/list
+  Future<List<CronJobAlertInfo>> listAlertCronJobs({
+    String name = '',
+    String status = '',
+    String type = '',
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/alert/cronjob/list',
+      data: {'name': name, 'status': status, 'type': type},
+    );
+    return ApiResponseParser.list(resp, CronJobAlertInfo.fromJson);
+  }
+
   /// 获取已启用的告警通知配置。
   Future<List<AlertConfigInfo>> getAlertConfigs() async {
     final resp = await _client.post<Map<String, dynamic>>(
@@ -76,13 +115,22 @@ class AlertApi {
 
   /// 获取告警配置。
   Future<AlertConfigInfo> getAlertConfig() async {
-    final resp = await _client.post<Map<String, dynamic>>(
-      '/api/v2/alert/config/info',
-    );
-    return ApiResponseParser.object(resp, AlertConfigInfo.fromJson);
+    final configs = await getAlertConfigs();
+    if (configs.isEmpty) {
+      throw const ApiFormatException('没有可编辑的告警配置');
+    }
+    return configs.first;
   }
 
   /// 更新告警配置。
+  /// POST /api/v2/alert/config/status
+  Future<void> updateAlertConfigStatus(int id, String status) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/alert/config/status',
+      data: {'id': id, 'status': status},
+    );
+  }
+
   Future<void> updateAlertConfig(AlertConfigUpdateReq req) async {
     await _client.post('/api/v2/alert/config/update', data: req.toJson());
   }

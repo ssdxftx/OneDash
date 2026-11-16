@@ -3,30 +3,41 @@ import 'dart:typed_data';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../core/network/dio_client.dart';
 import '../../core/network/dio_client_provider.dart';
 import '../../core/storage/storage_service.dart';
 import '../../core/utils/file_icon_path_cache.dart';
 import '../../domain/repositories/file_repository.dart';
 import '../../presentation/features/server_detail/providers/active_server_provider.dart';
 import '../api/file_api.dart';
+import '../api/task_waiter.dart';
 import '../dto/common/page_result.dart';
 import '../dto/file/file_ai_search_dto.dart';
+import '../dto/file/file_convert_dto.dart';
 import '../dto/file/file_favorite_dto.dart';
 import '../dto/file/file_item_dto.dart';
 import '../dto/file/file_log_dto.dart';
 import '../dto/file/user_group_dto.dart';
 import '../dto/file/file_share_dto.dart';
+import '../dto/file/file_tree_dto.dart';
 
 part 'file_repository_impl.g.dart';
 
 /// [FileRepository] 的默认实现。
 class FileRepositoryImpl implements FileRepository {
-  FileRepositoryImpl(this._fileApi, this._storage, this._serverId);
+  FileRepositoryImpl(
+    this._fileApi,
+    this._storage,
+    this._serverId,
+    this._client,
+  );
 
   final FileApi _fileApi;
+  final DioClient _client;
   final StorageService _storage;
   final String _serverId;
 
@@ -83,6 +94,19 @@ class FileRepositoryImpl implements FileRepository {
     required String path,
     required String content,
   }) => _fileApi.saveFileContent(path: path, content: content);
+
+  @override
+  Future<void> downloadFileTo({
+    required String path,
+    required String savePath,
+    void Function(int received, int total)? onReceiveProgress,
+    CancelToken? cancelToken,
+  }) => _fileApi.downloadFile(
+    path: path,
+    savePath: savePath,
+    onReceiveProgress: onReceiveProgress,
+    cancelToken: cancelToken,
+  );
 
   @override
   Future<Uint8List> downloadBytes(String path) =>
@@ -176,7 +200,47 @@ class FileRepositoryImpl implements FileRepository {
   Future<void> wgetStop(String key) => _fileApi.wgetStop(key);
 
   @override
+  Future<List<String>> removeWgetRecords(List<String> keys) =>
+      _fileApi.removeWgetRecords(keys);
+
+  @override
   Future<List<String>> wgetProcessKeys() => _fileApi.wgetProcessKeys();
+
+  @override
+  Future<WebSocketChannel> connectWgetProcessWebSocket() =>
+      FileApi.connectWgetProcessWebSocket(_client);
+
+  @override
+  Future<PageResult<FileUploadDto>> searchUploadFiles({
+    required String path,
+    int page = 1,
+    int pageSize = 50,
+  }) => _fileApi.searchUploadFiles(path: path, page: page, pageSize: pageSize);
+
+  @override
+  Future<void> convertFiles({
+    required List<Map<String, dynamic>> files,
+    required String outputPath,
+    bool deleteSource = false,
+    String taskID = '',
+  }) => _fileApi.convertFiles(
+    files: files,
+    outputPath: outputPath,
+    deleteSource: deleteSource,
+    taskID: taskID,
+  );
+
+  @override
+  Future<PageResult<FileConvertLogDto>> convertLogs({
+    int page = 1,
+    int pageSize = 20,
+  }) => _fileApi.convertLogs(page: page, pageSize: pageSize);
+
+  @override
+  Future<Uint8List> chunkDownload({
+    required String path,
+    required String name,
+  }) => _fileApi.chunkDownload(path: path, name: name);
 
   @override
   Future<void> compressFiles({
@@ -186,6 +250,7 @@ class FileRepositoryImpl implements FileRepository {
     required String name,
     bool replace = false,
     String? secret,
+    String taskID = '',
   }) => _fileApi.compressFiles(
     files: files,
     type: type,
@@ -193,7 +258,11 @@ class FileRepositoryImpl implements FileRepository {
     name: name,
     replace: replace,
     secret: secret ?? '',
+    taskID: taskID,
   );
+
+  @override
+  Future<void> stopCompress(String taskID) => _fileApi.stopCompress(taskID);
 
   @override
   Future<void> decompressFile({
@@ -201,12 +270,17 @@ class FileRepositoryImpl implements FileRepository {
     required String type,
     required String dst,
     String? secret,
+    String taskID = '',
   }) => _fileApi.decompressFile(
     path: path,
     type: type,
     dst: dst,
     secret: secret ?? '',
+    taskID: taskID,
   );
+
+  @override
+  Future<void> stopDecompress(String taskID) => _fileApi.stopDecompress(taskID);
 
   @override
   Future<bool> checkFileExists(String path) => _fileApi.checkFileExists(path);
@@ -223,6 +297,7 @@ class FileRepositoryImpl implements FileRepository {
     String name = '',
     bool cover = false,
     List<String> coverPaths = const [],
+    String taskID = '',
   }) => _fileApi.moveCopyFiles(
     oldPaths: oldPaths,
     newPath: newPath,
@@ -230,10 +305,21 @@ class FileRepositoryImpl implements FileRepository {
     name: name,
     cover: cover,
     coverPaths: coverPaths,
+    taskID: taskID,
   );
+
+  @override
+  Future<void> waitTask(String taskID, {String subject = '文件任务'}) => TaskWaiter(
+    _client,
+    interval: const Duration(seconds: 2),
+    maxAttempts: 300,
+  ).waitFor(taskID, subject: subject);
 
   static const _maxSingleFileSize = 10 * 1024 * 1024; // 10MB
   static const _chunkSize = 5 * 1024 * 1024; // 5MB
+
+  @override
+  Future<void> stopMove(String taskID) => _fileApi.stopMove(taskID);
 
   @override
   Future<void> uploadFile({
@@ -416,10 +502,55 @@ class FileRepositoryImpl implements FileRepository {
       _fileApi.getFileShareDetail(path);
 
   @override
+  Future<Map<String, dynamic>> getPublicShareInfo(String code) =>
+      _fileApi.getPublicShareInfo(code);
+
+  @override
+  Future<void> checkFileShare({required String code, String? password}) =>
+      _fileApi.checkFileShare(code: code, password: password);
+
+  @override
+  Future<void> downloadSharedFile({
+    required String code,
+    required String savePath,
+    String? password,
+  }) => _fileApi.downloadSharedFile(
+    code: code,
+    savePath: savePath,
+    password: password,
+  );
+
+  @override
   Future<Map<String, dynamic>> searchFileShares({
     int page = 1,
     int pageSize = 20,
   }) => _fileApi.searchFileShares(page: page, pageSize: pageSize);
+
+  @override
+  Future<FileItemDto> previewFile(String path, {bool isDetail = false}) =>
+      _fileApi.previewFile(path, isDetail: isDetail);
+
+  @override
+  Future<List<FileTreeNodeDto>> getFileTree({
+    required String path,
+    bool containSub = false,
+  }) => _fileApi.getFileTree(path: path, containSub: containSub);
+
+  @override
+  Future<Map<String, String>> getFileRemarks(List<String> paths) =>
+      _fileApi.getFileRemarks(paths);
+
+  @override
+  Future<void> setFileRemark({required String path, required String remark}) =>
+      _fileApi.setFileRemark(path: path, remark: remark);
+
+  @override
+  Future<List<int>> getFileShareQrCode(String code) =>
+      _fileApi.getFileShareQrCode(code);
+
+  @override
+  Future<List<Map<String, dynamic>>> getHostMounts() =>
+      _fileApi.getHostMounts();
 
   @override
   Future<Map<String, dynamic>> searchRecycleBin({
@@ -447,5 +578,10 @@ Future<FileRepository> fileRepository(Ref ref) async {
   final serverId = ref.watch(activeServerIdProvider);
   final client = await ref.watch(dioClientProvider(serverId).future);
   final storage = ref.watch(storageServiceProvider);
-  return FileRepositoryImpl(FileApi(client), storage, serverId.toString());
+  return FileRepositoryImpl(
+    FileApi(client),
+    storage,
+    serverId.toString(),
+    client,
+  );
 }

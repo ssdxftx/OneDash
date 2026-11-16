@@ -332,10 +332,13 @@ class RedisPersistenceDto {
   final String appendfsync;
 
   factory RedisPersistenceDto.fromJson(Map<String, dynamic> json) {
+    final save = '${json['save'] ?? ''}';
+    final rdbEnabled = json['rdb_enabled'] ?? json['rdbEnabled'];
     return RedisPersistenceDto(
-      aofEnabled: '${json['aof_enabled'] ?? json['aofEnabled'] ?? 'no'}',
-      rdbEnabled: '${json['rdb_enabled'] ?? json['rdbEnabled'] ?? 'yes'}',
-      save: '${json['save'] ?? ''}',
+      aofEnabled:
+          '${json['appendonly'] ?? json['aof_enabled'] ?? json['aofEnabled'] ?? 'no'}',
+      rdbEnabled: '${rdbEnabled ?? (save.trim().isEmpty ? 'no' : 'yes')}',
+      save: save,
       appendfsync: '${json['appendfsync'] ?? 'everysec'}',
     );
   }

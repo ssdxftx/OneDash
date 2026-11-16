@@ -173,6 +173,8 @@ class BackupApi {
     required String file,
     required String secret,
     required String taskID,
+    int backupRecordID = 0,
+    int timeout = 0,
   }) async {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/backups/recover',
@@ -185,6 +187,8 @@ class BackupApi {
         'file': file,
         'secret': secret,
         'taskID': taskID,
+        'backupRecordID': backupRecordID,
+        'timeout': timeout,
       },
     );
   }
@@ -251,6 +255,51 @@ class BackupApi {
     return ApiResponseParser.list(resp, BackupOptionDto.fromJson);
   }
 
+  /// GET /api/v2/backups/check/{name} — 校验备份账号名称是否被使用。
+  Future<void> checkBackupName(String name) async {
+    await _client.get<Map<String, dynamic>>(
+      '/api/v2/backups/check/${Uri.encodeComponent(name)}',
+    );
+  }
+
+  /// POST /api/v2/backups/search/files — 查询备份账号中的快照文件。
+  Future<List<String>> searchRecordFiles(int recordId) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/backups/search/files',
+      data: {'id': recordId},
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data.map((item) => '$item').toList(growable: false);
+  }
+
+  /// POST /api/v2/backups/record/search/bycronjob
+  Future<PageResult<BackupRecordDto>> searchRecordsByCronjob({
+    required int cronjobId,
+    int page = 1,
+    int pageSize = 100,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/backups/record/search/bycronjob',
+      data: {'cronjobID': cronjobId, 'page': page, 'pageSize': pageSize},
+    );
+    return PageResult<BackupRecordDto>.fromJson(
+      ApiResponseParser.map(resp),
+      BackupRecordDto.fromJson,
+    );
+  }
+
+  /// POST /api/v2/backups/record/description/update
+  Future<void> updateRecordDescription({
+    required int id,
+    required String description,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/backups/record/description/update',
+      data: {'id': id, 'description': description},
+    );
+  }
+
   /// 搜索备份账号。
   Future<Map<String, dynamic>> searchBackupAccounts({
     required int page,
@@ -260,24 +309,39 @@ class BackupApi {
   }) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/backups/search',
-      data: {'page': page, 'pageSize': pageSize, 'type': type, 'name': name},
+      data: {'page': page, 'pageSize': pageSize, 'type': type, 'info': name},
     );
     return ApiResponseParser.map(resp);
   }
 
-  /// 创建备份账号。
+  /// 创建备份账号；面板级账号使用 core 路由。
   Future<void> createBackupAccount(Map<String, dynamic> data) async {
-    await _client.post('/api/v2/backups', data: data);
+    await _client.post(
+      data['isPublic'] == true ? '/api/v2/core/backups' : '/api/v2/backups',
+      data: data,
+    );
   }
 
-  /// 更新备份账号。
+  /// 更新备份账号；面板级账号使用 core 路由。
   Future<void> updateBackupAccount(Map<String, dynamic> data) async {
-    await _client.post('/api/v2/backups/update', data: data);
+    await _client.post(
+      data['isPublic'] == true
+          ? '/api/v2/core/backups/update'
+          : '/api/v2/backups/update',
+      data: data,
+    );
   }
 
-  /// 删除备份账号。
-  Future<void> deleteBackupAccount(int id) async {
-    await _client.post('/api/v2/backups/del', data: {'id': id});
+  /// 删除备份账号；面板级账号按名称删除。
+  Future<void> deleteBackupAccount({
+    required int id,
+    required String name,
+    required bool isPublic,
+  }) async {
+    await _client.post(
+      isPublic ? '/api/v2/core/backups/del' : '/api/v2/backups/del',
+      data: isPublic ? {'name': name} : {'id': id},
+    );
   }
 
   /// 测试备份账号连接。
@@ -301,9 +365,18 @@ class BackupApi {
     return result is List ? result : [];
   }
 
-  /// 刷新 Token。
-  Future<void> refreshToken(int id) async {
-    await _client.post('/api/v2/backups/refresh/token', data: {'id': id});
+  /// 刷新 Token；面板级账号按名称刷新。
+  Future<void> refreshToken({
+    required int id,
+    required String name,
+    required bool isPublic,
+  }) async {
+    await _client.post(
+      isPublic
+          ? '/api/v2/core/backups/refresh/token'
+          : '/api/v2/backups/refresh/token',
+      data: isPublic ? {'name': name} : {'id': id},
+    );
   }
 
   /// 获取本地备份目录。

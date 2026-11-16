@@ -22,6 +22,7 @@ import '../../../common/components/section_header.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/tonal_card.dart';
+import '../../server_detail/providers/active_server_provider.dart';
 import '../providers/servers_provider.dart';
 import '../../../common/states/error_mapper.dart';
 import '../../../common/states/error_state.dart';
@@ -166,6 +167,8 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
           ..updatedAt = DateTime.now();
         await repository.update(existing, apiKey: apiKey);
         ref.invalidate(dioClientProvider(widget.serverId!));
+        ref.invalidate(serversProvider);
+        ref.invalidate(serverByIdProvider(widget.serverId!));
         server = existing;
       } else {
         server = await repository.add(
@@ -178,6 +181,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
         );
       }
       await ref.read(serversProvider.notifier).touch(server.id);
+      ref.read(activeServerIdStateProvider.notifier).state = server.id;
       if (!mounted) return;
       AppToast.success(context, l10n.server_edit_savedConnecting);
       context.go('/s/${server.id}/overview');
@@ -326,24 +330,81 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
       return;
     }
 
-    const probes = [
-      '/api/v2/dashboard/base/all/all',
-      '/api/v2/websites/search',
-      '/api/v2/containers/search',
-      '/api/v2/databases/search',
-      '/api/v2/apps/installed/search',
-      '/api/v2/cronjobs/search',
-      '/api/v2/hosts/firewall/base',
-      '/api/v2/hosts/terminal/local',
+    const probes = <({String method, String path, Object? data})>[
+      (method: 'GET', path: '/api/v2/dashboard/base/all/all', data: null),
+      (
+        method: 'POST',
+        path: '/api/v2/websites/search',
+        data: {
+          'page': 1,
+          'pageSize': 1,
+          'orderBy': 'createdAt',
+          'order': 'descending',
+        },
+      ),
+      (
+        method: 'POST',
+        path: '/api/v2/containers/search',
+        data: {
+          'page': 1,
+          'pageSize': 1,
+          'state': 'all',
+          'orderBy': 'createdAt',
+          'order': 'null',
+        },
+      ),
+      (
+        method: 'POST',
+        path: '/api/v2/databases/search',
+        data: {
+          'page': 1,
+          'pageSize': 1,
+          'orderBy': 'createdAt',
+          'order': 'null',
+        },
+      ),
+      (
+        method: 'POST',
+        path: '/api/v2/apps/installed/search',
+        data: {
+          'page': 1,
+          'pageSize': 1,
+          'name': '',
+          'tags': <String>[],
+          'update': false,
+          'sync': false,
+        },
+      ),
+      (
+        method: 'POST',
+        path: '/api/v2/cronjobs/search',
+        data: {
+          'page': 1,
+          'pageSize': 1,
+          'orderBy': 'createdAt',
+          'order': 'null',
+        },
+      ),
+      (
+        method: 'POST',
+        path: '/api/v2/hosts/firewall/base',
+        data: {'name': 'base'},
+      ),
     ];
     final probeClient = client;
     final results = await Future.wait(
-      probes.map((path) async {
+      probes.map((probe) async {
         try {
-          await probeClient.get<Map<String, dynamic>>(path);
+          if (probe.method == 'GET') {
+            await probeClient.get<Map<String, dynamic>>(probe.path);
+          } else {
+            await probeClient.post<Map<String, dynamic>>(
+              probe.path,
+              data: probe.data,
+            );
+          }
           return true;
         } catch (_) {
-          // 端点缺失视为能力不支持，不阻塞诊断。
           return false;
         }
       }),

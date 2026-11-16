@@ -24,6 +24,7 @@ class DockerOverviewPage extends ConsumerWidget {
 
   void _refresh(WidgetRef ref) {
     ref.invalidate(dockerStatusProvider);
+    ref.invalidate(dockerDaemonConfigProvider);
     ref.invalidate(containerStatusProvider);
     ref.invalidate(containerItemStatsProvider);
   }

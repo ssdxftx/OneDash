@@ -20,12 +20,15 @@ import '../../../common/components/buttons.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/segmented_tabs.dart';
+import '../../../common/components/skeleton.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../widgets/host_diagnostics_tab.dart';
 import '../widgets/host_disks_tab.dart';
+import '../widgets/host_remote_tab.dart';
+import '../widgets/host_ssh_logs_sheet.dart';
 import '../../../common/formatters/value_labels.dart';
 
 class HostPage extends ConsumerStatefulWidget {
@@ -58,27 +61,30 @@ class _HostPageState extends ConsumerState<HostPage> {
 
   bool get _certSelectionMode => _certSelecting;
   late Future<_MonitorSeries> _monitor;
-  late Future<SshInfoDto> _ssh;
+  Future<SshInfoDto>? _ssh;
+  bool _certsLoading = false;
 
   @override
   void initState() {
     super.initState();
     _monitor = _loadMonitor();
-    _ssh = _loadSsh();
-    unawaited(_loadCerts());
   }
 
   Future<_MonitorSeries> _loadMonitor() async {
     final repository = await ref.read(
       hostRepositoryProvider(widget.serverId).future,
     );
-    final settingFuture = repository.getMonitorSetting();
     final end = DateTime.now();
-    final data = await repository.searchMonitor(
-      param: 'all',
-      startTime: end.subtract(Duration(hours: _hours)),
-      endTime: end,
-    );
+    final results = await Future.wait<Object>([
+      repository.getMonitorSetting(),
+      repository.searchMonitor(
+        param: 'all',
+        startTime: end.subtract(Duration(hours: _hours)),
+        endTime: end,
+      ),
+    ]);
+    final setting = results[0] as Map<String, dynamic>;
+    final data = results[1] as List<Map<String, dynamic>>;
     var cpu = const <double>[];
     var memory = const <double>[];
     var load = const <double>[];
@@ -95,14 +101,12 @@ class _HostPageState extends ConsumerState<HostPage> {
             .whereType<Map>()
             .map((row) => _double(row['memory']))
             .toList(growable: false);
-      } else if (param == 'load') {
         load = values
             .whereType<Map>()
             .map((row) => _double(row['cpuLoad1']))
             .toList(growable: false);
       }
     }
-    final setting = await settingFuture;
     if (mounted) setState(() => _setting = setting);
     return _MonitorSeries(cpu: cpu, memory: memory, load: load);
   }
@@ -120,6 +124,8 @@ class _HostPageState extends ConsumerState<HostPage> {
   }
 
   Future<void> _loadCerts() async {
+    if (_certsLoading) return;
+    _certsLoading = true;
     try {
       final repository = await ref.read(
         hostRepositoryProvider(widget.serverId).future,
@@ -129,7 +135,15 @@ class _HostPageState extends ConsumerState<HostPage> {
       setState(() => _certs = certs);
     } catch (_) {
       // Key management is optional for panels without root key access.
+    } finally {
+      _certsLoading = false;
     }
+  }
+
+  void _loadSshTab() {
+    if (_ssh != null) return;
+    setState(() => _ssh = _loadSsh());
+    unawaited(_loadCerts());
   }
 
   void _refreshMonitor() {
@@ -162,12 +176,17 @@ class _HostPageState extends ConsumerState<HostPage> {
         labels: [
           l10n.host_monitor,
           l10n.host_ssh,
+          l10n.host_remoteHosts,
           l10n.host_disks,
           l10n.host_diagnostics,
         ],
+        onChanged: (index) {
+          if (index == 1) _loadSshTab();
+        },
         children: [
           _monitorTab(l10n),
           _sshTab(l10n),
+          HostRemoteTab(serverId: widget.serverId),
           HostDisksTab(serverId: widget.serverId),
           HostDiagnosticsTab(serverId: widget.serverId),
         ],
@@ -288,8 +307,15 @@ class _HostPageState extends ConsumerState<HostPage> {
   }
 
   Widget _sshTab(AppLocalizations l10n) {
+    final future = _ssh;
+    if (future == null) {
+      return const Padding(
+        padding: EdgeInsets.all(AppTokens.s16),
+        child: SkeletonList(itemCount: 5),
+      );
+    }
     return FutureBuilder<SshInfoDto>(
-      future: _ssh,
+      future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -386,6 +412,20 @@ class _HostPageState extends ConsumerState<HostPage> {
                   subtitle: l10n.host_terminalSessionsHint,
                   trailing: const Icon(TablerIcons.chevron_right),
                   onTap: _showSessions,
+                ),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.list_details),
+                  title: l10n.host_sshLogs,
+                  subtitle: l10n.host_sshLogsHint,
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: () =>
+                      showHostSshLogsSheet(context, serverId: widget.serverId),
+                ),
+                SplitListTile(
+                  leading: const Icon(TablerIcons.eraser),
+                  title: l10n.host_cleanSshLog,
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: _cleanSshLogs,
                 ),
               ],
             ),
@@ -541,6 +581,29 @@ class _HostPageState extends ConsumerState<HostPage> {
         _selectedCerts.clear();
       });
       await _loadCerts();
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _cleanSshLogs() async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.host_cleanSshLog,
+      message: l10n.action_confirm,
+      confirmLabel: l10n.action_confirm,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      await repository.cleanSshLogs();
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
     } catch (error) {
@@ -712,11 +775,12 @@ class _HostPageState extends ConsumerState<HostPage> {
       hostRepositoryProvider(widget.serverId).future,
     );
     if (!mounted) return;
+    final sessions = repository.searchTerminalSessions();
     await showAppSheet<void>(
       context: context,
       maxHeightFactor: 0.85,
       builder: (sheetContext) => FutureBuilder<List<Map<String, dynamic>>>(
-        future: repository.searchTerminalSessions(),
+        future: sessions,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

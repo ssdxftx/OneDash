@@ -489,6 +489,17 @@ class RuntimesPage extends ConsumerWidget {
     if (!confirmed || !context.mounted) return;
     try {
       final repository = await ref.read(runtimeRepositoryProvider.future);
+      final linked = await repository.checkRuntimeDelete(runtime.id);
+      if (linked.isNotEmpty && context.mounted) {
+        final proceed = await showConfirmSheet(
+          context,
+          title: l10n.runtimes_delete,
+          message: l10n.apps_linkedResources,
+          confirmLabel: l10n.action_delete,
+          danger: true,
+        );
+        if (!proceed || !context.mounted) return;
+      }
       await repository.deleteRuntime(runtime.id, forceDelete: true);
       ref.invalidate(_runtimesProvider);
       if (!context.mounted) return;

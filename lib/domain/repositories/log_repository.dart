@@ -2,6 +2,7 @@ import '../../data/dto/common/page_result.dart';
 import '../../data/dto/log/login_log_dto.dart';
 import '../../data/dto/log/operation_log_dto.dart';
 import '../../data/dto/log/ssh_log_dto.dart';
+import '../../data/dto/log/system_log_dto.dart';
 import '../../data/dto/log/task_log_dto.dart';
 import '../../data/dto/common/task_log_dto.dart' as log_file;
 
@@ -19,13 +20,27 @@ abstract interface class LogRepository {
   Future<PageResult<LoginLogDto>> searchLoginLogs({
     int page,
     int pageSize,
-    String ip,
+    String info,
     String status,
   });
 
   Future<void> cleanLogs(String logType);
 
   Future<List<String>> getSystemLogFiles();
+
+  Future<List<String>> getSystemLogServices();
+
+  Future<SystemLogStatusDto> getSystemLogStatus();
+
+  Future<SystemLogPageDto> readSystemLog({
+    String keyword,
+    String service,
+    String priority,
+    String cursor,
+    String startTime,
+    String endTime,
+    int pageSize,
+  });
 
   Future<PageResult<TaskLogDto>> searchTaskLogs({
     int page,
@@ -42,7 +57,12 @@ abstract interface class LogRepository {
     String status,
   });
 
-  Future<String> exportSshLogs({String info, String status});
+  Future<String> exportSshLogs({
+    String info,
+    String status,
+    int page,
+    int pageSize,
+  });
 
   /// 按 taskID 读取任务日志全文。
   Future<log_file.TaskLogDto> readTaskLog(String taskID);

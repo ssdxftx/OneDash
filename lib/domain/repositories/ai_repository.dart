@@ -19,11 +19,141 @@ abstract interface class AiRepository {
 
   Future<void> createOllamaModel(String name);
 
+  Future<void> recreateOllamaModel(String name);
+  Future<void> syncOllamaAccount({
+    required int id,
+    required String baseUrlType,
+    String baseUrl,
+  });
+  Future<Map<String, dynamic>> getGpuOptions();
+
+  Future<Map<String, dynamic>> getModelGpuDevices();
+  Stream<String> chatAccount({
+    required int id,
+    required String model,
+    required List<Map<String, String>> messages,
+  });
+
+  Future<List<Map<String, dynamic>>> listGpuGroups();
+  Future<void> saveGpuGroup(Map<String, dynamic> body);
+  Future<void> deleteGpuGroup(int id);
+  Future<Map<String, dynamic>> loadModelGpuUsage(Map<String, dynamic> body);
+  Future<List<Map<String, dynamic>>> batchOperateAgents(
+    Map<String, dynamic> body,
+  );
+  Future<Map<String, dynamic>> getAgentOverview(int agentId);
+  Future<List<Map<String, dynamic>>> getHermesChatSessions(int agentId);
+  Future<void> renameHermesChatSession({
+    required int agentId,
+    required String id,
+    required String title,
+  });
+  Future<void> deleteHermesChatSession({
+    required int agentId,
+    required String id,
+  });
+  Future<Map<String, dynamic>> searchGpuMonitor({
+    required DateTime startTime,
+    required DateTime endTime,
+    String deviceID,
+    String productName,
+    bool legacy,
+    String aggregation,
+  });
+  Future<List<Map<String, dynamic>>> getBenchmarkSources({
+    String kind,
+    String selected,
+  });
+  Future<List<Map<String, dynamic>>> listAgentPlugins(int agentId);
+  Future<List<Map<String, dynamic>>> searchAgentPlugins({
+    required int agentId,
+    required String keyword,
+    int limit,
+  });
+  Future<void> installAgentMarketPlugin({
+    required int agentId,
+    required String package,
+    required String version,
+    required String taskID,
+  });
+  Future<void> operateAgentPlugin({
+    required int agentId,
+    required String pluginId,
+    required String operate,
+    required String taskID,
+  });
+  Future<List<Map<String, dynamic>>> listAgentSkills(int agentId);
+  Future<List<Map<String, dynamic>>> searchAgentSkills({
+    required int agentId,
+    required String source,
+    required String keyword,
+  });
+  Future<void> installAgentSkill({
+    required int agentId,
+    required String source,
+    required String slug,
+    required String taskID,
+  });
+  Future<void> updateAgentSkill({
+    required int agentId,
+    required String name,
+    required bool enabled,
+  });
+  Future<void> uninstallAgentSkill({
+    required int agentId,
+    required String name,
+  });
+
   Future<void> deleteOllamaModels(List<int> ids, {bool force});
 
   Future<void> loadOllamaModel(String name);
 
   Future<void> closeOllamaModel(String name);
+  Future<List<Map<String, dynamic>>> discoverAgentAccountModels({
+    required String provider,
+    required String baseURL,
+    required String apiKey,
+    required String apiType,
+  });
+  Future<void> installAgentChannelPlugin({
+    required int agentId,
+    required String type,
+    required String taskID,
+  });
+  Future<void> upgradeAgentChannelPlugin({
+    required int agentId,
+    required String type,
+    required String taskID,
+  });
+  Future<void> uninstallAgentChannelPlugin({
+    required int agentId,
+    required String type,
+    required String taskID,
+  });
+  Future<void> approveAgentChannelPairing({
+    required int agentId,
+    required String type,
+    required String pairingCode,
+    String accountId,
+  });
+  Future<Map<String, dynamic>> checkAgentChannelPlugin({
+    required int agentId,
+    required String type,
+    bool checkLatest,
+  });
+  Future<List<Map<String, dynamic>>> batchInstallAgents(
+    Map<String, dynamic> body,
+  );
+  Future<List<Map<String, dynamic>>> batchUpgradeAgents(
+    Map<String, dynamic> body,
+  );
+  Future<List<String>> getAgentSecurity(int agentId);
+  Future<void> updateAgentSecurity(int agentId, List<String> origins);
+  Future<String> getAgentConfigFile(int agentId);
+  Future<void> updateAgentConfigFile(int agentId, String content);
+  Future<Map<String, dynamic>> getAiDomain(int appInstallId);
+  Future<void> bindAiDomain(Map<String, dynamic> body);
+  Future<void> updateAiDomain(Map<String, dynamic> body);
 
   Future<GpuInfoDto> loadGpuInfo();
 
@@ -46,6 +176,7 @@ abstract interface class AiRepository {
   Future<void> syncMcpStatus(List<int> ids);
 
   Future<List<AiProviderDto>> getProviders();
+  Future<Map<String, int>> countAccountsByProviders(List<String> providers);
 
   Future<void> createAccount(Map<String, dynamic> body);
 
@@ -58,6 +189,33 @@ abstract interface class AiRepository {
     String provider,
   });
 
+  Future<List<Map<String, dynamic>>> getAccountModels(int accountId);
+
+  Future<void> createAccountModel({
+    required int accountId,
+    required String id,
+    required String name,
+  });
+
+  Future<void> updateAccountModel({
+    required int accountId,
+    required String id,
+    required String name,
+  });
+
+  Future<void> deleteAccountModel({
+    required int accountId,
+    required int recordId,
+    bool deleteFiles = false,
+  });
+
+  Future<void> setAccountVerifyModel({
+    required int accountId,
+    required int recordId,
+  });
+
+  Future<void> verifyAccount({required int id, String model = ''});
+
   Future<void> deleteAccount(int id);
 
   Future<PageResult<AiAgentDto>> searchAgents({int page, int pageSize});
@@ -68,6 +226,24 @@ abstract interface class AiRepository {
 
   Future<List<AiAgentRoleDto>> getAgentRoles(int agentId);
 
+  Future<List<Map<String, dynamic>>> listAgentRoleMarkdownFiles({
+    required int agentId,
+    required String workspace,
+  });
+  Future<void> updateAgentRoleMarkdownFile({
+    required int agentId,
+    required String workspace,
+    required String name,
+    required String content,
+    bool restart,
+  });
+  Future<List<Map<String, dynamic>>> batchInstallAgentSkill(
+    Map<String, dynamic> body,
+  );
+  Future<void> switchAgentFeishuPlugin(Map<String, dynamic> body);
+  Future<Map<String, dynamic>> getAgentOtherConfig(int agentId);
+  Future<void> updateAgentOtherConfig(Map<String, dynamic> body);
+  Future<List<Map<String, dynamic>>> checkAgentDelete(int agentId);
   Future<void> deleteAgentRole(int agentId, String roleId);
 
   Future<String> createAgentRole({

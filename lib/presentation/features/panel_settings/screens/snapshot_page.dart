@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
+import '../../../../data/repositories_impl/backup_account_repository_impl.dart';
 import '../../../../data/repositories_impl/setting_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
@@ -341,6 +342,26 @@ class SnapshotPage extends ConsumerWidget {
 
   Future<void> _create(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
+    final backupRepository = await ref.read(
+      backupAccountRepositoryProvider.future,
+    );
+    final accountResult = await backupRepository.searchAccounts(
+      page: 1,
+      pageSize: 100,
+    );
+    final accountItems =
+        (accountResult['items'] as List?)
+            ?.whereType<Map>()
+            .map((item) => item.cast<String, dynamic>())
+            .where((item) => item['id'] is num)
+            .toList(growable: false) ??
+        const <Map<String, dynamic>>[];
+    if (!context.mounted) return;
+    if (accountItems.isEmpty) {
+      AppToast.warning(context, l10n.backups_noAccounts);
+      return;
+    }
+    var accountId = (accountItems.first['id'] as num).toInt();
     final name = TextEditingController(
       text: 'snapshot-${DateTime.now().millisecondsSinceEpoch}',
     );
@@ -370,6 +391,20 @@ class SnapshotPage extends ConsumerWidget {
               controller: description,
               label: l10n.panelSettings_snapshotDescription,
             ),
+            DropdownButtonFormField<int>(
+              initialValue: accountId,
+              decoration: InputDecoration(labelText: l10n.backups_accounts),
+              items: [
+                for (final account in accountItems)
+                  DropdownMenuItem(
+                    value: (account['id'] as num).toInt(),
+                    child: Text('${account['name'] ?? account['id']}'),
+                  ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => accountId = value);
+              },
+            ),
             for (final entry in flags.entries)
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
@@ -392,8 +427,8 @@ class SnapshotPage extends ConsumerWidget {
       await repository.createSnapshot({
         'name': snapshotName,
         'taskID': const Uuid().v4(),
-        'sourceAccountIDs': '1',
-        'downloadAccountID': 1,
+        'sourceAccountIDs': '$accountId',
+        'downloadAccountID': accountId,
         'description': note,
         'secret': '',
         ...options,

@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../network/panel_session.dart';
 import '../../domain/entities/server.dart';
 
 part 'storage_service.g.dart';
@@ -38,6 +39,7 @@ class StorageService {
       'allow_insecure_connections';
   static const _serversFileName = 'servers.json';
   static const _serverMemoPrefix = 'server_memo_v1_';
+  static const _panelSessionPrefix = 'panel_session_v1_';
 
   Stream<void> get serversChanged => _serversChangedController.stream;
 
@@ -88,6 +90,24 @@ class StorageService {
 
   Future<void> removeSecureString(String key) async {
     await _secureStorage.delete(key: key);
+  }
+
+  // --- Panel Session (Keychain / Keystore) ---
+
+  Future<PanelSession?> getPanelSession(int serverId) async {
+    final raw = await _secureStorage.read(key: '$_panelSessionPrefix$serverId');
+    return PanelSession.tryParse(raw);
+  }
+
+  Future<void> savePanelSession(int serverId, PanelSession session) async {
+    await _secureStorage.write(
+      key: '$_panelSessionPrefix$serverId',
+      value: session.encode(),
+    );
+  }
+
+  Future<void> clearPanelSession(int serverId) async {
+    await _secureStorage.delete(key: '$_panelSessionPrefix$serverId');
   }
 
   // --- Servers (JSON) ---

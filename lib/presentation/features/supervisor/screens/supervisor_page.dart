@@ -332,7 +332,7 @@ class SupervisorPage extends ConsumerWidget {
       final value = controller.text;
       controller.dispose();
       if (saved != true || !context.mounted) return;
-      await repository.supervisorConfig(operate: 'update', content: value);
+      await repository.supervisorConfig(operate: 'set', content: value);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_saved);
       ref.invalidate(_supervisorProvider);

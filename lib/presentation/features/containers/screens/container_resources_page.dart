@@ -72,6 +72,24 @@ class _ContainerResourcesPageState
               ref.invalidate(containerReposProvider);
             },
           ),
+          if (_tab == 0)
+            AppIconButton(
+              icon: TablerIcons.refresh_dot,
+              tooltip: l10n.containers_checkImageUpdates,
+              onPressed: _checkImageUpdates,
+            ),
+          if (_tab == 0)
+            AppIconButton(
+              icon: TablerIcons.calendar_repeat,
+              tooltip: l10n.containers_scheduleImageUpdates,
+              onPressed: _toggleImageUpdateSchedule,
+            ),
+          if (_tab == 0)
+            AppIconButton(
+              icon: TablerIcons.cloud_search,
+              tooltip: l10n.containers_searchRemote,
+              onPressed: _searchRemoteImages,
+            ),
           AppIconButton(
             icon: TablerIcons.plus,
             tooltip: _tab == 0
@@ -133,6 +151,93 @@ class _ContainerResourcesPageState
     if (!success || !mounted) return;
     AppToast.success(context, l10n.action_done);
     ref.invalidate(containerImagesProvider);
+  }
+
+  Future<void> _checkImageUpdates() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(containerRepositoryProvider.future);
+      await repository.checkImageUpdates();
+      if (!mounted) return;
+      AppToast.success(context, l10n.containers_imageUpdatesDone);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _toggleImageUpdateSchedule() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(containerRepositoryProvider.future);
+      final status = await repository.getImageUpdateStatus();
+      final enabled = status['enabled'] == true;
+      await repository.setImageUpdateSchedule(!enabled);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _searchRemoteImages() async {
+    final l10n = AppLocalizations.of(context);
+    final query = await showAppSheet<String>(
+      context: context,
+      builder: (sheetContext) => _RemoteSearchSheet(),
+    );
+    if (query == null || !mounted) return;
+    try {
+      final repository = await ref.read(containerRepositoryProvider.future);
+      final result = await repository.searchRemoteImages(query: query);
+      final items = result['items'] as List? ?? const [];
+      final names = [
+        for (final item in items)
+          if (item is Map && (item['name']?.toString().isNotEmpty ?? false))
+            item['name'].toString(),
+      ];
+      if (!mounted) return;
+      if (names.isEmpty) {
+        AppToast.warning(context, l10n.state_empty);
+        return;
+      }
+      final selected = await showSelectionMenu<String>(
+        context,
+        title: l10n.containers_searchRemote,
+        options: [
+          for (final name in names)
+            SelectionOption(
+              label: name,
+              value: name,
+              icon: TablerIcons.brand_docker,
+            ),
+        ],
+      );
+      if (selected == null || !mounted) return;
+      final taskID = const Uuid().v4();
+      final success = await TaskProgressSheet.run(
+        context,
+        title: l10n.containers_pullImage,
+        task: (controller) async {
+          await repository.pullImage(
+            ImagePullReq(taskID: taskID, imageName: [selected]),
+          );
+          await repository.waitForTask(
+            taskID,
+            onUpdate: (log) {
+              if (log.lines.isNotEmpty) controller.log(log.lines.last);
+            },
+          );
+        },
+      );
+      if (!success || !mounted) return;
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(containerImagesProvider);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _createRepo() async {
@@ -1475,6 +1580,52 @@ class _CreateNetworkSheetState extends State<_CreateNetworkSheet> {
                 gatewayV6: _gatewayV6.text.trim(),
               ),
             );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _RemoteSearchSheet extends StatefulWidget {
+  @override
+  State<_RemoteSearchSheet> createState() => _RemoteSearchSheetState();
+}
+
+class _RemoteSearchSheetState extends State<_RemoteSearchSheet> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.containers_searchRemote, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s12),
+        AppTextField(
+          controller: _controller,
+          label: l10n.containers_image,
+          autofocus: true,
+          onSubmitted: (value) {
+            final query = value.trim();
+            if (query.isNotEmpty) Navigator.of(context).pop(query);
+          },
+        ),
+        const SizedBox(height: AppTokens.s16),
+        PrimaryButton(
+          label: l10n.action_search,
+          onPressed: () {
+            final query = _controller.text.trim();
+            if (query.isEmpty) return;
+            Navigator.of(context).pop(query);
           },
         ),
       ],

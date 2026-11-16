@@ -40,9 +40,38 @@ class AppRepositoryImpl implements AppRepository {
       _appApi.checkAppInstalled(req);
 
   @override
+  Future<List<Map<String, dynamic>>> getInstalledDeleteCheck(int installId) =>
+      _appApi.getInstalledDeleteCheck(installId);
+
+  @override
+  Future<void> syncInstalledApps() => _appApi.syncInstalledApps();
+
+  @override
+  Future<void> updateInstalledSort(List<Map<String, dynamic>> items) =>
+      _appApi.updateInstalledSort(items);
+
+  @override
+  Future<String> getDefaultConfig({
+    required String key,
+    required String name,
+  }) => _appApi.getDefaultConfig(key: key, name: name);
+
+  @override
+  Future<AppDetailDto> getAppDetailById(int id) => _appApi.getAppDetailById(id);
+
+  @override
   Future<PageResult<AppInstalledDto>> searchInstalledApps(
     AppInstalledSearchReq req,
   ) => _appApi.searchInstalledApps(req);
+
+  @override
+  Future<Map<String, dynamic>> checkAppUpdates() => _appApi.checkAppUpdates();
+
+  @override
+  Future<void> updateInstalledConfig({
+    required int installId,
+    required String webUI,
+  }) => _appApi.updateInstalledConfig(installId: installId, webUI: webUI);
 
   @override
   Future<AppInstalledInfoDto> getInstalledInfo(int id) =>

@@ -48,11 +48,23 @@ class McpServerDto {
   final String createdAt;
 
   factory McpServerDto.fromJson(Map<String, dynamic> json) {
+    final baseUrl = json['baseUrl'] as String? ?? '';
+    var protocol = json['protocol'] as String? ?? 'http://';
+    var url = json['url'] as String? ?? '';
+    if (url.isEmpty && baseUrl.isNotEmpty) {
+      final uri = Uri.tryParse(baseUrl);
+      if (uri != null && uri.hasScheme) {
+        protocol = '${uri.scheme}://';
+        url = baseUrl.substring(protocol.length);
+      } else {
+        url = baseUrl;
+      }
+    }
     return McpServerDto(
       id: (json['id'] as num?)?.toInt() ?? 0,
       name: json['name'] as String? ?? '',
       status: json['status'] as String? ?? '',
-      baseUrl: json['baseUrl'] as String? ?? '',
+      baseUrl: baseUrl,
       ssePath: json['ssePath'] as String? ?? '',
       command: json['command'] as String? ?? '',
       port: (json['port'] as num?)?.toInt() ?? 0,
@@ -60,8 +72,8 @@ class McpServerDto {
       containerName: json['containerName'] as String? ?? '',
       dir: json['dir'] as String? ?? '',
       hostIP: json['hostIP'] as String? ?? '',
-      protocol: json['protocol'] as String? ?? 'http://',
-      url: json['url'] as String? ?? '',
+      protocol: protocol,
+      url: url,
       outputTransport: json['outputTransport'] as String? ?? 'sse',
       streamableHttpPath: json['streamableHttpPath'] as String? ?? '',
       type: json['type'] as String? ?? 'npx',

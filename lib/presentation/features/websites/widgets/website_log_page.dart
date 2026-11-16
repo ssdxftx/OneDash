@@ -23,7 +23,7 @@ List<LogSourceOption> websiteLogSources(
               : l10n.websites_errorLog,
           load: () async {
             final repository = await ref.read(websiteRepositoryProvider.future);
-            final log = await repository.readWebsiteLog(
+            final log = await repository.searchWebsiteLog(
               websiteId,
               type,
               pageSize: pageSize,
@@ -32,7 +32,7 @@ List<LogSourceOption> websiteLogSources(
           },
           loadPage: (page, size) async {
             final repository = await ref.read(websiteRepositoryProvider.future);
-            final log = await repository.readWebsiteLog(
+            final log = await repository.searchWebsiteLog(
               websiteId,
               type,
               page: page,
@@ -42,7 +42,7 @@ List<LogSourceOption> websiteLogSources(
           },
           exportBytes: () async {
             final repository = await ref.read(websiteRepositoryProvider.future);
-            final log = await repository.readWebsiteLog(
+            final log = await repository.searchWebsiteLog(
               websiteId,
               type,
               pageSize: 1,

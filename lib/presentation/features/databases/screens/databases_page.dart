@@ -173,7 +173,9 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage>
                     return RemovableListItem(
                       key: ValueKey('database-${item.id}'),
                       removing: _removing.contains(item.id),
-                      animateIn: entryAnimationEnabled,
+                      animateIn:
+                          entryAnimationEnabled &&
+                          index < AppTokens.listEntryAnimationLimit,
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: AppTokens.s12),
                         child: _DatabaseCard(
@@ -489,17 +491,19 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
     setState(() => _loading = true);
     try {
       final repository = await ref.read(databaseRepositoryProvider.future);
-      final items = <DatabaseInstanceDto>[];
-      for (final type in const ['mysql', 'postgresql', 'mongodb', 'redis']) {
-        try {
-          final page = await repository.searchRemoteDatabases(type: type);
-          items.addAll(page.items);
-        } catch (_) {
-          // Skip types the panel does not support.
-        }
-      }
+      final results = await Future.wait<List<DatabaseInstanceDto>>([
+        for (final type in const ['mysql', 'postgresql', 'mongodb', 'redis'])
+          () async {
+            try {
+              final page = await repository.searchRemoteDatabases(type: type);
+              return page.items;
+            } catch (_) {
+              return const <DatabaseInstanceDto>[];
+            }
+          }(),
+      ]);
       if (!mounted) return;
-      setState(() => _items = items);
+      setState(() => _items = results.expand((items) => items).toList());
     } catch (error) {
       if (!mounted) return;
       showErrorToast(context, error);
@@ -639,6 +643,11 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
       final repository = await ref.read(databaseRepositoryProvider.future);
       if (item.type.startsWith('postgresql')) {
         await repository.loadPgFromRemote(database: item.name);
+      } else if (item.type == 'mongodb') {
+        await repository.loadMongoFromRemote(
+          database: item.name,
+          from: item.from.isEmpty ? 'remote' : item.from,
+        );
       } else {
         await repository.loadFromRemote(
           from: item.from.isEmpty ? 'remote' : item.from,

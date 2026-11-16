@@ -8,12 +8,30 @@ class LogSanitizer {
   const LogSanitizer._();
 
   static final List<RegExp> _patterns = [
+    RegExp(
+      r'((?:old|new|confirm)?password\s*:\s*)[^,}\s]+',
+      caseSensitive: false,
+    ),
+    RegExp(r'(apiKey\s*:\s*)[^,}\s]+', caseSensitive: false),
+    RegExp(
+      r'((?:accessKey|credential|secret|privateKey|eabHmacKey)\s*:\s*)[^,}\s]+',
+      caseSensitive: false,
+    ),
+    RegExp(r'(token\s*:\s*)[^,}\s]+', caseSensitive: false),
     RegExp(r'(authorization_token=)[^;,\s]+', caseSensitive: false),
     RegExp(r'(session=)[^;,\s]+', caseSensitive: false),
     RegExp(r'("token"\s*:\s*")[^"]+(")', caseSensitive: false),
     RegExp(r'("apiKey"\s*:\s*")[^"]+(")', caseSensitive: false),
     RegExp(r'("cookie"\s*:\s*")[^"]+(")', caseSensitive: false),
     RegExp(r'("password"\s*:\s*")[^"]+(")', caseSensitive: false),
+    RegExp(r'("oldPassword"\s*:\s*")[^"]+(")', caseSensitive: false),
+    RegExp(r'("newPassword"\s*:\s*")[^"]+(")', caseSensitive: false),
+    RegExp(r'("confirmPassword"\s*:\s*")[^"]+(")', caseSensitive: false),
+    RegExp(r'("credential"\s*:\s*")[^"]+(")', caseSensitive: false),
+    RegExp(r'("accessKey"\s*:\s*")[^"]+(")', caseSensitive: false),
+    RegExp(r'("secret"\s*:\s*")[^"]+(")', caseSensitive: false),
+    RegExp(r'("privateKey"\s*:\s*")[^"]+(")', caseSensitive: false),
+    RegExp(r'("eabHmacKey"\s*:\s*")[^"]+(")', caseSensitive: false),
     RegExp(r'("phone"\s*:\s*")[^"]+(")', caseSensitive: false),
     RegExp(r'(1Panel-Token:\s*)\S+', caseSensitive: false),
   ];

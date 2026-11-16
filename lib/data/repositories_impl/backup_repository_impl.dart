@@ -29,6 +29,27 @@ class BackupRepositoryImpl implements BackupRepository {
   Future<void> deleteRecords(List<int> ids) => _backupApi.deleteRecords(ids);
 
   @override
+  Future<List<String>> searchRecordFiles(int recordId) =>
+      _backupApi.searchRecordFiles(recordId);
+
+  @override
+  Future<PageResult<BackupRecordDto>> searchRecordsByCronjob({
+    required int cronjobId,
+    int page = 1,
+    int pageSize = 100,
+  }) => _backupApi.searchRecordsByCronjob(
+    cronjobId: cronjobId,
+    page: page,
+    pageSize: pageSize,
+  );
+
+  @override
+  Future<void> updateRecordDescription({
+    required int id,
+    required String description,
+  }) => _backupApi.updateRecordDescription(id: id, description: description);
+
+  @override
   Future<void> backupApp({
     required String name,
     required String detailName,
@@ -128,6 +149,8 @@ class BackupRepositoryImpl implements BackupRepository {
     required String file,
     required String secret,
     required String taskID,
+    int backupRecordID = 0,
+    int timeout = 0,
   }) => _backupApi.recoverDatabase(
     downloadAccountID: downloadAccountID,
     type: type,
@@ -136,6 +159,8 @@ class BackupRepositoryImpl implements BackupRepository {
     file: file,
     secret: secret,
     taskID: taskID,
+    backupRecordID: backupRecordID,
+    timeout: timeout,
   );
 
   @override

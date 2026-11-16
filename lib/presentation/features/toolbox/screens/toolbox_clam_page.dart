@@ -12,6 +12,7 @@ import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
+import '../../../common/components/sheet_title.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
@@ -30,6 +31,8 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
   Map<String, dynamic> _base = const {};
   List<Map<String, dynamic>> _tasks = const [];
   bool _loading = true;
+  bool _failed = false;
+  bool _refreshing = false;
   Timer? _pollTimer;
 
   @override
@@ -44,8 +47,15 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
     super.dispose();
   }
 
-  Future<void> _load() async {
-    setState(() => _loading = true);
+  Future<void> _load({bool silent = false}) async {
+    if (_refreshing) return;
+    _refreshing = true;
+    if (!silent) {
+      setState(() {
+        _loading = true;
+        _failed = false;
+      });
+    }
     try {
       final repository = await ref.read(toolboxRepositoryProvider.future);
       final base = await repository.getClamBase();
@@ -57,11 +67,14 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
       setState(() {
         _base = base;
         _tasks = tasks;
+        _failed = false;
       });
     } catch (error) {
       if (!mounted) return;
+      if (!silent) setState(() => _failed = true);
       showErrorToast(context, error);
     } finally {
+      _refreshing = false;
       if (mounted) setState(() => _loading = false);
     }
   }
@@ -80,18 +93,26 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
     }
   }
 
-  Future<void> _create() async {
+  Future<void> _editRule([Map<String, dynamic>? task]) async {
     final l10n = AppLocalizations.of(context);
-    final name = TextEditingController(text: 'scan-${DateTime.now().minute}');
-    final path = TextEditingController(text: '/tmp');
-    final infectedDir = TextEditingController();
-    var strategy = 'none';
+    final editing = task != null;
+    final name = TextEditingController(
+      text: '${task?['name'] ?? 'scan-${DateTime.now().minute}'}',
+    );
+    final path = TextEditingController(text: '${task?['path'] ?? '/tmp'}');
+    final infectedDir = TextEditingController(
+      text: '${task?['infectedDir'] ?? ''}',
+    );
+    var strategy = '${task?['infectedStrategy'] ?? 'none'}';
+    if (!const {'none', 'remove', 'move', 'copy'}.contains(strategy)) {
+      strategy = 'none';
+    }
     final confirmed = await pushFormPage<bool>(
       context,
       StatefulBuilder(
         builder: (pageContext, setSheetState) => SimpleFormPage(
-          title: l10n.toolbox_clam,
-          saveLabel: l10n.action_create,
+          title: editing ? l10n.action_edit : l10n.toolbox_clam,
+          saveLabel: editing ? l10n.action_save : l10n.action_create,
           onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
             AppTextField(
@@ -150,12 +171,30 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
     if (confirmed != true || taskName.isEmpty || scanPath.isEmpty) return;
     try {
       final repository = await ref.read(toolboxRepositoryProvider.future);
-      await repository.createClam(
-        name: taskName,
-        path: scanPath,
-        infectedStrategy: strategy,
-        infectedDir: targetDir,
-      );
+      if (editing) {
+        await repository.updateClam({
+          'id': (task['id'] as num?)?.toInt() ?? 0,
+          'name': taskName,
+          'path': scanPath,
+          'infectedStrategy': strategy,
+          'infectedDir': targetDir,
+          'spec': '${task['spec'] ?? ''}',
+          'specObj': task['specObj'],
+          'hasSpec': task['hasSpec'],
+          'timeout': (task['timeout'] as num?)?.toInt() ?? 3600,
+          'description': '${task['description'] ?? ''}',
+          'alertCount': (task['alertCount'] as num?)?.toInt() ?? 0,
+          'alertMethod': '${task['alertMethod'] ?? ''}',
+          'alertTitle': '${task['alertTitle'] ?? ''}',
+        });
+      } else {
+        await repository.createClam(
+          name: taskName,
+          path: scanPath,
+          infectedStrategy: strategy,
+          infectedDir: targetDir,
+        );
+      }
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
       unawaited(_load());
@@ -191,8 +230,187 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
         timer.cancel();
         return;
       }
-      unawaited(_load());
+      unawaited(_load(silent: true));
     });
+  }
+
+  Future<void> _updateDatabase() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      await repository.operateClam('fresh-start');
+      if (!mounted) return;
+      AppToast.success(context, l10n.toolbox_updateVirusDatabase);
+      unawaited(_load());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _taskActions(Map<String, dynamic> task) async {
+    final l10n = AppLocalizations.of(context);
+    final action = await showSelectionMenu<String>(
+      context,
+      title: displayValue(context, task['name']?.toString()),
+      options: [
+        SelectionOption(
+          label: l10n.toolbox_startScan,
+          value: 'start',
+          icon: TablerIcons.player_play,
+        ),
+        SelectionOption(
+          label: l10n.action_edit,
+          value: 'edit',
+          icon: TablerIcons.pencil,
+        ),
+        SelectionOption(
+          label: '${task['status'] ?? ''}'.toLowerCase() == 'enable'
+              ? l10n.toolbox_disableScan
+              : l10n.toolbox_enableScan,
+          value: 'status',
+          icon: TablerIcons.power,
+        ),
+        SelectionOption(
+          label: l10n.toolbox_clamConfigFile,
+          value: 'config',
+          icon: TablerIcons.file_code,
+        ),
+        SelectionOption(
+          label: l10n.toolbox_clamRecords,
+          value: 'records',
+          icon: TablerIcons.list,
+        ),
+        SelectionOption(
+          label: l10n.action_delete,
+          value: 'delete',
+          icon: TablerIcons.trash,
+          danger: true,
+        ),
+      ],
+    );
+    if (action == null || !mounted) return;
+    switch (action) {
+      case 'start':
+        await _start(task);
+      case 'edit':
+        await _editRule(task);
+      case 'status':
+        await _toggleStatus(task);
+      case 'config':
+        await _showConfig(task);
+      case 'records':
+        await _showRecords(task);
+      case 'delete':
+        await _deleteTask(task);
+    }
+  }
+
+  Future<void> _deleteTask(Map<String, dynamic> task) async {
+    final l10n = AppLocalizations.of(context);
+    final id = (task['id'] as num?)?.toInt() ?? 0;
+    if (id == 0) return;
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.action_delete,
+      message: displayValue(context, task['name']?.toString()),
+      confirmLabel: l10n.action_delete,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      await repository.deleteClam(ids: [id]);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      unawaited(_load());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _toggleStatus(Map<String, dynamic> task) async {
+    final l10n = AppLocalizations.of(context);
+    final id = (task['id'] as num?)?.toInt() ?? 0;
+    final current = '${task['status'] ?? ''}'.toLowerCase();
+    final next = current == 'enable' ? 'Disable' : 'Enable';
+    if (id == 0) return;
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      await repository.updateClamStatus(id, next);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      unawaited(_load());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showConfig(Map<String, dynamic> task) async {
+    final l10n = AppLocalizations.of(context);
+    final name = '${task['name'] ?? ''}';
+    if (name.isEmpty) return;
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      final content = await repository.loadClamFile(name);
+      if (!mounted) return;
+      final edit = await showAppSheet<bool>(
+        context: context,
+        maxHeightFactor: 0.9,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SheetTitle(
+              title: l10n.toolbox_clamConfigFile,
+              onClose: () => Navigator.of(sheetContext).pop(false),
+              actions: [
+                IconButton(
+                  tooltip: l10n.action_edit,
+                  onPressed: () => Navigator.of(sheetContext).pop(true),
+                  icon: const Icon(TablerIcons.pencil),
+                ),
+              ],
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                child: SelectableText(
+                  content,
+                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+      if (edit != true || !mounted) return;
+      final controller = TextEditingController(text: content);
+      final confirmed = await pushFormPage<bool>(
+        context,
+        SimpleFormPage(
+          title: l10n.toolbox_clamConfigFile,
+          onSave: () async =>
+              Navigator.of(context, rootNavigator: true).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.toolbox_clamConfigFile,
+              maxLines: 20,
+            ),
+          ],
+        ),
+      );
+      final newContent = controller.text;
+      controller.dispose();
+      if (confirmed != true) return;
+      await repository.updateClamFile(name: name, file: newContent);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _showRecords(Map<String, dynamic> task) async {
@@ -232,6 +450,23 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
                       ),
                       subtitle:
                           '${record['status'] ?? ''} · ${record['infectedFiles'] ?? '0'}',
+                      trailing: record['id'] == null
+                          ? null
+                          : IconButton(
+                              tooltip: l10n.action_clear,
+                              icon: const Icon(TablerIcons.eraser),
+                              onPressed: () async {
+                                await repository.cleanClamRecords(
+                                  (record['id'] as num).toInt(),
+                                );
+                                if (!sheetContext.mounted) return;
+                                AppToast.success(
+                                  sheetContext,
+                                  l10n.action_done,
+                                );
+                                Navigator.of(sheetContext).pop();
+                              },
+                            ),
                     ),
                 ],
               ),
@@ -247,9 +482,6 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
     final active = _base['isActive'] == true;
     final scanning = _tasks.any((task) {
       final status = '${task['status'] ?? ''}'.toLowerCase();
@@ -266,85 +498,100 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
           ),
           AppIconButton(
             icon: TablerIcons.plus,
-            tooltip: l10n.toolbox_scanRecords,
-            onPressed: _base['isExist'] == true ? _create : null,
+            tooltip: l10n.toolbox_clamAdd,
+            onPressed: _base['isExist'] == true ? _editRule : null,
           ),
         ],
       ),
-      body: ListView(
-        padding: EdgeInsets.all(context.pagePadding),
-        children: [
-          SplitListGroup(
-            children: [
-              SwitchListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppTokens.s16,
-                ),
-                title: const Text('ClamAV'),
-                subtitle: Text(
-                  active ? l10n.toolbox_running : l10n.toolbox_stopped,
-                ),
-                value: active,
-                onChanged: _base['isExist'] == true ? _toggle : null,
-              ),
-              SplitListTile(
-                title: l10n.toolbox_version,
-                subtitle: displayValue(context, _base['version']?.toString()),
-              ),
-              SplitListTile(
-                title: l10n.toolbox_virusDatabase,
-                subtitle: displayValue(
-                  context,
-                  _base['freshVersion']?.toString(),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppTokens.s24),
-          SectionHeader(title: l10n.toolbox_scanRecords),
-          if (scanning)
-            const Padding(
-              padding: EdgeInsets.only(bottom: AppTokens.s12),
-              child: LinearProgressIndicator(),
-            ),
-          if (_tasks.isEmpty)
-            EmptyState(
-              icon: TablerIcons.virus,
-              title: l10n.toolbox_clamScanEmptyTitle,
-              message: l10n.toolbox_noScans,
-              compact: true,
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _failed
+          ? EmptyState(
+              icon: TablerIcons.alert_triangle,
+              title: l10n.toolbox_loadFailed,
+              actionLabel: l10n.action_retry,
+              onAction: _load,
             )
-          else
-            SplitListGroup(
+          : ListView(
+              padding: EdgeInsets.all(context.pagePadding),
               children: [
-                for (final task in _tasks)
-                  SplitListTile(
-                    leading: const Icon(TablerIcons.scan),
-                    title: displayValue(context, task['name']?.toString()),
-                    subtitle: [
-                      displayValue(context, task['path']?.toString()),
-                      if ((task['status']?.toString() ?? '').isNotEmpty)
-                        task['status'].toString(),
-                    ].join(' · '),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextButton(
-                          onPressed: () => _showRecords(task),
-                          child: Text(l10n.toolbox_clamRecords),
-                        ),
-                        IconButton(
-                          tooltip: l10n.toolbox_startScan,
-                          onPressed: () => _start(task),
-                          icon: const Icon(TablerIcons.player_play),
-                        ),
-                      ],
+                SplitListGroup(
+                  children: [
+                    SwitchListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppTokens.s16,
+                      ),
+                      title: const Text('ClamAV'),
+                      subtitle: Text(
+                        active ? l10n.toolbox_running : l10n.toolbox_stopped,
+                      ),
+                      value: active,
+                      onChanged: _base['isExist'] == true ? _toggle : null,
                     ),
+                    SplitListTile(
+                      title: l10n.toolbox_version,
+                      subtitle: displayValue(
+                        context,
+                        _base['version']?.toString(),
+                      ),
+                    ),
+                    SplitListTile(
+                      title: l10n.toolbox_virusDatabase,
+                      subtitle: displayValue(
+                        context,
+                        _base['freshVersion']?.toString(),
+                      ),
+                    ),
+                    SplitListTile(
+                      leading: const Icon(TablerIcons.refresh),
+                      title: l10n.toolbox_updateVirusDatabase,
+                      subtitle: l10n.toolbox_updateVirusDatabaseHint,
+                      trailing: const Icon(TablerIcons.chevron_right),
+                      onTap: _base['freshIsExist'] == true
+                          ? _updateDatabase
+                          : null,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppTokens.s24),
+                SectionHeader(title: l10n.toolbox_scanRecords),
+                if (scanning)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: AppTokens.s12),
+                    child: LinearProgressIndicator(),
+                  ),
+                if (_tasks.isEmpty)
+                  EmptyState(
+                    icon: TablerIcons.virus,
+                    title: l10n.toolbox_clamScanEmptyTitle,
+                    message: l10n.toolbox_noScans,
+                    compact: true,
+                  )
+                else
+                  SplitListGroup(
+                    children: [
+                      for (final task in _tasks)
+                        SplitListTile(
+                          leading: const Icon(TablerIcons.scan),
+                          title: displayValue(
+                            context,
+                            task['name']?.toString(),
+                          ),
+                          subtitle: [
+                            displayValue(context, task['path']?.toString()),
+                            if ((task['status']?.toString() ?? '').isNotEmpty)
+                              task['status'].toString(),
+                          ].join(' · '),
+                          trailing: IconButton(
+                            tooltip: l10n.action_more,
+                            icon: const Icon(TablerIcons.dots),
+                            onPressed: () => _taskActions(task),
+                          ),
+                        ),
+                    ],
                   ),
               ],
             ),
-        ],
-      ),
     );
   }
 }

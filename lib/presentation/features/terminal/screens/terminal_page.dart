@@ -33,6 +33,8 @@ class TerminalPage extends ConsumerStatefulWidget {
     this.redisName,
     this.redisFrom,
     this.initialCommand,
+    this.scriptId,
+    this.sshHostId,
   });
 
   final int serverId;
@@ -40,6 +42,8 @@ class TerminalPage extends ConsumerStatefulWidget {
   final String? redisName;
   final String? redisFrom;
   final String? initialCommand;
+  final int? scriptId;
+  final int? sshHostId;
 
   @override
   ConsumerState<TerminalPage> createState() => _TerminalPageState();
@@ -81,10 +85,14 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
       final wsScheme = uri.scheme == 'https' ? 'wss' : 'ws';
       final isContainer = widget.containerName != null;
       final isRedis = widget.redisName != null;
+      final isScript = widget.scriptId != null;
+      final isSsh = widget.sshHostId != null;
       final query = <String, String>{
         'cols': '${_terminal.viewWidth}',
         'rows': '${_terminal.viewHeight}',
         'operateNode': 'local',
+        if (isScript) 'script_id': '${widget.scriptId}',
+        if (isSsh) 'id': '${widget.sshHostId}',
         if (isContainer) ...{
           'source': 'container',
           'containerid': widget.containerName!,
@@ -94,11 +102,15 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
           'source': 'redis',
           'name': widget.redisName!,
           'from': widget.redisFrom ?? 'local',
-        } else ...{
+        } else if (!isScript) ...{
           'source': 'host',
         },
       };
-      final paths = isContainer || isRedis
+      final paths = isScript
+          ? const ['/api/v2/core/script/run']
+          : isSsh
+          ? const ['/api/v2/hosts/terminal/ssh']
+          : isContainer || isRedis
           ? const [
               '/api/v2/hosts/terminal/container',
               '/api/v2/containers/exec',
@@ -134,7 +146,11 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
             )
             .toList(growable: false),
         cacheScope: widget.serverId,
-        cacheKey: isContainer
+        cacheKey: isScript
+            ? 'terminal.script'
+            : isSsh
+            ? 'terminal.ssh.${widget.sshHostId}'
+            : isContainer
             ? 'terminal.container'
             : isRedis
             ? 'terminal.redis'

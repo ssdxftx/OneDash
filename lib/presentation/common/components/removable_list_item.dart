@@ -16,6 +16,7 @@ class RemovableListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!animateIn && !removing) return child;
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: animateIn ? 0 : 1, end: removing ? 0 : 1),
       duration: context.motion(AppTokens.dBase),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -18,6 +20,9 @@ import '../../servers/providers/servers_provider.dart';
 
 final _panelCountsProvider = FutureProvider.autoDispose
     .family<DashboardBase, int>((ref, id) async {
+      final link = ref.keepAlive();
+      final timer = Timer(AppTokens.serverHealthPoll, link.close);
+      ref.onDispose(timer.cancel);
       final repository = await ref.watch(
         dashboardRepositoryForServerProvider(id).future,
       );
@@ -104,6 +109,13 @@ class MorePage extends ConsumerWidget {
                           title: l10n.ai_title,
                           subtitle: l10n.ai_subtitle,
                           onTap: () => context.push('/s/$serverId/more/ai'),
+                        ),
+                        _tile(
+                          context,
+                          icon: TablerIcons.device_desktop,
+                          title: l10n.vm_title,
+                          subtitle: l10n.vm_subtitle,
+                          onTap: () => context.push('/s/$serverId/more/vms'),
                         ),
                       ],
                     ),

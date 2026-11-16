@@ -11,6 +11,7 @@ import '../dto/common/task_log_dto.dart' as log_file;
 import '../dto/log/login_log_dto.dart';
 import '../dto/log/operation_log_dto.dart';
 import '../dto/log/ssh_log_dto.dart';
+import '../dto/log/system_log_dto.dart';
 import '../dto/log/task_log_dto.dart';
 
 part 'log_repository_impl.g.dart';
@@ -43,12 +44,12 @@ class LogRepositoryImpl implements LogRepository {
   Future<PageResult<LoginLogDto>> searchLoginLogs({
     int page = 1,
     int pageSize = 20,
-    String ip = '',
+    String info = '',
     String status = '',
   }) => _api.searchLoginLogs(
     page: page,
     pageSize: pageSize,
-    ip: ip,
+    info: info,
     status: status,
   );
 
@@ -57,6 +58,31 @@ class LogRepositoryImpl implements LogRepository {
 
   @override
   Future<List<String>> getSystemLogFiles() => _api.getSystemLogFiles();
+
+  @override
+  Future<List<String>> getSystemLogServices() => _api.getSystemLogServices();
+
+  @override
+  Future<SystemLogStatusDto> getSystemLogStatus() => _api.getSystemLogStatus();
+
+  @override
+  Future<SystemLogPageDto> readSystemLog({
+    String keyword = '',
+    String service = '',
+    String priority = '',
+    String cursor = '',
+    String startTime = '',
+    String endTime = '',
+    int pageSize = 50,
+  }) => _api.readSystemLog(
+    keyword: keyword,
+    service: service,
+    priority: priority,
+    cursor: cursor,
+    startTime: startTime,
+    endTime: endTime,
+    pageSize: pageSize,
+  );
 
   @override
   Future<PageResult<TaskLogDto>> searchTaskLogs({
@@ -87,8 +113,17 @@ class LogRepositoryImpl implements LogRepository {
   );
 
   @override
-  Future<String> exportSshLogs({String info = '', String status = 'All'}) =>
-      _api.exportSshLogs(info: info, status: status);
+  Future<String> exportSshLogs({
+    String info = '',
+    String status = 'All',
+    int page = 1,
+    int pageSize = 100000,
+  }) => _api.exportSshLogs(
+    info: info,
+    status: status,
+    page: page,
+    pageSize: pageSize,
+  );
 
   @override
   Future<log_file.TaskLogDto> readTaskLog(String taskID) =>

@@ -285,6 +285,18 @@
   "@settings_appearance_modeDark": {
     "description": "Dark appearance mode option."
   },
+  "firewall_panelPort": "Panel port",
+  "@firewall_panelPort": {
+    "description": "OneDash UI text."
+  },
+  "firewall_portChanged": "Port updated",
+  "@firewall_portChanged": {
+    "description": "OneDash UI text."
+  },
+  "firewall_newPort": "New port",
+  "@firewall_newPort": {
+    "description": "OneDash UI text."
+  },
   "firewall_title": "Firewall",
   "@firewall_title": {
     "description": "OneDash UI string"
@@ -340,6 +352,118 @@
   "panelSettings_panelUsername": "Panel Username",
   "@panelSettings_panelUsername": {
     "description": "Panel username setting title."
+  },
+  "panelSettings_apiKeyManagement": "Independent API keys",
+  "@panelSettings_apiKeyManagement": {
+    "description": "Independent API key management."
+  },
+  "panelSettings_apiKeyManagementHint": "Create, view and manage independent API keys.",
+  "@panelSettings_apiKeyManagementHint": {
+    "description": "Independent API key management hint."
+  },
+  "panelSettings_apiKeyCreate": "Create API key",
+  "@panelSettings_apiKeyCreate": {
+    "description": "Create independent API key."
+  },
+  "panelSettings_apiKeyName": "Name",
+  "@panelSettings_apiKeyName": {
+    "description": "API key name."
+  },
+  "panelSettings_apiKeyDescription": "Description",
+  "@panelSettings_apiKeyDescription": {
+    "description": "API key description."
+  },
+  "panelSettings_apiKeyIpWhiteList": "IP allowlist",
+  "@panelSettings_apiKeyIpWhiteList": {
+    "description": "API key IP allowlist."
+  },
+  "panelSettings_apiKeyTrustedProxies": "Trusted proxies",
+  "@panelSettings_apiKeyTrustedProxies": {
+    "description": "API key trusted proxies."
+  },
+  "panelSettings_apiKeyValidity": "Timestamp validity (minutes)",
+  "@panelSettings_apiKeyValidity": {
+    "description": "API key timestamp validity."
+  },
+  "panelSettings_apiKeyAllowAppBinding": "Allow app binding",
+  "@panelSettings_apiKeyAllowAppBinding": {
+    "description": "API key app binding."
+  },
+  "panelSettings_apiKeyReveal": "Reveal key",
+  "@panelSettings_apiKeyReveal": {
+    "description": "Reveal API key."
+  },
+  "panelSettings_apiKeyEnable": "Enable",
+  "@panelSettings_apiKeyEnable": {
+    "description": "Enable API key."
+  },
+  "panelSettings_apiKeyDisable": "Disable",
+  "@panelSettings_apiKeyDisable": {
+    "description": "Disable API key."
+  },
+  "panelSettings_apiKeyRevoke": "Revoke",
+  "@panelSettings_apiKeyRevoke": {
+    "description": "Revoke API key."
+  },
+  "panelSettings_apiKeyDelete": "Delete",
+  "@panelSettings_apiKeyDelete": {
+    "description": "Delete API key."
+  },
+  "panelSettings_apiKeyEmpty": "No independent API keys",
+  "@panelSettings_apiKeyEmpty": {
+    "description": "Empty API key list."
+  },
+  "panelSettings_apiKeyCreated": "API key created and copied",
+  "@panelSettings_apiKeyCreated": {
+    "description": "API key created."
+  },
+  "panelSettings_apiKeyRevokeConfirm": "Revoke cannot be undone. Continue?",
+  "@panelSettings_apiKeyRevokeConfirm": {
+    "description": "Revoke API key confirmation."
+  },
+  "panelSettings_apiKeyDeleteConfirm": "Delete cannot be undone. Continue?",
+  "@panelSettings_apiKeyDeleteConfirm": {
+    "description": "Delete API key confirmation."
+  },
+  "panelSettings_apiKeyExpires": "Expires",
+  "@panelSettings_apiKeyExpires": {
+    "description": "API key expiry."
+  },
+  "panelSettings_panelLogin": "Panel login",
+  "@panelSettings_panelLogin": {
+    "description": "Panel login entry."
+  },
+  "panelSettings_panelLoggedIn": "Signed in. Password, MFA, Passkey and API Key management are available.",
+  "@panelSettings_panelLoggedIn": {
+    "description": "Panel session active."
+  },
+  "panelSettings_panelNotLoggedIn": "Not signed in. Password, MFA, Passkey and API Key management require a panel session.",
+  "@panelSettings_panelNotLoggedIn": {
+    "description": "Panel session missing."
+  },
+  "panelSettings_username": "Username",
+  "@panelSettings_username": {
+    "description": "Panel login username."
+  },
+  "panelSettings_password": "Password",
+  "@panelSettings_password": {
+    "description": "Panel login password."
+  },
+  "panelSettings_login": "Sign in",
+  "@panelSettings_login": {
+    "description": "Panel login action."
+  },
+  "panelSettings_loginRequired": "Sign in to the panel first.",
+  "@panelSettings_loginRequired": {
+    "description": "Session required hint."
+  },
+  "panelSettings_captcha": "Verification code",
+  "@panelSettings_captcha": {
+    "description": "Login captcha label."
+  },
+  "panelSettings_logout": "Sign out",
+  "@panelSettings_logout": {
+    "description": "Panel logout action."
   },
   "panelSettings_panelLoginPassword": "Panel Login Password",
   "@panelSettings_panelLoginPassword": {
@@ -1261,6 +1385,34 @@
   "@files_compress": {
     "description": "OneDash UI string"
   },
+  "files_preview": "Preview",
+  "@files_preview": {
+    "description": "OneDash UI text."
+  },
+  "files_directoryTree": "Directory tree",
+  "@files_directoryTree": {
+    "description": "OneDash UI text."
+  },
+  "files_remark": "Remark",
+  "@files_remark": {
+    "description": "OneDash UI text."
+  },
+  "files_remarkSaved": "Remark saved",
+  "@files_remarkSaved": {
+    "description": "OneDash UI text."
+  },
+  "files_shareQr": "Share QR code",
+  "@files_shareQr": {
+    "description": "OneDash UI text."
+  },
+  "files_mounts": "System mounts",
+  "@files_mounts": {
+    "description": "OneDash UI text."
+  },
+  "files_mountPoint": "Mount point",
+  "@files_mountPoint": {
+    "description": "OneDash UI text."
+  },
   "files_share": "Share",
   "@files_share": {
     "description": "OneDash UI string"
@@ -1308,6 +1460,14 @@
   "websites_proxy": "Reverse proxy",
   "@websites_proxy": {
     "description": "OneDash UI string"
+  },
+  "websites_deployment": "Application",
+  "@websites_deployment": {
+    "description": "OneDash UI text."
+  },
+  "websites_subsite": "Subsite",
+  "@websites_subsite": {
+    "description": "OneDash UI text."
   },
   "websites_php": "PHP",
   "@websites_php": {
@@ -1880,6 +2040,10 @@
   "files_downloadTooLarge": "File exceeds 50 MB. Use the web version to download.",
   "@files_downloadTooLarge": {
     "description": "Download limit."
+  },
+  "files_downloadReady": "File is ready. Save or share it from the share sheet.",
+  "@files_downloadReady": {
+    "description": "Download ready in share sheet."
   },
   "files_savedTo": "Saved to {path}",
   "@files_savedTo": {
@@ -3407,6 +3571,18 @@
   "@host_monitor": {
     "description": "Monitoring tab title."
   },
+  "host_cleanSshLog": "Clean SSH logs",
+  "@host_cleanSshLog": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_cleanMonitor": "Clean monitor data",
+  "@dashboard_cleanMonitor": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_cleanMonitorConfirm": "Collected monitoring data will be deleted. Continue?",
+  "@dashboard_cleanMonitorConfirm": {
+    "description": "OneDash UI text."
+  },
   "host_ssh": "SSH",
   "@host_ssh": {
     "description": "SSH tab title."
@@ -3722,6 +3898,111 @@
   "host_diagnostics": "Diagnostics",
   "@host_diagnostics": {
     "description": "Host runtime diagnostics tab label."
+  },
+  "host_remoteHosts": "Remote hosts",
+  "@host_remoteHosts": {
+    "description": "OneDash UI text."
+  },
+  "host_addRemote": "Add remote host",
+  "@host_addRemote": {
+    "description": "OneDash UI text."
+  },
+  "host_noRemote": "No remote hosts",
+  "@host_noRemote": {
+    "description": "OneDash UI text."
+  },
+  "host_noRemoteHint": "Remote hosts can be used from the terminal.",
+  "@host_noRemoteHint": {
+    "description": "OneDash UI text."
+  },
+  "host_remoteName": "Name",
+  "@host_remoteName": {
+    "description": "OneDash UI text."
+  },
+  "host_address": "Address",
+  "@host_address": {
+    "description": "OneDash UI text."
+  },
+  "host_port": "Port",
+  "@host_port": {
+    "description": "OneDash UI text."
+  },
+  "host_user": "User",
+  "@host_user": {
+    "description": "OneDash UI text."
+  },
+  "host_authMode": "Authentication",
+  "@host_authMode": {
+    "description": "OneDash UI text."
+  },
+  "host_authPassword": "Password",
+  "@host_authPassword": {
+    "description": "OneDash UI text."
+  },
+  "host_authKey": "Private key",
+  "@host_authKey": {
+    "description": "OneDash UI text."
+  },
+  "host_password": "Password",
+  "@host_password": {
+    "description": "OneDash UI text."
+  },
+  "host_privateKey": "Private key",
+  "@host_privateKey": {
+    "description": "OneDash UI text."
+  },
+  "host_passphrase": "Key passphrase",
+  "@host_passphrase": {
+    "description": "OneDash UI text."
+  },
+  "host_rememberPassword": "Remember password",
+  "@host_rememberPassword": {
+    "description": "OneDash UI text."
+  },
+  "host_description": "Description",
+  "@host_description": {
+    "description": "OneDash UI text."
+  },
+  "host_group": "Group",
+  "@host_group": {
+    "description": "OneDash UI text."
+  },
+  "host_noGroup": "No group",
+  "@host_noGroup": {
+    "description": "OneDash UI text."
+  },
+  "host_testConnection": "Test connection",
+  "@host_testConnection": {
+    "description": "OneDash UI text."
+  },
+  "host_connectionOk": "Connection succeeded",
+  "@host_connectionOk": {
+    "description": "OneDash UI text."
+  },
+  "host_connectionFailed": "Connection failed",
+  "@host_connectionFailed": {
+    "description": "OneDash UI text."
+  },
+  "host_deleteRemote": "Delete remote host",
+  "@host_deleteRemote": {
+    "description": "OneDash UI text."
+  },
+  "host_deleteRemoteMessage": "Delete {name}?",
+  "@host_deleteRemoteMessage": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "host_remoteSaved": "Remote host saved",
+  "@host_remoteSaved": {
+    "description": "OneDash UI text."
+  },
+  "action_test": "Test",
+  "@action_test": {
+    "description": "OneDash UI text."
   },
   "host_diskSystem": "System disks",
   "@host_diskSystem": {
@@ -4075,9 +4356,9 @@
   "@websites_templateRemark": {
     "description": "Website template remark."
   },
-  "websites_templateVariables": "Variables",
+  "websites_templateVariables": "Template variables",
   "@websites_templateVariables": {
-    "description": "Website template variables."
+    "description": "OneDash UI text."
   },
   "websites_templateAddVariable": "Add variable",
   "@websites_templateAddVariable": {
@@ -4399,6 +4680,134 @@
   "firewall_settingsBackendHint": "Tap to switch the managed backend",
   "@firewall_settingsBackendHint": {
     "description": "Firewall backend switch hint."
+  },
+  "firewall_backendSystem": "System rules",
+  "@firewall_backendSystem": {
+    "description": "OneDash UI text."
+  },
+  "firewall_backendForwarding": "Port forwarding",
+  "@firewall_backendForwarding": {
+    "description": "OneDash UI text."
+  },
+  "firewall_backendDocker": "Docker rules",
+  "@firewall_backendDocker": {
+    "description": "OneDash UI text."
+  },
+  "firewall_advanced": "Advanced actions",
+  "@firewall_advanced": {
+    "description": "OneDash UI text."
+  },
+  "firewall_familyOperation": "Initialize or repair firewall family",
+  "@firewall_familyOperation": {
+    "description": "OneDash UI text."
+  },
+  "firewall_familyOperationHint": "Initialize, repair or bind a subsystem for IPv4 or IPv6",
+  "@firewall_familyOperationHint": {
+    "description": "OneDash UI text."
+  },
+  "firewall_filterChain": "Base chain operations",
+  "@firewall_filterChain": {
+    "description": "OneDash UI text."
+  },
+  "firewall_filterChainHint": "Initialize, bind or unbind the 1PANEL_BASIC chain",
+  "@firewall_filterChainHint": {
+    "description": "OneDash UI text."
+  },
+  "firewall_subsystem": "Subsystem",
+  "@firewall_subsystem": {
+    "description": "OneDash UI text."
+  },
+  "firewall_family": "Family",
+  "@firewall_family": {
+    "description": "OneDash UI text."
+  },
+  "firewall_operation": "Operation",
+  "@firewall_operation": {
+    "description": "OneDash UI text."
+  },
+  "firewall_subsystemSystem": "System rules",
+  "@firewall_subsystemSystem": {
+    "description": "OneDash UI text."
+  },
+  "firewall_subsystemForwarding": "Port forwarding",
+  "@firewall_subsystemForwarding": {
+    "description": "OneDash UI text."
+  },
+  "firewall_subsystemDocker": "Docker rules",
+  "@firewall_subsystemDocker": {
+    "description": "OneDash UI text."
+  },
+  "firewall_operationInitialize": "Initialize",
+  "@firewall_operationInitialize": {
+    "description": "OneDash UI text."
+  },
+  "firewall_operationRepair": "Repair",
+  "@firewall_operationRepair": {
+    "description": "OneDash UI text."
+  },
+  "firewall_operationBind": "Bind",
+  "@firewall_operationBind": {
+    "description": "OneDash UI text."
+  },
+  "firewall_filterInit": "Initialize base chain",
+  "@firewall_filterInit": {
+    "description": "OneDash UI text."
+  },
+  "firewall_filterBind": "Bind base chain",
+  "@firewall_filterBind": {
+    "description": "OneDash UI text."
+  },
+  "firewall_filterUnbind": "Unbind base chain",
+  "@firewall_filterUnbind": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerPolicy": "Port guard policy",
+  "@firewall_dockerPolicy": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerPolicyHint": "Restrict sources for a published container port",
+  "@firewall_dockerPolicyHint": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerMode": "Policy mode",
+  "@firewall_dockerMode": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerSources": "Source addresses",
+  "@firewall_dockerSources": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerSourcesHint": "Separate multiple addresses with commas",
+  "@firewall_dockerSourcesHint": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerPolicySaved": "Port guard policy saved",
+  "@firewall_dockerPolicySaved": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerPolicyDeleted": "Port guard policy deleted",
+  "@firewall_dockerPolicyDeleted": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerModeDenySources": "Deny specified sources",
+  "@firewall_dockerModeDenySources": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerModeAllowSources": "Allow only specified sources",
+  "@firewall_dockerModeAllowSources": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerModeDenyAll": "Deny all sources",
+  "@firewall_dockerModeDenyAll": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerModeAcceptSources": "Accept specified sources",
+  "@firewall_dockerModeAcceptSources": {
+    "description": "OneDash UI text."
+  },
+  "firewall_dockerModeAcceptAll": "Accept all sources",
+  "@firewall_dockerModeAcceptAll": {
+    "description": "OneDash UI text."
   },
   "host_sshCheckFailed": "Local SSH connection check failed. Save cancelled.",
   "@host_sshCheckFailed": {
@@ -5366,6 +5775,62 @@
   "@files_batchPermission": {
     "description": "OneDash UI text."
   },
+  "files_convert": "Convert format",
+  "@files_convert": {
+    "description": "OneDash UI text."
+  },
+  "files_convertFormat": "Output format",
+  "@files_convertFormat": {
+    "description": "OneDash UI text."
+  },
+  "files_convertOutput": "Output directory",
+  "@files_convertOutput": {
+    "description": "OneDash UI text."
+  },
+  "files_convertDeleteSource": "Delete source files after conversion",
+  "@files_convertDeleteSource": {
+    "description": "OneDash UI text."
+  },
+  "files_convertStarted": "Conversion task submitted",
+  "@files_convertStarted": {
+    "description": "OneDash UI text."
+  },
+  "files_convertOnlyFiles": "Only files can be converted, not directories",
+  "@files_convertOnlyFiles": {
+    "description": "OneDash UI text."
+  },
+  "files_convertNoFile": "Select files to convert first",
+  "@files_convertNoFile": {
+    "description": "OneDash UI text."
+  },
+  "files_uploadRecords": "Upload records",
+  "@files_uploadRecords": {
+    "description": "OneDash UI text."
+  },
+  "files_noUploadRecords": "No upload records",
+  "@files_noUploadRecords": {
+    "description": "OneDash UI text."
+  },
+  "files_noUploadRecordsHint": "Uploaded files in the current directory appear here.",
+  "@files_noUploadRecordsHint": {
+    "description": "OneDash UI text."
+  },
+  "files_convertLogs": "Conversion records",
+  "@files_convertLogs": {
+    "description": "OneDash UI text."
+  },
+  "files_noConvertLogs": "No conversion records",
+  "@files_noConvertLogs": {
+    "description": "OneDash UI text."
+  },
+  "files_noConvertLogsHint": "Completed file conversions appear here.",
+  "@files_noConvertLogsHint": {
+    "description": "OneDash UI text."
+  },
+  "files_removeDownloadRecord": "Remove record",
+  "@files_removeDownloadRecord": {
+    "description": "OneDash UI text."
+  },
   "files_copyMode": "Copy instead of move",
   "@files_copyMode": {
     "description": "OneDash UI text."
@@ -5438,6 +5903,14 @@
   "@websites_dirPermissionHint": {
     "description": "OneDash UI text."
   },
+  "action_enable": "Enable",
+  "@action_enable": {
+    "description": "OneDash UI text."
+  },
+  "action_disable": "Disable",
+  "@action_disable": {
+    "description": "OneDash UI text."
+  },
   "websites_enabled": "Enabled",
   "@websites_enabled": {
     "description": "OneDash UI text."
@@ -5464,6 +5937,130 @@
   },
   "websites_owner": "User",
   "@websites_owner": {
+    "description": "OneDash UI text."
+  },
+  "websites_batchActions": "Batch actions",
+  "@websites_batchActions": {
+    "description": "OneDash UI text."
+  },
+  "websites_batchSuccess": "Batch operation completed",
+  "@websites_batchSuccess": {
+    "description": "OneDash UI text."
+  },
+  "websites_changeGroup": "Change group",
+  "@websites_changeGroup": {
+    "description": "OneDash UI text."
+  },
+  "websites_bindSsl": "Bind certificate",
+  "@websites_bindSsl": {
+    "description": "OneDash UI text."
+  },
+  "websites_selectGroup": "Select group",
+  "@websites_selectGroup": {
+    "description": "OneDash UI text."
+  },
+  "websites_selectSsl": "Select certificate",
+  "@websites_selectSsl": {
+    "description": "OneDash UI text."
+  },
+  "websites_defaultSite": "Default site",
+  "@websites_defaultSite": {
+    "description": "OneDash UI text."
+  },
+  "websites_crossSite": "Cross-site access",
+  "@websites_crossSite": {
+    "description": "OneDash UI text."
+  },
+  "websites_proxyCache": "Proxy cache",
+  "@websites_proxyCache": {
+    "description": "OneDash UI text."
+  },
+  "websites_cacheLimit": "Cache limit",
+  "@websites_cacheLimit": {
+    "description": "OneDash UI text."
+  },
+  "websites_cacheShare": "Shared cache",
+  "@websites_cacheShare": {
+    "description": "OneDash UI text."
+  },
+  "websites_cacheExpire": "Cache expiry",
+  "@websites_cacheExpire": {
+    "description": "OneDash UI text."
+  },
+  "websites_clearProxyCache": "Clear proxy cache",
+  "@websites_clearProxyCache": {
+    "description": "OneDash UI text."
+  },
+  "websites_composer": "Composer",
+  "@websites_composer": {
+    "description": "OneDash UI text."
+  },
+  "websites_composerCommand": "Command",
+  "@websites_composerCommand": {
+    "description": "OneDash UI text."
+  },
+  "websites_composerMirror": "Mirror",
+  "@websites_composerMirror": {
+    "description": "OneDash UI text."
+  },
+  "websites_composerDir": "Working directory",
+  "@websites_composerDir": {
+    "description": "OneDash UI text."
+  },
+  "websites_composerUser": "Run as user",
+  "@websites_composerUser": {
+    "description": "OneDash UI text."
+  },
+  "websites_cacheCleared": "Proxy cache cleared",
+  "@websites_cacheCleared": {
+    "description": "OneDash UI text."
+  },
+  "websites_pushSsl": "Push to nodes",
+  "@websites_pushSsl": {
+    "description": "OneDash UI text."
+  },
+  "websites_nodes": "Nodes",
+  "@websites_nodes": {
+    "description": "OneDash UI text."
+  },
+  "websites_mergeGroup": "Move to group",
+  "@websites_mergeGroup": {
+    "description": "OneDash UI text."
+  },
+  "websites_defaultHtml": "Default pages",
+  "@websites_defaultHtml": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlType": "Page type",
+  "@websites_htmlType": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlContent": "HTML content",
+  "@websites_htmlContent": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlSaved": "Default page saved",
+  "@websites_htmlSaved": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlIndex": "index.html",
+  "@websites_htmlIndex": {
+    "description": "OneDash UI text."
+  },
+  "websites_html404": "404.html",
+  "@websites_html404": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlPhp": "index.php",
+  "@websites_htmlPhp": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlDomain404": "domain404.html",
+  "@websites_htmlDomain404": {
+    "description": "OneDash UI text."
+  },
+  "websites_htmlStop": "stop/index.html",
+  "@websites_htmlStop": {
     "description": "OneDash UI text."
   },
   "websites_group": "Group",
@@ -5556,6 +6153,14 @@
   },
   "websites_editRedirect": "Edit redirect",
   "@websites_editRedirect": {
+    "description": "OneDash UI text."
+  },
+  "websites_deleteRedirect": "Delete redirect",
+  "@websites_deleteRedirect": {
+    "description": "OneDash UI text."
+  },
+  "websites_redirectDeleted": "Redirect deleted",
+  "@websites_redirectDeleted": {
     "description": "OneDash UI text."
   },
   "websites_redirectType": "Type",
@@ -6205,6 +6810,14 @@
   "@websites_useProxy": {
     "description": "OneDash UI text."
   },
+  "websites_eabKid": "EAB Kid",
+  "@websites_eabKid": {
+    "description": "ACME EAB key identifier."
+  },
+  "websites_eabHmacKey": "EAB HmacKey",
+  "@websites_eabHmacKey": {
+    "description": "ACME EAB HMAC key."
+  },
   "websites_useEab": "Use EAB",
   "@websites_useEab": {
     "description": "OneDash UI text."
@@ -6279,6 +6892,74 @@
   },
   "files_exactSize": "Calculate exact size",
   "@files_exactSize": {
+    "description": "OneDash UI text."
+  },
+  "containers_rename": "Rename",
+  "@containers_rename": {
+    "description": "OneDash UI text."
+  },
+  "containers_newName": "New name",
+  "@containers_newName": {
+    "description": "OneDash UI text."
+  },
+  "containers_checkImageUpdates": "Check image updates",
+  "@containers_checkImageUpdates": {
+    "description": "OneDash UI text."
+  },
+  "containers_imageUpdatesDone": "Image update check started",
+  "@containers_imageUpdatesDone": {
+    "description": "OneDash UI text."
+  },
+  "containers_searchRemote": "Search remote images",
+  "@containers_searchRemote": {
+    "description": "OneDash UI text."
+  },
+  "containers_scheduleImageUpdates": "Schedule image update checks",
+  "@containers_scheduleImageUpdates": {
+    "description": "OneDash UI text."
+  },
+  "containers_downloadLog": "Download logs",
+  "@containers_downloadLog": {
+    "description": "OneDash UI text."
+  },
+  "containers_fileBrowser": "Container files",
+  "@containers_fileBrowser": {
+    "description": "OneDash UI text."
+  },
+  "containers_uploadFile": "Upload file",
+  "@containers_uploadFile": {
+    "description": "OneDash UI text."
+  },
+  "containers_fileContent": "File content",
+  "@containers_fileContent": {
+    "description": "OneDash UI text."
+  },
+  "containers_binaryFile": "Binary file, cannot preview",
+  "@containers_binaryFile": {
+    "description": "OneDash UI text."
+  },
+  "containers_parentDir": "Parent directory",
+  "@containers_parentDir": {
+    "description": "OneDash UI text."
+  },
+  "containers_fileDeleted": "File deleted",
+  "@containers_fileDeleted": {
+    "description": "OneDash UI text."
+  },
+  "containers_fileEmpty": "Directory is empty",
+  "@containers_fileEmpty": {
+    "description": "OneDash UI text."
+  },
+  "containers_composeEnv": "Compose environment",
+  "@containers_composeEnv": {
+    "description": "OneDash UI text."
+  },
+  "containers_pinCompose": "Pin compose",
+  "@containers_pinCompose": {
+    "description": "OneDash UI text."
+  },
+  "containers_unpinCompose": "Unpin compose",
+  "@containers_unpinCompose": {
     "description": "OneDash UI text."
   },
   "containers_cleanLogs": "Clear container logs",
@@ -6423,6 +7104,10 @@
   "@files_pickOwner": {
     "description": "OneDash UI text."
   },
+  "panelSettings_apiConfigUnavailable": "The API Key mode cannot safely read the API whitelist. Update it in the panel web UI.",
+  "@panelSettings_apiConfigUnavailable": {
+    "description": "OneDash UI text."
+  },
   "panelSettings_apiInterfaceToggleHint": "Allow API access for this panel",
   "@panelSettings_apiInterfaceToggleHint": {
     "description": "OneDash UI text."
@@ -6538,6 +7223,138 @@
   },
   "files_checkExistence": "Verify existence",
   "@files_checkExistence": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_closeMfa": "Close MFA",
+  "@panelSettings_closeMfa": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_mfaClosed": "MFA closed",
+  "@panelSettings_mfaClosed": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_resetExpiredPassword": "Reset expired password",
+  "@panelSettings_resetExpiredPassword": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_passwordReset": "Password reset",
+  "@panelSettings_passwordReset": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_commandLibrary": "Command library",
+  "@panelSettings_commandLibrary": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_add": "New command",
+  "@commandLibrary_add": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_name": "Command name",
+  "@commandLibrary_name": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_command": "Command",
+  "@commandLibrary_command": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_empty": "No commands",
+  "@commandLibrary_empty": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_tree": "Command tree",
+  "@commandLibrary_tree": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_import": "Import commands",
+  "@commandLibrary_import": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_export": "Export commands",
+  "@commandLibrary_export": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_imported": "Commands imported",
+  "@commandLibrary_imported": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_exported": "Commands exported",
+  "@commandLibrary_exported": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_importEmpty": "No importable commands in CSV",
+  "@commandLibrary_importEmpty": {
+    "description": "OneDash UI text."
+  },
+  "commandLibrary_copied": "Command copied",
+  "@commandLibrary_copied": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_run": "Run script",
+  "@scriptLibrary_run": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_groupManagement": "Group management",
+  "@panelSettings_groupManagement": {
+    "description": "OneDash UI text."
+  },
+  "group_add": "New group",
+  "@group_add": {
+    "description": "OneDash UI text."
+  },
+  "group_name": "Group name",
+  "@group_name": {
+    "description": "OneDash UI text."
+  },
+  "group_empty": "No groups",
+  "@group_empty": {
+    "description": "OneDash UI text."
+  },
+  "group_typeScript": "Script",
+  "@group_typeScript": {
+    "description": "OneDash UI text."
+  },
+  "group_typeCommand": "Command",
+  "@group_typeCommand": {
+    "description": "OneDash UI text."
+  },
+  "group_typeCronjob": "Cronjob",
+  "@group_typeCronjob": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_scriptLibrary": "Script library",
+  "@panelSettings_scriptLibrary": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_add": "New script",
+  "@scriptLibrary_add": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_name": "Script name",
+  "@scriptLibrary_name": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_description": "Description",
+  "@scriptLibrary_description": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_content": "Script content",
+  "@scriptLibrary_content": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_interactive": "Interactive script",
+  "@scriptLibrary_interactive": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_sync": "Sync scripts",
+  "@scriptLibrary_sync": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_syncStarted": "Sync task started",
+  "@scriptLibrary_syncStarted": {
+    "description": "OneDash UI text."
+  },
+  "scriptLibrary_empty": "No scripts",
+  "@scriptLibrary_empty": {
     "description": "OneDash UI text."
   },
   "panelSettings_mfa": "Two-factor authentication",
@@ -7492,7 +8309,7 @@
   },
   "websites_privateKeyPath": "Private key path",
   "@websites_privateKeyPath": {
-    "description": "Private key path"
+    "description": "OneDash UI text."
   },
   "websites_status": "Status",
   "@websites_status": {
@@ -7800,6 +8617,26 @@
   "@ai_account_add": {
     "description": "Add model account"
   },
+  "ai_account_models": "Models",
+  "@ai_account_models": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_id": "Model ID",
+  "@ai_model_id": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_verify": "Set as verification model",
+  "@ai_model_verify": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_verified": "Verification model",
+  "@ai_model_verified": {
+    "description": "OneDash UI text."
+  },
+  "ai_account_verify": "Verify account",
+  "@ai_account_verify": {
+    "description": "OneDash UI text."
+  },
   "ai_account_edit": "Edit model account",
   "@ai_account_edit": {
     "description": "Edit model account"
@@ -7957,9 +8794,9 @@
   "@ai_agent_require_mention": {
     "description": "Require mention"
   },
-  "ai_agent_streaming": "Streaming",
+  "ai_agent_streaming": "Streaming replies",
   "@ai_agent_streaming": {
-    "description": "Streaming"
+    "description": "OneDash UI text."
   },
   "ai_agent_thread_session": "Thread session",
   "@ai_agent_thread_session": {
@@ -8019,129 +8856,253 @@
     "description": "Scan the QR code shown in the task log to connect Weixin."
   },
   "websites_basicConfigHint": "Domain, directory, port and index files",
-  "@websites_basicConfigHint": {"description": "OneDash UI text."},
+  "@websites_basicConfigHint": {
+    "description": "OneDash UI text."
+  },
   "websites_securityHint": "Auth, CORS, hotlink protection and real IP",
-  "@websites_securityHint": {"description": "OneDash UI text."},
+  "@websites_securityHint": {
+    "description": "OneDash UI text."
+  },
   "websites_rewriteHint": "Rewrite rules",
-  "@websites_rewriteHint": {"description": "OneDash UI text."},
+  "@websites_rewriteHint": {
+    "description": "OneDash UI text."
+  },
   "websites_redirectHint": "Redirect rules",
-  "@websites_redirectHint": {"description": "OneDash UI text."},
+  "@websites_redirectHint": {
+    "description": "OneDash UI text."
+  },
   "websites_proxyHint": "Forward a domain to an existing service",
-  "@websites_proxyHint": {"description": "OneDash UI text."},
+  "@websites_proxyHint": {
+    "description": "OneDash UI text."
+  },
   "websites_staticHint": "Serve HTML / CSS / JS directly",
-  "@websites_staticHint": {"description": "OneDash UI text."},
+  "@websites_staticHint": {
+    "description": "OneDash UI text."
+  },
   "websites_runtimeHint": "PHP / Java / Node.js / Go / Python / .NET",
-  "@websites_runtimeHint": {"description": "OneDash UI text."},
+  "@websites_runtimeHint": {
+    "description": "OneDash UI text."
+  },
   "websites_tunnel": "TCP/UDP proxy",
-  "@websites_tunnel": {"description": "OneDash UI text."},
+  "@websites_tunnel": {
+    "description": "OneDash UI text."
+  },
   "websites_tunnelHint": "Layer 4 forwarding without HTTP",
-  "@websites_tunnelHint": {"description": "OneDash UI text."},
+  "@websites_tunnelHint": {
+    "description": "OneDash UI text."
+  },
   "websites_port": "Port",
-  "@websites_port": {"description": "OneDash UI text."},
+  "@websites_port": {
+    "description": "OneDash UI text."
+  },
   "websites_protocol": "Protocol",
-  "@websites_protocol": {"description": "OneDash UI text."},
+  "@websites_protocol": {
+    "description": "OneDash UI text."
+  },
   "websites_enableSsl": "Enable SSL",
-  "@websites_enableSsl": {"description": "OneDash UI text."},
+  "@websites_enableSsl": {
+    "description": "OneDash UI text."
+  },
   "websites_ipv6": "IPv6",
-  "@websites_ipv6": {"description": "OneDash UI text."},
+  "@websites_ipv6": {
+    "description": "OneDash UI text."
+  },
   "websites_relativeDir": "Relative to {path}",
-  "@websites_relativeDir": {"description": "OneDash UI text."},
+  "@websites_relativeDir": {
+    "description": "OneDash UI text."
+  },
   "websites_createSuccess": "Website created",
-  "@websites_createSuccess": {"description": "OneDash UI text."},
+  "@websites_createSuccess": {
+    "description": "OneDash UI text."
+  },
   "websites_sslRequired": "Select a certificate",
-  "@websites_sslRequired": {"description": "OneDash UI text."},
+  "@websites_sslRequired": {
+    "description": "OneDash UI text."
+  },
   "websites_menu": "Menu",
-  "@websites_menu": {"description": "OneDash UI text."},
+  "@websites_menu": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyNotInstalled": "OpenResty is not installed",
-  "@websites_openRestyNotInstalled": {"description": "OneDash UI text."},
+  "@websites_openRestyNotInstalled": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyStopped": "OpenResty is stopped",
-  "@websites_openRestyStopped": {"description": "OneDash UI text."},
+  "@websites_openRestyStopped": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyInstall": "Open the app store",
-  "@websites_openRestyInstall": {"description": "OneDash UI text."},
+  "@websites_openRestyInstall": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyService": "Service",
-  "@websites_openRestyService": {"description": "OneDash UI text."},
+  "@websites_openRestyService": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyStart": "Start",
-  "@websites_openRestyStart": {"description": "OneDash UI text."},
+  "@websites_openRestyStart": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyStop": "Stop",
-  "@websites_openRestyStop": {"description": "OneDash UI text."},
+  "@websites_openRestyStop": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyRestart": "Restart",
-  "@websites_openRestyRestart": {"description": "OneDash UI text."},
+  "@websites_openRestyRestart": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyReload": "Reload",
-  "@websites_openRestyReload": {"description": "OneDash UI text."},
+  "@websites_openRestyReload": {
+    "description": "OneDash UI text."
+  },
   "websites_serverNamesHash": "Server names hash bucket size",
-  "@websites_serverNamesHash": {"description": "OneDash UI text."},
+  "@websites_serverNamesHash": {
+    "description": "OneDash UI text."
+  },
   "websites_clientHeaderBuffer": "Client header buffer size",
-  "@websites_clientHeaderBuffer": {"description": "OneDash UI text."},
+  "@websites_clientHeaderBuffer": {
+    "description": "OneDash UI text."
+  },
   "websites_maxBodySize": "Maximum upload size",
-  "@websites_maxBodySize": {"description": "OneDash UI text."},
+  "@websites_maxBodySize": {
+    "description": "OneDash UI text."
+  },
   "websites_keepaliveTimeout": "Keepalive timeout",
-  "@websites_keepaliveTimeout": {"description": "OneDash UI text."},
+  "@websites_keepaliveTimeout": {
+    "description": "OneDash UI text."
+  },
   "websites_gzip": "Enable compression",
-  "@websites_gzip": {"description": "OneDash UI text."},
+  "@websites_gzip": {
+    "description": "OneDash UI text."
+  },
   "websites_gzipMinLength": "Minimum compressed size",
-  "@websites_gzipMinLength": {"description": "OneDash UI text."},
+  "@websites_gzipMinLength": {
+    "description": "OneDash UI text."
+  },
   "websites_gzipCompLevel": "Compression level",
-  "@websites_gzipCompLevel": {"description": "OneDash UI text."},
+  "@websites_gzipCompLevel": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyLogs": "OpenResty logs",
-  "@websites_openRestyLogs": {"description": "OneDash UI text."},
+  "@websites_openRestyLogs": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyConfigFile": "Main configuration",
-  "@websites_openRestyConfigFile": {"description": "OneDash UI text."},
+  "@websites_openRestyConfigFile": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyPerformanceTitle": "Performance",
-  "@websites_openRestyPerformanceTitle": {"description": "OneDash UI text."},
+  "@websites_openRestyPerformanceTitle": {
+    "description": "OneDash UI text."
+  },
   "websites_createProxyTitle": "New reverse proxy",
-  "@websites_createProxyTitle": {"description": "OneDash UI text."},
+  "@websites_createProxyTitle": {
+    "description": "OneDash UI text."
+  },
   "websites_createStaticTitle": "New static site",
-  "@websites_createStaticTitle": {"description": "OneDash UI text."},
+  "@websites_createStaticTitle": {
+    "description": "OneDash UI text."
+  },
   "websites_createRuntimeTitle": "New runtime site",
-  "@websites_createRuntimeTitle": {"description": "OneDash UI text."},
+  "@websites_createRuntimeTitle": {
+    "description": "OneDash UI text."
+  },
   "websites_createStreamTitle": "New TCP-UDP proxy",
-  "@websites_createStreamTitle": {"description": "OneDash UI text."},
+  "@websites_createStreamTitle": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyReading": "Reading",
-  "@websites_openRestyReading": {"description": "OneDash UI text."},
+  "@websites_openRestyReading": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyWriting": "Writing",
-  "@websites_openRestyWriting": {"description": "OneDash UI text."},
+  "@websites_openRestyWriting": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyWaiting": "Waiting",
-  "@websites_openRestyWaiting": {"description": "OneDash UI text."},
+  "@websites_openRestyWaiting": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyServiceHint": "Start OpenResty from the service menu first.",
-  "@websites_openRestyServiceHint": {"description": "OneDash UI text."},
+  "@websites_openRestyServiceHint": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyInstallHint": "Install OpenResty before changing global settings.",
-  "@websites_openRestyInstallHint": {"description": "OneDash UI text."},
+  "@websites_openRestyInstallHint": {
+    "description": "OneDash UI text."
+  },
   "websites_openRestyServiceConfirm": "Run \"{action}\" on OpenResty?",
-  "@websites_openRestyServiceConfirm": {"description": "OneDash UI text."},
+  "@websites_openRestyServiceConfirm": {
+    "description": "OneDash UI text."
+  },
   "websites_createDb": "Create database",
-  "@websites_createDb": {"description": "OneDash UI text."},
+  "@websites_createDb": {
+    "description": "OneDash UI text."
+  },
   "websites_dbName": "Database name",
-  "@websites_dbName": {"description": "OneDash UI text."},
+  "@websites_dbName": {
+    "description": "OneDash UI text."
+  },
   "websites_enableFtp": "Create FTP",
-  "@websites_enableFtp": {"description": "OneDash UI text."},
+  "@websites_enableFtp": {
+    "description": "OneDash UI text."
+  },
   "websites_ftpUser": "FTP user",
-  "@websites_ftpUser": {"description": "OneDash UI text."},
+  "@websites_ftpUser": {
+    "description": "OneDash UI text."
+  },
   "websites_ftpPassword": "FTP password",
-  "@websites_ftpPassword": {"description": "OneDash UI text."},
+  "@websites_ftpPassword": {
+    "description": "OneDash UI text."
+  },
   "common_success": "Success",
-  "@common_success": {"description": "OneDash UI text."},
+  "@common_success": {
+    "description": "OneDash UI text."
+  },
   "common_failed": "Failed",
-  "@common_failed": {"description": "OneDash UI text."},
+  "@common_failed": {
+    "description": "OneDash UI text."
+  },
   "common_unknown": "Unknown",
-  "@common_unknown": {"description": "OneDash UI text."},
+  "@common_unknown": {
+    "description": "OneDash UI text."
+  },
   "logs_source": "Source",
-  "@logs_source": {"description": "OneDash UI text."},
+  "@logs_source": {
+    "description": "OneDash UI text."
+  },
   "logs_address": "Location",
-  "@logs_address": {"description": "OneDash UI text."},
+  "@logs_address": {
+    "description": "OneDash UI text."
+  },
   "logs_device": "Device",
-  "@logs_device": {"description": "OneDash UI text."},
+  "@logs_device": {
+    "description": "OneDash UI text."
+  },
   "taskLog_copy": "Copy log",
-  "@taskLog_copy": {"description": "OneDash UI text."},
+  "@taskLog_copy": {
+    "description": "OneDash UI text."
+  },
   "taskLog_copied": "Copied",
-  "@taskLog_copied": {"description": "OneDash UI text."},
+  "@taskLog_copied": {
+    "description": "OneDash UI text."
+  },
   "taskLog_emptyTitle": "No log yet",
-  "@taskLog_emptyTitle": {"description": "OneDash UI text."},
+  "@taskLog_emptyTitle": {
+    "description": "OneDash UI text."
+  },
   "taskLog_readFailedTitle": "Failed to read task log",
-  "@taskLog_readFailedTitle": {"description": "OneDash UI text."},
+  "@taskLog_readFailedTitle": {
+    "description": "OneDash UI text."
+  },
   "taskLog_executing": "Running",
-  "@taskLog_executing": {"description": "OneDash UI text."},
+  "@taskLog_executing": {
+    "description": "OneDash UI text."
+  },
   "taskLog_expired": "The log for this task has been cleaned",
-  "@taskLog_expired": {"description": "OneDash UI text."},
+  "@taskLog_expired": {
+    "description": "OneDash UI text."
+  },
   "taskLog_lines": "{count} lines",
   "@taskLog_lines": {
     "description": "Number of log lines.",
@@ -8152,35 +9113,2685 @@
     }
   },
   "common_custom": "Custom",
-  "@common_custom": {"description": "OneDash UI text."},
+  "@common_custom": {
+    "description": "OneDash UI text."
+  },
   "ai_channel_qqBot": "QQ Bot",
-  "@ai_channel_qqBot": {"description": "OneDash UI text."},
+  "@ai_channel_qqBot": {
+    "description": "OneDash UI text."
+  },
   "ai_channel_weixin": "Weixin",
-  "@ai_channel_weixin": {"description": "OneDash UI text."},
+  "@ai_channel_weixin": {
+    "description": "OneDash UI text."
+  },
   "error_wsPreflightFailed": "Failed to establish realtime connection",
-  "@error_wsPreflightFailed": {"description": "OneDash UI text."},
+  "@error_wsPreflightFailed": {
+    "description": "OneDash UI text."
+  },
   "error_wsPreflightTimeout": "Realtime connection timed out",
-  "@error_wsPreflightTimeout": {"description": "OneDash UI text."},
+  "@error_wsPreflightTimeout": {
+    "description": "OneDash UI text."
+  },
   "runtimes_packageManager": "Package manager",
-  "@runtimes_packageManager": {"description": "OneDash UI text."},
+  "@runtimes_packageManager": {
+    "description": "OneDash UI text."
+  },
   "websites_sslId": "SSL ID",
-  "@websites_sslId": {"description": "OneDash UI text."},
+  "@websites_sslId": {
+    "description": "OneDash UI text."
+  },
   "ai_mcp_gatewayImage": "Gateway image",
-  "@ai_mcp_gatewayImage": {"description": "OneDash UI text."},
+  "@ai_mcp_gatewayImage": {
+    "description": "OneDash UI text."
+  },
   "common_installing": "Installing",
-  "@common_installing": {"description": "OneDash UI text."},
+  "@common_installing": {
+    "description": "OneDash UI text."
+  },
   "common_restarting": "Restarting",
-  "@common_restarting": {"description": "OneDash UI text."},
+  "@common_restarting": {
+    "description": "OneDash UI text."
+  },
   "common_paused": "Paused",
-  "@common_paused": {"description": "OneDash UI text."},
+  "@common_paused": {
+    "description": "OneDash UI text."
+  },
   "common_abnormal": "Abnormal",
-  "@common_abnormal": {"description": "OneDash UI text."},
+  "@common_abnormal": {
+    "description": "OneDash UI text."
+  },
   "logs_authMode": "Auth method",
-  "@logs_authMode": {"description": "OneDash UI text."},
+  "@logs_authMode": {
+    "description": "OneDash UI text."
+  },
   "logs_message": "Error message",
-  "@logs_message": {"description": "OneDash UI text."},
+  "@logs_message": {
+    "description": "OneDash UI text."
+  },
   "common_removing": "Removing",
-  "@common_removing": {"description": "OneDash UI text."},
+  "@common_removing": {
+    "description": "OneDash UI text."
+  },
   "logs_result": "Result",
-  "@logs_result": {"description": "OneDash UI text."}
+  "@logs_result": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_plugins": "Plugins",
+  "@ai_agent_plugins": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_skills": "Skills",
+  "@ai_agent_skills": {
+    "description": "OneDash UI text."
+  },
+  "ai_plugin_installed": "Installed plugins",
+  "@ai_plugin_installed": {
+    "description": "OneDash UI text."
+  },
+  "ai_plugin_market": "Plugin marketplace",
+  "@ai_plugin_market": {
+    "description": "OneDash UI text."
+  },
+  "ai_plugin_searchHint": "Search plugins",
+  "@ai_plugin_searchHint": {
+    "description": "OneDash UI text."
+  },
+  "ai_plugin_enable": "Enable",
+  "@ai_plugin_enable": {
+    "description": "OneDash UI text."
+  },
+  "ai_plugin_disable": "Disable",
+  "@ai_plugin_disable": {
+    "description": "OneDash UI text."
+  },
+  "ai_plugin_version": "Version",
+  "@ai_plugin_version": {
+    "description": "OneDash UI text."
+  },
+  "ai_plugin_install": "Install",
+  "@ai_plugin_install": {
+    "description": "OneDash UI text."
+  },
+  "ai_plugin_empty": "No installed plugins",
+  "@ai_plugin_empty": {
+    "description": "OneDash UI text."
+  },
+  "ai_plugin_noResults": "No matching plugins",
+  "@ai_plugin_noResults": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_installed": "Installed skills",
+  "@ai_skill_installed": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_market": "Skill marketplace",
+  "@ai_skill_market": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_searchHint": "Search skills",
+  "@ai_skill_searchHint": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_source": "Source",
+  "@ai_skill_source": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_install": "Install",
+  "@ai_skill_install": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_uninstall": "Uninstall",
+  "@ai_skill_uninstall": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_empty": "No installed skills",
+  "@ai_skill_empty": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_noResults": "No matching skills",
+  "@ai_skill_noResults": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_syncAccount": "Sync to account",
+  "@ai_model_syncAccount": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_recreate": "Recreate",
+  "@ai_model_recreate": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_baseUrlType": "Address type",
+  "@ai_model_baseUrlType": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_baseUrl": "Base URL",
+  "@ai_model_baseUrl": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpu_monitor": "GPU monitor",
+  "@ai_gpu_monitor": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpu_benchmark": "Benchmark sources",
+  "@ai_gpu_benchmark": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpu_benchmarkEmpty": "No benchmark sources",
+  "@ai_gpu_benchmarkEmpty": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpu_utilizationChart": "GPU utilization",
+  "@ai_gpu_utilizationChart": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpu_memoryChart": "Memory usage",
+  "@ai_gpu_memoryChart": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_baseUrlContainer": "Container",
+  "@ai_model_baseUrlContainer": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_baseUrlLocalhost": "Localhost",
+  "@ai_model_baseUrlLocalhost": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_baseUrlSystemIp": "Panel IP",
+  "@ai_model_baseUrlSystemIp": {
+    "description": "OneDash UI text."
+  },
+  "ai_model_baseUrlCustom": "Custom",
+  "@ai_model_baseUrlCustom": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_sourceOfficial": "Official",
+  "@ai_skill_sourceOfficial": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_sourceClawhubGlobal": "ClawHub global",
+  "@ai_skill_sourceClawhubGlobal": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_sourceClawhubCn": "ClawHub China",
+  "@ai_skill_sourceClawhubCn": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_sourceSkillhub": "SkillHub",
+  "@ai_skill_sourceSkillhub": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_sourceSkillsSh": "skills.sh",
+  "@ai_skill_sourceSkillsSh": {
+    "description": "OneDash UI text."
+  },
+  "ai_skill_sourceLocalHub": "Local skill hub",
+  "@ai_skill_sourceLocalHub": {
+    "description": "OneDash UI text."
+  },
+  "ai_vllm_monitor": "vLLM monitor",
+  "@ai_vllm_monitor": {
+    "description": "OneDash UI text."
+  },
+  "ai_vllm_app": "vLLM app",
+  "@ai_vllm_app": {
+    "description": "OneDash UI text."
+  },
+  "ai_vllm_noApps": "No vLLM apps found",
+  "@ai_vllm_noApps": {
+    "description": "OneDash UI text."
+  },
+  "ai_vllm_samples": "Samples",
+  "@ai_vllm_samples": {
+    "description": "OneDash UI text."
+  },
+  "ai_vllm_running": "Running requests",
+  "@ai_vllm_running": {
+    "description": "OneDash UI text."
+  },
+  "ai_vllm_waiting": "Waiting requests",
+  "@ai_vllm_waiting": {
+    "description": "OneDash UI text."
+  },
+  "ai_vllm_cache": "Cache usage",
+  "@ai_vllm_cache": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_sessions": "Chat sessions",
+  "@ai_agent_sessions": {
+    "description": "OneDash UI text."
+  },
+  "ai_session_rename": "Rename session",
+  "@ai_session_rename": {
+    "description": "OneDash UI text."
+  },
+  "ai_session_delete": "Delete session",
+  "@ai_session_delete": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_batch": "Batch operations",
+  "@ai_agent_batch": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_type": "App type",
+  "@ai_batch_type": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_operate": "Operation",
+  "@ai_batch_operate": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_start": "Start",
+  "@ai_batch_start": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_stop": "Stop",
+  "@ai_batch_stop": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_restart": "Restart",
+  "@ai_batch_restart": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_delete": "Delete",
+  "@ai_batch_delete": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_force": "Force delete",
+  "@ai_batch_force": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_result": "Succeeded {success}, skipped {skipped}",
+  "@ai_batch_result": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "success": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "ai_agent_overview": "Agent overview",
+  "@ai_agent_overview": {
+    "description": "OneDash UI text."
+  },
+  "ai_vllm_clean": "Clean monitor data",
+  "@ai_vllm_clean": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_nodeInfo": "Node info",
+  "@dashboard_nodeInfo": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_quickJumps": "Quick jumps",
+  "@dashboard_quickJumps": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_manageQuick": "Manage quick jumps and directories",
+  "@dashboard_manageQuick": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_quickDirectories": "Quick directories",
+  "@dashboard_quickDirectories": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_quickDirectoryPath": "Directory path",
+  "@dashboard_quickDirectoryPath": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_quickDirectoryAlias": "Alias",
+  "@dashboard_quickDirectoryAlias": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_launcher": "App launcher",
+  "@dashboard_launcher": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_manageLauncher": "Manage launcher",
+  "@dashboard_manageLauncher": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_topCpu": "Top CPU processes",
+  "@dashboard_topCpu": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_topMem": "Top memory processes",
+  "@dashboard_topMem": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_noData": "No data",
+  "@dashboard_noData": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_appInstalled": "Installed",
+  "@dashboard_appInstalled": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_appNotInstalled": "Not installed",
+  "@dashboard_appNotInstalled": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_addQuickDirectory": "Add quick directory",
+  "@dashboard_addQuickDirectory": {
+    "description": "OneDash UI text."
+  },
+  "dashboard_editQuickDirectory": "Edit quick directory",
+  "@dashboard_editQuickDirectory": {
+    "description": "OneDash UI text."
+  },
+  "files_openShare": "Open share",
+  "@files_openShare": {
+    "description": "OneDash UI text."
+  },
+  "backups_editDescription": "Edit description",
+  "@backups_editDescription": {
+    "description": "OneDash UI text."
+  },
+  "backups_snapshotFiles": "Snapshot files",
+  "@backups_snapshotFiles": {
+    "description": "OneDash UI text."
+  },
+  "backups_noSnapshotFiles": "No snapshot files",
+  "@backups_noSnapshotFiles": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_nextRun": "Next run",
+  "@cronjobs_nextRun": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_updateGroup": "Change group",
+  "@cronjobs_updateGroup": {
+    "description": "OneDash UI text."
+  },
+  "apps_checkUpdates": "Check store updates",
+  "@apps_checkUpdates": {
+    "description": "OneDash UI text."
+  },
+  "apps_storeCanUpdate": "App store update available",
+  "@apps_storeCanUpdate": {
+    "description": "OneDash UI text."
+  },
+  "apps_storeLatest": "App store is up to date",
+  "@apps_storeLatest": {
+    "description": "OneDash UI text."
+  },
+  "apps_editWebUi": "Edit WebUI URL",
+  "@apps_editWebUi": {
+    "description": "OneDash UI text."
+  },
+  "apps_webUi": "WebUI URL",
+  "@apps_webUi": {
+    "description": "OneDash UI text."
+  },
+  "alerts_clamScans": "Clam scans",
+  "@alerts_clamScans": {
+    "description": "OneDash UI text."
+  },
+  "alerts_cronjobTargets": "Cron jobs",
+  "@alerts_cronjobTargets": {
+    "description": "OneDash UI text."
+  },
+  "alerts_targetsEmpty": "No alert targets available",
+  "@alerts_targetsEmpty": {
+    "description": "OneDash UI text."
+  },
+  "alerts_targetPath": "Path: {path}",
+  "@alerts_targetPath": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "alerts_targetType": "Type: {type}",
+  "@alerts_targetType": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "host_sshLogs": "SSH login logs",
+  "@host_sshLogs": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogsHint": "View and filter SSH login records",
+  "@host_sshLogsHint": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogInfo": "Keyword",
+  "@host_sshLogInfo": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogInfoHint": "User, IP or message",
+  "@host_sshLogInfoHint": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogStatus": "Status",
+  "@host_sshLogStatus": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogAll": "All",
+  "@host_sshLogAll": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogSuccess": "Success",
+  "@host_sshLogSuccess": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogFailed": "Failed",
+  "@host_sshLogFailed": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogRange": "Time range",
+  "@host_sshLogRange": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogDays": "{days} days",
+  "@host_sshLogDays": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "host_sshLogEmpty": "No SSH login logs match the filters",
+  "@host_sshLogEmpty": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogExport": "Export logs",
+  "@host_sshLogExport": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogExported": "Logs exported to {path}",
+  "@host_sshLogExported": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "host_sshLogSearch": "Search",
+  "@host_sshLogSearch": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_operation": "Batch operate",
+  "@ai_batch_operation": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_install": "Batch install",
+  "@ai_batch_install": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_upgrade": "Batch upgrade",
+  "@ai_batch_upgrade": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_version": "Target version",
+  "@ai_batch_version": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_backup": "Backup before upgrade",
+  "@ai_batch_backup": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_pullImage": "Pull image",
+  "@ai_batch_pullImage": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_port": "WebUI port",
+  "@ai_batch_port": {
+    "description": "OneDash UI text."
+  },
+  "ai_batch_name": "Name (auto when empty)",
+  "@ai_batch_name": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_security": "Security config",
+  "@ai_agent_security": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_security_origins": "Allowed origins",
+  "@ai_agent_security_origins": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_security_hint": "Separate multiple origins with commas",
+  "@ai_agent_security_hint": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_config_file": "Agent config file",
+  "@ai_agent_config_file": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_config_file_hint": "Edit the channel config file directly",
+  "@ai_agent_config_file_hint": {
+    "description": "OneDash UI text."
+  },
+  "ai_domain": "AI domain binding",
+  "@ai_domain": {
+    "description": "OneDash UI text."
+  },
+  "ai_domain_name": "Domain",
+  "@ai_domain_name": {
+    "description": "OneDash UI text."
+  },
+  "ai_domain_ssl": "SSL ID",
+  "@ai_domain_ssl": {
+    "description": "OneDash UI text."
+  },
+  "ai_domain_website": "Website ID",
+  "@ai_domain_website": {
+    "description": "OneDash UI text."
+  },
+  "ai_domain_ipList": "Allowed IPs",
+  "@ai_domain_ipList": {
+    "description": "OneDash UI text."
+  },
+  "ai_domain_hint": "Separate multiple IPs with commas",
+  "@ai_domain_hint": {
+    "description": "OneDash UI text."
+  },
+  "ai_domain_noApp": "No installed Ollama app found",
+  "@ai_domain_noApp": {
+    "description": "OneDash UI text."
+  },
+  "ai_domain_bound": "Bound domain: {domain}",
+  "@ai_domain_bound": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "domain": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_domain_saved": "Domain settings saved",
+  "@ai_domain_saved": {
+    "description": "OneDash UI text."
+  },
+  "files_batchMove": "Batch move/copy",
+  "@files_batchMove": {
+    "description": "OneDash UI text."
+  },
+  "files_pickFromTree": "Pick from directory tree",
+  "@files_pickFromTree": {
+    "description": "OneDash UI text."
+  },
+  "vm_title": "Virtual machines",
+  "@vm_title": {
+    "description": "OneDash UI text."
+  },
+  "vm_subtitle": "KVM virtual machine management",
+  "@vm_subtitle": {
+    "description": "OneDash UI text."
+  },
+  "vm_environment": "Runtime environment",
+  "@vm_environment": {
+    "description": "OneDash UI text."
+  },
+  "vm_envReady": "Runtime environment ready",
+  "@vm_envReady": {
+    "description": "OneDash UI text."
+  },
+  "vm_envNotReady": "Runtime environment not ready",
+  "@vm_envNotReady": {
+    "description": "OneDash UI text."
+  },
+  "vm_enable": "Enable runtime environment",
+  "@vm_enable": {
+    "description": "OneDash UI text."
+  },
+  "vm_enabled": "Runtime environment enabled",
+  "@vm_enabled": {
+    "description": "OneDash UI text."
+  },
+  "vm_arch": "Architecture",
+  "@vm_arch": {
+    "description": "OneDash UI text."
+  },
+  "vm_kvm": "KVM",
+  "@vm_kvm": {
+    "description": "OneDash UI text."
+  },
+  "vm_libvirt": "libvirt",
+  "@vm_libvirt": {
+    "description": "OneDash UI text."
+  },
+  "vm_storage": "Storage",
+  "@vm_storage": {
+    "description": "OneDash UI text."
+  },
+  "vm_empty": "No virtual machines",
+  "@vm_empty": {
+    "description": "OneDash UI text."
+  },
+  "vm_emptyHint": "Enable the KVM runtime environment before creating a VM",
+  "@vm_emptyHint": {
+    "description": "OneDash UI text."
+  },
+  "vm_create": "New virtual machine",
+  "@vm_create": {
+    "description": "OneDash UI text."
+  },
+  "vm_update": "Edit virtual machine",
+  "@vm_update": {
+    "description": "OneDash UI text."
+  },
+  "vm_name": "Name",
+  "@vm_name": {
+    "description": "OneDash UI text."
+  },
+  "vm_cpu": "CPU cores",
+  "@vm_cpu": {
+    "description": "OneDash UI text."
+  },
+  "vm_memory": "Memory (MB)",
+  "@vm_memory": {
+    "description": "OneDash UI text."
+  },
+  "vm_disk": "Disk (GB)",
+  "@vm_disk": {
+    "description": "OneDash UI text."
+  },
+  "vm_network": "Network",
+  "@vm_network": {
+    "description": "OneDash UI text."
+  },
+  "vm_osType": "OS type",
+  "@vm_osType": {
+    "description": "OneDash UI text."
+  },
+  "vm_description": "Description",
+  "@vm_description": {
+    "description": "OneDash UI text."
+  },
+  "vm_start": "Start",
+  "@vm_start": {
+    "description": "OneDash UI text."
+  },
+  "vm_shutdown": "Shut down",
+  "@vm_shutdown": {
+    "description": "OneDash UI text."
+  },
+  "vm_reboot": "Reboot",
+  "@vm_reboot": {
+    "description": "OneDash UI text."
+  },
+  "vm_destroy": "Force stop",
+  "@vm_destroy": {
+    "description": "OneDash UI text."
+  },
+  "vm_suspend": "Suspend",
+  "@vm_suspend": {
+    "description": "OneDash UI text."
+  },
+  "vm_resume": "Resume",
+  "@vm_resume": {
+    "description": "OneDash UI text."
+  },
+  "vm_delete": "Delete virtual machine",
+  "@vm_delete": {
+    "description": "OneDash UI text."
+  },
+  "vm_rename": "Rename",
+  "@vm_rename": {
+    "description": "OneDash UI text."
+  },
+  "vm_newName": "New name",
+  "@vm_newName": {
+    "description": "OneDash UI text."
+  },
+  "vm_stats": "Runtime status",
+  "@vm_stats": {
+    "description": "OneDash UI text."
+  },
+  "vm_snapshots": "Snapshots",
+  "@vm_snapshots": {
+    "description": "OneDash UI text."
+  },
+  "vm_snapshotCreate": "Create snapshot",
+  "@vm_snapshotCreate": {
+    "description": "OneDash UI text."
+  },
+  "vm_snapshotName": "Snapshot name",
+  "@vm_snapshotName": {
+    "description": "OneDash UI text."
+  },
+  "vm_snapshotRecover": "Recover snapshot",
+  "@vm_snapshotRecover": {
+    "description": "OneDash UI text."
+  },
+  "vm_snapshotDelete": "Delete snapshot",
+  "@vm_snapshotDelete": {
+    "description": "OneDash UI text."
+  },
+  "vm_snapshotEmpty": "No snapshots",
+  "@vm_snapshotEmpty": {
+    "description": "OneDash UI text."
+  },
+  "vm_needEnv": "Enable the VM runtime environment first",
+  "@vm_needEnv": {
+    "description": "OneDash UI text."
+  },
+  "vm_confirmDelete": "Delete virtual machine {name}?",
+  "@vm_confirmDelete": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "vm_forceDelete": "Force delete",
+  "@vm_forceDelete": {
+    "description": "OneDash UI text."
+  },
+  "vm_startAfterCreate": "Start after creation",
+  "@vm_startAfterCreate": {
+    "description": "OneDash UI text."
+  },
+  "vm_autoStart": "Start on boot",
+  "@vm_autoStart": {
+    "description": "OneDash UI text."
+  },
+  "vm_limit": "Quota {limit} VMs",
+  "@vm_limit": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "vm_osOther": "Other",
+  "@vm_osOther": {
+    "description": "OneDash UI text."
+  },
+  "vm_sync": "Sync virtual machines",
+  "@vm_sync": {
+    "description": "OneDash UI text."
+  },
+  "vm_storagePool": "Storage pool",
+  "@vm_storagePool": {
+    "description": "OneDash UI text."
+  },
+  "vm_template": "Template (optional)",
+  "@vm_template": {
+    "description": "OneDash UI text."
+  },
+  "vm_osLinux": "Linux",
+  "@vm_osLinux": {
+    "description": "OneDash UI text."
+  },
+  "vm_osWindows": "Windows",
+  "@vm_osWindows": {
+    "description": "OneDash UI text."
+  },
+  "ai_account_discover": "Discover models",
+  "@ai_account_discover": {
+    "description": "OneDash UI text."
+  },
+  "ai_account_discover_empty": "No models found",
+  "@ai_account_discover_empty": {
+    "description": "OneDash UI text."
+  },
+  "ai_account_discover_result": "Found {count} models",
+  "@ai_account_discover_result": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_channel_plugins": "Channel plugins",
+  "@ai_channel_plugins": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_installed": "Installed",
+  "@ai_channel_installed": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_notInstalled": "Not installed",
+  "@ai_channel_notInstalled": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_upgradable": "Upgrade to {version}",
+  "@ai_channel_upgradable": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_channel_install": "Install plugin",
+  "@ai_channel_install": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_upgrade": "Upgrade plugin",
+  "@ai_channel_upgrade": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_uninstall": "Uninstall plugin",
+  "@ai_channel_uninstall": {
+    "description": "OneDash UI text."
+  },
+  "vm_resources": "Resources",
+  "@vm_resources": {
+    "description": "OneDash UI text."
+  },
+  "vm_networks": "Networks",
+  "@vm_networks": {
+    "description": "OneDash UI text."
+  },
+  "vm_storages": "Storages",
+  "@vm_storages": {
+    "description": "OneDash UI text."
+  },
+  "vm_templates": "Templates",
+  "@vm_templates": {
+    "description": "OneDash UI text."
+  },
+  "vm_isos": "ISO images",
+  "@vm_isos": {
+    "description": "OneDash UI text."
+  },
+  "vm_type": "Type",
+  "@vm_type": {
+    "description": "OneDash UI text."
+  },
+  "vm_path": "Path",
+  "@vm_path": {
+    "description": "OneDash UI text."
+  },
+  "vm_cidr": "CIDR",
+  "@vm_cidr": {
+    "description": "OneDash UI text."
+  },
+  "vm_gateway": "Gateway",
+  "@vm_gateway": {
+    "description": "OneDash UI text."
+  },
+  "vm_sourceInterface": "Source interface",
+  "@vm_sourceInterface": {
+    "description": "OneDash UI text."
+  },
+  "vm_templateName": "Template name",
+  "@vm_templateName": {
+    "description": "OneDash UI text."
+  },
+  "vm_sourceVm": "Source virtual machine",
+  "@vm_sourceVm": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoType": "Image type",
+  "@vm_isoType": {
+    "description": "OneDash UI text."
+  },
+  "vm_resourceEmpty": "No resources",
+  "@vm_resourceEmpty": {
+    "description": "OneDash UI text."
+  },
+  "vm_deleteResource": "Delete {name}?",
+  "@vm_deleteResource": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "vm_deleteFile": "Delete file as well",
+  "@vm_deleteFile": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoImage": "ISO image",
+  "@vm_isoImage": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoDisk": "Disk",
+  "@vm_isoDisk": {
+    "description": "OneDash UI text."
+  },
+  "vm_netNat": "NAT",
+  "@vm_netNat": {
+    "description": "OneDash UI text."
+  },
+  "vm_netBridge": "Bridge",
+  "@vm_netBridge": {
+    "description": "OneDash UI text."
+  },
+  "vm_netMacvtap": "Macvtap",
+  "@vm_netMacvtap": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_pairing": "Approve pairing",
+  "@ai_channel_pairing": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_pairingCode": "Pairing code",
+  "@ai_channel_pairingCode": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_pairingAccount": "Account ID (optional)",
+  "@ai_channel_pairingAccount": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_pairingApproved": "Pairing approved",
+  "@ai_channel_pairingApproved": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_feishu": "Feishu",
+  "@ai_channel_feishu": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_telegram": "Telegram",
+  "@ai_channel_telegram": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_discord": "Discord",
+  "@ai_channel_discord": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_wecom": "WeCom",
+  "@ai_channel_wecom": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_qqbot": "QQBot",
+  "@ai_channel_qqbot": {
+    "description": "OneDash UI text."
+  },
+  "ai_channel_dingtalk": "DingTalk",
+  "@ai_channel_dingtalk": {
+    "description": "OneDash UI text."
+  },
+  "vm_console": "Console",
+  "@vm_console": {
+    "description": "OneDash UI text."
+  },
+  "vm_consoleConnecting": "Connecting to console…",
+  "@vm_consoleConnecting": {
+    "description": "OneDash UI text."
+  },
+  "vm_consoleFailed": "Console connection failed",
+  "@vm_consoleFailed": {
+    "description": "OneDash UI text."
+  },
+  "vm_consoleHint": "Drag to move the pointer, use the keyboard to type",
+  "@vm_consoleHint": {
+    "description": "OneDash UI text."
+  },
+  "vm_consoleDisconnected": "Console disconnected",
+  "@vm_consoleDisconnected": {
+    "description": "OneDash UI text."
+  },
+  "websites_clearLog": "Clear logs",
+  "@websites_clearLog": {
+    "description": "OneDash UI text."
+  },
+  "websites_logType": "Log type",
+  "@websites_logType": {
+    "description": "OneDash UI text."
+  },
+  "websites_lbEditFile": "Edit source file",
+  "@websites_lbEditFile": {
+    "description": "OneDash UI text."
+  },
+  "websites_lbFileHint": "Edit the load balance configuration directly",
+  "@websites_lbFileHint": {
+    "description": "OneDash UI text."
+  },
+  "websites_streamPorts": "Listen ports",
+  "@websites_streamPorts": {
+    "description": "OneDash UI text."
+  },
+  "websites_streamName": "Upstream name",
+  "@websites_streamName": {
+    "description": "OneDash UI text."
+  },
+  "websites_streamAlgorithm": "Algorithm",
+  "@websites_streamAlgorithm": {
+    "description": "OneDash UI text."
+  },
+  "websites_streamServer": "Backend address",
+  "@websites_streamServer": {
+    "description": "OneDash UI text."
+  },
+  "websites_streamUdp": "UDP forwarding",
+  "@websites_streamUdp": {
+    "description": "OneDash UI text."
+  },
+  "websites_lbRoundRobin": "Round robin",
+  "@websites_lbRoundRobin": {
+    "description": "OneDash UI text."
+  },
+  "websites_lbLeastConnections": "Least connections",
+  "@websites_lbLeastConnections": {
+    "description": "OneDash UI text."
+  },
+  "websites_lbIpHashShort": "IP hash",
+  "@websites_lbIpHashShort": {
+    "description": "OneDash UI text."
+  },
+  "websites_parentWebsite": "Parent website",
+  "@websites_parentWebsite": {
+    "description": "OneDash UI text."
+  },
+  "websites_subsitePath": "Subsite directory",
+  "@websites_subsitePath": {
+    "description": "OneDash UI text."
+  },
+  "websites_deploymentApp": "Application",
+  "@websites_deploymentApp": {
+    "description": "OneDash UI text."
+  },
+  "websites_templatePreview": "Preview template",
+  "@websites_templatePreview": {
+    "description": "OneDash UI text."
+  },
+  "websites_deploymentRunning": "Application is running and ready",
+  "@websites_deploymentRunning": {
+    "description": "OneDash UI text."
+  },
+  "websites_deploymentStopped": "Application is stopped; start it first",
+  "@websites_deploymentStopped": {
+    "description": "OneDash UI text."
+  },
+  "websites_templatePreviewResult": "Preview result",
+  "@websites_templatePreviewResult": {
+    "description": "OneDash UI text."
+  },
+  "websites_templatePreviewFailed": "No preview available",
+  "@websites_templatePreviewFailed": {
+    "description": "OneDash UI text."
+  },
+  "websites_templateOutputDetail": "Output detail",
+  "@websites_templateOutputDetail": {
+    "description": "OneDash UI text."
+  },
+  "websites_templateOutputTemplate": "Template",
+  "@websites_templateOutputTemplate": {
+    "description": "OneDash UI text."
+  },
+  "websites_templateOutputVariables": "Variable values",
+  "@websites_templateOutputVariables": {
+    "description": "OneDash UI text."
+  },
+  "websites_templateOutputCreatedAt": "Created at",
+  "@websites_templateOutputCreatedAt": {
+    "description": "OneDash UI text."
+  },
+  "websites_templateOutputPath": "Output path",
+  "@websites_templateOutputPath": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_aiSettings": "AI settings",
+  "@panelSettings_aiSettings": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_aiSettingsHint": "Terminal and file management AI assistant",
+  "@panelSettings_aiSettingsHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalAi": "Terminal AI",
+  "@panelSettings_terminalAi": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fileAi": "File AI",
+  "@panelSettings_fileAi": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_aiEnabled": "Enable AI",
+  "@panelSettings_aiEnabled": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_aiPrefix": "Trigger prefix",
+  "@panelSettings_aiPrefix": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_aiAccount": "AI account ID",
+  "@panelSettings_aiAccount": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_aiAccountHint": "Enter a configured AI account ID",
+  "@panelSettings_aiAccountHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_aiRiskCommands": "Risk command prompt",
+  "@panelSettings_aiRiskCommands": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_aiRiskCommandsHint": "Describe risky commands to block",
+  "@panelSettings_aiRiskCommandsHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fileHistory": "File history",
+  "@panelSettings_fileHistory": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fileHistoryHint": "Revision history and quota for configuration files",
+  "@panelSettings_fileHistoryHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fileHistoryEnable": "Enable file history",
+  "@panelSettings_fileHistoryEnable": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fileHistoryMaxPerPath": "Revisions per path",
+  "@panelSettings_fileHistoryMaxPerPath": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fileHistoryQuota": "Disk quota (MB)",
+  "@panelSettings_fileHistoryQuota": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_localSsh": "Local SSH connection",
+  "@panelSettings_localSsh": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_localSshHint": "SSH credentials for the panel host",
+  "@panelSettings_localSshHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_testConnection": "Test connection",
+  "@panelSettings_testConnection": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshCheckOk": "SSH connection is healthy",
+  "@panelSettings_sshCheckOk": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshRequired": "Address and user are required",
+  "@panelSettings_sshRequired": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshAddress": "Address",
+  "@panelSettings_sshAddress": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshPort": "Port",
+  "@panelSettings_sshPort": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshUser": "Username",
+  "@panelSettings_sshUser": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshAuthMode": "Authentication",
+  "@panelSettings_sshAuthMode": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshAuthPassword": "Password",
+  "@panelSettings_sshAuthPassword": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshAuthKey": "Key",
+  "@panelSettings_sshAuthKey": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshPassword": "Password",
+  "@panelSettings_sshPassword": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshPrivateKey": "Private key",
+  "@panelSettings_sshPrivateKey": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshPassPhrase": "Key passphrase",
+  "@panelSettings_sshPassPhrase": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_defaultSshConn": "Default terminal connection",
+  "@panelSettings_defaultSshConn": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_defaultSshConnHint": "Connection used when opening the terminal",
+  "@panelSettings_defaultSshConnHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_defaultSshConnPlaceholder": "Enter a connection name or address",
+  "@panelSettings_defaultSshConnPlaceholder": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_resetMenu": "Restore default menu",
+  "@panelSettings_resetMenu": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_resetMenuHint": "Restore the panel menu to default visibility",
+  "@panelSettings_resetMenuHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_resetMenuConfirm": "Restore the default menu?",
+  "@panelSettings_resetMenuConfirm": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModules": "OpenResty modules",
+  "@websites_openRestyModules": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModuleAdd": "Add module",
+  "@websites_openRestyModuleAdd": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModuleDelete": "Delete module",
+  "@websites_openRestyModuleDelete": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModuleDeleteConfirm": "Delete module {name}?",
+  "@websites_openRestyModuleDeleteConfirm": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModuleEmpty": "No custom modules",
+  "@websites_openRestyModuleEmpty": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModuleName": "Module name",
+  "@websites_openRestyModuleName": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModuleProvider": "Provider",
+  "@websites_openRestyModuleProvider": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModuleBuildMode": "Build mode",
+  "@websites_openRestyModuleBuildMode": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModuleLoadOrder": "Load order",
+  "@websites_openRestyModuleLoadOrder": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModulePackages": "Packages",
+  "@websites_openRestyModulePackages": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModuleParams": "Build parameters",
+  "@websites_openRestyModuleParams": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyModuleScript": "Build script",
+  "@websites_openRestyModuleScript": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyBuild": "Build OpenResty",
+  "@websites_openRestyBuild": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyBuildHint": "Select modules and rebuild in the background",
+  "@websites_openRestyBuildHint": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyBuildModules": "Modules to build",
+  "@websites_openRestyBuildModules": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyMirror": "Download mirror",
+  "@websites_openRestyMirror": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyForce": "Force rebuild",
+  "@websites_openRestyForce": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyBuildSubmitted": "Build task submitted",
+  "@websites_openRestyBuildSubmitted": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyHttps": "Default HTTPS",
+  "@websites_openRestyHttps": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyHttpsHint": "Control HTTPS behavior for the default site",
+  "@websites_openRestyHttpsHint": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyHttpsReject": "Reject unmatched SSL handshakes",
+  "@websites_openRestyHttpsReject": {
+    "description": "OneDash UI text."
+  },
+  "logs_systemServices": "System service logs",
+  "@logs_systemServices": {
+    "description": "OneDash UI text."
+  },
+  "logs_systemFiles": "Log files",
+  "@logs_systemFiles": {
+    "description": "OneDash UI text."
+  },
+  "logs_service": "Service",
+  "@logs_service": {
+    "description": "OneDash UI text."
+  },
+  "logs_serviceAll": "All services",
+  "@logs_serviceAll": {
+    "description": "OneDash UI text."
+  },
+  "logs_priority": "Priority",
+  "@logs_priority": {
+    "description": "OneDash UI text."
+  },
+  "logs_priorityAll": "All priorities",
+  "@logs_priorityAll": {
+    "description": "OneDash UI text."
+  },
+  "logs_keyword": "Keyword",
+  "@logs_keyword": {
+    "description": "OneDash UI text."
+  },
+  "logs_loadMore": "Load more",
+  "@logs_loadMore": {
+    "description": "OneDash UI text."
+  },
+  "logs_noSystemLog": "No system logs",
+  "@logs_noSystemLog": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_updateVirusDatabase": "Update virus database",
+  "@toolbox_updateVirusDatabase": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_updateVirusDatabaseHint": "Fetch the latest ClamAV signatures",
+  "@toolbox_updateVirusDatabaseHint": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_enableScan": "Enable scan rule",
+  "@toolbox_enableScan": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_disableScan": "Disable scan rule",
+  "@toolbox_disableScan": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_clamConfigFile": "Scan configuration file",
+  "@toolbox_clamConfigFile": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpEdit": "Edit FTP account",
+  "@toolbox_ftpEdit": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpPasswordKeep": "Leave empty to keep the current password",
+  "@toolbox_ftpPasswordKeep": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpStatus": "Status",
+  "@toolbox_ftpStatus": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpService": "FTP service actions",
+  "@toolbox_ftpService": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpStart": "Start",
+  "@toolbox_ftpStart": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpStop": "Stop",
+  "@toolbox_ftpStop": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpRestart": "Restart",
+  "@toolbox_ftpRestart": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpReload": "Reload",
+  "@toolbox_ftpReload": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpSync": "Sync FTP accounts",
+  "@toolbox_ftpSync": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpSyncDone": "FTP accounts synced",
+  "@toolbox_ftpSyncDone": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpLogs": "FTP operation logs",
+  "@toolbox_ftpLogs": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpLogEmpty": "No operation logs",
+  "@toolbox_ftpLogEmpty": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_fail2banConfFile": "Fail2ban configuration file",
+  "@toolbox_fail2banConfFile": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_fail2banConfFileHint": "View and update the full jail configuration",
+  "@toolbox_fail2banConfFileHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_panelUpgrade": "Panel upgrade",
+  "@panelSettings_panelUpgrade": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_panelUpgradeHint": "Check for and install 1Panel updates",
+  "@panelSettings_panelUpgradeHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_upgradeAvailable": "New version available",
+  "@panelSettings_upgradeAvailable": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_upToDate": "Already up to date",
+  "@panelSettings_upToDate": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_upgradeTo": "Upgrade to {version}",
+  "@panelSettings_upgradeTo": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_upgradeConfirm": "The panel will upgrade to {version}. Services restart briefly.",
+  "@panelSettings_upgradeConfirm": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_upgradeSubmitted": "Upgrade task submitted",
+  "@panelSettings_upgradeSubmitted": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_latestVersion": "Latest version",
+  "@panelSettings_latestVersion": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_testVersion": "Test version",
+  "@panelSettings_testVersion": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_releaseNotesTitle": "Release history",
+  "@panelSettings_releaseNotesTitle": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_newCount": "{count} new",
+  "@panelSettings_newCount": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fixCount": "{count} fixes",
+  "@panelSettings_fixCount": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_optimizationCount": "{count} optimizations",
+  "@panelSettings_optimizationCount": {
+    "description": "OneDash UI text."
+  },
+  "backups_publicAccount": "Panel-level backup account",
+  "@backups_publicAccount": {
+    "description": "OneDash UI text."
+  },
+  "backups_publicAccountHint": "Stored on the panel and shared across nodes",
+  "@backups_publicAccountHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_sshCheckFailed": "SSH connection failed",
+  "@panelSettings_sshCheckFailed": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_loadFailed": "Failed to load settings. Please retry.",
+  "@panelSettings_loadFailed": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_noReleaseNotes": "No release notes yet",
+  "@panelSettings_noReleaseNotes": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpPasswordRequired": "Enter a new FTP password",
+  "@toolbox_ftpPasswordRequired": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_loadFailed": "Failed to load. Please retry.",
+  "@toolbox_loadFailed": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_clamAdd": "New scan task",
+  "@toolbox_clamAdd": {
+    "description": "OneDash UI text."
+  },
+  "websites_groupCreate": "New group",
+  "@websites_groupCreate": {
+    "description": "OneDash UI text."
+  },
+  "websites_groupMergeEmpty": "No other group to merge into",
+  "@websites_groupMergeEmpty": {
+    "description": "OneDash UI text."
+  },
+  "websites_templateNameRequired": "Enter a template name",
+  "@websites_templateNameRequired": {
+    "description": "OneDash UI text."
+  },
+  "websites_templateFileRequired": "Upload the template file",
+  "@websites_templateFileRequired": {
+    "description": "OneDash UI text."
+  },
+  "websites_templateOutputNameRequired": "Enter an output name",
+  "@websites_templateOutputNameRequired": {
+    "description": "OneDash UI text."
+  },
+  "logs_loadFailed": "Failed to load logs. Please retry.",
+  "@logs_loadFailed": {
+    "description": "OneDash UI text."
+  },
+  "host_sshLogLoadFailed": "Failed to load SSH logs",
+  "@host_sshLogLoadFailed": {
+    "description": "OneDash UI text."
+  },
+  "vm_forceStopConfirm": "Force stop {name}? Data loss is possible.",
+  "@vm_forceStopConfirm": {
+    "description": "OneDash UI text."
+  },
+  "vm_snapshotRecoverConfirm": "Restore snapshot {name}? The current state will be replaced.",
+  "@vm_snapshotRecoverConfirm": {
+    "description": "OneDash UI text."
+  },
+  "vm_snapshotDeleteConfirm": "Delete snapshot {name}?",
+  "@vm_snapshotDeleteConfirm": {
+    "description": "OneDash UI text."
+  },
+  "vm_statsCpu": "CPU",
+  "@vm_statsCpu": {
+    "description": "OneDash UI text."
+  },
+  "vm_statsMemory": "Memory",
+  "@vm_statsMemory": {
+    "description": "OneDash UI text."
+  },
+  "vm_statsDisk": "Disk R/W",
+  "@vm_statsDisk": {
+    "description": "OneDash UI text."
+  },
+  "vm_statsNetwork": "Network RX/TX",
+  "@vm_statsNetwork": {
+    "description": "OneDash UI text."
+  },
+  "websites_openRestyHttpsLoadFailed": "Failed to load HTTPS settings",
+  "@websites_openRestyHttpsLoadFailed": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_ftpServiceConfirm": "This interrupts active FTP connections. Continue?",
+  "@toolbox_ftpServiceConfirm": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_fail2banStop": "Stop Fail2ban",
+  "@toolbox_fail2banStop": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_fail2banStopConfirm": "Brute-force protection stops until restarted. Continue?",
+  "@toolbox_fail2banStopConfirm": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_title": "MCP",
+  "@panelMcp_title": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_subtitle": "Panel MCP service, credentials and invocations",
+  "@panelMcp_subtitle": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_service": "MCP service",
+  "@panelMcp_service": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_notInstalled": "Not installed",
+  "@panelMcp_notInstalled": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_installed": "Installed",
+  "@panelMcp_installed": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_ready": "Ready",
+  "@panelMcp_ready": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_serviceRunning": "Service running",
+  "@panelMcp_serviceRunning": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_serviceStopped": "Service stopped",
+  "@panelMcp_serviceStopped": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_install": "Install MCP service",
+  "@panelMcp_install": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_start": "Start",
+  "@panelMcp_start": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_stop": "Stop",
+  "@panelMcp_stop": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_restart": "Restart",
+  "@panelMcp_restart": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_logs": "Service logs",
+  "@panelMcp_logs": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_settings": "Runtime settings",
+  "@panelMcp_settings": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_endpoint": "Endpoint",
+  "@panelMcp_endpoint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_runtimeType": "Runtime type",
+  "@panelMcp_runtimeType": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_dockerImage": "Docker image",
+  "@panelMcp_dockerImage": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_listenPort": "Listen port",
+  "@panelMcp_listenPort": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_externalUrl": "External URL",
+  "@panelMcp_externalUrl": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_accessPolicy": "Access policy",
+  "@panelMcp_accessPolicy": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_allowedIPs": "Allowed IPs",
+  "@panelMcp_allowedIPs": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_allowedIPsHint": "One IP or CIDR per line",
+  "@panelMcp_allowedIPsHint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_saveSettings": "Save settings",
+  "@panelMcp_saveSettings": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_website": "Website binding",
+  "@panelMcp_website": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_unbound": "Unbound",
+  "@panelMcp_unbound": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_bound": "Bound",
+  "@panelMcp_bound": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_domain": "Domain",
+  "@panelMcp_domain": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_enableSsl": "Enable SSL",
+  "@panelMcp_enableSsl": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_sslId": "SSL ID",
+  "@panelMcp_sslId": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_bindWebsite": "Bind website",
+  "@panelMcp_bindWebsite": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_updateWebsite": "Update binding",
+  "@panelMcp_updateWebsite": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_unbindWebsite": "Unbind website",
+  "@panelMcp_unbindWebsite": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_deleteWebsite": "Delete linked website",
+  "@panelMcp_deleteWebsite": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_unbindConfirm": "Unbind MCP website {domain}?",
+  "@panelMcp_unbindConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "domain": {
+        "type": "String"
+      }
+    }
+  },
+  "panelMcp_credentials": "Credentials",
+  "@panelMcp_credentials": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_createCredential": "Create credential",
+  "@panelMcp_createCredential": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_editCredential": "Edit credential",
+  "@panelMcp_editCredential": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_credentialName": "Credential name",
+  "@panelMcp_credentialName": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_credentialDescription": "Description",
+  "@panelMcp_credentialDescription": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_expiresAt": "Expires at (ISO 8601, optional)",
+  "@panelMcp_expiresAt": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_tools": "Allowed tools",
+  "@panelMcp_tools": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_nodes": "Nodes",
+  "@panelMcp_nodes": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_noCredentials": "No MCP credentials",
+  "@panelMcp_noCredentials": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_noInvocations": "No MCP invocations",
+  "@panelMcp_noInvocations": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_invocations": "Invocations",
+  "@panelMcp_invocations": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_tool": "Tool",
+  "@panelMcp_tool": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_credential": "Credential",
+  "@panelMcp_credential": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_revealToken": "Reveal token",
+  "@panelMcp_revealToken": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_rotateToken": "Rotate token",
+  "@panelMcp_rotateToken": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_exportCredential": "Export enrollment",
+  "@panelMcp_exportCredential": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_revoke": "Revoke",
+  "@panelMcp_revoke": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_revokeConfirm": "Revoke credential {name}?",
+  "@panelMcp_revokeConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "panelMcp_deleteConfirm": "Delete credential {name}?",
+  "@panelMcp_deleteConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "panelMcp_tokenTitle": "MCP token",
+  "@panelMcp_tokenTitle": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_tokenHint": "Copy this token now. It will not be shown again.",
+  "@panelMcp_tokenHint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_exportTitle": "Enrollment document",
+  "@panelMcp_exportTitle": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_exportClient": "Client",
+  "@panelMcp_exportClient": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_exportClientHint": "For example: claude, cursor, vscode",
+  "@panelMcp_exportClientHint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_catalog": "Tool catalog",
+  "@panelMcp_catalog": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_catalogHint": "Tools available to this panel",
+  "@panelMcp_catalogHint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_serviceConfirm": "Operate MCP service: {operation}?",
+  "@panelMcp_serviceConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      }
+    }
+  },
+  "panelMcp_requiredFields": "Fill in required fields",
+  "@panelMcp_requiredFields": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_status": "Status",
+  "@panelMcp_status": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_reason": "Reason",
+  "@panelMcp_reason": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_noNodes": "No nodes",
+  "@panelMcp_noNodes": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_operationCompleted": "Operation completed",
+  "@panelMcp_operationCompleted": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_loadFailed": "Failed to load MCP data",
+  "@panelMcp_loadFailed": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_createSuccess": "Credential created",
+  "@panelMcp_createSuccess": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_revision": "Revision",
+  "@panelMcp_revision": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_pending": "Pending request: {operation}",
+  "@panelMcp_pending": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      }
+    }
+  },
+  "panelMcp_sslHint": "Required when SSL is enabled",
+  "@panelMcp_sslHint": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_websiteState": "Website state",
+  "@panelMcp_websiteState": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_installing": "Installing MCP service",
+  "@panelMcp_installing": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_taskId": "Task ID",
+  "@panelMcp_taskId": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_saved": "MCP settings saved",
+  "@panelMcp_saved": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_toolsCount": "{count} tools",
+  "@panelMcp_toolsCount": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "panelMcp_tokenCopied": "Token copied",
+  "@panelMcp_tokenCopied": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroups": "GPU groups",
+  "@ai_gpuGroups": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupsEmpty": "No GPU groups",
+  "@ai_gpuGroupsEmpty": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupAdd": "Add GPU group",
+  "@ai_gpuGroupAdd": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupEdit": "Edit GPU group",
+  "@ai_gpuGroupEdit": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupName": "Group name",
+  "@ai_gpuGroupName": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupDescription": "Description",
+  "@ai_gpuGroupDescription": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupImageType": "GPU type",
+  "@ai_gpuGroupImageType": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupDevices": "GPU devices",
+  "@ai_gpuGroupDevices": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupCapabilities": "Capabilities (comma separated)",
+  "@ai_gpuGroupCapabilities": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuGroupDeleteConfirm": "Delete GPU group {name}?",
+  "@ai_gpuGroupDeleteConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_gpuUsage": "GPU usage check",
+  "@ai_gpuUsage": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuUsageCompose": "Docker Compose",
+  "@ai_gpuUsageCompose": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuUsageEnv": "Environment variables",
+  "@ai_gpuUsageEnv": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuUsageResult": "GPU usage result",
+  "@ai_gpuUsageResult": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuUsageWarnings": "Warnings",
+  "@ai_gpuUsageWarnings": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuUsagePossible": "Possible deployments",
+  "@ai_gpuUsagePossible": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_title": "Model chat",
+  "@ai_chat_title": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_model": "Model",
+  "@ai_chat_model": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_input": "Message",
+  "@ai_chat_input": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_send": "Send",
+  "@ai_chat_send": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_empty": "Send a message to test this model",
+  "@ai_chat_empty": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_failed": "Chat failed",
+  "@ai_chat_failed": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_stop": "Stop",
+  "@ai_chat_stop": {
+    "description": "OneDash UI text."
+  },
+  "ai_chat_noModels": "No models configured for this account",
+  "@ai_chat_noModels": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherConfig": "Other configuration",
+  "@ai_agent_otherConfig": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherTimezone": "User timezone",
+  "@ai_agent_otherTimezone": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherBrowser": "Enable browser",
+  "@ai_agent_otherBrowser": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherNpm": "NPM registry",
+  "@ai_agent_otherNpm": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherUsername": "Dashboard username",
+  "@ai_agent_otherUsername": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_otherPassword": "Dashboard password",
+  "@ai_agent_otherPassword": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_markdown": "Markdown files",
+  "@ai_agent_markdown": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_markdownEmpty": "No markdown files",
+  "@ai_agent_markdownEmpty": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_markdownContent": "Content",
+  "@ai_agent_markdownContent": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_batchSkill": "Batch install skill",
+  "@ai_agent_batchSkill": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_skillName": "Skill name",
+  "@ai_agent_skillName": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_skillPackage": "Package path",
+  "@ai_agent_skillPackage": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_feishuSwitch": "Switch Feishu plugin",
+  "@ai_agent_feishuSwitch": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_groupScope": "Group session scope",
+  "@ai_agent_groupScope": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_requireMention": "Require mention",
+  "@ai_agent_requireMention": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_deleteResources": "Resources linked to this agent",
+  "@ai_agent_deleteResources": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_noDeleteResources": "No linked resources",
+  "@ai_agent_noDeleteResources": {
+    "description": "OneDash UI text."
+  },
+  "databases_editUser": "Edit user",
+  "@databases_editUser": {
+    "description": "OneDash UI text."
+  },
+  "databases_savePassword": "Save password locally",
+  "@databases_savePassword": {
+    "description": "OneDash UI text."
+  },
+  "databases_grantsSummary": "Grant summary",
+  "@databases_grantsSummary": {
+    "description": "OneDash UI text."
+  },
+  "databases_commonInfo": "Instance information",
+  "@databases_commonInfo": {
+    "description": "OneDash UI text."
+  },
+  "databases_editDescription": "Edit description",
+  "@databases_editDescription": {
+    "description": "OneDash UI text."
+  },
+  "databases_rootPassword": "Root password",
+  "@databases_rootPassword": {
+    "description": "OneDash UI text."
+  },
+  "vm_resizeDisk": "Resize disk",
+  "@vm_resizeDisk": {
+    "description": "OneDash UI text."
+  },
+  "vm_diskTarget": "Disk target",
+  "@vm_diskTarget": {
+    "description": "OneDash UI text."
+  },
+  "vm_diskSizeNew": "New size (GiB)",
+  "@vm_diskSizeNew": {
+    "description": "OneDash UI text."
+  },
+  "vm_healthCheck": "Health check",
+  "@vm_healthCheck": {
+    "description": "OneDash UI text."
+  },
+  "vm_healthPass": "Passed",
+  "@vm_healthPass": {
+    "description": "OneDash UI text."
+  },
+  "vm_healthWarn": "Warnings",
+  "@vm_healthWarn": {
+    "description": "OneDash UI text."
+  },
+  "vm_healthFail": "Failed",
+  "@vm_healthFail": {
+    "description": "OneDash UI text."
+  },
+  "vm_orphans": "Orphan resources",
+  "@vm_orphans": {
+    "description": "OneDash UI text."
+  },
+  "vm_orphansEmpty": "No orphan resources",
+  "@vm_orphansEmpty": {
+    "description": "OneDash UI text."
+  },
+  "vm_orphansScan": "Scan orphan resources",
+  "@vm_orphansScan": {
+    "description": "OneDash UI text."
+  },
+  "vm_orphansClean": "Clean selected",
+  "@vm_orphansClean": {
+    "description": "OneDash UI text."
+  },
+  "vm_cleanConfirm": "Delete {count} orphan resources?",
+  "@vm_cleanConfirm": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "runtime_phpConfig": "PHP configuration",
+  "@runtime_phpConfig": {
+    "description": "OneDash UI text."
+  },
+  "runtime_phpParams": "PHP parameters (JSON)",
+  "@runtime_phpParams": {
+    "description": "OneDash UI text."
+  },
+  "runtime_disableFunctions": "Disabled functions",
+  "@runtime_disableFunctions": {
+    "description": "OneDash UI text."
+  },
+  "runtime_uploadMaxSize": "Upload limit",
+  "@runtime_uploadMaxSize": {
+    "description": "OneDash UI text."
+  },
+  "runtime_maxExecutionTime": "Max execution time",
+  "@runtime_maxExecutionTime": {
+    "description": "OneDash UI text."
+  },
+  "runtime_container": "PHP container",
+  "@runtime_container": {
+    "description": "OneDash UI text."
+  },
+  "runtime_containerName": "Container name",
+  "@runtime_containerName": {
+    "description": "OneDash UI text."
+  },
+  "runtime_exposedPorts": "Exposed ports (JSON)",
+  "@runtime_exposedPorts": {
+    "description": "OneDash UI text."
+  },
+  "runtime_environments": "Environment variables (JSON)",
+  "@runtime_environments": {
+    "description": "OneDash UI text."
+  },
+  "runtime_volumes": "Volumes (JSON)",
+  "@runtime_volumes": {
+    "description": "OneDash UI text."
+  },
+  "runtime_extraHosts": "Extra hosts (JSON)",
+  "@runtime_extraHosts": {
+    "description": "OneDash UI text."
+  },
+  "runtime_jsonHint": "Enter a valid JSON array",
+  "@runtime_jsonHint": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_hosts": "Hosts file",
+  "@toolbox_hosts": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_hostsEdit": "Edit hosts file",
+  "@toolbox_hostsEdit": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_password": "Root password",
+  "@toolbox_password": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_passwordChanged": "Root password updated",
+  "@toolbox_passwordChanged": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_dnsCheck": "Test DNS resolution",
+  "@toolbox_dnsCheck": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_dnsOk": "DNS resolution works",
+  "@toolbox_dnsOk": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_dnsFail": "DNS resolution failed",
+  "@toolbox_dnsFail": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_systemClean": "Clean system junk",
+  "@toolbox_systemClean": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_systemCleanConfirm": "Clean scanned junk files?",
+  "@toolbox_systemCleanConfirm": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_users": "System users",
+  "@toolbox_users": {
+    "description": "OneDash UI text."
+  },
+  "toolbox_addHost": "Add host entry",
+  "@toolbox_addHost": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_accessInherit": "Inherit",
+  "@panelMcp_accessInherit": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_accessAll": "All",
+  "@panelMcp_accessAll": {
+    "description": "OneDash UI text."
+  },
+  "panelMcp_accessRestricted": "Restricted",
+  "@panelMcp_accessRestricted": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuTypeNvidia": "NVIDIA",
+  "@ai_gpuTypeNvidia": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuTypeIntel": "Intel",
+  "@ai_gpuTypeIntel": {
+    "description": "OneDash UI text."
+  },
+  "ai_gpuTypeAscend": "Ascend",
+  "@ai_gpuTypeAscend": {
+    "description": "OneDash UI text."
+  },
+  "apps_linkedResources": "Linked resources",
+  "@apps_linkedResources": {
+    "description": "OneDash UI text."
+  },
+  "files_wgetDetails": "Download details",
+  "@files_wgetDetails": {
+    "description": "OneDash UI text."
+  },
+  "files_wgetProgress": "Progress: {percent}%",
+  "@files_wgetProgress": {
+    "description": "OneDash UI text."
+  },
+  "files_wgetWaiting": "Waiting for download progress...",
+  "@files_wgetWaiting": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetNew": "New extension preset",
+  "@runtime_presetNew": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetName": "Preset name",
+  "@runtime_presetName": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetExtensions": "Extensions",
+  "@runtime_presetExtensions": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetExtensionsHint": "Separate extensions with commas, e.g. redis,opcache",
+  "@runtime_presetExtensionsHint": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetImport": "Import extension preset",
+  "@runtime_presetImport": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetImported": "Extension preset imported",
+  "@runtime_presetImported": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetSkipped": "Preset already exists with the same content",
+  "@runtime_presetSkipped": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetPush": "Push preset",
+  "@runtime_presetPush": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetSourceNode": "Source node",
+  "@runtime_presetSourceNode": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetTargetNodes": "Target nodes",
+  "@runtime_presetTargetNodes": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetNodesHint": "Separate nodes with commas",
+  "@runtime_presetNodesHint": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetDeleteConfirm": "Delete extension preset \"{name}\"?",
+  "@runtime_presetDeleteConfirm": {
+    "description": "OneDash UI text."
+  },
+  "runtime_presetPushed": "Push task submitted",
+  "@runtime_presetPushed": {
+    "description": "OneDash UI text."
+  },
+  "runtime_supervisor": "Supervisor",
+  "@runtime_supervisor": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoSearch": "Search ISO",
+  "@vm_isoSearch": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoSearchHint": "Name keyword",
+  "@vm_isoSearchHint": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoCreateRecord": "Add image record",
+  "@vm_isoCreateRecord": {
+    "description": "OneDash UI text."
+  },
+  "vm_isoImport": "Import from path",
+  "@vm_isoImport": {
+    "description": "OneDash UI text."
+  },
+  "vm_networkInterfaces": "Network interfaces",
+  "@vm_networkInterfaces": {
+    "description": "OneDash UI text."
+  },
+  "apps_sort": "Installed app order",
+  "@apps_sort": {
+    "description": "OneDash UI text."
+  },
+  "apps_sortHint": "Smaller values appear first",
+  "@apps_sortHint": {
+    "description": "OneDash UI text."
+  },
+  "apps_defaultConfig": "Default config",
+  "@apps_defaultConfig": {
+    "description": "OneDash UI text."
+  },
+  "apps_defaultConfigEmpty": "No default config",
+  "@apps_defaultConfigEmpty": {
+    "description": "OneDash UI text."
+  },
+  "databases_redisCliInstalled": "redis-cli is installed",
+  "@databases_redisCliInstalled": {
+    "description": "OneDash UI text."
+  },
+  "databases_redisCliMissing": "redis-cli is missing; remote Redis terminal is unavailable",
+  "@databases_redisCliMissing": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_export": "Export cron jobs",
+  "@cronjobs_export": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_import": "Import cron jobs",
+  "@cronjobs_import": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_exported": "Cron jobs exported",
+  "@cronjobs_exported": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_imported": "Cron jobs imported",
+  "@cronjobs_imported": {
+    "description": "OneDash UI text."
+  },
+  "cronjobs_importEmpty": "No cron jobs found in the file",
+  "@cronjobs_importEmpty": {
+    "description": "OneDash UI text."
+  },
+  "websites_importCa": "Import CA",
+  "@websites_importCa": {
+    "description": "OneDash UI text."
+  },
+  "websites_uploadCa": "Upload CA archive",
+  "@websites_uploadCa": {
+    "description": "OneDash UI text."
+  },
+  "websites_caName": "CA name",
+  "@websites_caName": {
+    "description": "OneDash UI text."
+  },
+  "websites_importType": "Import type",
+  "@websites_importType": {
+    "description": "OneDash UI text."
+  },
+  "websites_importPaste": "Paste certificate",
+  "@websites_importPaste": {
+    "description": "OneDash UI text."
+  },
+  "websites_importLocal": "Server files",
+  "@websites_importLocal": {
+    "description": "OneDash UI text."
+  },
+  "websites_certificatePath": "Certificate path",
+  "@websites_certificatePath": {
+    "description": "OneDash UI text."
+  },
+  "ai_accountCountLabel": "{name}: {count}",
+  "@ai_accountCountLabel": {
+    "description": "OneDash UI text.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "panelSettings_proxy": "Server proxy",
+  "@panelSettings_proxy": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyHint": "Configure HTTP/HTTPS/SOCKS5 proxy for outbound panel traffic",
+  "@panelSettings_proxyHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyType": "Proxy type",
+  "@panelSettings_proxyType": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyHttp": "HTTP",
+  "@panelSettings_proxyHttp": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyHttps": "HTTPS",
+  "@panelSettings_proxyHttps": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxySocks5": "SOCKS5",
+  "@panelSettings_proxySocks5": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyClose": "Disable proxy",
+  "@panelSettings_proxyClose": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyUrl": "Proxy host",
+  "@panelSettings_proxyUrl": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyUrlHint": "e.g. 127.0.0.1 or proxy.example.com",
+  "@panelSettings_proxyUrlHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyPort": "Proxy port",
+  "@panelSettings_proxyPort": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyUser": "Proxy user",
+  "@panelSettings_proxyUser": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyPassword": "Proxy password",
+  "@panelSettings_proxyPassword": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyPasswordHint": "Leave empty to clear the saved proxy password",
+  "@panelSettings_proxyPasswordHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyDocker": "Proxy Docker too",
+  "@panelSettings_proxyDocker": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyRestartDocker": "Restart Docker after applying",
+  "@panelSettings_proxyRestartDocker": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_proxyRequired": "Enter proxy host and port",
+  "@panelSettings_proxyRequired": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_downloadPreference": "Download preference",
+  "@panelSettings_downloadPreference": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_downloadPreferenceHint": "Choose the filename used when downloading files",
+  "@panelSettings_downloadPreferenceHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_useServerFilename": "Use server filename",
+  "@panelSettings_useServerFilename": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_useServerFilenameHint": "Prefer the original filename returned by the server",
+  "@panelSettings_useServerFilenameHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_downloadSsl": "Download panel certificate",
+  "@panelSettings_downloadSsl": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_downloadSslHint": "Export the panel self-signed SSL certificate for trust",
+  "@panelSettings_downloadSslHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalAppearance": "Terminal appearance",
+  "@panelSettings_terminalAppearance": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalAppearanceHint": "Adjust the font, colors and cursor of the panel web terminal",
+  "@panelSettings_terminalAppearanceHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalBehavior": "Terminal behavior",
+  "@panelSettings_terminalBehavior": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_showTerminalButton": "Show terminal button",
+  "@panelSettings_showTerminalButton": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_showTerminalButtonHint": "Show a shortcut to open the terminal in the panel",
+  "@panelSettings_showTerminalButtonHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_cursorBlink": "Blinking cursor",
+  "@panelSettings_cursorBlink": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_cursorStyle": "Cursor style",
+  "@panelSettings_cursorStyle": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_cursorBlock": "Block",
+  "@panelSettings_cursorBlock": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_cursorUnderline": "Underline",
+  "@panelSettings_cursorUnderline": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_cursorBar": "Bar",
+  "@panelSettings_cursorBar": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_scrollback": "Scrollback lines",
+  "@panelSettings_scrollback": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_scrollSensitivity": "Scroll sensitivity",
+  "@panelSettings_scrollSensitivity": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalTypography": "Typography",
+  "@panelSettings_terminalTypography": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fontFamily": "Font family",
+  "@panelSettings_fontFamily": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fontFamilyHint": "Leave empty to use the panel default font",
+  "@panelSettings_fontFamilyHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_fontSize": "Font size",
+  "@panelSettings_fontSize": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_lineHeight": "Line height",
+  "@panelSettings_lineHeight": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_letterSpacing": "Letter spacing",
+  "@panelSettings_letterSpacing": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_terminalColors": "Colors",
+  "@panelSettings_terminalColors": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_backgroundColor": "Background color",
+  "@panelSettings_backgroundColor": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_foregroundColor": "Foreground color",
+  "@panelSettings_foregroundColor": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_colorHint": "Hex color such as #1e1e1e",
+  "@panelSettings_colorHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_registerPasskey": "Register in browser",
+  "@panelSettings_registerPasskey": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_registerPasskeyHint": "Passkeys bind to the current domain, so finish registration in the panel web page",
+  "@panelSettings_registerPasskeyHint": {
+    "description": "OneDash UI text."
+  },
+  "host_sshTerminal": "SSH terminal",
+  "@host_sshTerminal": {
+    "description": "Open an SSH terminal to a remote host."
+  },
+  "websites_editStream": "Edit tunnel",
+  "@websites_editStream": {
+    "description": "Edit stream website forwarding settings."
+  },
+  "cronjobs_pickScript": "Choose from library",
+  "@cronjobs_pickScript": {
+    "description": "Pick a shell script from the script library."
+  }
 }

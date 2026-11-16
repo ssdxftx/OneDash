@@ -14,6 +14,42 @@ class ToolboxRepositoryImpl implements ToolboxRepository {
   Future<Map<String, dynamic>> getDeviceBase() => _api.getDeviceBase();
 
   @override
+  Future<String> loadDeviceConf(String name) => _api.loadDeviceConf(name);
+
+  @override
+  Future<void> updateDeviceByFile({
+    required String name,
+    required String file,
+  }) => _api.updateDeviceByFile(name: name, file: file);
+
+  @override
+  Future<void> updateDeviceHosts(List<Map<String, String>> hosts) =>
+      _api.updateDeviceHosts(hosts);
+
+  @override
+  Future<void> updateDevicePassword({
+    required String user,
+    required String password,
+  }) => _api.updateDevicePassword(user: user, password: password);
+
+  @override
+  Future<bool> checkDns({String key = 'form', required String value}) =>
+      _api.checkDns(key: key, value: value);
+
+  @override
+  Future<void> cleanSystem(List<Map<String, dynamic>> items) =>
+      _api.cleanSystem(items);
+
+  @override
+  Future<void> deleteClam({
+    required List<int> ids,
+    bool removeInfected = false,
+  }) => _api.deleteClam(ids: ids, removeInfected: removeInfected);
+
+  @override
+  Future<void> cleanClamRecords(int id) => _api.cleanClamRecords(id);
+
+  @override
   Future<Map<String, dynamic>> getFail2banBase() => _api.getFail2banBase();
 
   @override
@@ -59,6 +95,13 @@ class ToolboxRepositoryImpl implements ToolboxRepository {
       _api.updateFail2banConf(key, value);
 
   @override
+  Future<String> loadFail2banConf() => _api.loadFail2banConf();
+
+  @override
+  Future<void> updateFail2banByFile(String file) =>
+      _api.updateFail2banByFile(file);
+
+  @override
   Future<List<Map<String, dynamic>>> searchFtp({
     int page = 1,
     int pageSize = 100,
@@ -79,6 +122,28 @@ class ToolboxRepositoryImpl implements ToolboxRepository {
 
   @override
   Future<void> deleteFtp(List<int> ids) => _api.deleteFtp(ids);
+
+  @override
+  Future<void> operateFtp(String operation) => _api.operateFtp(operation);
+
+  @override
+  Future<void> syncFtp() => _api.syncFtp();
+
+  @override
+  Future<void> updateFtp(Map<String, dynamic> data) => _api.updateFtp(data);
+
+  @override
+  Future<Map<String, dynamic>> searchFtpLogs({
+    int page = 1,
+    int pageSize = 50,
+    String user = '',
+    String operation = '',
+  }) => _api.searchFtpLogs(
+    page: page,
+    pageSize: pageSize,
+    user: user,
+    operation: operation,
+  );
 
   @override
   Future<List<Map<String, dynamic>>> searchClam({
@@ -104,6 +169,21 @@ class ToolboxRepositoryImpl implements ToolboxRepository {
 
   @override
   Future<void> handleClam(int id) => _api.handleClam(id);
+
+  @override
+  Future<void> updateClam(Map<String, dynamic> data) => _api.updateClam(data);
+
+  @override
+  Future<void> updateClamStatus(int id, String status) =>
+      _api.updateClamStatus(id, status);
+
+  @override
+  Future<String> loadClamFile(String name, {String tail = ''}) =>
+      _api.loadClamFile(name, tail: tail);
+
+  @override
+  Future<void> updateClamFile({required String name, required String file}) =>
+      _api.updateClamFile(name: name, file: file);
 
   @override
   Future<List<Map<String, dynamic>>> searchClamRecords({

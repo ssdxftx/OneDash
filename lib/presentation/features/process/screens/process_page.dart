@@ -94,7 +94,7 @@ class ProcessPage extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            '${displayValue(context, item.address)}${item.port.isEmpty ? '' : ':${item.port}'} · ${item.protocol}',
+                            _endpoint(context, item),
                             style: AppTextStyles.caption.copyWith(
                               color: context.scheme.onSurfaceVariant,
                             ),
@@ -104,16 +104,17 @@ class ProcessPage extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    SizedBox(
-                      width: 72,
-                      child: Text(
-                        item.user,
-                        style: AppTextStyles.caption,
-                        textAlign: TextAlign.end,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    if (item.user.isNotEmpty)
+                      SizedBox(
+                        width: 72,
+                        child: Text(
+                          item.user,
+                          style: AppTextStyles.caption,
+                          textAlign: TextAlign.end,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
                     Icon(
                       TablerIcons.chevron_right,
                       size: AppTokens.iconList,
@@ -127,6 +128,13 @@ class ProcessPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _endpoint(BuildContext context, ProcessInfo item) {
+    final endpoint = item.address.isEmpty
+        ? (item.port.isEmpty ? displayValue(context, null) : item.port)
+        : '${item.address}${item.port.isEmpty ? '' : ':${item.port}'}';
+    return item.protocol.isEmpty ? endpoint : '$endpoint · ${item.protocol}';
   }
 
   Future<void> _showActions(
@@ -144,7 +152,9 @@ class ProcessPage extends ConsumerWidget {
           Text(item.name, style: AppTextStyles.titleL),
           const SizedBox(height: AppTokens.s4),
           Text(
-            'PID ${item.pid} · ${item.user}',
+            item.user.isEmpty
+                ? 'PID ${item.pid}'
+                : 'PID ${item.pid} · ${item.user}',
             style: AppTextStyles.bodyS.copyWith(
               color: context.scheme.onSurfaceVariant,
             ),

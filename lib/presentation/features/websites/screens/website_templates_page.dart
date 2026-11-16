@@ -16,6 +16,8 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/filter_chips.dart';
 import '../../../common/components/section_header.dart';
+import '../../../common/components/skeleton.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
@@ -43,6 +45,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
   }
 
   Future<void> _load() async {
+    if (!mounted) return;
     setState(() => _loading = true);
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
@@ -69,12 +72,56 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
       }
       if (!mounted) return;
     }
-    await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.95,
-      builder: (sheetContext) => _TemplateEditorSheet(template: template),
+    final saved = await pushFormPage<bool>(
+      context,
+      _TemplateEditorSheet(template: template),
     );
-    unawaited(_load());
+    if (saved == true) unawaited(_load());
+  }
+
+  Future<void> _preview(WebsiteTemplateDto template) async {
+    final l10n = AppLocalizations.of(context);
+    final variables = template.parsedVariables
+        .map(
+          (item) =>
+              '${item.key}${item.label.isEmpty ? '' : ' (${item.label})'}'
+              '${item.required ? ' *' : ''}'
+              '${item.defaultValue.isEmpty ? '' : ' = ${item.defaultValue}'}',
+        )
+        .join('\n');
+    await showAppSheet<void>(
+      context: context,
+      maxHeightFactor: 0.9,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(template.name, style: AppTextStyles.titleM),
+          if (template.remark.isNotEmpty)
+            Text(
+              template.remark,
+              style: AppTextStyles.caption.copyWith(
+                color: sheetContext.scheme.onSurfaceVariant,
+              ),
+            ),
+          const SizedBox(height: AppTokens.s12),
+          if (variables.isNotEmpty) ...[
+            Text(l10n.websites_templateVariables, style: AppTextStyles.titleS),
+            const SizedBox(height: AppTokens.s4),
+            Text(variables, style: AppTextStyles.bodyS),
+            const SizedBox(height: AppTokens.s12),
+          ],
+          Flexible(
+            child: SingleChildScrollView(
+              child: SelectableText(
+                template.isSingle ? template.content : template.filePath,
+                style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _delete(WebsiteTemplateDto template) async {
@@ -100,11 +147,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
   }
 
   Future<void> _generate(WebsiteTemplateDto template) async {
-    await showAppSheet<bool>(
-      context: context,
-      maxHeightFactor: 0.95,
-      builder: (sheetContext) => _TemplateOutputSheet(template: template),
-    );
+    await pushFormPage<bool>(context, _TemplateOutputSheet(template: template));
   }
 
   Future<void> _showOutputs() async {
@@ -163,7 +206,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
           ),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const SkeletonList(itemCount: 5)
                 : _templates.isEmpty
                 ? EmptyState(
                     icon: TablerIcons.layout,
@@ -200,7 +243,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: AppTokens.s8,
-                                          vertical: 2,
+                                          vertical: AppTokens.chipPaddingY,
                                         ),
                                         decoration: BoxDecoration(
                                           color: context
@@ -217,6 +260,12 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                                                 context.scheme.onSurfaceVariant,
                                           ),
                                         ),
+                                      ),
+                                      IconButton(
+                                        tooltip: l10n.websites_templatePreview,
+                                        visualDensity: VisualDensity.compact,
+                                        icon: const Icon(TablerIcons.eye),
+                                        onPressed: () => _preview(template),
                                       ),
                                       IconButton(
                                         tooltip: l10n.websites_templateDelete,
@@ -430,10 +479,17 @@ class _TemplateEditorSheetState extends ConsumerState<_TemplateEditorSheet> {
   }
 
   Future<void> _save() async {
+    if (_uploading || _saving) return;
     final l10n = AppLocalizations.of(context);
     final name = _name.text.trim();
-    if (name.isEmpty) return;
-    if (_type == 'multi' && _filePath.isEmpty) return;
+    if (name.isEmpty) {
+      AppToast.error(context, l10n.websites_templateNameRequired);
+      return;
+    }
+    if (_type == 'multi' && _filePath.isEmpty) {
+      AppToast.error(context, l10n.websites_templateFileRequired);
+      return;
+    }
     setState(() => _saving = true);
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
@@ -468,15 +524,11 @@ class _TemplateEditorSheetState extends ConsumerState<_TemplateEditorSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SimpleFormPage(
+      title: _isEdit ? l10n.websites_templateEdit : l10n.websites_templateAdd,
+      onSave: _save,
+      saving: _saving,
       children: [
-        Text(
-          _isEdit ? l10n.websites_templateEdit : l10n.websites_templateAdd,
-          style: AppTextStyles.titleL,
-        ),
-        const SizedBox(height: AppTokens.s16),
         AppTextField(controller: _name, label: l10n.websites_templateName),
         const SizedBox(height: AppTokens.s12),
         DropdownButtonFormField<String>(
@@ -649,12 +701,6 @@ class _TemplateEditorSheetState extends ConsumerState<_TemplateEditorSheet> {
                 ),
               ),
             ),
-        const SizedBox(height: AppTokens.s24),
-        PrimaryButton(
-          label: l10n.action_save,
-          loading: _saving,
-          onPressed: _save,
-        ),
       ],
     );
   }
@@ -684,6 +730,8 @@ class _TemplateOutputSheetState extends ConsumerState<_TemplateOutputSheet> {
   late final TextEditingController _name;
   final _values = <String, TextEditingController>{};
   bool _saving = false;
+  bool _previewing = false;
+  String? _previewHtml;
 
   @override
   void initState() {
@@ -708,7 +756,10 @@ class _TemplateOutputSheetState extends ConsumerState<_TemplateOutputSheet> {
   Future<void> _generate() async {
     final l10n = AppLocalizations.of(context);
     final name = _name.text.trim();
-    if (name.isEmpty) return;
+    if (name.isEmpty) {
+      AppToast.error(context, l10n.websites_templateOutputNameRequired);
+      return;
+    }
     setState(() => _saving = true);
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
@@ -730,23 +781,41 @@ class _TemplateOutputSheetState extends ConsumerState<_TemplateOutputSheet> {
     }
   }
 
+  Future<void> _preview() async {
+    final l10n = AppLocalizations.of(context);
+    setState(() => _previewing = true);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final html = await repository.previewTemplate(
+        templateID: widget.template.id,
+        variableValues: {
+          for (final entry in _values.entries) entry.key: entry.value.text,
+        },
+      );
+      if (!mounted) return;
+      setState(() => _previewHtml = html);
+      if (html.trim().isEmpty) {
+        AppToast.show(context, l10n.websites_templatePreviewFailed);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    } finally {
+      if (mounted) setState(() => _previewing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final variables = widget.template.parsedVariables;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SimpleFormPage(
+      title: l10n.websites_templateGenerate,
+      subtitle: widget.template.name,
+      saveLabel: l10n.websites_templateGenerate,
+      onSave: _generate,
+      saving: _saving,
       children: [
-        Text(l10n.websites_templateGenerate, style: AppTextStyles.titleL),
-        const SizedBox(height: AppTokens.s8),
-        Text(
-          widget.template.name,
-          style: AppTextStyles.bodyS.copyWith(
-            color: context.scheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: AppTokens.s16),
         AppTextField(
           controller: _name,
           label: l10n.websites_templateOutputName,
@@ -761,11 +830,27 @@ class _TemplateOutputSheetState extends ConsumerState<_TemplateOutputSheet> {
                 : TextInputType.text,
           ),
         ],
-        const SizedBox(height: AppTokens.s24),
-        PrimaryButton(
-          label: l10n.websites_templateGenerate,
-          loading: _saving,
-          onPressed: _generate,
+        if (_previewHtml != null) ...[
+          const SizedBox(height: AppTokens.s16),
+          SectionHeader(title: l10n.websites_templatePreviewResult),
+          TonalCard(
+            child: SizedBox(
+              width: double.infinity,
+              child: SingleChildScrollView(
+                child: SelectableText(
+                  _previewHtml!,
+                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                ),
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: AppTokens.s16),
+        SecondaryButton(
+          label: l10n.websites_templatePreview,
+          icon: TablerIcons.eye,
+          loading: _previewing,
+          onPressed: _previewing || _saving ? null : _preview,
         ),
       ],
     );
@@ -791,6 +876,7 @@ class _TemplateOutputsSheetState extends ConsumerState<_TemplateOutputsSheet> {
   }
 
   Future<void> _load() async {
+    if (!mounted) return;
     setState(() => _loading = true);
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
@@ -803,6 +889,71 @@ class _TemplateOutputsSheetState extends ConsumerState<_TemplateOutputsSheet> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _showDetail(WebsiteTemplateOutputDto output) async {
+    final l10n = AppLocalizations.of(context);
+    WebsiteTemplateOutputDto detail = output;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      detail = await repository.getTemplateOutput(output.id);
+    } catch (_) {
+      // Fall back to the list item snapshot.
+    }
+    if (!mounted) return;
+    await showAppSheet<void>(
+      context: context,
+      maxHeightFactor: 0.9,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.websites_templateOutputDetail, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s12),
+          _detailRow(l10n.websites_templateOutputName, detail.name),
+          _detailRow(l10n.websites_templateOutputTemplate, detail.templateName),
+          _detailRow(l10n.websites_templateOutputPath, detail.outputPath),
+          _detailRow(l10n.websites_templateOutputCreatedAt, detail.createdAt),
+          if (detail.variableValues.isNotEmpty) ...[
+            const SizedBox(height: AppTokens.s8),
+            Text(
+              l10n.websites_templateOutputVariables,
+              style: AppTextStyles.titleS,
+            ),
+            const SizedBox(height: AppTokens.s4),
+            Flexible(
+              child: SingleChildScrollView(
+                child: SelectableText(
+                  detail.variableValues,
+                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _detailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppTokens.s8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 96,
+            child: Text(
+              label,
+              style: AppTextStyles.bodyS.copyWith(
+                color: context.scheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          Expanded(child: SelectableText(value, style: AppTextStyles.bodyS)),
+        ],
+      ),
+    );
   }
 
   Future<void> _delete(WebsiteTemplateOutputDto output) async {
@@ -864,6 +1015,7 @@ class _TemplateOutputsSheetState extends ConsumerState<_TemplateOutputsSheet> {
             Padding(
               padding: const EdgeInsets.only(bottom: AppTokens.s8),
               child: TonalCard(
+                onTap: () => _showDetail(output),
                 child: Row(
                   children: [
                     Expanded(

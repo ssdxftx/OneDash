@@ -51,6 +51,65 @@ class DashboardRepositoryImpl implements DashboardRepository {
   @override
   Future<void> restartSystem(String operation) =>
       _dashboardApi.restartSystem(operation);
+  @override
+  Future<List<Map<String, dynamic>>> getQuickOptions() =>
+      _dashboardApi.getQuickOptions();
+
+  @override
+  Future<void> changeQuick(List<Map<String, dynamic>> quicks) =>
+      _dashboardApi.changeQuick(quicks);
+
+  @override
+  Future<List<Map<String, dynamic>>> getQuickDirectories() =>
+      _dashboardApi.getQuickDirectories();
+
+  @override
+  Future<void> createQuickDirectory({
+    required String path,
+    String alias = '',
+  }) => _dashboardApi.createQuickDirectory(path: path, alias: alias);
+
+  @override
+  Future<void> updateQuickDirectory({
+    required int id,
+    required String path,
+    String alias = '',
+    bool legacy = false,
+  }) => _dashboardApi.updateQuickDirectory(
+    id: id,
+    path: path,
+    alias: alias,
+    legacy: legacy,
+  );
+
+  @override
+  Future<void> deleteQuickDirectory({required int id, bool legacy = false}) =>
+      _dashboardApi.deleteQuickDirectory(id: id, legacy: legacy);
+
+  @override
+  Future<List<Map<String, dynamic>>> getAppLauncher() =>
+      _dashboardApi.getAppLauncher();
+
+  @override
+  Future<List<Map<String, dynamic>>> getAppLauncherOptions({
+    String filter = '',
+  }) => _dashboardApi.getAppLauncherOptions(filter: filter);
+
+  @override
+  Future<void> updateAppLauncherShow({
+    required String key,
+    required bool show,
+  }) => _dashboardApi.updateAppLauncherShow(key: key, show: show);
+
+  @override
+  Future<List<Map<String, dynamic>>> getTopCpu() => _dashboardApi.getTopCpu();
+
+  @override
+  Future<List<Map<String, dynamic>>> getTopMem() => _dashboardApi.getTopMem();
+
+  @override
+  Future<Map<String, dynamic>> getNodeCurrent() =>
+      _dashboardApi.getNodeCurrent();
 
   @override
   Future<List<String>> getMonitorIoOptions() => _hostApi.getMonitorIoOptions();

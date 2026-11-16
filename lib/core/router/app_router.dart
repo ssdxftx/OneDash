@@ -9,6 +9,8 @@ import '../../presentation/features/app_store/screens/app_store_page.dart';
 import '../../presentation/features/app_store/screens/installed_app_page.dart';
 import '../../presentation/features/backups/screens/backup_accounts_page.dart';
 import '../../presentation/features/ai/screens/ai_page.dart';
+import '../../presentation/features/vm/screens/vm_console_page.dart';
+import '../../presentation/features/vm/screens/vm_page.dart';
 import '../../presentation/features/backups/screens/backups_page.dart';
 import '../../data/dto/container/container_compose_dto.dart';
 import '../../presentation/features/containers/screens/compose_form_page.dart';
@@ -34,6 +36,7 @@ import '../../presentation/features/files/screens/files_page.dart';
 import '../../presentation/features/firewall/screens/firewall_page.dart';
 import '../../presentation/features/log/screens/log_hub_page.dart';
 import '../../presentation/features/more/screens/more_page.dart';
+import '../../presentation/features/panel_settings/screens/panel_mcp_page.dart';
 import '../../presentation/features/panel_settings/screens/panel_settings_page.dart';
 import '../../presentation/features/panel_settings/screens/snapshot_page.dart';
 import '../../presentation/features/process/screens/process_page.dart';
@@ -75,10 +78,19 @@ final appRouter = GoRouter(
   observers: [appRouteObserver],
   redirect: (context, state) {
     final id = int.tryParse(state.pathParameters['id'] ?? '');
-    if (id != null) {
-      final notifier = appContainer.read(activeServerIdStateProvider.notifier);
-      if (notifier.state != id) notifier.state = id;
+    if (id == null) return null;
+
+    final notifier = appContainer.read(activeServerIdStateProvider.notifier);
+    final active = notifier.state;
+    final segments = state.uri.pathSegments;
+    final isServerPath = segments.length >= 2 && segments.first == 's';
+    if (active > 0 && id != active && isServerPath) {
+      final target = state.uri.replace(
+        pathSegments: ['s', '$active', ...segments.skip(2)],
+      );
+      return target.toString();
     }
+    if (active != id) notifier.state = id;
     return null;
   },
   routes: [
@@ -127,6 +139,12 @@ final appRouter = GoRouter(
               redisName: state.uri.queryParameters['redis'],
               redisFrom: state.uri.queryParameters['redisFrom'],
               initialCommand: state.uri.queryParameters['redisCommand'],
+              scriptId: int.tryParse(
+                state.uri.queryParameters['scriptId'] ?? '',
+              ),
+              sshHostId: int.tryParse(
+                state.uri.queryParameters['sshHostId'] ?? '',
+              ),
             ),
           ),
         ),
@@ -260,7 +278,10 @@ final appRouter = GoRouter(
                       parentNavigatorKey: _rootNavigatorKey,
                       pageBuilder: (context, state) => slidePage(
                         state,
-                        FileToolsPage(serverId: _serverId(state)),
+                        FileToolsPage(
+                          serverId: _serverId(state),
+                          initialPath: state.uri.queryParameters['path'] ?? '/',
+                        ),
                       ),
                     ),
                   ],
@@ -423,6 +444,27 @@ final appRouter = GoRouter(
                           slidePage(state, AiPage(serverId: _serverId(state))),
                     ),
                     GoRoute(
+                      path: 'vms',
+                      pageBuilder: (context, state) =>
+                          slidePage(state, VmPage(serverId: _serverId(state))),
+                      routes: [
+                        GoRoute(
+                          path: 'console',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            VmConsolePage(
+                              serverId: _serverId(state),
+                              name:
+                                  state.uri.queryParameters['name'] ??
+                                  state.extra as String? ??
+                                  '',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    GoRoute(
                       path: 'databases',
                       pageBuilder: (context, state) => slidePage(
                         state,
@@ -521,6 +563,14 @@ final appRouter = GoRouter(
                           pageBuilder: (context, state) => slidePage(
                             state,
                             SnapshotPage(serverId: _serverId(state)),
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'mcp',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => slidePage(
+                            state,
+                            PanelMcpPage(serverId: _serverId(state)),
                           ),
                         ),
                       ],

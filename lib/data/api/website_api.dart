@@ -1,8 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../core/network/api_compatibility.dart';
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/network/network_exceptions.dart';
 import '../dto/common/page_result.dart';
 import '../dto/website/website_acme_account_dto.dart';
 import '../dto/website/website_create_req.dart';
@@ -409,6 +413,38 @@ class WebsiteApi {
     );
   }
 
+  /// POST /api/v2/websites/templates/preview
+  Future<String> previewTemplate({
+    required int templateID,
+    required Map<String, String> variableValues,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/templates/preview',
+      data: {'templateID': templateID, 'variableValues': variableValues},
+    );
+    return ApiResponseParser.map(resp)['html'] as String? ?? '';
+  }
+
+  /// POST /api/v2/websites/templates/outputs/get
+  Future<WebsiteTemplateOutputDto> getTemplateOutput(int id) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/templates/outputs/get',
+      data: {'id': id},
+    );
+    return ApiResponseParser.object(resp, WebsiteTemplateOutputDto.fromJson);
+  }
+
+  /// POST /api/v2/websites/check
+  Future<List<WebsitePreInstallCheckDto>> checkWebsiteInstall(
+    List<int> installIds,
+  ) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/check',
+      data: {'InstallIds': installIds},
+    );
+    return ApiResponseParser.list(resp, WebsitePreInstallCheckDto.fromJson);
+  }
+
   /// 查询网站负载均衡上游列表。
   Future<List<WebsiteLoadBalanceDto>> listLoadBalances(int websiteId) async {
     final resp = await _client.get<Map<String, dynamic>>(
@@ -434,6 +470,18 @@ class WebsiteApi {
   }
 
   /// 删除负载均衡上游。
+  /// POST /api/v2/websites/lbs/file — 保存负载均衡源文件。
+  Future<void> updateLoadBalanceFile({
+    required int websiteId,
+    required String name,
+    required String content,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/lbs/file',
+      data: {'websiteID': websiteId, 'name': name, 'content': content},
+    );
+  }
+
   Future<void> deleteLoadBalance(int websiteId, String name) async {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/lbs/del',
@@ -475,6 +523,56 @@ class WebsiteApi {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/auths/path/update',
       data: req.toJson(),
+    );
+  }
+
+  /// GET /api/v2/openresty/modules
+  Future<Map<String, dynamic>> getOpenRestyModules() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/openresty/modules',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/openresty/modules/update
+  Future<void> updateOpenRestyModule(Map<String, dynamic> data) async {
+    await _client.post('/api/v2/openresty/modules/update', data: data);
+  }
+
+  /// POST /api/v2/openresty/build
+  Future<void> buildOpenResty({
+    required String mirror,
+    required String taskID,
+    List<String> modules = const [],
+    bool force = false,
+  }) async {
+    await _client.post(
+      '/api/v2/openresty/build',
+      data: {
+        'mirror': mirror,
+        'taskID': taskID,
+        'modules': modules,
+        'force': force,
+      },
+    );
+  }
+
+  /// GET /api/v2/openresty/https
+  Future<Map<String, dynamic>> getOpenRestyHttps() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/openresty/https',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/openresty/https
+  Future<void> updateOpenRestyHttps({
+    required String operate,
+    bool sslRejectHandshake = false,
+  }) async {
+    await _client.post(
+      '/api/v2/openresty/https',
+      data: {'operate': operate, 'sslRejectHandshake': sslRejectHandshake},
     );
   }
 
@@ -533,11 +631,67 @@ class WebsiteApi {
     );
   }
 
+  /// 更新隧道网站转发配置。
+  Future<void> updateStreamConfig({
+    required int websiteId,
+    required String streamPorts,
+    required String name,
+    required String algorithm,
+    required bool udp,
+    required List<dynamic> servers,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/stream/update',
+      data: {
+        'websiteID': websiteId,
+        'streamPorts': streamPorts,
+        'name': name,
+        'algorithm': algorithm,
+        'udp': udp,
+        'servers': servers,
+      },
+    );
+  }
+
   /// 更新网站基础信息。
   Future<void> updateWebsite(WebsiteUpdateReq req) async {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/update',
       data: req.toJson(),
+    );
+  }
+
+  /// 分页查询网站日志。
+  /// POST /api/v2/websites/log/search
+  Future<WebsiteLogFileDto> searchWebsiteLog(
+    int websiteId, {
+    required WebsiteLogType type,
+    int page = 1,
+    int pageSize = 500,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/log/search',
+      data: {
+        'id': websiteId,
+        'logType': type.fileName,
+        'page': page,
+        'pageSize': pageSize,
+      },
+    );
+    final data = ApiResponseParser.map(resp);
+    final content = '${data['content'] ?? ''}';
+    final lines = content
+        .split('\n')
+        .where((line) => line.isNotEmpty)
+        .toList(growable: false);
+    return WebsiteLogFileDto(
+      end: data['end'] as bool? ?? true,
+      path: data['path'] as String? ?? '',
+      total: lines.length,
+      taskStatus: '',
+      lines: lines,
+      scope: '',
+      totalLines: lines.length,
     );
   }
 
@@ -744,12 +898,18 @@ class WebsiteApi {
     return ApiResponseParser.object(resp, SslManageDto.fromJson);
   }
 
-  /// 创建 SSL 证书。
-  Future<void> createSsl(SslCreateReq req) async {
-    await _client.post<Map<String, dynamic>>(
+  /// 创建 SSL 证书，返回新证书 ID。
+  Future<int> createSsl(SslCreateReq req) async {
+    final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/ssl',
       data: req.toJson(),
     );
+    final id = ApiResponseParser.map(resp)['id'];
+    final parsed = id is num ? id.toInt() : int.tryParse('$id');
+    if (parsed == null || parsed <= 0) {
+      throw const ApiFormatException('创建证书响应缺少 id');
+    }
+    return parsed;
   }
 
   /// 更新 SSL 证书。
@@ -772,7 +932,7 @@ class WebsiteApi {
   Future<void> obtainSsl(int id) async {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/ssl/obtain',
-      data: {'sslId': id},
+      data: {'ID': id},
     );
   }
 
@@ -780,7 +940,7 @@ class WebsiteApi {
   Future<List<SslResolveDto>> resolveSsl(int acmeId, int sslId) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/ssl/resolve',
-      data: {'acmeAccountId': acmeId, 'sslId': sslId},
+      data: {'acmeAccountId': acmeId, 'websiteSSLId': sslId},
     );
     return ApiResponseParser.list(resp, SslResolveDto.fromJson);
   }
@@ -809,7 +969,10 @@ class WebsiteApi {
         if (privateKeyPath != null) 'privateKeyPath': privateKeyPath,
         if (description != null) 'description': description,
         if (domainId != null) 'domainId': domainId,
-        if (websiteSSLId != null) 'websiteSSLId': websiteSSLId,
+        if (websiteSSLId != null) ...{
+          'sslID': websiteSSLId,
+          'websiteSSLId': websiteSSLId,
+        },
       },
     );
   }
@@ -826,7 +989,7 @@ class WebsiteApi {
       'certificateFile': await MultipartFile.fromFile(certificatePath),
       'privateKeyFile': await MultipartFile.fromFile(privateKeyPath),
       if (description != null) 'description': description,
-      if (websiteSSLId != null) 'websiteSSLId': websiteSSLId,
+      if (websiteSSLId != null) 'sslID': websiteSSLId,
     });
     await _client.postMultipart<Map<String, dynamic>>(
       '/api/v2/websites/ssl/upload/file',
@@ -838,7 +1001,7 @@ class WebsiteApi {
   Future<Response<dynamic>> downloadSsl(int id) async {
     return _client.post<dynamic>(
       '/api/v2/websites/ssl/download',
-      data: {'sslId': id},
+      data: {'id': id},
       options: Options(responseType: ResponseType.bytes),
     );
   }
@@ -959,6 +1122,44 @@ class WebsiteApi {
     );
   }
 
+  /// 导入 CA 证书。
+  /// POST /api/v2/websites/ca/import
+  Future<void> importCa({
+    required String name,
+    required String type,
+    String certificate = '',
+    String privateKey = '',
+    String certificatePath = '',
+    String privateKeyPath = '',
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/ca/import',
+      data: {
+        'name': name,
+        'type': type,
+        'certificate': certificate,
+        'privateKey': privateKey,
+        'certificatePath': certificatePath,
+        'privateKeyPath': privateKeyPath,
+      },
+    );
+  }
+
+  /// 上传 CA ZIP 压缩包。
+  /// POST /api/v2/websites/ca/upload
+  Future<void> uploadCa({
+    required String fileName,
+    required Uint8List bytes,
+  }) async {
+    final formData = FormData.fromMap({
+      'file': MultipartFile.fromBytes(bytes, filename: fileName),
+    });
+    await _client.postMultipart<Map<String, dynamic>>(
+      '/api/v2/websites/ca/upload',
+      formData: formData,
+    );
+  }
+
   /// 用 CA 签发证书。
   Future<void> obtainCa(CaObtainReq req) async {
     await _client.post<Map<String, dynamic>>(
@@ -971,7 +1172,7 @@ class WebsiteApi {
   Future<void> renewCa(int sslId) async {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/ca/renew',
-      data: {'sslId': sslId},
+      data: {'SSLID': sslId},
     );
   }
 
@@ -1023,6 +1224,155 @@ class WebsiteApi {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/databases',
       data: req.toJson(),
+    );
+  }
+
+  /// 批量启动、停止或删除网站。
+  Future<void> batchOperateWebsites(
+    List<int> ids,
+    String operate, {
+    String? taskId,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/batch/operate',
+      data: {
+        'ids': ids,
+        'operate': operate,
+        'taskID': taskId ?? const Uuid().v4(),
+      },
+    );
+  }
+
+  /// 批量修改网站分组。
+  Future<void> batchSetWebsiteGroup(List<int> ids, int groupId) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/batch/group',
+      data: {'ids': ids, 'groupID': groupId},
+    );
+  }
+
+  /// 批量绑定已有证书。
+  Future<void> batchSetWebsiteHttps({
+    required List<int> ids,
+    required int sslId,
+    String? taskId,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/batch/ssl',
+      data: {
+        'ids': ids,
+        'taskID': taskId ?? const Uuid().v4(),
+        'websiteSSLId': sslId,
+        'type': 'existed',
+        'privateKey': '',
+        'certificate': '',
+        'privateKeyPath': '',
+        'certificatePath': '',
+        'importType': 'local',
+        'httpConfig': 'HTTPToHTTPS',
+        'SSLProtocol': const ['TLSv1.2', 'TLSv1.3'],
+        'algorithm': '',
+        'hsts': false,
+        'hstsIncludeSubDomains': false,
+        'httpsPorts': const [443],
+      },
+    );
+  }
+
+  /// 将旧分组迁移到新分组。
+  Future<void> changeWebsiteGroup(int group, int newGroup) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/group/change',
+      data: {'group': group, 'newGroup': newGroup},
+    );
+  }
+
+  /// 将指定网站设为默认站点。
+  Future<void> setDefaultWebsite(int websiteId) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/default/server',
+      data: {'id': websiteId},
+    );
+  }
+
+  /// 开启或关闭跨站访问。
+  Future<void> operateCrossSite(int websiteId, {required bool enable}) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/crosssite',
+      data: {
+        'websiteID': websiteId,
+        'operation': enable ? 'Enable' : 'Disable',
+      },
+    );
+  }
+
+  /// 获取默认 HTML 内容。
+  Future<Map<String, dynamic>> getDefaultHtml(String type) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/websites/default/html/$type',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 更新默认 HTML 内容。
+  Future<void> updateDefaultHtml({
+    required String type,
+    required String content,
+    bool sync = true,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/default/html/update',
+      data: {'type': type, 'content': content, 'sync': sync},
+    );
+  }
+
+  /// 获取代理缓存配置。
+  Future<Map<String, dynamic>> getProxyCache(int websiteId) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/websites/proxy/config/$websiteId',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 更新代理缓存配置。
+  Future<void> updateProxyCache(Map<String, dynamic> request) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/proxy/config',
+      data: request,
+    );
+  }
+
+  /// 清理代理缓存。
+  Future<void> clearProxyCache(int websiteId) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/proxy/clear',
+      data: {'websiteID': websiteId},
+    );
+  }
+
+  /// 执行 Composer 命令。
+  Future<void> execComposer(Map<String, dynamic> request) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/exec/composer',
+      data: request,
+    );
+  }
+
+  /// 推送证书到从节点。
+  Future<void> pushSsl({
+    required int id,
+    required String nodes,
+    bool sync = true,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/ssl/push',
+      data: {
+        'id': id,
+        'pushNode': true,
+        'nodes': nodes,
+        'sync': sync,
+        'taskID': const Uuid().v4(),
+      },
     );
   }
 }

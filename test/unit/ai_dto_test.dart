@@ -57,6 +57,16 @@ void main() {
     expect(server.environments, hasLength(1));
   });
 
+  test('MCP server derives protocol and url from baseUrl', () {
+    final server = McpServerDto.fromJson({
+      'id': 4,
+      'name': 'gateway',
+      'baseUrl': 'https://10.0.0.8:8811/sse',
+    });
+    expect(server.protocol, 'https://');
+    expect(server.url, '10.0.0.8:8811/sse');
+  });
+
   test('MCP domain parses connection URL and allowed IPs', () {
     final domain = McpDomainDto.fromJson({
       'domain': 'mcp.example.com',

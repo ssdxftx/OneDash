@@ -1,14 +1,199 @@
+import 'dart:typed_data';
+
 import 'dart:convert';
+
+import 'package:dio/dio.dart';
 
 import '../../core/network/api_compatibility.dart';
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/network/panel_password_encrypter.dart';
+import '../../core/network/panel_session.dart';
+import '../dto/common/page_result.dart';
+import '../dto/setting/api_key_dto.dart';
+import '../dto/setting/group_dto.dart';
+import '../dto/setting/command_library_dto.dart';
+import '../dto/setting/script_library_dto.dart';
 
 /// 设置相关 API。
 class SettingApi {
   SettingApi(this._client);
 
   final DioClient _client;
+  String? _panelPublicKey;
+
+  /// 获取登录页配置（是否启用 MFA、是否需要验证码等）。
+  Future<Map<String, dynamic>> getLoginSetting() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/core/auth/setting',
+      options: Options(extra: const {'skipAuth': true, 'skipSession': true}),
+    );
+    _capturePublicKey(resp);
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 获取登录验证码（data URI 图片）。
+  Future<Map<String, dynamic>> loadLoginCaptcha() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/core/auth/captcha',
+      options: Options(extra: const {'skipAuth': true, 'skipSession': true}),
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 登录面板并保存会话。
+  Future<PanelLoginResult> loginPanel({
+    required String name,
+    required String password,
+    required String language,
+    String captcha = '',
+    String captchaId = '',
+    String entrance = '',
+  }) async {
+    await _loadPanelPublicKey();
+    final headers = <String, dynamic>{
+      if (entrance.isNotEmpty)
+        'EntranceCode': base64Encode(utf8.encode(entrance)),
+    };
+    final publicKey = _panelPublicKey;
+    final passwordValue = publicKey == null
+        ? password
+        : PanelPasswordEncrypter.encrypt(password, publicKey);
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/login',
+      data: {
+        'name': name,
+        'password': passwordValue,
+        'captcha': captcha,
+        'captchaID': captchaId,
+        'language': language,
+      },
+      options: Options(
+        headers: headers,
+        extra: const {'skipAuth': true, 'skipSession': true},
+      ),
+    );
+    final data = ApiResponseParser.map(resp);
+    final session = _sessionFromResponse(resp);
+    final result = PanelLoginResult(
+      session: session,
+      mfaStatus: data['mfaStatus']?.toString() ?? '',
+      mfaSession: data['mfaSession']?.toString() ?? '',
+    );
+    _client.updateSession(result.needsMfa ? null : session);
+    return result;
+  }
+
+  /// 完成 MFA 二次登录并保存会话。
+  Future<PanelLoginResult> loginPanelMfa({
+    required String sessionId,
+    required String code,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/mfalogin',
+      data: {'sessionId': sessionId, 'code': code},
+      options: Options(extra: const {'skipAuth': true, 'skipSession': true}),
+    );
+    final data = ApiResponseParser.map(resp);
+    final session = _sessionFromResponse(resp);
+    final result = PanelLoginResult(
+      session: session,
+      mfaStatus: data['mfaStatus']?.toString() ?? '',
+      mfaSession: data['mfaSession']?.toString() ?? '',
+    );
+    _client.updateSession(result.needsMfa ? null : session);
+    return result;
+  }
+
+  /// 注销面板会话。
+  Future<void> logoutPanel() async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/logout',
+      data: const {},
+    );
+    _client.updateSession(null);
+  }
+
+  Future<void> _loadPanelPublicKey() async {
+    if (_panelPublicKey != null) return;
+    await getLoginSetting();
+  }
+
+  void _capturePublicKey(Response<dynamic> response) {
+    final raw = _cookieValue(response, 'panel_public_key');
+    if (raw == null || raw.isEmpty) return;
+    var value = Uri.decodeComponent(raw.replaceAll('+', ' '));
+    value = value.replaceAll('"', '');
+    try {
+      _panelPublicKey = utf8.decode(base64Decode(value));
+    } catch (_) {
+      _panelPublicKey = value;
+    }
+  }
+
+  String? _cookieValue(Response<dynamic> response, String name) {
+    final cookies = response.headers.map['set-cookie'] ?? const <String>[];
+    for (final header in cookies) {
+      for (final part in header.split(';')) {
+        final index = part.indexOf('=');
+        if (index <= 0) continue;
+        if (part.substring(0, index).trim() == name) {
+          return part.substring(index + 1).trim();
+        }
+      }
+    }
+    return null;
+  }
+
+  PanelSession? _sessionFromResponse(Response<dynamic> response) {
+    final cookies = response.headers.map['set-cookie'] ?? const <String>[];
+    String sessionId = '';
+    String csrfToken = '';
+    for (final header in cookies) {
+      for (final part in header.split(';')) {
+        final index = part.indexOf('=');
+        if (index <= 0) continue;
+        final key = part.substring(0, index).trim();
+        final value = part.substring(index + 1).trim();
+        if (key == 'psession') sessionId = value;
+        if (key == 'pcsrftoken') csrfToken = value;
+      }
+    }
+    if (sessionId.isEmpty) return null;
+    return PanelSession(sessionId: sessionId, csrfToken: csrfToken);
+  }
+
+  /// 获取当前用户文件下载偏好。
+  /// GET /api/v2/core/settings/file/download
+  Future<bool> getFileDownloadPreference() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/core/settings/file/download',
+    );
+    final data = resp.data?['data'];
+    return data is Map && data['useServerFilename'] == true;
+  }
+
+  /// 更新当前用户文件下载偏好。
+  /// POST /api/v2/core/settings/file/download
+  Future<void> updateFileDownloadPreference({
+    required bool useServerFilename,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/settings/file/download',
+      data: {'useServerFilename': useServerFilename},
+    );
+  }
+
+  /// 下载面板 SSL 证书。
+  /// POST /api/v2/core/settings/ssl/download
+  Future<Uint8List> downloadPanelSsl() async {
+    final resp = await _client.post<List<int>>(
+      '/api/v2/core/settings/ssl/download',
+      data: const {},
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return Uint8List.fromList(resp.data ?? const []);
+  }
 
   /// 获取面板安装根目录。
   /// GET /api/v2/settings/basedir
@@ -29,6 +214,170 @@ class SettingApi {
       '/api/v2/settings/update',
       data: {'key': key, 'value': value},
     );
+  }
+
+  /// POST /api/v2/core/settings/terminal/search
+  Future<Map<String, dynamic>> getTerminalAppearanceSettings() async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/settings/terminal/search',
+      data: {},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/core/settings/terminal/update
+  Future<void> updateTerminalAppearanceSettings(
+    Map<String, String> data,
+  ) async {
+    await _client.post('/api/v2/core/settings/terminal/update', data: data);
+  }
+
+  /// POST /api/v2/settings/terminal/ai/search
+  Future<Map<String, dynamic>> getTerminalAiSetting() async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/settings/terminal/ai/search',
+      data: {},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/settings/terminal/ai/update
+  Future<void> updateTerminalAiSetting({
+    required String aiStatus,
+    required String aiPrefix,
+    String aiAccountId = '',
+    String aiRiskCommands = '',
+  }) async {
+    await _client.post(
+      '/api/v2/settings/terminal/ai/update',
+      data: {
+        'aiStatus': aiStatus,
+        'aiPrefix': aiPrefix,
+        'aiAccountId': aiAccountId,
+        'aiRiskCommands': aiRiskCommands,
+      },
+    );
+  }
+
+  /// POST /api/v2/settings/files/ai/search
+  Future<Map<String, dynamic>> getFileAiSetting() async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/settings/files/ai/search',
+      data: {},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/settings/files/ai/update
+  Future<void> updateFileAiSetting({
+    required String aiStatus,
+    String aiAccountId = '',
+  }) async {
+    await _client.post(
+      '/api/v2/settings/files/ai/update',
+      data: {'aiStatus': aiStatus, 'aiAccountId': aiAccountId},
+    );
+  }
+
+  /// POST /api/v2/settings/file-history/search
+  Future<Map<String, dynamic>> getFileHistorySetting() async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/settings/file-history/search',
+      data: {},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/settings/file-history/update
+  Future<void> updateFileHistorySetting({
+    required String enable,
+    required int maxPerPath,
+    required int diskQuotaMB,
+  }) async {
+    await _client.post(
+      '/api/v2/settings/file-history/update',
+      data: {
+        'enable': enable,
+        'maxPerPath': maxPerPath,
+        'diskQuotaMB': diskQuotaMB,
+      },
+    );
+  }
+
+  /// GET /api/v2/core/settings/upgrade
+  Future<Map<String, dynamic>> getUpgradeInfo() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/core/settings/upgrade',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// GET /api/v2/core/settings/upgrade/releases
+  Future<List<Map<String, dynamic>>> getUpgradeReleases() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/core/settings/upgrade/releases',
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data
+        .whereType<Map>()
+        .map(Map<String, dynamic>.from)
+        .toList(growable: false);
+  }
+
+  /// POST /api/v2/core/settings/upgrade/notes
+  Future<String> getUpgradeNotes(String version) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/settings/upgrade/notes',
+      data: {'version': version},
+    );
+    return ApiResponseParser.primitive<String>(resp);
+  }
+
+  /// POST /api/v2/core/settings/upgrade
+  Future<void> upgradePanel(String version) async {
+    await _client.post(
+      '/api/v2/core/settings/upgrade',
+      data: {'version': version},
+    );
+  }
+
+  /// GET /api/v2/settings/ssh/conn
+  Future<Map<String, dynamic>> getLocalSshConn() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/settings/ssh/conn',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/settings/ssh
+  Future<void> saveLocalSshConn(Map<String, dynamic> data) async {
+    await _client.post('/api/v2/settings/ssh', data: data);
+  }
+
+  /// POST /api/v2/settings/ssh/check/info
+  Future<bool> checkLocalSshConn(Map<String, dynamic> data) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/settings/ssh/check/info',
+      data: data,
+    );
+    return ApiResponseParser.primitive<bool>(resp);
+  }
+
+  /// POST /api/v2/settings/ssh/default
+  Future<void> setSshDefaultConn({
+    required String defaultConn,
+    bool withReset = false,
+  }) async {
+    await _client.post(
+      '/api/v2/settings/ssh/default',
+      data: {'defaultConn': defaultConn, 'withReset': withReset},
+    );
+  }
+
+  /// POST /api/v2/core/settings/menu/default
+  Future<void> resetMenuSetting() async {
+    await _client.post('/api/v2/core/settings/menu/default', data: {});
   }
 
   /// 保存描述与置顶状态。
@@ -115,6 +464,35 @@ class SettingApi {
     await _client.post(
       '/api/v2/core/settings/update',
       data: {'key': key, 'value': value},
+    );
+  }
+
+  /// 更新面板服务器代理。
+  /// POST /api/v2/core/settings/proxy/update
+  Future<void> updatePanelProxy({
+    required String proxyUrl,
+    required String proxyType,
+    required String proxyPort,
+    String proxyUser = '',
+    String proxyPasswd = '',
+    bool proxyPasswdKeep = false,
+    bool proxyDocker = false,
+    bool withDockerRestart = false,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/settings/proxy/update',
+      data: {
+        'proxyUrl': proxyUrl,
+        'proxyType': proxyType,
+        'proxyPort': proxyPort,
+        'proxyUser': proxyUser,
+        'proxyPasswd': proxyPasswd.isEmpty
+            ? ''
+            : base64Encode(utf8.encode(proxyPasswd)),
+        'proxyPasswdKeep': proxyPasswdKeep ? 'true' : 'false',
+        'proxyDocker': proxyDocker,
+        'withDockerRestart': withDockerRestart,
+      },
     );
   }
 
@@ -266,7 +644,7 @@ class SettingApi {
   Future<void> bindMFA({
     required String secret,
     required String code,
-    required String interval,
+    required int interval,
   }) async {
     final data = {'secret': secret, 'code': code, 'interval': interval};
     await ApiCompatibility.tryVariants<void>(
@@ -290,6 +668,173 @@ class SettingApi {
   }
 
   /// 获取 Passkey 列表。
+  /// POST /api/v2/core/auth/mfa/close
+  Future<void> closeMFA() async {
+    await _client.post('/api/v2/core/auth/mfa/close', data: const {});
+  }
+
+  /// POST /api/v2/core/auth/expired/reset
+  Future<void> resetExpiredPassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    await _client.post(
+      '/api/v2/core/auth/expired/reset',
+      data: {'oldPassword': oldPassword, 'newPassword': newPassword},
+    );
+  }
+
+  /// POST /api/v2/core/groups/search
+  Future<List<CoreGroupDto>> searchGroups({required String type}) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/groups/search',
+      data: {'type': type},
+    );
+    return ApiResponseParser.list(resp, CoreGroupDto.fromJson);
+  }
+
+  /// POST /api/v2/core/groups
+  Future<void> createGroup({required String name, required String type}) async {
+    await _client.post(
+      '/api/v2/core/groups',
+      data: {'name': name, 'type': type},
+    );
+  }
+
+  /// POST /api/v2/core/groups/update
+  Future<void> updateGroup({
+    required int id,
+    required String name,
+    required String type,
+    bool isDefault = false,
+  }) async {
+    await _client.post(
+      '/api/v2/core/groups/update',
+      data: {'id': id, 'name': name, 'type': type, 'isDefault': isDefault},
+    );
+  }
+
+  /// POST /api/v2/core/groups/del
+  Future<void> deleteGroup(int id) async {
+    await _client.post('/api/v2/core/groups/del', data: {'id': id});
+  }
+
+  /// POST /api/v2/core/commands/search
+  Future<PageResult<CommandLibraryDto>> searchCommands({
+    String type = 'command',
+    String info = '',
+    int page = 1,
+    int pageSize = 50,
+    int groupID = 0,
+    String orderBy = 'createdAt',
+    String order = 'descending',
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/commands/search',
+      data: {
+        'type': type,
+        'info': info,
+        'page': page,
+        'pageSize': pageSize,
+        'groupID': groupID,
+        'orderBy': orderBy,
+        'order': order,
+      },
+    );
+    return PageResult<CommandLibraryDto>.fromJson(
+      ApiResponseParser.map(resp),
+      CommandLibraryDto.fromJson,
+    );
+  }
+
+  /// POST /api/v2/core/commands
+  Future<void> createCommand(Map<String, dynamic> data) async {
+    await _client.post('/api/v2/core/commands', data: data);
+  }
+
+  /// POST /api/v2/core/commands/update
+  Future<void> updateCommand(Map<String, dynamic> data) async {
+    await _client.post('/api/v2/core/commands/update', data: data);
+  }
+
+  /// POST /api/v2/core/commands/del
+  Future<void> deleteCommands({
+    required List<int> ids,
+    String type = 'command',
+  }) async {
+    await _client.post(
+      '/api/v2/core/commands/del',
+      data: {'type': type, 'ids': ids},
+    );
+  }
+
+  /// POST /api/v2/core/commands/tree
+  Future<List<CommandTreeDto>> searchCommandTree({
+    String type = 'command',
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/commands/tree',
+      data: {'type': type},
+    );
+    return ApiResponseParser.list(resp, CommandTreeDto.fromJson);
+  }
+
+  /// POST /api/v2/core/commands/import
+  Future<void> importCommands(List<Map<String, dynamic>> items) async {
+    await _client.post('/api/v2/core/commands/import', data: {'items': items});
+  }
+
+  /// POST /api/v2/core/commands/export
+  Future<String> exportCommands() async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/commands/export',
+      data: const {},
+    );
+    return ApiResponseParser.primitive<String>(resp);
+  }
+
+  /// POST /api/v2/core/script/search
+  Future<PageResult<ScriptLibraryDto>> searchScripts({
+    String info = '',
+    int page = 1,
+    int pageSize = 50,
+    int groupID = 0,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/script/search',
+      data: {
+        'info': info,
+        'page': page,
+        'pageSize': pageSize,
+        'groupID': groupID,
+      },
+    );
+    return PageResult<ScriptLibraryDto>.fromJson(
+      ApiResponseParser.map(resp),
+      ScriptLibraryDto.fromJson,
+    );
+  }
+
+  /// POST /api/v2/core/script
+  Future<void> createScript(Map<String, dynamic> data) async {
+    await _client.post('/api/v2/core/script', data: data);
+  }
+
+  /// POST /api/v2/core/script/update
+  Future<void> updateScript(Map<String, dynamic> data) async {
+    await _client.post('/api/v2/core/script/update', data: data);
+  }
+
+  /// POST /api/v2/core/script/del
+  Future<void> deleteScripts(List<int> ids) async {
+    await _client.post('/api/v2/core/script/del', data: {'ids': ids});
+  }
+
+  /// POST /api/v2/core/script/sync
+  Future<void> syncScripts(String taskID) async {
+    await _client.post('/api/v2/core/script/sync', data: {'taskID': taskID});
+  }
+
   /// GET /api/v2/core/settings/passkey/list
   Future<List<Map<String, dynamic>>> listPasskeys() async {
     final resp = await ApiCompatibility.tryVariants(
@@ -317,7 +862,7 @@ class SettingApi {
 
   /// 删除 Passkey。
   /// DELETE /api/v2/core/settings/passkey/:id
-  Future<void> deletePasskey(int id) async {
+  Future<void> deletePasskey(String id) async {
     await ApiCompatibility.tryVariants<void>(
       [
         ApiEndpointVariant(
@@ -325,7 +870,7 @@ class SettingApi {
           call: () async {
             await _client.post(
               '/api/v2/core/auth/passkey/del',
-              data: {'id': '$id'},
+              data: {'id': id},
             );
           },
         ),
@@ -393,6 +938,123 @@ class SettingApi {
       cacheScope: _client,
       cacheKey: 'core.api.update',
     );
+  }
+
+  // ── 独立 API Key ──
+
+  /// POST /api/v2/core/auth/api/keys/search
+  Future<PageResult<ApiKeyItemDto>> searchApiKeys({
+    int page = 1,
+    int pageSize = 20,
+    bool excludeRevoked = false,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/api/keys/search',
+      data: {
+        'page': page,
+        'pageSize': pageSize,
+        'excludeRevoked': excludeRevoked,
+      },
+    );
+    return PageResult<ApiKeyItemDto>.fromJson(
+      ApiResponseParser.map(resp),
+      ApiKeyItemDto.fromJson,
+    );
+  }
+
+  /// POST /api/v2/core/auth/api/keys/create
+  Future<ApiKeyCreatedDto> createApiKey({
+    required String requestId,
+    required String name,
+    String description = '',
+    String ipWhiteList = '',
+    String apiTrustedProxies = '',
+    int apiKeyValidityTime = 120,
+    DateTime? expiresAt,
+    bool allowAppBinding = false,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/api/keys/create',
+      data: {
+        'requestID': requestId,
+        'name': name,
+        'description': description,
+        'ipWhiteList': ipWhiteList,
+        'apiTrustedProxies': apiTrustedProxies,
+        'apiKeyValidityTime': apiKeyValidityTime,
+        if (expiresAt != null) 'expiresAt': expiresAt.toUtc().toIso8601String(),
+        'allowAppBinding': allowAppBinding,
+      },
+    );
+    return ApiResponseParser.object(resp, ApiKeyCreatedDto.fromJson);
+  }
+
+  /// POST /api/v2/core/auth/api/keys/update
+  Future<void> updateApiKey({
+    required String id,
+    required int revision,
+    required String name,
+    String description = '',
+    String ipWhiteList = '',
+    String apiTrustedProxies = '',
+    int apiKeyValidityTime = 120,
+    DateTime? expiresAt,
+    bool allowAppBinding = false,
+  }) async {
+    await _client.post(
+      '/api/v2/core/auth/api/keys/update',
+      data: {
+        'id': id,
+        'revision': revision,
+        'name': name,
+        'description': description,
+        'ipWhiteList': ipWhiteList,
+        'apiTrustedProxies': apiTrustedProxies,
+        'apiKeyValidityTime': apiKeyValidityTime,
+        'expiresAt': expiresAt?.toUtc().toIso8601String(),
+        'allowAppBinding': allowAppBinding,
+      },
+    );
+  }
+
+  /// POST /api/v2/core/auth/api/keys/status
+  Future<void> setApiKeyStatus({
+    required String id,
+    required int revision,
+    required String status,
+  }) async {
+    await _client.post(
+      '/api/v2/core/auth/api/keys/status',
+      data: {'id': id, 'revision': revision, 'status': status},
+    );
+  }
+
+  /// POST /api/v2/core/auth/api/keys/revoke
+  Future<void> revokeApiKey({required String id, required int revision}) async {
+    await _client.post(
+      '/api/v2/core/auth/api/keys/revoke',
+      data: {'id': id, 'revision': revision},
+    );
+  }
+
+  /// POST /api/v2/core/auth/api/keys/delete
+  Future<void> deleteApiKey({required String id, required int revision}) async {
+    await _client.post(
+      '/api/v2/core/auth/api/keys/delete',
+      data: {'id': id, 'revision': revision},
+    );
+  }
+
+  /// POST /api/v2/core/auth/api/keys/reveal
+  Future<String> revealApiKey({
+    required String id,
+    required int revision,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/api/keys/reveal',
+      data: {'id': id, 'revision': revision},
+    );
+    return (ApiResponseParser.map(resp)['apiKey'] ?? '').toString();
   }
 
   // ── 快照 ──

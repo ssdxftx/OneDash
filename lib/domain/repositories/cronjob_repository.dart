@@ -1,12 +1,19 @@
 import '../../data/dto/common/page_result.dart';
 import '../../data/dto/cronjob/cronjob_dto.dart';
+import '../../data/dto/cronjob/cronjob_form_data_dto.dart';
 
 /// 计划任务数据仓库接口。
 abstract interface class CronjobRepository {
   Future<PageResult<CronjobDto>> searchCronjobs(Map<String, dynamic> req);
   Future<void> createCronjob(CronjobCreateReq req);
   Future<CronjobDto> getCronjobInfo(int id);
+  Future<List<ScriptOptionDto>> loadScriptOptions();
   Future<void> updateCronjob(CronjobCreateReq req);
+
+  Future<List<String>> getNextRun(String spec);
+  Future<void> updateCronjobGroup({required int id, required int groupId});
+  Future<String> exportCronjobs(List<int> ids);
+  Future<void> importCronjobs(List<Map<String, dynamic>> items);
   Future<void> deleteCronjob(List<int> ids, {bool cleanData = false});
   Future<void> updateStatus(int id, String status);
   Future<void> handleOnce(int id);

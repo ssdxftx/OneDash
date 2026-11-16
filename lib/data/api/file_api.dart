@@ -2,14 +2,19 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../core/network/api_compatibility.dart';
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/network/one_panel_auth.dart';
+import '../../core/network/web_socket_connector.dart';
 import '../dto/common/page_result.dart';
 import '../dto/file/file_ai_search_dto.dart';
 import '../dto/file/file_favorite_dto.dart';
 import '../dto/file/file_item_dto.dart';
+import '../dto/file/file_convert_dto.dart';
+import '../dto/file/file_tree_dto.dart';
 import '../dto/file/file_log_dto.dart';
 import '../dto/file/user_group_dto.dart';
 import '../dto/file/file_share_dto.dart';
@@ -82,6 +87,116 @@ class FileApi {
       },
     );
     return ApiResponseParser.object(resp, FileItemDto.fromJson);
+  }
+
+  /// 连接远程下载进度 WebSocket。
+  /// GET /api/v2/files/wget/process
+  static Future<WebSocketChannel> connectWgetProcessWebSocket(
+    DioClient client, {
+    String? operateNode = 'local',
+  }) async {
+    final uri = Uri.parse(client.baseUrl);
+    final wsUrl = Uri(
+      scheme: uri.scheme == 'https' ? 'wss' : 'ws',
+      host: uri.host,
+      port: uri.port,
+      path: '${uri.path}/api/v2/files/wget/process'.replaceAll('//', '/'),
+      queryParameters: operateNode == null
+          ? null
+          : {'operateNode': operateNode},
+    );
+    final headers = await OnePanelAuth.signedHeaders(client.apiKey);
+    await checkAppWebSocketAuth(
+      wsUrl,
+      headers: headers,
+      allowInsecureConnections: client.allowInsecureConnections,
+      currentNode: operateNode,
+    );
+    return connectAppWebSocket(
+      wsUrl,
+      headers: headers,
+      allowInsecureConnections: client.allowInsecureConnections,
+    );
+  }
+
+  /// 查询上传目录中的文件记录。
+  /// POST /api/v2/files/upload/search
+  Future<PageResult<FileUploadDto>> searchUploadFiles({
+    required String path,
+    int page = 1,
+    int pageSize = 50,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/upload/search',
+      data: {'path': path, 'page': page, 'pageSize': pageSize},
+    );
+    return PageResult<FileUploadDto>.fromJson(
+      ApiResponseParser.map(resp),
+      FileUploadDto.fromJson,
+    );
+  }
+
+  /// 移除已结束的远程下载记录。
+  /// POST /api/v2/files/wget/process/remove
+  Future<List<String>> removeWgetRecords(List<String> keys) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/wget/process/remove',
+      data: {'keys': keys},
+    );
+    final data = resp.data?['data'];
+    if (data is Map && data['keys'] is List) {
+      return (data['keys'] as List).map((e) => e.toString()).toList();
+    }
+    return [];
+  }
+
+  /// 提交文件格式转换任务。
+  /// POST /api/v2/files/convert
+  Future<void> convertFiles({
+    required List<Map<String, dynamic>> files,
+    required String outputPath,
+    bool deleteSource = false,
+    String taskID = '',
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/convert',
+      data: {
+        'files': files,
+        'outputPath': outputPath,
+        'deleteSource': deleteSource,
+        'taskID': taskID,
+      },
+    );
+  }
+
+  /// 查询文件转换日志。
+  /// POST /api/v2/files/convert/log
+  Future<PageResult<FileConvertLogDto>> convertLogs({
+    int page = 1,
+    int pageSize = 20,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/convert/log',
+      data: {'page': page, 'pageSize': pageSize},
+    );
+    return PageResult<FileConvertLogDto>.fromJson(
+      ApiResponseParser.map(resp),
+      FileConvertLogDto.fromJson,
+    );
+  }
+
+  /// 分块下载文件内容。
+  /// POST /api/v2/files/chunkdownload
+  Future<Uint8List> chunkDownload({
+    required String path,
+    required String name,
+  }) async {
+    final response = await _client.post<List<int>>(
+      '/api/v2/files/chunkdownload',
+      data: {'path': path, 'name': name},
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return Uint8List.fromList(response.data ?? const []);
   }
 
   /// 文件内容搜索，可选 AI 摘要；未启用 AI 时返回 grep 模式。
@@ -372,6 +487,7 @@ class FileApi {
     required String name,
     bool replace = false,
     String secret = '',
+    String taskID = '',
   }) async {
     await _client.post(
       '/api/v2/files/compress',
@@ -382,7 +498,17 @@ class FileApi {
         'name': name,
         'replace': replace,
         'secret': secret,
+        'taskID': taskID,
       },
+    );
+  }
+
+  /// 停止压缩任务。
+  /// POST /api/v2/files/compress/stop
+  Future<void> stopCompress(String taskID) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/compress/stop',
+      data: {'taskID': taskID},
     );
   }
 
@@ -393,10 +519,26 @@ class FileApi {
     required String type,
     required String dst,
     String secret = '',
+    String taskID = '',
   }) async {
     await _client.post(
       '/api/v2/files/decompress',
-      data: {'path': path, 'type': type, 'dst': dst, 'secret': secret},
+      data: {
+        'path': path,
+        'type': type,
+        'dst': dst,
+        'secret': secret,
+        'taskID': taskID,
+      },
+    );
+  }
+
+  /// 停止解压任务。
+  /// POST /api/v2/files/decompress/stop
+  Future<void> stopDecompress(String taskID) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/decompress/stop',
+      data: {'taskID': taskID},
     );
   }
 
@@ -560,6 +702,7 @@ class FileApi {
     String name = '',
     bool cover = false,
     List<String> coverPaths = const [],
+    String taskID = '',
   }) async {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/files/move',
@@ -570,7 +713,17 @@ class FileApi {
         'name': name,
         'cover': cover,
         'coverPaths': coverPaths,
+        'taskID': taskID,
       },
+    );
+  }
+
+  /// 停止移动/复制任务。
+  /// POST /api/v2/files/move/stop
+  Future<void> stopMove(String taskID) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/move/stop',
+      data: {'taskID': taskID},
     );
   }
 
@@ -722,6 +875,36 @@ class FileApi {
     );
   }
 
+  /// GET /api/v2/files/share/info — 无需登录获取分享信息。
+  Future<Map<String, dynamic>> getPublicShareInfo(String code) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/files/share/info',
+      query: {'code': code},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// GET /api/v2/files/share/check — 校验分享码与可选密码。
+  Future<void> checkFileShare({required String code, String? password}) async {
+    await _client.get<Map<String, dynamic>>(
+      '/api/v2/files/share/check',
+      query: {'code': code, if (password != null) 'password': password},
+    );
+  }
+
+  /// GET /api/v2/files/share/download — 通过分享码下载文件。
+  Future<void> downloadSharedFile({
+    required String code,
+    required String savePath,
+    String? password,
+  }) async {
+    await _client.download(
+      '/api/v2/files/share/download',
+      savePath: savePath,
+      query: {'code': code, if (password != null) 'password': password},
+    );
+  }
+
   /// 创建或更新文件分享
   /// POST /api/v2/files/share/create
   Future<Map<String, dynamic>> createFileShare({
@@ -787,6 +970,96 @@ class FileApi {
     );
     return resp.data?['data'] as Map<String, dynamic>? ??
         {'total': 0, 'items': []};
+  }
+
+  /// 读取文件预览内容。
+  /// POST /api/v2/files/preview
+  Future<FileItemDto> previewFile(String path, {bool isDetail = false}) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/preview',
+      data: {'path': path, 'isDetail': isDetail},
+    );
+    return ApiResponseParser.object(resp, FileItemDto.fromJson);
+  }
+
+  /// 获取目录树。
+  /// POST /api/v2/files/tree
+  Future<List<FileTreeNodeDto>> getFileTree({
+    required String path,
+    bool containSub = false,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/tree',
+      data: {
+        'path': path,
+        'search': '',
+        'containSub': containSub,
+        'expand': true,
+        'dir': true,
+        'showHidden': false,
+        'page': 1,
+        'pageSize': 1000,
+        'sortBy': 'name',
+        'sortOrder': 'ascending',
+        'isDetail': false,
+      },
+    );
+    return ApiResponseParser.list(resp, FileTreeNodeDto.fromJson);
+  }
+
+  /// 设置文件备注。
+  /// POST /api/v2/files/remark
+  Future<void> setFileRemark({
+    required String path,
+    required String remark,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/remark',
+      data: {'path': path, 'remark': remark},
+    );
+    ApiResponseParser.ok(resp);
+  }
+
+  /// 批量获取文件备注。
+  /// POST /api/v2/files/remarks
+  Future<Map<String, String>> getFileRemarks(List<String> paths) async {
+    if (paths.isEmpty) return const {};
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/remarks',
+      data: {'paths': paths},
+    );
+    final data = resp.data?['data'];
+    final remarks = data is Map ? data['remarks'] : null;
+    if (remarks is! Map) return const {};
+    return remarks.map(
+      (key, value) => MapEntry('$key', value?.toString() ?? ''),
+    );
+  }
+
+  /// 获取文件分享二维码 PNG。
+  /// GET /api/v2/files/share/qrcode
+  Future<List<int>> getFileShareQrCode(String code) async {
+    final resp = await _client.get<List<int>>(
+      '/api/v2/files/share/qrcode',
+      query: {'code': code},
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return resp.data ?? const [];
+  }
+
+  /// 获取宿主机挂载点。
+  /// POST /api/v2/files/mount
+  Future<List<Map<String, dynamic>>> getHostMounts() async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/mount',
+      data: const {},
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data
+        .whereType<Map>()
+        .map((item) => item.cast<String, dynamic>())
+        .toList(growable: false);
   }
 
   /// 分页获取回收站列表。

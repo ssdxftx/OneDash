@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -9,10 +11,12 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../data/dto/app/app_catalog_dto.dart';
 import '../../../../data/dto/app/app_installed_dto.dart';
+import '../../../../data/dto/common/page_result.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/formatters/status_labels.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_icon.dart';
+import '../../../common/components/app_text_field.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -56,6 +60,16 @@ Future<String?> _newVersion(WidgetRef ref, AppInstalledDto app) async {
   }
 }
 
+Future<void> _syncInstalledApps(WidgetRef ref) async {
+  try {
+    final repository = await ref.read(appRepositoryProvider.future);
+    await repository.syncInstalledApps();
+  } catch (_) {
+    // Fall back to the local installed list when the panel is offline.
+  }
+  await ref.read(installedAppsProvider.notifier).refresh();
+}
+
 class AppStorePage extends ConsumerStatefulWidget {
   const AppStorePage({super.key, required this.serverId, this.initialTab = 0});
 
@@ -67,15 +81,53 @@ class AppStorePage extends ConsumerStatefulWidget {
 }
 
 class _AppStorePageState extends ConsumerState<AppStorePage> {
+  static const _busyStatuses = {'installing', 'rebuilding', 'upgrading'};
+
   final _searchController = TextEditingController();
   final _searchDebouncer = Debouncer();
   String _query = '';
+  Timer? _statusTimer;
+
+  void _syncStatusTimer(PageResult<AppInstalledDto>? data) {
+    final busy =
+        data?.items.any(
+          (app) => _busyStatuses.contains(app.status.toLowerCase()),
+        ) ??
+        false;
+    if (!busy) {
+      _statusTimer?.cancel();
+      _statusTimer = null;
+      return;
+    }
+    _statusTimer ??= Timer.periodic(AppTokens.appStatusPoll, (_) {
+      if (!mounted) return;
+      invalidateInstalledAppLists(ref);
+    });
+  }
 
   @override
   void dispose() {
+    _statusTimer?.cancel();
     _searchDebouncer.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkUpdates(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      final result = await repository.checkAppUpdates();
+      if (!context.mounted) return;
+      if (result['canUpdate'] == true) {
+        AppToast.success(context, l10n.apps_storeCanUpdate);
+      } else {
+        AppToast.success(context, l10n.apps_storeLatest);
+      }
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _storeSettings(BuildContext context, WidgetRef ref) async {
@@ -129,12 +181,72 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
         ),
       );
       if (saved != true || !context.mounted) return;
-      for (final entry in values.entries) {
-        await repository.updateStoreConfig(
-          scope: entry.key,
-          enable: entry.value,
-        );
+      await Future.wait([
+        for (final entry in values.entries)
+          repository.updateStoreConfig(scope: entry.key, enable: entry.value),
+      ]);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _sortInstalled(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final data = await ref.read(installedAppsProvider.future);
+      if (!context.mounted) return;
+      final items = data.items;
+      if (items.isEmpty) {
+        AppToast.warning(context, l10n.apps_installedEmptyTitle);
+        return;
       }
+      final controllers = {
+        for (final app in items)
+          app.id: TextEditingController(text: '${app.sortOrder}'),
+      };
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.apps_sort,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              Text(
+                l10n.apps_sortHint,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: pageContext.scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppTokens.s12),
+              for (final app in items) ...[
+                AppTextField(
+                  controller: controllers[app.id]!,
+                  label: app.displayName,
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: AppTokens.s12),
+              ],
+            ],
+          ),
+        ),
+      );
+      final payload = [
+        for (final app in items)
+          {
+            'installID': app.id,
+            'sortOrder': int.tryParse(controllers[app.id]!.text.trim()) ?? 0,
+          },
+      ];
+      for (final controller in controllers.values) {
+        controller.dispose();
+      }
+      if (saved != true || !context.mounted) return;
+      final repository = await ref.read(appRepositoryProvider.future);
+      await repository.updateInstalledSort(payload);
+      invalidateInstalledAppLists(ref);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_saved);
     } catch (error) {
@@ -152,30 +264,27 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
     final repository = await ref.read(appRepositoryProvider.future);
     if (!context.mounted) return;
     final taskID = const Uuid().v4();
+    if (remote) {
+      final message = await repository.syncRemoteApps(taskID);
+      if (!context.mounted) return;
+      if (message != null && message.isNotEmpty) {
+        AppToast.show(context, message);
+        ref.invalidate(appCatalogProvider(_query));
+        invalidateInstalledAppLists(ref);
+        return;
+      }
+    }
     final success = await TaskProgressSheet.run(
       context,
       title: remote ? l10n.apps_syncRemote : l10n.apps_syncLocal,
       task: (controller) async {
-        if (remote) {
-          await repository.syncRemoteApps(taskID);
-        } else {
-          await repository.syncLocalApps(taskID);
-        }
-        for (var attempt = 0; attempt < 120; attempt++) {
-          final log = await repository.readTaskLog(taskID);
-          if (log.lines.isNotEmpty) controller.log(log.lines.last);
-          final status = log.taskStatus.toLowerCase();
-          if (status == 'success') return;
-          if (status == 'failed' || status == 'error' || status == 'canceled') {
-            throw Exception(log.lines.isEmpty ? 'Task failed' : log.lines.last);
-          }
-          await Future<void>.delayed(const Duration(milliseconds: 500));
-        }
+        if (!remote) await repository.syncLocalApps(taskID);
+        await InstalledAppActions.waitTask(controller, repository, taskID);
       },
     );
     if (!success || !context.mounted) return;
     ref.invalidate(appCatalogProvider(_query));
-    ref.invalidate(installedAppsProvider);
+    invalidateInstalledAppLists(ref);
     AppToast.success(context, l10n.action_done);
   }
 
@@ -183,7 +292,8 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     // 预热：进入页面即发出已安装请求，而不是等用户点 tab。
-    ref.watch(installedAppsProvider);
+    final installed = ref.watch(installedAppsProvider);
+    _syncStatusTimer(installed.valueOrNull);
     final server = ref.watch(serverByIdProvider(widget.serverId)).valueOrNull;
     return Scaffold(
       appBar: AppBarLarge(
@@ -197,7 +307,7 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
             tooltip: l10n.action_refresh,
             onPressed: () {
               ref.invalidate(appCatalogProvider(_query));
-              ref.invalidate(installedAppsProvider);
+              invalidateInstalledAppLists(ref);
             },
           ),
           AppIconButton(
@@ -218,6 +328,16 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
                     icon: TablerIcons.database_import,
                   ),
                   SelectionOption(
+                    label: l10n.apps_checkUpdates,
+                    value: 'updates',
+                    icon: TablerIcons.refresh_alert,
+                  ),
+                  SelectionOption(
+                    label: l10n.apps_sort,
+                    value: 'sort',
+                    icon: TablerIcons.sort_ascending,
+                  ),
+                  SelectionOption(
                     label: l10n.apps_storeSettings,
                     value: 'settings',
                     icon: TablerIcons.settings,
@@ -231,6 +351,14 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
               }
               if (value == 'local') {
                 await _sync(context, ref, remote: false);
+                return;
+              }
+              if (value == 'updates') {
+                await _checkUpdates(context, ref);
+                return;
+              }
+              if (value == 'sort') {
+                await _sortInstalled(context, ref);
                 return;
               }
               if (value == 'settings') {
@@ -324,42 +452,57 @@ class _CatalogTabState extends ConsumerState<_CatalogTab> {
         Expanded(
           child: AsyncStateView(
             value: catalog,
-            onRetry: () => ref.invalidate(appCatalogProvider(widget.query)),
+            onRetry: () =>
+                ref.read(appCatalogProvider(widget.query).notifier).refresh(),
             loading: const CatalogAppSkeletonList(),
             isEmpty: (data) => _visible(data.items).isEmpty,
             empty: RefreshableEmptyState(
               onRefresh: () =>
-                  ref.refresh(appCatalogProvider(widget.query).future),
+                  ref.read(appCatalogProvider(widget.query).notifier).refresh(),
               child: EmptyState(
                 icon: TablerIcons.apps,
                 title: l10n.apps_emptyTitle,
                 message: l10n.apps_emptyMessage,
               ),
             ),
-            builder: (data) => RefreshIndicator(
-              onRefresh: () =>
-                  ref.refresh(appCatalogProvider(widget.query).future),
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.all(context.pagePadding),
-                itemCount: _visible(data.items).length,
-                itemBuilder: (context, index) {
-                  final app = _visible(data.items)[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppTokens.s12),
-                    child: _AppRow(
-                      app: app,
-                      cacheKey: '${widget.serverId}:${app.key}',
-                      onTap: () => showAppDetailSheet(
-                        context,
-                        serverId: widget.serverId,
-                        appId: app.key,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+            builder: (data) {
+              final visible = _visible(data.items);
+              return RefreshIndicator(
+                onRefresh: () => ref
+                    .read(appCatalogProvider(widget.query).notifier)
+                    .refresh(),
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification.metrics.extentAfter < 400) {
+                      ref
+                          .read(appCatalogProvider(widget.query).notifier)
+                          .loadMore();
+                    }
+                    return false;
+                  },
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.all(context.pagePadding),
+                    itemCount: visible.length,
+                    itemBuilder: (context, index) {
+                      final app = visible[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                        child: _AppRow(
+                          app: app,
+                          cacheKey: '${widget.serverId}:${app.key}',
+                          onTap: () => showAppDetailSheet(
+                            context,
+                            serverId: widget.serverId,
+                            appId: app.key,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -564,6 +707,19 @@ class _InstalledTab extends ConsumerWidget {
                         },
                       ),
                       ActionSheetRow(
+                        icon: TablerIcons.file_settings,
+                        iconColor: context.scheme.onSurfaceVariant,
+                        title: l10n.apps_defaultConfig,
+                        onTap: () {
+                          Navigator.of(sheetContext).pop();
+                          InstalledAppActions.showDefaultConfig(
+                            context,
+                            ref,
+                            app,
+                          );
+                        },
+                      ),
+                      ActionSheetRow(
                         icon: TablerIcons.bell_off,
                         iconColor: context.scheme.onSurfaceVariant,
                         title: ignored
@@ -605,14 +761,20 @@ class _InstalledTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final installed = ref.watch(installedAppsProvider);
+    final installed = onlyUpgradable
+        ? ref.watch(upgradableAppsProvider)
+        : ref.watch(installedAppsProvider);
     return AsyncStateView(
       value: installed,
-      onRetry: () => ref.invalidate(installedAppsProvider),
+      onRetry: () => onlyUpgradable
+          ? ref.read(upgradableAppsProvider.notifier).refresh()
+          : _syncInstalledApps(ref),
       loading: const InstalledAppSkeletonList(),
       isEmpty: (data) => _visible(data.items).isEmpty,
       empty: RefreshableEmptyState(
-        onRefresh: () => ref.refresh(installedAppsProvider.future),
+        onRefresh: () => onlyUpgradable
+            ? ref.read(upgradableAppsProvider.notifier).refresh()
+            : _syncInstalledApps(ref),
         child: EmptyState(
           icon: TablerIcons.package,
           title: onlyUpgradable
@@ -626,76 +788,93 @@ class _InstalledTab extends ConsumerWidget {
       builder: (data) {
         final visible = _visible(data.items);
         return RefreshIndicator(
-          onRefresh: () => ref.refresh(installedAppsProvider.future),
-          child: ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.all(context.pagePadding),
-            itemCount: visible.length,
-            itemBuilder: (context, index) {
-              final app = visible[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppTokens.s12),
-                child: TonalCard(
-                  onTap: () => _showActions(context, ref, app),
-                  child: Row(
-                    children: [
-                      AppIcon(
-                        name: app.displayName,
-                        icon: app.icon,
-                        size: 36,
-                        cacheKey: '$serverId:${app.appKey}',
-                        iconLoader: () => ref
-                            .read(appRepositoryProvider.future)
-                            .then(
-                              (repository) => repository.getAppIcon(app.appKey),
+          onRefresh: () => onlyUpgradable
+              ? ref.read(upgradableAppsProvider.notifier).refresh()
+              : _syncInstalledApps(ref),
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              if (notification.metrics.extentAfter < 400) {
+                if (onlyUpgradable) {
+                  ref.read(upgradableAppsProvider.notifier).loadMore();
+                } else {
+                  ref.read(installedAppsProvider.notifier).loadMore();
+                }
+              }
+              return false;
+            },
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.all(context.pagePadding),
+              itemCount: visible.length,
+              itemBuilder: (context, index) {
+                final app = visible[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                  child: TonalCard(
+                    onTap: () => _showActions(context, ref, app),
+                    child: Row(
+                      children: [
+                        AppIcon(
+                          name: app.displayName,
+                          icon: app.icon,
+                          size: 36,
+                          cacheKey: '$serverId:${app.appKey}',
+                          iconLoader: () => ref
+                              .read(appRepositoryProvider.future)
+                              .then(
+                                (repository) =>
+                                    repository.getAppIcon(app.appKey),
+                              ),
+                        ),
+                        const SizedBox(width: AppTokens.s12),
+                        StatusDot(status: app.status.toLowerCase()),
+                        const SizedBox(width: AppTokens.s8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                app.displayName,
+                                style: AppTextStyles.titleM,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                '${app.version} · ${app.httpPort}',
+                                style: AppTextStyles.bodyS.copyWith(
+                                  color: context.scheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (app.canUpdate)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppTokens.s8,
+                              vertical: 2,
                             ),
-                      ),
-                      const SizedBox(width: AppTokens.s12),
-                      StatusDot(status: app.status.toLowerCase()),
-                      const SizedBox(width: AppTokens.s8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              app.displayName,
-                              style: AppTextStyles.titleM,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              '${app.version} · ${app.httpPort}',
-                              style: AppTextStyles.bodyS.copyWith(
-                                color: context.scheme.onSurfaceVariant,
+                            decoration: BoxDecoration(
+                              color: context.appColors.warning.withValues(
+                                alpha: 0.15,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                AppTokens.rXs,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      if (app.canUpdate)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppTokens.s8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: context.appColors.warning.withValues(
-                              alpha: 0.15,
-                            ),
-                            borderRadius: BorderRadius.circular(AppTokens.rXs),
-                          ),
-                          child: Text(
-                            l10n.apps_update_available,
-                            style: AppTextStyles.caption.copyWith(
-                              color: context.appColors.warning,
+                            child: Text(
+                              l10n.apps_update_available,
+                              style: AppTextStyles.caption.copyWith(
+                                color: context.appColors.warning,
+                              ),
                             ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         );
       },

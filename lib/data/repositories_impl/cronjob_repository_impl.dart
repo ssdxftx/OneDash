@@ -7,6 +7,7 @@ import '../../presentation/features/server_detail/providers/active_server_provid
 import '../api/cronjob_api.dart';
 import '../dto/common/page_result.dart';
 import '../dto/cronjob/cronjob_dto.dart';
+import '../dto/cronjob/cronjob_form_data_dto.dart';
 
 part 'cronjob_repository_impl.g.dart';
 
@@ -27,7 +28,24 @@ class CronjobRepositoryImpl implements CronjobRepository {
   Future<CronjobDto> getCronjobInfo(int id) => _api.getCronjobInfo(id);
 
   @override
+  Future<List<ScriptOptionDto>> loadScriptOptions() => _api.loadScriptOptions();
+
+  @override
   Future<void> updateCronjob(CronjobCreateReq req) => _api.updateCronjob(req);
+
+  @override
+  Future<List<String>> getNextRun(String spec) => _api.getNextRun(spec);
+
+  @override
+  Future<void> updateCronjobGroup({required int id, required int groupId}) =>
+      _api.updateCronjobGroup(id: id, groupId: groupId);
+
+  @override
+  Future<String> exportCronjobs(List<int> ids) => _api.exportCronjobs(ids);
+
+  @override
+  Future<void> importCronjobs(List<Map<String, dynamic>> items) =>
+      _api.importCronjobs(items);
 
   @override
   Future<void> deleteCronjob(List<int> ids, {bool cleanData = false}) =>

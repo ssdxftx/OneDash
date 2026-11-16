@@ -8,6 +8,7 @@ import '../../../../data/dto/app/app_detail_dto.dart';
 import '../../../../data/dto/app/app_install_config_dto.dart';
 import '../../../../data/dto/app/app_install_req.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
+import '../providers/app_store_provider.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
@@ -167,6 +168,7 @@ class _AppInstallSheetState extends ConsumerState<AppInstallSheet> {
         ),
       );
       if (!mounted) return;
+      invalidateInstalledAppLists(ref);
       AppToast.success(context, AppLocalizations.of(context).action_done);
       Navigator.of(context).pop(true);
     } catch (error) {

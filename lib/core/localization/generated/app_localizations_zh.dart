@@ -200,6 +200,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_appearance_modeDark => '暗色';
 
   @override
+  String get firewall_panelPort => '面板端口';
+
+  @override
+  String get firewall_portChanged => '端口已更新';
+
+  @override
+  String get firewall_newPort => '新端口';
+
+  @override
   String get firewall_title => '防火墙';
 
   @override
@@ -240,6 +249,91 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get panelSettings_panelUsername => '面板用户名';
+
+  @override
+  String get panelSettings_apiKeyManagement => '独立 API Key';
+
+  @override
+  String get panelSettings_apiKeyManagementHint => '创建、查看和管理独立 API Key';
+
+  @override
+  String get panelSettings_apiKeyCreate => '新建 API Key';
+
+  @override
+  String get panelSettings_apiKeyName => '名称';
+
+  @override
+  String get panelSettings_apiKeyDescription => '描述';
+
+  @override
+  String get panelSettings_apiKeyIpWhiteList => 'IP 白名单';
+
+  @override
+  String get panelSettings_apiKeyTrustedProxies => '可信代理';
+
+  @override
+  String get panelSettings_apiKeyValidity => '时间戳有效期（分钟）';
+
+  @override
+  String get panelSettings_apiKeyAllowAppBinding => '允许应用绑定';
+
+  @override
+  String get panelSettings_apiKeyReveal => '显示密钥';
+
+  @override
+  String get panelSettings_apiKeyEnable => '启用';
+
+  @override
+  String get panelSettings_apiKeyDisable => '停用';
+
+  @override
+  String get panelSettings_apiKeyRevoke => '吊销';
+
+  @override
+  String get panelSettings_apiKeyDelete => '删除';
+
+  @override
+  String get panelSettings_apiKeyEmpty => '暂无独立 API Key';
+
+  @override
+  String get panelSettings_apiKeyCreated => 'API Key 已创建并复制';
+
+  @override
+  String get panelSettings_apiKeyRevokeConfirm => '吊销后无法恢复，确定继续？';
+
+  @override
+  String get panelSettings_apiKeyDeleteConfirm => '删除后无法恢复，确定继续？';
+
+  @override
+  String get panelSettings_apiKeyExpires => '过期时间';
+
+  @override
+  String get panelSettings_panelLogin => '面板登录';
+
+  @override
+  String get panelSettings_panelLoggedIn => '已登录，可管理密码、MFA、Passkey 和 API Key';
+
+  @override
+  String get panelSettings_panelNotLoggedIn =>
+      '未登录，密码、MFA、Passkey 和 API Key 管理需要面板会话';
+
+  @override
+  String get panelSettings_username => '用户名';
+
+  @override
+  String get panelSettings_password => '密码';
+
+  @override
+  String get panelSettings_login => '登录';
+
+  @override
+  String get panelSettings_loginRequired => '该操作需要先登录面板';
+
+  @override
+  String get panelSettings_captcha => '验证码';
+
+  @override
+  String get panelSettings_logout => '退出登录';
 
   @override
   String get panelSettings_panelLoginPassword => '面板登录密码';
@@ -896,6 +990,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get files_compress => '压缩';
 
   @override
+  String get files_preview => '预览';
+
+  @override
+  String get files_directoryTree => '目录树';
+
+  @override
+  String get files_remark => '备注';
+
+  @override
+  String get files_remarkSaved => '备注已保存';
+
+  @override
+  String get files_shareQr => '分享二维码';
+
+  @override
+  String get files_mounts => '系统挂载点';
+
+  @override
+  String get files_mountPoint => '挂载点';
+
+  @override
   String get files_share => '分享';
 
   @override
@@ -930,6 +1045,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_proxy => '反向代理';
+
+  @override
+  String get websites_deployment => '应用';
+
+  @override
+  String get websites_subsite => '子站';
 
   @override
   String get websites_php => 'PHP';
@@ -1348,6 +1469,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get files_downloadTooLarge => '文件超过 50MB，请使用网页版下载';
+
+  @override
+  String get files_downloadReady => '文件已准备好，可在分享面板中保存或分享';
 
   @override
   String files_savedTo(String path) {
@@ -2462,6 +2586,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get host_monitor => '监控';
 
   @override
+  String get host_cleanSshLog => '清理 SSH 登录日志';
+
+  @override
+  String get dashboard_cleanMonitor => '清理监控数据';
+
+  @override
+  String get dashboard_cleanMonitorConfirm => '将删除已采集的监控数据，确认继续？';
+
+  @override
   String get host_ssh => 'SSH';
 
   @override
@@ -2697,6 +2830,83 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get host_diagnostics => '诊断';
+
+  @override
+  String get host_remoteHosts => '远程主机';
+
+  @override
+  String get host_addRemote => '添加远程主机';
+
+  @override
+  String get host_noRemote => '暂无远程主机';
+
+  @override
+  String get host_noRemoteHint => '添加远程主机后可在终端中连接。';
+
+  @override
+  String get host_remoteName => '名称';
+
+  @override
+  String get host_address => '地址';
+
+  @override
+  String get host_port => '端口';
+
+  @override
+  String get host_user => '用户名';
+
+  @override
+  String get host_authMode => '认证方式';
+
+  @override
+  String get host_authPassword => '密码';
+
+  @override
+  String get host_authKey => '密钥';
+
+  @override
+  String get host_password => '密码';
+
+  @override
+  String get host_privateKey => '私钥';
+
+  @override
+  String get host_passphrase => '私钥口令';
+
+  @override
+  String get host_rememberPassword => '记住密码';
+
+  @override
+  String get host_description => '描述';
+
+  @override
+  String get host_group => '分组';
+
+  @override
+  String get host_noGroup => '未分组';
+
+  @override
+  String get host_testConnection => '测试连接';
+
+  @override
+  String get host_connectionOk => '连接成功';
+
+  @override
+  String get host_connectionFailed => '连接失败';
+
+  @override
+  String get host_deleteRemote => '删除远程主机';
+
+  @override
+  String host_deleteRemoteMessage(String name) {
+    return '确定删除 $name 吗？';
+  }
+
+  @override
+  String get host_remoteSaved => '远程主机已保存';
+
+  @override
+  String get action_test => '测试';
 
   @override
   String get host_diskSystem => '系统磁盘';
@@ -2963,7 +3173,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_templateRemark => '备注';
 
   @override
-  String get websites_templateVariables => '变量';
+  String get websites_templateVariables => '模板变量';
 
   @override
   String get websites_templateAddVariable => '添加变量';
@@ -3203,6 +3413,102 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get firewall_settingsBackendHint => '点击切换面板管理的防火墙后端';
+
+  @override
+  String get firewall_backendSystem => '系统规则';
+
+  @override
+  String get firewall_backendForwarding => '端口转发';
+
+  @override
+  String get firewall_backendDocker => 'Docker 规则';
+
+  @override
+  String get firewall_advanced => '高级操作';
+
+  @override
+  String get firewall_familyOperation => '初始化或修复防火墙族';
+
+  @override
+  String get firewall_familyOperationHint => '对指定子系统和 IPv4/IPv6 族执行初始化、修复或绑定';
+
+  @override
+  String get firewall_filterChain => '基础链操作';
+
+  @override
+  String get firewall_filterChainHint => '初始化、绑定或解绑 1PANEL_BASIC 基础链';
+
+  @override
+  String get firewall_subsystem => '子系统';
+
+  @override
+  String get firewall_family => '协议族';
+
+  @override
+  String get firewall_operation => '操作';
+
+  @override
+  String get firewall_subsystemSystem => '系统规则';
+
+  @override
+  String get firewall_subsystemForwarding => '端口转发';
+
+  @override
+  String get firewall_subsystemDocker => 'Docker 规则';
+
+  @override
+  String get firewall_operationInitialize => '初始化';
+
+  @override
+  String get firewall_operationRepair => '修复';
+
+  @override
+  String get firewall_operationBind => '绑定';
+
+  @override
+  String get firewall_filterInit => '初始化基础链';
+
+  @override
+  String get firewall_filterBind => '绑定基础链';
+
+  @override
+  String get firewall_filterUnbind => '解绑基础链';
+
+  @override
+  String get firewall_dockerPolicy => '端口防护策略';
+
+  @override
+  String get firewall_dockerPolicyHint => '为容器发布端口设置来源限制';
+
+  @override
+  String get firewall_dockerMode => '策略模式';
+
+  @override
+  String get firewall_dockerSources => '来源地址';
+
+  @override
+  String get firewall_dockerSourcesHint => '多个地址用逗号分隔';
+
+  @override
+  String get firewall_dockerPolicySaved => '端口防护策略已保存';
+
+  @override
+  String get firewall_dockerPolicyDeleted => '端口防护策略已删除';
+
+  @override
+  String get firewall_dockerModeDenySources => '拒绝指定来源';
+
+  @override
+  String get firewall_dockerModeAllowSources => '仅允许指定来源';
+
+  @override
+  String get firewall_dockerModeDenyAll => '拒绝全部来源';
+
+  @override
+  String get firewall_dockerModeAcceptSources => '接受指定来源';
+
+  @override
+  String get firewall_dockerModeAcceptAll => '接受全部来源';
 
   @override
   String get host_sshCheckFailed => '本地 SSH 连通性检查失败，已取消保存。';
@@ -3912,6 +4218,48 @@ class AppLocalizationsZh extends AppLocalizations {
   String get files_batchPermission => '批量权限';
 
   @override
+  String get files_convert => '格式转换';
+
+  @override
+  String get files_convertFormat => '输出格式';
+
+  @override
+  String get files_convertOutput => '输出目录';
+
+  @override
+  String get files_convertDeleteSource => '转换后删除源文件';
+
+  @override
+  String get files_convertStarted => '转换任务已提交';
+
+  @override
+  String get files_convertOnlyFiles => '只能转换文件，不能转换目录';
+
+  @override
+  String get files_convertNoFile => '请先选择要转换的文件';
+
+  @override
+  String get files_uploadRecords => '上传记录';
+
+  @override
+  String get files_noUploadRecords => '暂无上传记录';
+
+  @override
+  String get files_noUploadRecordsHint => '当前目录中的上传文件会显示在这里。';
+
+  @override
+  String get files_convertLogs => '转换记录';
+
+  @override
+  String get files_noConvertLogs => '暂无转换记录';
+
+  @override
+  String get files_noConvertLogsHint => '文件格式转换完成后会显示在这里。';
+
+  @override
+  String get files_removeDownloadRecord => '移除记录';
+
+  @override
   String get files_copyMode => '复制而非移动';
 
   @override
@@ -3966,6 +4314,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_dirPermissionHint => '修改运行用户与用户组';
 
   @override
+  String get action_enable => '启用';
+
+  @override
+  String get action_disable => '停用';
+
+  @override
   String get websites_enabled => '已启用';
 
   @override
@@ -3985,6 +4339,99 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_owner => '用户';
+
+  @override
+  String get websites_batchActions => '批量操作';
+
+  @override
+  String get websites_batchSuccess => '批量操作已完成';
+
+  @override
+  String get websites_changeGroup => '修改分组';
+
+  @override
+  String get websites_bindSsl => '绑定证书';
+
+  @override
+  String get websites_selectGroup => '选择分组';
+
+  @override
+  String get websites_selectSsl => '选择证书';
+
+  @override
+  String get websites_defaultSite => '默认站点';
+
+  @override
+  String get websites_crossSite => '跨站访问';
+
+  @override
+  String get websites_proxyCache => '代理缓存';
+
+  @override
+  String get websites_cacheLimit => '缓存上限';
+
+  @override
+  String get websites_cacheShare => '共享缓存';
+
+  @override
+  String get websites_cacheExpire => '缓存过期';
+
+  @override
+  String get websites_clearProxyCache => '清理代理缓存';
+
+  @override
+  String get websites_composer => 'Composer';
+
+  @override
+  String get websites_composerCommand => '命令';
+
+  @override
+  String get websites_composerMirror => '镜像地址';
+
+  @override
+  String get websites_composerDir => '执行目录';
+
+  @override
+  String get websites_composerUser => '运行用户';
+
+  @override
+  String get websites_cacheCleared => '代理缓存已清理';
+
+  @override
+  String get websites_pushSsl => '推送到从节点';
+
+  @override
+  String get websites_nodes => '节点列表';
+
+  @override
+  String get websites_mergeGroup => '迁移到分组';
+
+  @override
+  String get websites_defaultHtml => '默认页面';
+
+  @override
+  String get websites_htmlType => '页面类型';
+
+  @override
+  String get websites_htmlContent => 'HTML 内容';
+
+  @override
+  String get websites_htmlSaved => '默认页面已保存';
+
+  @override
+  String get websites_htmlIndex => 'index.html';
+
+  @override
+  String get websites_html404 => '404.html';
+
+  @override
+  String get websites_htmlPhp => 'index.php';
+
+  @override
+  String get websites_htmlDomain404 => 'domain404.html';
+
+  @override
+  String get websites_htmlStop => 'stop/index.html';
 
   @override
   String get websites_group => '用户组';
@@ -4054,6 +4501,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_editRedirect => '编辑重定向';
+
+  @override
+  String get websites_deleteRedirect => '删除重定向';
+
+  @override
+  String get websites_redirectDeleted => '重定向已删除';
 
   @override
   String get websites_redirectType => '类型';
@@ -4529,6 +4982,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_useProxy => '使用代理';
 
   @override
+  String get websites_eabKid => 'EAB Kid';
+
+  @override
+  String get websites_eabHmacKey => 'EAB HmacKey';
+
+  @override
   String get websites_useEab => '使用 EAB';
 
   @override
@@ -4584,6 +5043,57 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get files_exactSize => '计算精确大小';
+
+  @override
+  String get containers_rename => '重命名';
+
+  @override
+  String get containers_newName => '新名称';
+
+  @override
+  String get containers_checkImageUpdates => '检查镜像更新';
+
+  @override
+  String get containers_imageUpdatesDone => '镜像更新检查已启动';
+
+  @override
+  String get containers_searchRemote => '搜索远程镜像';
+
+  @override
+  String get containers_scheduleImageUpdates => '定时检查镜像更新';
+
+  @override
+  String get containers_downloadLog => '下载日志';
+
+  @override
+  String get containers_fileBrowser => '容器文件';
+
+  @override
+  String get containers_uploadFile => '上传文件';
+
+  @override
+  String get containers_fileContent => '文件内容';
+
+  @override
+  String get containers_binaryFile => '二进制文件，无法预览';
+
+  @override
+  String get containers_parentDir => '上级目录';
+
+  @override
+  String get containers_fileDeleted => '文件已删除';
+
+  @override
+  String get containers_fileEmpty => '目录为空';
+
+  @override
+  String get containers_composeEnv => 'Compose 环境变量';
+
+  @override
+  String get containers_pinCompose => '置顶 Compose';
+
+  @override
+  String get containers_unpinCompose => '取消置顶';
 
   @override
   String get containers_cleanLogs => '清空容器日志';
@@ -4689,6 +5199,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get files_pickOwner => '选择用户或用户组';
 
   @override
+  String get panelSettings_apiConfigUnavailable =>
+      '当前 API Key 模式无法安全读取接口白名单，请到面板 Web 端修改。';
+
+  @override
   String get panelSettings_apiInterfaceToggleHint => '允许通过 API 访问面板';
 
   @override
@@ -4773,6 +5287,105 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get files_checkExistence => '检查是否存在';
+
+  @override
+  String get panelSettings_closeMfa => '关闭双因素认证';
+
+  @override
+  String get panelSettings_mfaClosed => '双因素认证已关闭';
+
+  @override
+  String get panelSettings_resetExpiredPassword => '密码过期重置';
+
+  @override
+  String get panelSettings_passwordReset => '密码已重置';
+
+  @override
+  String get panelSettings_commandLibrary => '命令库';
+
+  @override
+  String get commandLibrary_add => '新建命令';
+
+  @override
+  String get commandLibrary_name => '命令名称';
+
+  @override
+  String get commandLibrary_command => '命令内容';
+
+  @override
+  String get commandLibrary_empty => '暂无命令';
+
+  @override
+  String get commandLibrary_tree => '命令树';
+
+  @override
+  String get commandLibrary_import => '导入命令';
+
+  @override
+  String get commandLibrary_export => '导出命令';
+
+  @override
+  String get commandLibrary_imported => '命令已导入';
+
+  @override
+  String get commandLibrary_exported => '命令已导出';
+
+  @override
+  String get commandLibrary_importEmpty => 'CSV 中没有可导入的命令';
+
+  @override
+  String get commandLibrary_copied => '命令已复制';
+
+  @override
+  String get scriptLibrary_run => '运行脚本';
+
+  @override
+  String get panelSettings_groupManagement => '分组管理';
+
+  @override
+  String get group_add => '新建分组';
+
+  @override
+  String get group_name => '分组名称';
+
+  @override
+  String get group_empty => '暂无分组';
+
+  @override
+  String get group_typeScript => '脚本';
+
+  @override
+  String get group_typeCommand => '命令';
+
+  @override
+  String get group_typeCronjob => '计划任务';
+
+  @override
+  String get panelSettings_scriptLibrary => '脚本库';
+
+  @override
+  String get scriptLibrary_add => '新建脚本';
+
+  @override
+  String get scriptLibrary_name => '脚本名称';
+
+  @override
+  String get scriptLibrary_description => '描述';
+
+  @override
+  String get scriptLibrary_content => '脚本内容';
+
+  @override
+  String get scriptLibrary_interactive => '交互式脚本';
+
+  @override
+  String get scriptLibrary_sync => '同步脚本库';
+
+  @override
+  String get scriptLibrary_syncStarted => '同步任务已启动';
+
+  @override
+  String get scriptLibrary_empty => '暂无脚本';
 
   @override
   String get panelSettings_mfa => '双因素认证';
@@ -5702,6 +6315,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ai_account_add => '添加模型账户';
 
   @override
+  String get ai_account_models => '模型管理';
+
+  @override
+  String get ai_model_id => '模型 ID';
+
+  @override
+  String get ai_model_verify => '设为验证模型';
+
+  @override
+  String get ai_model_verified => '验证模型';
+
+  @override
+  String get ai_account_verify => '验证账号';
+
+  @override
   String get ai_account_edit => '编辑模型账户';
 
   @override
@@ -6104,4 +6732,1950 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get logs_result => '结果';
+
+  @override
+  String get ai_agent_plugins => '插件管理';
+
+  @override
+  String get ai_agent_skills => '技能管理';
+
+  @override
+  String get ai_plugin_installed => '已安装插件';
+
+  @override
+  String get ai_plugin_market => '插件市场';
+
+  @override
+  String get ai_plugin_searchHint => '搜索插件';
+
+  @override
+  String get ai_plugin_enable => '启用';
+
+  @override
+  String get ai_plugin_disable => '停用';
+
+  @override
+  String get ai_plugin_version => '版本';
+
+  @override
+  String get ai_plugin_install => '安装';
+
+  @override
+  String get ai_plugin_empty => '暂无已安装插件';
+
+  @override
+  String get ai_plugin_noResults => '没有匹配的插件';
+
+  @override
+  String get ai_skill_installed => '已安装技能';
+
+  @override
+  String get ai_skill_market => '技能市场';
+
+  @override
+  String get ai_skill_searchHint => '搜索技能';
+
+  @override
+  String get ai_skill_source => '来源';
+
+  @override
+  String get ai_skill_install => '安装';
+
+  @override
+  String get ai_skill_uninstall => '卸载';
+
+  @override
+  String get ai_skill_empty => '暂无已安装技能';
+
+  @override
+  String get ai_skill_noResults => '没有匹配的技能';
+
+  @override
+  String get ai_model_syncAccount => '同步到账号';
+
+  @override
+  String get ai_model_recreate => '重新创建';
+
+  @override
+  String get ai_model_baseUrlType => '地址类型';
+
+  @override
+  String get ai_model_baseUrl => '基础地址';
+
+  @override
+  String get ai_gpu_monitor => 'GPU 监控';
+
+  @override
+  String get ai_gpu_benchmark => '基准来源';
+
+  @override
+  String get ai_gpu_benchmarkEmpty => '暂无基准来源';
+
+  @override
+  String get ai_gpu_utilizationChart => 'GPU 使用率';
+
+  @override
+  String get ai_gpu_memoryChart => '显存使用';
+
+  @override
+  String get ai_model_baseUrlContainer => '容器地址';
+
+  @override
+  String get ai_model_baseUrlLocalhost => '本机地址';
+
+  @override
+  String get ai_model_baseUrlSystemIp => '面板 IP';
+
+  @override
+  String get ai_model_baseUrlCustom => '自定义';
+
+  @override
+  String get ai_skill_sourceOfficial => '官方';
+
+  @override
+  String get ai_skill_sourceClawhubGlobal => 'ClawHub 全球';
+
+  @override
+  String get ai_skill_sourceClawhubCn => 'ClawHub 中国';
+
+  @override
+  String get ai_skill_sourceSkillhub => 'SkillHub';
+
+  @override
+  String get ai_skill_sourceSkillsSh => 'skills.sh';
+
+  @override
+  String get ai_skill_sourceLocalHub => '本地技能库';
+
+  @override
+  String get ai_vllm_monitor => 'vLLM 监控';
+
+  @override
+  String get ai_vllm_app => 'vLLM 应用';
+
+  @override
+  String get ai_vllm_noApps => '未找到 vLLM 应用';
+
+  @override
+  String get ai_vllm_samples => '样本数';
+
+  @override
+  String get ai_vllm_running => '运行中请求';
+
+  @override
+  String get ai_vllm_waiting => '等待请求';
+
+  @override
+  String get ai_vllm_cache => '缓存使用率';
+
+  @override
+  String get ai_agent_sessions => '对话会话';
+
+  @override
+  String get ai_session_rename => '重命名会话';
+
+  @override
+  String get ai_session_delete => '删除会话';
+
+  @override
+  String get ai_agent_batch => '批量操作';
+
+  @override
+  String get ai_batch_type => '应用类型';
+
+  @override
+  String get ai_batch_operate => '操作';
+
+  @override
+  String get ai_batch_start => '启动';
+
+  @override
+  String get ai_batch_stop => '停止';
+
+  @override
+  String get ai_batch_restart => '重启';
+
+  @override
+  String get ai_batch_delete => '删除';
+
+  @override
+  String get ai_batch_force => '强制删除';
+
+  @override
+  String ai_batch_result(int success, int skipped) {
+    return '成功 $success 个，跳过 $skipped 个';
+  }
+
+  @override
+  String get ai_agent_overview => '智能体概览';
+
+  @override
+  String get ai_vllm_clean => '清理监控数据';
+
+  @override
+  String get dashboard_nodeInfo => '节点信息';
+
+  @override
+  String get dashboard_quickJumps => '快速跳转';
+
+  @override
+  String get dashboard_manageQuick => '管理快速跳转与目录';
+
+  @override
+  String get dashboard_quickDirectories => '快捷目录';
+
+  @override
+  String get dashboard_quickDirectoryPath => '目录路径';
+
+  @override
+  String get dashboard_quickDirectoryAlias => '别名';
+
+  @override
+  String get dashboard_launcher => '应用启动器';
+
+  @override
+  String get dashboard_manageLauncher => '管理启动器';
+
+  @override
+  String get dashboard_topCpu => 'CPU 占用排行';
+
+  @override
+  String get dashboard_topMem => '内存占用排行';
+
+  @override
+  String get dashboard_noData => '暂无数据';
+
+  @override
+  String get dashboard_appInstalled => '已安装';
+
+  @override
+  String get dashboard_appNotInstalled => '未安装';
+
+  @override
+  String get dashboard_addQuickDirectory => '添加快捷目录';
+
+  @override
+  String get dashboard_editQuickDirectory => '编辑快捷目录';
+
+  @override
+  String get files_openShare => '打开分享';
+
+  @override
+  String get backups_editDescription => '编辑描述';
+
+  @override
+  String get backups_snapshotFiles => '快照文件';
+
+  @override
+  String get backups_noSnapshotFiles => '暂无快照文件';
+
+  @override
+  String get cronjobs_nextRun => '下次执行';
+
+  @override
+  String get cronjobs_updateGroup => '修改分组';
+
+  @override
+  String get apps_checkUpdates => '检查商店更新';
+
+  @override
+  String get apps_storeCanUpdate => '应用商店有可用更新';
+
+  @override
+  String get apps_storeLatest => '应用商店已是最新';
+
+  @override
+  String get apps_editWebUi => '编辑 WebUI 地址';
+
+  @override
+  String get apps_webUi => 'WebUI 地址';
+
+  @override
+  String get alerts_clamScans => 'Clam 扫描';
+
+  @override
+  String get alerts_cronjobTargets => '计划任务';
+
+  @override
+  String get alerts_targetsEmpty => '暂无可关联的告警对象';
+
+  @override
+  String alerts_targetPath(String path) {
+    return '路径：$path';
+  }
+
+  @override
+  String alerts_targetType(String type) {
+    return '类型：$type';
+  }
+
+  @override
+  String get host_sshLogs => 'SSH 登录日志';
+
+  @override
+  String get host_sshLogsHint => '查看并筛选 SSH 登录记录';
+
+  @override
+  String get host_sshLogInfo => '关键词';
+
+  @override
+  String get host_sshLogInfoHint => '用户名、IP 或消息';
+
+  @override
+  String get host_sshLogStatus => '状态';
+
+  @override
+  String get host_sshLogAll => '全部';
+
+  @override
+  String get host_sshLogSuccess => '成功';
+
+  @override
+  String get host_sshLogFailed => '失败';
+
+  @override
+  String get host_sshLogRange => '时间范围';
+
+  @override
+  String host_sshLogDays(String days) {
+    return '$days 天';
+  }
+
+  @override
+  String get host_sshLogEmpty => '没有符合条件的 SSH 登录日志';
+
+  @override
+  String get host_sshLogExport => '导出日志';
+
+  @override
+  String host_sshLogExported(String path) {
+    return '日志已导出到 $path';
+  }
+
+  @override
+  String get host_sshLogSearch => '查询';
+
+  @override
+  String get ai_batch_operation => '批量启停';
+
+  @override
+  String get ai_batch_install => '批量安装';
+
+  @override
+  String get ai_batch_upgrade => '批量升级';
+
+  @override
+  String get ai_batch_version => '目标版本';
+
+  @override
+  String get ai_batch_backup => '升级前备份';
+
+  @override
+  String get ai_batch_pullImage => '拉取镜像';
+
+  @override
+  String get ai_batch_port => 'WebUI 端口';
+
+  @override
+  String get ai_batch_name => '名称（留空自动生成）';
+
+  @override
+  String get ai_agent_security => '安全配置';
+
+  @override
+  String get ai_agent_security_origins => '允许来源';
+
+  @override
+  String get ai_agent_security_hint => '多个来源用逗号分隔';
+
+  @override
+  String get ai_agent_config_file => 'Agent 配置文件';
+
+  @override
+  String get ai_agent_config_file_hint => '直接编辑渠道配置文件';
+
+  @override
+  String get ai_domain => 'AI 域名绑定';
+
+  @override
+  String get ai_domain_name => '域名';
+
+  @override
+  String get ai_domain_ssl => 'SSL ID';
+
+  @override
+  String get ai_domain_website => '网站 ID';
+
+  @override
+  String get ai_domain_ipList => '允许 IP';
+
+  @override
+  String get ai_domain_hint => '多个 IP 用逗号分隔';
+
+  @override
+  String get ai_domain_noApp => '未找到已安装的 Ollama 应用';
+
+  @override
+  String ai_domain_bound(String domain) {
+    return '已绑定域名：$domain';
+  }
+
+  @override
+  String get ai_domain_saved => '域名配置已保存';
+
+  @override
+  String get files_batchMove => '批量移动/复制';
+
+  @override
+  String get files_pickFromTree => '从目录树选择';
+
+  @override
+  String get vm_title => '虚拟机';
+
+  @override
+  String get vm_subtitle => 'KVM 虚拟机管理';
+
+  @override
+  String get vm_environment => '运行环境';
+
+  @override
+  String get vm_envReady => '运行环境就绪';
+
+  @override
+  String get vm_envNotReady => '运行环境未就绪';
+
+  @override
+  String get vm_enable => '启用运行环境';
+
+  @override
+  String get vm_enabled => '运行环境已启用';
+
+  @override
+  String get vm_arch => '架构';
+
+  @override
+  String get vm_kvm => 'KVM';
+
+  @override
+  String get vm_libvirt => 'libvirt';
+
+  @override
+  String get vm_storage => '存储';
+
+  @override
+  String get vm_empty => '暂无虚拟机';
+
+  @override
+  String get vm_emptyHint => '创建虚拟机需要先启用 KVM 运行环境';
+
+  @override
+  String get vm_create => '新建虚拟机';
+
+  @override
+  String get vm_update => '编辑虚拟机';
+
+  @override
+  String get vm_name => '名称';
+
+  @override
+  String get vm_cpu => 'CPU 核心';
+
+  @override
+  String get vm_memory => '内存（MB）';
+
+  @override
+  String get vm_disk => '磁盘（GB）';
+
+  @override
+  String get vm_network => '网络';
+
+  @override
+  String get vm_osType => '系统类型';
+
+  @override
+  String get vm_description => '描述';
+
+  @override
+  String get vm_start => '启动';
+
+  @override
+  String get vm_shutdown => '关机';
+
+  @override
+  String get vm_reboot => '重启';
+
+  @override
+  String get vm_destroy => '强制停止';
+
+  @override
+  String get vm_suspend => '挂起';
+
+  @override
+  String get vm_resume => '恢复';
+
+  @override
+  String get vm_delete => '删除虚拟机';
+
+  @override
+  String get vm_rename => '重命名';
+
+  @override
+  String get vm_newName => '新名称';
+
+  @override
+  String get vm_stats => '运行状态';
+
+  @override
+  String get vm_snapshots => '快照';
+
+  @override
+  String get vm_snapshotCreate => '创建快照';
+
+  @override
+  String get vm_snapshotName => '快照名称';
+
+  @override
+  String get vm_snapshotRecover => '恢复快照';
+
+  @override
+  String get vm_snapshotDelete => '删除快照';
+
+  @override
+  String get vm_snapshotEmpty => '暂无快照';
+
+  @override
+  String get vm_needEnv => '请先启用虚拟机运行环境';
+
+  @override
+  String vm_confirmDelete(String name) {
+    return '删除虚拟机 $name？';
+  }
+
+  @override
+  String get vm_forceDelete => '强制删除';
+
+  @override
+  String get vm_startAfterCreate => '创建后启动';
+
+  @override
+  String get vm_autoStart => '开机自启';
+
+  @override
+  String vm_limit(String limit) {
+    return '配额 $limit 台';
+  }
+
+  @override
+  String get vm_osOther => '其他';
+
+  @override
+  String get vm_sync => '同步虚拟机';
+
+  @override
+  String get vm_storagePool => '存储池';
+
+  @override
+  String get vm_template => '模板（可选）';
+
+  @override
+  String get vm_osLinux => 'Linux';
+
+  @override
+  String get vm_osWindows => 'Windows';
+
+  @override
+  String get ai_account_discover => '发现模型';
+
+  @override
+  String get ai_account_discover_empty => '未发现可用模型';
+
+  @override
+  String ai_account_discover_result(String count) {
+    return '发现 $count 个模型';
+  }
+
+  @override
+  String get ai_channel_plugins => '渠道插件';
+
+  @override
+  String get ai_channel_installed => '已安装';
+
+  @override
+  String get ai_channel_notInstalled => '未安装';
+
+  @override
+  String ai_channel_upgradable(String version) {
+    return '可升级到 $version';
+  }
+
+  @override
+  String get ai_channel_install => '安装插件';
+
+  @override
+  String get ai_channel_upgrade => '升级插件';
+
+  @override
+  String get ai_channel_uninstall => '卸载插件';
+
+  @override
+  String get vm_resources => '资源管理';
+
+  @override
+  String get vm_networks => '网络';
+
+  @override
+  String get vm_storages => '存储';
+
+  @override
+  String get vm_templates => '模板';
+
+  @override
+  String get vm_isos => 'ISO 镜像';
+
+  @override
+  String get vm_type => '类型';
+
+  @override
+  String get vm_path => '路径';
+
+  @override
+  String get vm_cidr => '网段';
+
+  @override
+  String get vm_gateway => '网关';
+
+  @override
+  String get vm_sourceInterface => '源网卡';
+
+  @override
+  String get vm_templateName => '模板名称';
+
+  @override
+  String get vm_sourceVm => '源虚拟机';
+
+  @override
+  String get vm_isoType => '镜像类型';
+
+  @override
+  String get vm_resourceEmpty => '暂无资源';
+
+  @override
+  String vm_deleteResource(String name) {
+    return '删除 $name？';
+  }
+
+  @override
+  String get vm_deleteFile => '同时删除文件';
+
+  @override
+  String get vm_isoImage => 'ISO 镜像';
+
+  @override
+  String get vm_isoDisk => '磁盘';
+
+  @override
+  String get vm_netNat => 'NAT';
+
+  @override
+  String get vm_netBridge => '桥接';
+
+  @override
+  String get vm_netMacvtap => 'Macvtap';
+
+  @override
+  String get ai_channel_pairing => '配对审批';
+
+  @override
+  String get ai_channel_pairingCode => '配对码';
+
+  @override
+  String get ai_channel_pairingAccount => '账号 ID（可选）';
+
+  @override
+  String get ai_channel_pairingApproved => '配对已通过';
+
+  @override
+  String get ai_channel_feishu => '飞书';
+
+  @override
+  String get ai_channel_telegram => 'Telegram';
+
+  @override
+  String get ai_channel_discord => 'Discord';
+
+  @override
+  String get ai_channel_wecom => '企业微信';
+
+  @override
+  String get ai_channel_qqbot => 'QQ 机器人';
+
+  @override
+  String get ai_channel_dingtalk => '钉钉';
+
+  @override
+  String get vm_console => '控制台';
+
+  @override
+  String get vm_consoleConnecting => '正在连接控制台…';
+
+  @override
+  String get vm_consoleFailed => '控制台连接失败';
+
+  @override
+  String get vm_consoleHint => '拖动操作鼠标，使用键盘输入';
+
+  @override
+  String get vm_consoleDisconnected => '控制台连接已断开';
+
+  @override
+  String get websites_clearLog => '清空日志';
+
+  @override
+  String get websites_logType => '日志类型';
+
+  @override
+  String get websites_lbEditFile => '编辑源文件';
+
+  @override
+  String get websites_lbFileHint => '直接编辑负载均衡配置内容';
+
+  @override
+  String get websites_streamPorts => '监听端口';
+
+  @override
+  String get websites_streamName => '上游名称';
+
+  @override
+  String get websites_streamAlgorithm => '调度算法';
+
+  @override
+  String get websites_streamServer => '后端地址';
+
+  @override
+  String get websites_streamUdp => 'UDP 转发';
+
+  @override
+  String get websites_lbRoundRobin => '轮询';
+
+  @override
+  String get websites_lbLeastConnections => '最少连接';
+
+  @override
+  String get websites_lbIpHashShort => 'IP 哈希';
+
+  @override
+  String get websites_parentWebsite => '父站点';
+
+  @override
+  String get websites_subsitePath => '子站目录';
+
+  @override
+  String get websites_deploymentApp => '部署应用';
+
+  @override
+  String get websites_templatePreview => '预览模板';
+
+  @override
+  String get websites_deploymentRunning => '应用运行正常，可创建站点';
+
+  @override
+  String get websites_deploymentStopped => '应用未运行，建议先启动应用';
+
+  @override
+  String get websites_templatePreviewResult => '预览结果';
+
+  @override
+  String get websites_templatePreviewFailed => '暂无预览结果';
+
+  @override
+  String get websites_templateOutputDetail => '输出详情';
+
+  @override
+  String get websites_templateOutputTemplate => '来源模板';
+
+  @override
+  String get websites_templateOutputVariables => '变量值';
+
+  @override
+  String get websites_templateOutputCreatedAt => '创建时间';
+
+  @override
+  String get websites_templateOutputPath => '输出路径';
+
+  @override
+  String get panelSettings_aiSettings => 'AI 设置';
+
+  @override
+  String get panelSettings_aiSettingsHint => '终端与文件管理 AI 助手';
+
+  @override
+  String get panelSettings_terminalAi => '终端 AI';
+
+  @override
+  String get panelSettings_fileAi => '文件管理 AI';
+
+  @override
+  String get panelSettings_aiEnabled => '启用 AI';
+
+  @override
+  String get panelSettings_aiPrefix => '触发前缀';
+
+  @override
+  String get panelSettings_aiAccount => 'AI 账号 ID';
+
+  @override
+  String get panelSettings_aiAccountHint => '输入已配置的 AI 账号 ID';
+
+  @override
+  String get panelSettings_aiRiskCommands => '风险命令提示词';
+
+  @override
+  String get panelSettings_aiRiskCommandsHint => '描述需要拦截的高风险命令';
+
+  @override
+  String get panelSettings_fileHistory => '文件历史';
+
+  @override
+  String get panelSettings_fileHistoryHint => '配置文件修改的历史版本与配额';
+
+  @override
+  String get panelSettings_fileHistoryEnable => '启用文件历史';
+
+  @override
+  String get panelSettings_fileHistoryMaxPerPath => '每路径保留数量';
+
+  @override
+  String get panelSettings_fileHistoryQuota => '磁盘配额（MB）';
+
+  @override
+  String get panelSettings_localSsh => '本地 SSH 连接';
+
+  @override
+  String get panelSettings_localSshHint => '面板所在主机的 SSH 登录信息';
+
+  @override
+  String get panelSettings_testConnection => '测试连接';
+
+  @override
+  String get panelSettings_sshCheckOk => 'SSH 连接正常';
+
+  @override
+  String get panelSettings_sshRequired => '请填写地址和用户名';
+
+  @override
+  String get panelSettings_sshAddress => '地址';
+
+  @override
+  String get panelSettings_sshPort => '端口';
+
+  @override
+  String get panelSettings_sshUser => '用户名';
+
+  @override
+  String get panelSettings_sshAuthMode => '认证方式';
+
+  @override
+  String get panelSettings_sshAuthPassword => '密码';
+
+  @override
+  String get panelSettings_sshAuthKey => '密钥';
+
+  @override
+  String get panelSettings_sshPassword => '密码';
+
+  @override
+  String get panelSettings_sshPrivateKey => '私钥';
+
+  @override
+  String get panelSettings_sshPassPhrase => '私钥口令';
+
+  @override
+  String get panelSettings_defaultSshConn => '默认终端连接';
+
+  @override
+  String get panelSettings_defaultSshConnHint => '打开终端时默认使用的连接';
+
+  @override
+  String get panelSettings_defaultSshConnPlaceholder => '输入连接名称或地址';
+
+  @override
+  String get panelSettings_resetMenu => '恢复默认菜单';
+
+  @override
+  String get panelSettings_resetMenuHint => '将面板菜单恢复为默认显示';
+
+  @override
+  String get panelSettings_resetMenuConfirm => '确定要恢复默认菜单吗？';
+
+  @override
+  String get websites_openRestyModules => 'OpenResty 模块';
+
+  @override
+  String get websites_openRestyModuleAdd => '添加模块';
+
+  @override
+  String get websites_openRestyModuleDelete => '删除模块';
+
+  @override
+  String websites_openRestyModuleDeleteConfirm(Object name) {
+    return '确定删除模块 $name 吗？';
+  }
+
+  @override
+  String get websites_openRestyModuleEmpty => '暂无自定义模块';
+
+  @override
+  String get websites_openRestyModuleName => '模块名称';
+
+  @override
+  String get websites_openRestyModuleProvider => '来源';
+
+  @override
+  String get websites_openRestyModuleBuildMode => '构建方式';
+
+  @override
+  String get websites_openRestyModuleLoadOrder => '加载顺序';
+
+  @override
+  String get websites_openRestyModulePackages => '依赖包';
+
+  @override
+  String get websites_openRestyModuleParams => '编译参数';
+
+  @override
+  String get websites_openRestyModuleScript => '构建脚本';
+
+  @override
+  String get websites_openRestyBuild => '构建 OpenResty';
+
+  @override
+  String get websites_openRestyBuildHint => '选择模块并触发重新编译，任务在后台执行';
+
+  @override
+  String get websites_openRestyBuildModules => '参与构建的模块';
+
+  @override
+  String get websites_openRestyMirror => '下载镜像地址';
+
+  @override
+  String get websites_openRestyForce => '强制重新构建';
+
+  @override
+  String get websites_openRestyBuildSubmitted => '构建任务已提交';
+
+  @override
+  String get websites_openRestyHttps => '默认 HTTPS';
+
+  @override
+  String get websites_openRestyHttpsHint => '控制 OpenResty 默认站点的 HTTPS 行为';
+
+  @override
+  String get websites_openRestyHttpsReject => '拒绝未匹配的 SSL 握手';
+
+  @override
+  String get logs_systemServices => '系统服务日志';
+
+  @override
+  String get logs_systemFiles => '日志文件';
+
+  @override
+  String get logs_service => '服务';
+
+  @override
+  String get logs_serviceAll => '全部服务';
+
+  @override
+  String get logs_priority => '日志级别';
+
+  @override
+  String get logs_priorityAll => '全部级别';
+
+  @override
+  String get logs_keyword => '关键词';
+
+  @override
+  String get logs_loadMore => '加载更多';
+
+  @override
+  String get logs_noSystemLog => '暂无系统日志';
+
+  @override
+  String get toolbox_updateVirusDatabase => '更新病毒库';
+
+  @override
+  String get toolbox_updateVirusDatabaseHint => '获取最新的 ClamAV 病毒特征库';
+
+  @override
+  String get toolbox_enableScan => '启用扫描规则';
+
+  @override
+  String get toolbox_disableScan => '停用扫描规则';
+
+  @override
+  String get toolbox_clamConfigFile => '扫描配置文件';
+
+  @override
+  String get toolbox_ftpEdit => '编辑 FTP 账户';
+
+  @override
+  String get toolbox_ftpPasswordKeep => '留空表示不修改密码';
+
+  @override
+  String get toolbox_ftpStatus => '状态';
+
+  @override
+  String get toolbox_ftpService => 'FTP 服务操作';
+
+  @override
+  String get toolbox_ftpStart => '启动';
+
+  @override
+  String get toolbox_ftpStop => '停止';
+
+  @override
+  String get toolbox_ftpRestart => '重启';
+
+  @override
+  String get toolbox_ftpReload => '重载';
+
+  @override
+  String get toolbox_ftpSync => '同步 FTP 账户';
+
+  @override
+  String get toolbox_ftpSyncDone => 'FTP 账户已同步';
+
+  @override
+  String get toolbox_ftpLogs => 'FTP 操作日志';
+
+  @override
+  String get toolbox_ftpLogEmpty => '暂无操作日志';
+
+  @override
+  String get toolbox_fail2banConfFile => 'Fail2ban 配置文件';
+
+  @override
+  String get toolbox_fail2banConfFileHint => '按 jail 配置查看与整文件更新';
+
+  @override
+  String get panelSettings_panelUpgrade => '面板升级';
+
+  @override
+  String get panelSettings_panelUpgradeHint => '检查并安装 1Panel 新版本';
+
+  @override
+  String get panelSettings_upgradeAvailable => '发现新版本';
+
+  @override
+  String get panelSettings_upToDate => '已是最新版本';
+
+  @override
+  String panelSettings_upgradeTo(Object version) {
+    return '升级到 $version';
+  }
+
+  @override
+  String panelSettings_upgradeConfirm(Object version) {
+    return '面板将升级到 $version，升级期间服务会短暂中断。';
+  }
+
+  @override
+  String get panelSettings_upgradeSubmitted => '升级任务已提交';
+
+  @override
+  String get panelSettings_latestVersion => '最新版本';
+
+  @override
+  String get panelSettings_testVersion => '测试版本';
+
+  @override
+  String get panelSettings_releaseNotesTitle => '版本记录';
+
+  @override
+  String panelSettings_newCount(Object count) {
+    return '新增 $count';
+  }
+
+  @override
+  String panelSettings_fixCount(Object count) {
+    return '修复 $count';
+  }
+
+  @override
+  String panelSettings_optimizationCount(Object count) {
+    return '优化 $count';
+  }
+
+  @override
+  String get backups_publicAccount => '面板级备份账号';
+
+  @override
+  String get backups_publicAccountHint => '账号保存在面板侧，可跨节点共享';
+
+  @override
+  String get panelSettings_sshCheckFailed => 'SSH 连接失败';
+
+  @override
+  String get panelSettings_loadFailed => '设置加载失败，请重试';
+
+  @override
+  String get panelSettings_noReleaseNotes => '暂无版本说明';
+
+  @override
+  String get toolbox_ftpPasswordRequired => '请输入新的 FTP 密码';
+
+  @override
+  String get toolbox_loadFailed => '加载失败，请重试';
+
+  @override
+  String get toolbox_clamAdd => '新建扫描任务';
+
+  @override
+  String get websites_groupCreate => '新建分组';
+
+  @override
+  String get websites_groupMergeEmpty => '没有可合并的其他分组';
+
+  @override
+  String get websites_templateNameRequired => '请输入模板名称';
+
+  @override
+  String get websites_templateFileRequired => '请上传模板文件';
+
+  @override
+  String get websites_templateOutputNameRequired => '请输入输出名称';
+
+  @override
+  String get logs_loadFailed => '日志加载失败，请重试';
+
+  @override
+  String get host_sshLogLoadFailed => 'SSH 日志加载失败';
+
+  @override
+  String vm_forceStopConfirm(Object name) {
+    return '强制停止 $name？可能导致数据丢失。';
+  }
+
+  @override
+  String vm_snapshotRecoverConfirm(Object name) {
+    return '恢复到快照 $name？当前状态将被替换。';
+  }
+
+  @override
+  String vm_snapshotDeleteConfirm(Object name) {
+    return '删除快照 $name？';
+  }
+
+  @override
+  String get vm_statsCpu => 'CPU';
+
+  @override
+  String get vm_statsMemory => '内存';
+
+  @override
+  String get vm_statsDisk => '磁盘读写';
+
+  @override
+  String get vm_statsNetwork => '网络收发';
+
+  @override
+  String get websites_openRestyHttpsLoadFailed => 'HTTPS 配置加载失败';
+
+  @override
+  String get toolbox_ftpServiceConfirm => '操作会中断当前 FTP 连接，确定继续？';
+
+  @override
+  String get toolbox_fail2banStop => '停止 Fail2ban';
+
+  @override
+  String get toolbox_fail2banStopConfirm => '停止后将暂时失去暴力破解防护，确定继续？';
+
+  @override
+  String get panelMcp_title => 'MCP';
+
+  @override
+  String get panelMcp_subtitle => '面板 MCP 服务、凭据与调用记录';
+
+  @override
+  String get panelMcp_service => 'MCP 服务';
+
+  @override
+  String get panelMcp_notInstalled => '未安装';
+
+  @override
+  String get panelMcp_installed => '已安装';
+
+  @override
+  String get panelMcp_ready => '就绪';
+
+  @override
+  String get panelMcp_serviceRunning => '服务运行中';
+
+  @override
+  String get panelMcp_serviceStopped => '服务已停止';
+
+  @override
+  String get panelMcp_install => '安装 MCP 服务';
+
+  @override
+  String get panelMcp_start => '启动';
+
+  @override
+  String get panelMcp_stop => '停止';
+
+  @override
+  String get panelMcp_restart => '重启';
+
+  @override
+  String get panelMcp_logs => '服务日志';
+
+  @override
+  String get panelMcp_settings => '运行设置';
+
+  @override
+  String get panelMcp_endpoint => '访问端点';
+
+  @override
+  String get panelMcp_runtimeType => '运行类型';
+
+  @override
+  String get panelMcp_dockerImage => 'Docker 镜像';
+
+  @override
+  String get panelMcp_listenPort => '监听端口';
+
+  @override
+  String get panelMcp_externalUrl => '外部地址';
+
+  @override
+  String get panelMcp_accessPolicy => '访问策略';
+
+  @override
+  String get panelMcp_allowedIPs => '允许的 IP';
+
+  @override
+  String get panelMcp_allowedIPsHint => '每行一个 IP 或 CIDR';
+
+  @override
+  String get panelMcp_saveSettings => '保存设置';
+
+  @override
+  String get panelMcp_website => '网站绑定';
+
+  @override
+  String get panelMcp_unbound => '未绑定';
+
+  @override
+  String get panelMcp_bound => '已绑定';
+
+  @override
+  String get panelMcp_domain => '域名';
+
+  @override
+  String get panelMcp_enableSsl => '启用 SSL';
+
+  @override
+  String get panelMcp_sslId => 'SSL ID';
+
+  @override
+  String get panelMcp_bindWebsite => '绑定网站';
+
+  @override
+  String get panelMcp_updateWebsite => '更新绑定';
+
+  @override
+  String get panelMcp_unbindWebsite => '解绑网站';
+
+  @override
+  String get panelMcp_deleteWebsite => '同时删除关联网站';
+
+  @override
+  String panelMcp_unbindConfirm(String domain) {
+    return '解绑 MCP 网站 $domain？';
+  }
+
+  @override
+  String get panelMcp_credentials => '访问凭据';
+
+  @override
+  String get panelMcp_createCredential => '创建凭据';
+
+  @override
+  String get panelMcp_editCredential => '编辑凭据';
+
+  @override
+  String get panelMcp_credentialName => '凭据名称';
+
+  @override
+  String get panelMcp_credentialDescription => '描述';
+
+  @override
+  String get panelMcp_expiresAt => '过期时间（ISO 8601，可留空）';
+
+  @override
+  String get panelMcp_tools => '允许的工具';
+
+  @override
+  String get panelMcp_nodes => '节点';
+
+  @override
+  String get panelMcp_noCredentials => '暂无 MCP 凭据';
+
+  @override
+  String get panelMcp_noInvocations => '暂无 MCP 调用记录';
+
+  @override
+  String get panelMcp_invocations => '调用记录';
+
+  @override
+  String get panelMcp_tool => '工具';
+
+  @override
+  String get panelMcp_credential => '凭据';
+
+  @override
+  String get panelMcp_revealToken => '查看令牌';
+
+  @override
+  String get panelMcp_rotateToken => '轮换令牌';
+
+  @override
+  String get panelMcp_exportCredential => '导出接入文档';
+
+  @override
+  String get panelMcp_revoke => '撤销';
+
+  @override
+  String panelMcp_revokeConfirm(String name) {
+    return '撤销凭据 $name？';
+  }
+
+  @override
+  String panelMcp_deleteConfirm(String name) {
+    return '删除凭据 $name？';
+  }
+
+  @override
+  String get panelMcp_tokenTitle => 'MCP 令牌';
+
+  @override
+  String get panelMcp_tokenHint => '请立即复制令牌，之后不会再次显示。';
+
+  @override
+  String get panelMcp_exportTitle => '接入文档';
+
+  @override
+  String get panelMcp_exportClient => '客户端';
+
+  @override
+  String get panelMcp_exportClientHint => '例如 claude、cursor、vscode';
+
+  @override
+  String get panelMcp_catalog => '工具目录';
+
+  @override
+  String get panelMcp_catalogHint => '当前面板可用的工具';
+
+  @override
+  String panelMcp_serviceConfirm(String operation) {
+    return '操作 MCP 服务：$operation？';
+  }
+
+  @override
+  String get panelMcp_requiredFields => '请填写必填项';
+
+  @override
+  String get panelMcp_status => '状态';
+
+  @override
+  String get panelMcp_reason => '原因';
+
+  @override
+  String get panelMcp_noNodes => '暂无节点';
+
+  @override
+  String get panelMcp_operationCompleted => '操作完成';
+
+  @override
+  String get panelMcp_loadFailed => 'MCP 数据加载失败';
+
+  @override
+  String get panelMcp_createSuccess => '凭据已创建';
+
+  @override
+  String get panelMcp_revision => '版本';
+
+  @override
+  String panelMcp_pending(String operation) {
+    return '待处理请求：$operation';
+  }
+
+  @override
+  String get panelMcp_sslHint => '启用 SSL 时必填';
+
+  @override
+  String get panelMcp_websiteState => '网站状态';
+
+  @override
+  String get panelMcp_installing => '正在安装 MCP 服务';
+
+  @override
+  String get panelMcp_taskId => '任务 ID';
+
+  @override
+  String get panelMcp_saved => 'MCP 设置已保存';
+
+  @override
+  String panelMcp_toolsCount(int count) {
+    return '$count 个工具';
+  }
+
+  @override
+  String get panelMcp_tokenCopied => '令牌已复制';
+
+  @override
+  String get ai_gpuGroups => 'GPU 分组';
+
+  @override
+  String get ai_gpuGroupsEmpty => '暂无 GPU 分组';
+
+  @override
+  String get ai_gpuGroupAdd => '添加 GPU 分组';
+
+  @override
+  String get ai_gpuGroupEdit => '编辑 GPU 分组';
+
+  @override
+  String get ai_gpuGroupName => '分组名称';
+
+  @override
+  String get ai_gpuGroupDescription => '描述';
+
+  @override
+  String get ai_gpuGroupImageType => 'GPU 类型';
+
+  @override
+  String get ai_gpuGroupDevices => 'GPU 设备';
+
+  @override
+  String get ai_gpuGroupCapabilities => '能力（逗号分隔）';
+
+  @override
+  String ai_gpuGroupDeleteConfirm(String name) {
+    return '删除 GPU 分组 $name？';
+  }
+
+  @override
+  String get ai_gpuUsage => 'GPU 占用检查';
+
+  @override
+  String get ai_gpuUsageCompose => 'Docker Compose';
+
+  @override
+  String get ai_gpuUsageEnv => '环境变量';
+
+  @override
+  String get ai_gpuUsageResult => 'GPU 占用结果';
+
+  @override
+  String get ai_gpuUsageWarnings => '警告';
+
+  @override
+  String get ai_gpuUsagePossible => '可部署方案';
+
+  @override
+  String get ai_chat_title => '模型对话';
+
+  @override
+  String get ai_chat_model => '模型';
+
+  @override
+  String get ai_chat_input => '消息';
+
+  @override
+  String get ai_chat_send => '发送';
+
+  @override
+  String get ai_chat_empty => '发送消息测试该模型';
+
+  @override
+  String get ai_chat_failed => '对话失败';
+
+  @override
+  String get ai_chat_stop => '停止';
+
+  @override
+  String get ai_chat_noModels => '该账号未配置模型';
+
+  @override
+  String get ai_agent_otherConfig => '其他配置';
+
+  @override
+  String get ai_agent_otherTimezone => '用户时区';
+
+  @override
+  String get ai_agent_otherBrowser => '启用浏览器';
+
+  @override
+  String get ai_agent_otherNpm => 'NPM 源';
+
+  @override
+  String get ai_agent_otherUsername => '面板用户名';
+
+  @override
+  String get ai_agent_otherPassword => '面板密码';
+
+  @override
+  String get ai_agent_markdown => 'Markdown 文件';
+
+  @override
+  String get ai_agent_markdownEmpty => '暂无 Markdown 文件';
+
+  @override
+  String get ai_agent_markdownContent => '内容';
+
+  @override
+  String get ai_agent_batchSkill => '批量安装技能';
+
+  @override
+  String get ai_agent_skillName => '技能名称';
+
+  @override
+  String get ai_agent_skillPackage => '安装包路径';
+
+  @override
+  String get ai_agent_feishuSwitch => '切换飞书插件';
+
+  @override
+  String get ai_agent_groupScope => '群会话范围';
+
+  @override
+  String get ai_agent_requireMention => '需要提及';
+
+  @override
+  String get ai_agent_deleteResources => '与该智能体关联的资源';
+
+  @override
+  String get ai_agent_noDeleteResources => '无关联资源';
+
+  @override
+  String get databases_editUser => '编辑用户';
+
+  @override
+  String get databases_savePassword => '仅保存密码';
+
+  @override
+  String get databases_grantsSummary => '授权汇总';
+
+  @override
+  String get databases_commonInfo => '实例信息';
+
+  @override
+  String get databases_editDescription => '编辑描述';
+
+  @override
+  String get databases_rootPassword => 'Root 密码';
+
+  @override
+  String get vm_resizeDisk => '扩容磁盘';
+
+  @override
+  String get vm_diskTarget => '磁盘标识';
+
+  @override
+  String get vm_diskSizeNew => '新容量（GiB）';
+
+  @override
+  String get vm_healthCheck => '健康检查';
+
+  @override
+  String get vm_healthPass => '通过';
+
+  @override
+  String get vm_healthWarn => '警告';
+
+  @override
+  String get vm_healthFail => '失败';
+
+  @override
+  String get vm_orphans => '孤立资源';
+
+  @override
+  String get vm_orphansEmpty => '暂无孤立资源';
+
+  @override
+  String get vm_orphansScan => '扫描孤立资源';
+
+  @override
+  String get vm_orphansClean => '清理所选';
+
+  @override
+  String vm_cleanConfirm(int count) {
+    return '删除 $count 个孤立资源？';
+  }
+
+  @override
+  String get runtime_phpConfig => 'PHP 配置';
+
+  @override
+  String get runtime_phpParams => 'PHP 参数（JSON）';
+
+  @override
+  String get runtime_disableFunctions => '禁用函数';
+
+  @override
+  String get runtime_uploadMaxSize => '上传限制';
+
+  @override
+  String get runtime_maxExecutionTime => '最大执行时间';
+
+  @override
+  String get runtime_container => 'PHP 容器';
+
+  @override
+  String get runtime_containerName => '容器名称';
+
+  @override
+  String get runtime_exposedPorts => '暴露端口（JSON）';
+
+  @override
+  String get runtime_environments => '环境变量（JSON）';
+
+  @override
+  String get runtime_volumes => '挂载卷（JSON）';
+
+  @override
+  String get runtime_extraHosts => '额外主机（JSON）';
+
+  @override
+  String get runtime_jsonHint => '请输入有效的 JSON 数组';
+
+  @override
+  String get toolbox_hosts => 'Hosts 文件';
+
+  @override
+  String get toolbox_hostsEdit => '编辑 Hosts 文件';
+
+  @override
+  String get toolbox_password => 'Root 密码';
+
+  @override
+  String get toolbox_passwordChanged => 'Root 密码已更新';
+
+  @override
+  String get toolbox_dnsCheck => '测试 DNS 解析';
+
+  @override
+  String get toolbox_dnsOk => 'DNS 解析正常';
+
+  @override
+  String get toolbox_dnsFail => 'DNS 解析失败';
+
+  @override
+  String get toolbox_systemClean => '清理系统垃圾';
+
+  @override
+  String get toolbox_systemCleanConfirm => '清理扫描到的垃圾文件？';
+
+  @override
+  String get toolbox_users => '系统用户';
+
+  @override
+  String get toolbox_addHost => '添加 Host 记录';
+
+  @override
+  String get panelMcp_accessInherit => '继承';
+
+  @override
+  String get panelMcp_accessAll => '全部';
+
+  @override
+  String get panelMcp_accessRestricted => '受限';
+
+  @override
+  String get ai_gpuTypeNvidia => 'NVIDIA';
+
+  @override
+  String get ai_gpuTypeIntel => 'Intel';
+
+  @override
+  String get ai_gpuTypeAscend => 'Ascend';
+
+  @override
+  String get apps_linkedResources => '关联资源';
+
+  @override
+  String get files_wgetDetails => '下载详情';
+
+  @override
+  String files_wgetProgress(Object percent) {
+    return '进度：$percent%';
+  }
+
+  @override
+  String get files_wgetWaiting => '等待下载进度...';
+
+  @override
+  String get runtime_presetNew => '新建扩展预设';
+
+  @override
+  String get runtime_presetName => '预设名称';
+
+  @override
+  String get runtime_presetExtensions => '扩展列表';
+
+  @override
+  String get runtime_presetExtensionsHint => '多个扩展用逗号分隔，例如 redis,opcache';
+
+  @override
+  String get runtime_presetImport => '导入扩展预设';
+
+  @override
+  String get runtime_presetImported => '扩展预设已导入';
+
+  @override
+  String get runtime_presetSkipped => '预设已存在且内容一致，已跳过';
+
+  @override
+  String get runtime_presetPush => '推送预设';
+
+  @override
+  String get runtime_presetSourceNode => '源节点';
+
+  @override
+  String get runtime_presetTargetNodes => '目标节点';
+
+  @override
+  String get runtime_presetNodesHint => '多个节点用逗号分隔';
+
+  @override
+  String runtime_presetDeleteConfirm(Object name) {
+    return '删除扩展预设“$name”？';
+  }
+
+  @override
+  String get runtime_presetPushed => '推送任务已提交';
+
+  @override
+  String get runtime_supervisor => '进程守护';
+
+  @override
+  String get vm_isoSearch => '搜索 ISO';
+
+  @override
+  String get vm_isoSearchHint => '名称关键字';
+
+  @override
+  String get vm_isoCreateRecord => '新增镜像记录';
+
+  @override
+  String get vm_isoImport => '从路径导入';
+
+  @override
+  String get vm_networkInterfaces => '网络接口';
+
+  @override
+  String get apps_sort => '已安装应用排序';
+
+  @override
+  String get apps_sortHint => '数值越小越靠前';
+
+  @override
+  String get apps_defaultConfig => '默认配置';
+
+  @override
+  String get apps_defaultConfigEmpty => '暂无默认配置';
+
+  @override
+  String get databases_redisCliInstalled => 'redis-cli 已安装';
+
+  @override
+  String get databases_redisCliMissing => 'redis-cli 未安装，远程 Redis 终端不可用';
+
+  @override
+  String get cronjobs_export => '导出计划任务';
+
+  @override
+  String get cronjobs_import => '导入计划任务';
+
+  @override
+  String get cronjobs_exported => '计划任务已导出';
+
+  @override
+  String get cronjobs_imported => '计划任务已导入';
+
+  @override
+  String get cronjobs_importEmpty => '文件中没有可导入的计划任务';
+
+  @override
+  String get websites_importCa => '导入 CA';
+
+  @override
+  String get websites_uploadCa => '上传 CA 压缩包';
+
+  @override
+  String get websites_caName => 'CA 名称';
+
+  @override
+  String get websites_importType => '导入方式';
+
+  @override
+  String get websites_importPaste => '粘贴证书';
+
+  @override
+  String get websites_importLocal => '服务器文件';
+
+  @override
+  String get websites_certificatePath => '证书路径';
+
+  @override
+  String ai_accountCountLabel(String name, int count) {
+    return '$name：$count';
+  }
+
+  @override
+  String get panelSettings_proxy => '服务器代理';
+
+  @override
+  String get panelSettings_proxyHint => '配置面板访问外网使用的 HTTP/HTTPS/SOCKS5 代理';
+
+  @override
+  String get panelSettings_proxyType => '代理类型';
+
+  @override
+  String get panelSettings_proxyHttp => 'HTTP';
+
+  @override
+  String get panelSettings_proxyHttps => 'HTTPS';
+
+  @override
+  String get panelSettings_proxySocks5 => 'SOCKS5';
+
+  @override
+  String get panelSettings_proxyClose => '关闭代理';
+
+  @override
+  String get panelSettings_proxyUrl => '代理地址';
+
+  @override
+  String get panelSettings_proxyUrlHint => '例如 127.0.0.1 或 proxy.example.com';
+
+  @override
+  String get panelSettings_proxyPort => '代理端口';
+
+  @override
+  String get panelSettings_proxyUser => '代理用户名';
+
+  @override
+  String get panelSettings_proxyPassword => '代理密码';
+
+  @override
+  String get panelSettings_proxyPasswordHint => '留空会清除已保存的代理密码';
+
+  @override
+  String get panelSettings_proxyDocker => '同时代理 Docker';
+
+  @override
+  String get panelSettings_proxyRestartDocker => '应用后重启 Docker';
+
+  @override
+  String get panelSettings_proxyRequired => '请填写代理地址和端口';
+
+  @override
+  String get panelSettings_downloadPreference => '下载偏好';
+
+  @override
+  String get panelSettings_downloadPreferenceHint => '选择下载文件时使用的文件名';
+
+  @override
+  String get panelSettings_useServerFilename => '使用服务器文件名';
+
+  @override
+  String get panelSettings_useServerFilenameHint => '开启后优先使用服务器返回的原始文件名';
+
+  @override
+  String get panelSettings_downloadSsl => '下载面板证书';
+
+  @override
+  String get panelSettings_downloadSslHint => '导出面板自签 SSL 证书以便信任';
+
+  @override
+  String get panelSettings_terminalAppearance => '终端外观';
+
+  @override
+  String get panelSettings_terminalAppearanceHint => '调整面板 Web 终端的字体、颜色与光标';
+
+  @override
+  String get panelSettings_terminalBehavior => '终端行为';
+
+  @override
+  String get panelSettings_showTerminalButton => '显示终端按钮';
+
+  @override
+  String get panelSettings_showTerminalButtonHint => '在面板中显示快速打开终端的入口';
+
+  @override
+  String get panelSettings_cursorBlink => '光标闪烁';
+
+  @override
+  String get panelSettings_cursorStyle => '光标样式';
+
+  @override
+  String get panelSettings_cursorBlock => '方块';
+
+  @override
+  String get panelSettings_cursorUnderline => '下划线';
+
+  @override
+  String get panelSettings_cursorBar => '竖线';
+
+  @override
+  String get panelSettings_scrollback => '回滚行数';
+
+  @override
+  String get panelSettings_scrollSensitivity => '滚动灵敏度';
+
+  @override
+  String get panelSettings_terminalTypography => '字体排版';
+
+  @override
+  String get panelSettings_fontFamily => '字体';
+
+  @override
+  String get panelSettings_fontFamilyHint => '留空使用面板默认字体';
+
+  @override
+  String get panelSettings_fontSize => '字号';
+
+  @override
+  String get panelSettings_lineHeight => '行高';
+
+  @override
+  String get panelSettings_letterSpacing => '字间距';
+
+  @override
+  String get panelSettings_terminalColors => '颜色';
+
+  @override
+  String get panelSettings_backgroundColor => '背景色';
+
+  @override
+  String get panelSettings_foregroundColor => '前景色';
+
+  @override
+  String get panelSettings_colorHint => '支持十六进制颜色，如 #1e1e1e';
+
+  @override
+  String get panelSettings_registerPasskey => '在浏览器中注册';
+
+  @override
+  String get panelSettings_registerPasskeyHint => '通行密钥绑定当前域名，请在面板网页中完成注册';
+
+  @override
+  String get host_sshTerminal => 'SSH 终端';
+
+  @override
+  String get websites_editStream => '编辑隧道';
+
+  @override
+  String get cronjobs_pickScript => '从脚本库选择';
 }

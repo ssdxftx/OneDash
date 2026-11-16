@@ -275,6 +275,40 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                   ),
                 ),
                 ActionSheetRow(
+                  icon: TablerIcons.pin,
+                  iconColor: context.scheme.onSurfaceVariant,
+                  title: item.isPinned
+                      ? l10n.containers_unpinCompose
+                      : l10n.containers_pinCompose,
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    try {
+                      final repository = await ref.read(
+                        containerRepositoryProvider.future,
+                      );
+                      await repository.setComposePin(
+                        name: item.name,
+                        isPinned: !item.isPinned,
+                      );
+                      ref.invalidate(containerComposeProvider);
+                      if (!context.mounted) return;
+                      AppToast.success(context, l10n.action_done);
+                    } catch (error) {
+                      if (!context.mounted) return;
+                      showErrorToast(context, error);
+                    }
+                  },
+                ),
+                ActionSheetRow(
+                  icon: TablerIcons.variable,
+                  iconColor: context.scheme.onSurfaceVariant,
+                  title: l10n.containers_composeEnv,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _showEnv(context, ref, item);
+                  },
+                ),
+                ActionSheetRow(
                   icon: TablerIcons.file_text,
                   iconColor: context.scheme.onSurfaceVariant,
                   title: l10n.containers_composeLogs,
@@ -377,6 +411,47 @@ class _ComposePageState extends ConsumerState<ComposePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _showEnv(
+    BuildContext context,
+    WidgetRef ref,
+    ContainerComposeDto item,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(containerRepositoryProvider.future);
+      final lines = await repository.loadComposeEnv(item.path);
+      if (!context.mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.9,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.containers_composeEnv, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s12),
+            if (lines.isEmpty)
+              Text(l10n.state_empty, style: AppTextStyles.bodyM)
+            else
+              Flexible(
+                child: SingleChildScrollView(
+                  child: SelectableText(
+                    lines.join('\n'),
+                    style: AppTextStyles.bodyS.copyWith(
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _run(

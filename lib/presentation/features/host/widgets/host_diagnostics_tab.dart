@@ -123,14 +123,14 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
       final repository = await ref.read(
         hostRepositoryProvider(widget.serverId).future,
       );
-      final (summary, snapshot) = await (
+      final results = await Future.wait<Object>([
         repository.getDiagnosticsSummary(),
         repository.getGoroutineSnapshot(),
-      ).wait;
+      ]);
       if (!mounted) return;
       setState(() {
-        _summary = summary;
-        _snapshot = snapshot;
+        _summary = results[0] as DiagnosticsSummaryDto;
+        _snapshot = results[1] as GoroutineSnapshotDto;
       });
     } catch (error) {
       if (!mounted) return;

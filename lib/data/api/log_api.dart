@@ -4,6 +4,7 @@ import '../dto/common/page_result.dart';
 import '../dto/log/login_log_dto.dart';
 import '../dto/log/operation_log_dto.dart';
 import '../dto/log/ssh_log_dto.dart';
+import '../dto/log/system_log_dto.dart';
 import '../dto/log/task_log_dto.dart';
 
 /// 日志审计 API。
@@ -46,7 +47,7 @@ class LogApi {
   Future<PageResult<LoginLogDto>> searchLoginLogs({
     int page = 1,
     int pageSize = 20,
-    String ip = '',
+    String info = '',
     String status = '',
   }) async {
     final resp = await _client.post<Map<String, dynamic>>(
@@ -54,7 +55,7 @@ class LogApi {
       data: {
         'page': page,
         'pageSize': pageSize,
-        if (ip.isNotEmpty) 'ip': ip,
+        if (info.isNotEmpty) 'info': info,
         if (status.isNotEmpty) 'status': status,
       },
     );
@@ -84,6 +85,49 @@ class LogApi {
       return data.map((e) => e.toString()).toList();
     }
     return [];
+  }
+
+  /// GET /api/v2/logs/system/services
+  Future<List<String>> getSystemLogServices() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/logs/system/services',
+    );
+    final data = resp.data?['data'];
+    if (data is List) return data.map((e) => e.toString()).toList();
+    return const [];
+  }
+
+  /// GET /api/v2/logs/system/status
+  Future<SystemLogStatusDto> getSystemLogStatus() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/logs/system/status',
+    );
+    return ApiResponseParser.object(resp, SystemLogStatusDto.fromJson);
+  }
+
+  /// POST /api/v2/logs/system/read
+  Future<SystemLogPageDto> readSystemLog({
+    String keyword = '',
+    String service = '',
+    String priority = '',
+    String cursor = '',
+    String startTime = '',
+    String endTime = '',
+    int pageSize = 50,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/logs/system/read',
+      data: {
+        'pageSize': pageSize,
+        if (keyword.isNotEmpty) 'keyword': keyword,
+        if (service.isNotEmpty) 'service': service,
+        if (priority.isNotEmpty) 'priority': priority,
+        if (cursor.isNotEmpty) 'cursor': cursor,
+        if (startTime.isNotEmpty) 'startTime': startTime,
+        if (endTime.isNotEmpty) 'endTime': endTime,
+      },
+    );
+    return ApiResponseParser.object(resp, SystemLogPageDto.fromJson);
   }
 
   /// 分页查询任务日志。
@@ -153,10 +197,14 @@ class LogApi {
   Future<String> exportSshLogs({
     String info = '',
     String status = 'All',
+    int page = 1,
+    int pageSize = 100000,
   }) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/hosts/ssh/log/export',
       data: {
+        'page': page,
+        'pageSize': pageSize,
         if (info.isNotEmpty) 'info': info,
         'Status': status.isEmpty ? 'All' : status,
       },

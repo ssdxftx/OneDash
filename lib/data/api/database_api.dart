@@ -501,7 +501,7 @@ class DatabaseApi {
   }) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/databases/redis/password',
-      data: {'database': database, 'value': value},
+      data: {'database': database, 'value': _base64(value)},
     );
     ApiResponseParser.ok(resp);
   }
@@ -556,6 +556,15 @@ class DatabaseApi {
       },
     );
     ApiResponseParser.ok(resp);
+  }
+
+  /// 检查 redis-cli 是否已安装。
+  /// GET /api/v2/databases/redis/check
+  Future<bool> checkRedisCli() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/databases/redis/check',
+    );
+    return resp.data?['data'] == true;
   }
 
   /// 安装 redis-cli（用于远程 Redis 终端）。
@@ -766,6 +775,116 @@ class DatabaseApi {
         'username': username,
         'host': host,
         'password': _base64(password),
+      },
+    );
+  }
+
+  /// 更新数据库用户（主机与描述）。
+  Future<void> updateUser({
+    required String database,
+    required String username,
+    required String host,
+    required String newHost,
+    String description = '',
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/users/update',
+      data: {
+        'database': database,
+        'username': username,
+        'host': host,
+        'newHost': newHost,
+        'description': description,
+      },
+    );
+  }
+
+  /// 仅保存用户密码到面板记录，不修改数据库中的密码。
+  Future<void> saveUserPassword({
+    required String database,
+    required String username,
+    required String host,
+    required String password,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/users/password/save',
+      data: {
+        'database': database,
+        'username': username,
+        'host': host,
+        'password': _base64(password),
+      },
+    );
+  }
+
+  /// 查询 MySQL 授权汇总。
+  Future<Map<String, dynamic>> getGrantsSummary({
+    required String database,
+    required List<String> dbs,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/grants/summary',
+      data: {'database': database, 'dbs': dbs},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 更新数据库描述。
+  Future<void> updateDescription({
+    required int id,
+    required String type,
+    required String description,
+  }) async {
+    final path = type == 'mongodb'
+        ? '/mongodb/description'
+        : type.startsWith('postgresql')
+        ? '/pg/description'
+        : '/description/update';
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases$path',
+      data: {'id': id, 'description': description},
+    );
+  }
+
+  /// 查询数据库实例基础信息。
+  Future<Map<String, dynamic>> getCommonInfo({
+    required String name,
+    required String type,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/common/info',
+      data: {'name': name, 'type': type},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 从远程载入 MongoDB 数据库。
+  Future<void> loadMongoFromRemote({
+    required String database,
+    String from = 'remote',
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/mongodb/load',
+      data: {'from': from, 'type': 'mongodb', 'database': database},
+    );
+  }
+
+  /// 修改 MongoDB root 密码。
+  Future<void> changeMongoRootPassword({
+    required int id,
+    required String database,
+    required String password,
+    String from = 'local',
+    String type = 'mongodb',
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/mongodb/root/password',
+      data: {
+        'id': id,
+        'from': from,
+        'type': type,
+        'database': database,
+        'value': _base64(password),
       },
     );
   }

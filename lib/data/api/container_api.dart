@@ -18,6 +18,7 @@ import '../dto/container/container_by_image_dto.dart';
 import '../dto/container/container_info_dto.dart';
 import '../dto/container/container_option_dto.dart';
 import '../dto/container/container_compose_dto.dart';
+import '../dto/container/container_file_dto.dart';
 import '../dto/container/compose_template_dto.dart';
 import '../dto/container/image_dtos.dart';
 import '../dto/container/network_dtos.dart';
@@ -108,9 +109,12 @@ class ContainerApi {
 
   /// 获取容器资源统计列表信息。
   /// GET /api/v2/containers/list/stats
-  Future<List<ContainerResourceStatsDto>> getContainerResourceStats() async {
+  Future<List<ContainerResourceStatsDto>> getContainerResourceStats({
+    List<String>? ids,
+  }) async {
     final resp = await _client.get<Map<String, dynamic>>(
       '/api/v2/containers/list/stats',
+      query: ids == null || ids.isEmpty ? null : {'ids': ids.join(',')},
     );
     return ApiResponseParser.list(resp, ContainerResourceStatsDto.fromJson);
   }
@@ -153,7 +157,7 @@ class ContainerApi {
 
     final chunks = <int>[];
     await for (final chunk in body.stream.timeout(
-      const Duration(seconds: 2),
+      const Duration(seconds: 30),
       onTimeout: (sink) => sink.close(),
     )) {
       chunks.addAll(chunk);
@@ -190,7 +194,7 @@ class ContainerApi {
 
     final chunks = <int>[];
     await for (final chunk in body.stream.timeout(
-      const Duration(seconds: 2),
+      const Duration(seconds: 30),
       onTimeout: (sink) => sink.close(),
     )) {
       chunks.addAll(chunk);
@@ -379,7 +383,8 @@ class ContainerApi {
   }) async {
     await TaskWaiter(
       _client,
-      maxAttempts: 240,
+      interval: const Duration(seconds: 2),
+      maxAttempts: 300,
     ).waitFor(taskID, subject: '容器任务', onUpdate: onUpdate);
   }
 
@@ -430,7 +435,7 @@ class ContainerApi {
     final lines = <String>[];
     for (final line in const LineSplitter().convert(raw)) {
       if (line.startsWith('data:')) {
-        lines.add(line.substring(5).trimLeft());
+        lines.add(_decodeLogData(line.substring(5).trimLeft()));
       } else if (line.isNotEmpty &&
           !line.startsWith('event:') &&
           !line.startsWith('id:') &&
@@ -439,6 +444,15 @@ class ContainerApi {
       }
     }
     return lines.join('\n').trimRight();
+  }
+
+  static String _decodeLogData(String value) {
+    if (value.isEmpty) return value;
+    try {
+      return utf8.decode(base64Decode(value), allowMalformed: true);
+    } on FormatException {
+      return value;
+    }
   }
 
   /// 搜索编排 (Compose)。
@@ -877,6 +891,29 @@ class ContainerApi {
     ApiResponseParser.ok(resp);
   }
 
+  /// 读取 Compose 环境变量。
+  /// POST /api/v2/containers/compose/env
+  Future<List<String>> loadComposeEnv(String path) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/compose/env',
+      data: {'path': path},
+    );
+    return ApiResponseParser.primitiveList<String>(resp);
+  }
+
+  /// 设置 Compose 置顶状态。
+  /// POST /api/v2/containers/compose/pin
+  Future<void> setComposePin({
+    required String name,
+    required bool isPinned,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/compose/pin',
+      data: {'name': name, 'isPinned': isPinned},
+    );
+    ApiResponseParser.ok(resp);
+  }
+
   /// 获取容器内用户列表。
   Future<List<String>> loadContainerUsers(String containerName) async {
     final resp = await _client.post<Map<String, dynamic>>(
@@ -884,5 +921,192 @@ class ContainerApi {
       data: {'name': containerName},
     );
     return ApiResponseParser.primitiveList<String>(resp);
+  }
+
+  /// 重命名容器。
+  /// POST /api/v2/containers/rename
+  Future<void> renameContainer({
+    required String name,
+    required String newName,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/rename',
+      data: {'name': name, 'newName': newName},
+    );
+    ApiResponseParser.ok(resp);
+  }
+
+  /// 分页搜索存储卷。
+  /// POST /api/v2/containers/volume/search
+  Future<Map<String, dynamic>> searchVolumes({
+    String info = '',
+    int page = 1,
+    int pageSize = 20,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/volume/search',
+      data: {'info': info, 'page': page, 'pageSize': pageSize},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 远程镜像仓库搜索。
+  /// POST /api/v2/containers/image/remote/search
+  Future<Map<String, dynamic>> searchRemoteImages({
+    required String query,
+    int page = 1,
+    int pageSize = 20,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/image/remote/search',
+      data: {'query': query, 'page': page, 'pageSize': pageSize},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 获取镜像更新检查状态。
+  /// GET /api/v2/containers/image-updates
+  Future<Map<String, dynamic>> getImageUpdateStatus() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/containers/image-updates',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 触发镜像更新检查。
+  /// POST /api/v2/containers/image-updates/check
+  Future<Map<String, dynamic>> checkImageUpdates() async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/image-updates/check',
+      data: const {},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 设置镜像更新定时检查。
+  /// POST /api/v2/containers/image-updates/schedule
+  Future<Map<String, dynamic>> setImageUpdateSchedule(bool enabled) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/image-updates/schedule',
+      data: {'enabled': enabled},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// 下载容器或 Compose 日志。
+  /// POST /api/v2/containers/download/log
+  Future<List<int>> downloadLog({
+    required String container,
+    String since = '',
+    int tail = 1000,
+    bool timestamp = false,
+    String containerType = '',
+  }) async {
+    final resp = await _client.post<List<int>>(
+      '/api/v2/containers/download/log',
+      data: {
+        'container': container,
+        'since': since,
+        'tail': tail,
+        'timestamp': timestamp,
+        'containerType': containerType,
+      },
+      options: Options(responseType: ResponseType.bytes),
+    );
+    final data = resp.data;
+    return data ?? const [];
+  }
+
+  /// 列出容器内目录。
+  /// POST /api/v2/containers/files/search
+  Future<List<ContainerFileDto>> listContainerFiles({
+    required String containerId,
+    String path = '/',
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/files/search',
+      data: {'containerID': containerId, 'path': path},
+    );
+    return ApiResponseParser.list(resp, ContainerFileDto.fromJson);
+  }
+
+  /// 读取容器内文件内容。
+  /// POST /api/v2/containers/files/content
+  Future<ContainerFileContentDto> getContainerFileContent({
+    required String containerId,
+    required String path,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/files/content',
+      data: {'containerID': containerId, 'path': path},
+    );
+    return ApiResponseParser.object(resp, ContainerFileContentDto.fromJson);
+  }
+
+  /// 获取容器内文件大小。
+  /// POST /api/v2/containers/files/size
+  Future<int> getContainerFileSize({
+    required String containerId,
+    required String path,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/files/size',
+      data: {'containerID': containerId, 'path': path},
+    );
+    return ApiResponseParser.primitive<int>(resp);
+  }
+
+  /// 删除容器内文件。
+  /// POST /api/v2/containers/files/del
+  Future<void> deleteContainerFiles({
+    required String containerId,
+    required List<String> paths,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/files/del',
+      data: {'containerID': containerId, 'paths': paths},
+    );
+    ApiResponseParser.ok(resp);
+  }
+
+  /// 上传文件到容器。
+  /// POST /api/v2/containers/files/upload
+  Future<void> uploadContainerFile({
+    required String containerId,
+    required String path,
+    required String filePath,
+    void Function(int sent, int total)? onSendProgress,
+  }) async {
+    final formData = FormData();
+    formData.fields.add(MapEntry('containerID', containerId));
+    formData.fields.add(MapEntry('path', path));
+    formData.files.add(
+      MapEntry(
+        'file',
+        await MultipartFile.fromFile(
+          filePath,
+          filename: filePath.split('/').last,
+        ),
+      ),
+    );
+    await _client.postMultipart<Map<String, dynamic>>(
+      '/api/v2/containers/files/upload',
+      formData: formData,
+      onSendProgress: onSendProgress,
+    );
+  }
+
+  /// 下载容器内文件。
+  /// POST /api/v2/containers/files/download
+  Future<List<int>> downloadContainerFile({
+    required String containerId,
+    required String path,
+  }) async {
+    final resp = await _client.post<List<int>>(
+      '/api/v2/containers/files/download',
+      data: {'containerID': containerId, 'path': path},
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return resp.data ?? const [];
   }
 }

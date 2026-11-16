@@ -15,6 +15,8 @@ class DashboardApi {
 
   final DioClient _client;
 
+  static const _dashboardTimeout = Duration(seconds: 15);
+
   /// 获取主机基础信息 + 当前指标。
   ///
   /// [ioOption] / [netOption] 控制返回的 IO / 网络粒度，默认 `all`。
@@ -23,18 +25,20 @@ class DashboardApi {
     String ioOption = 'all',
     String netOption = 'all',
   }) async {
-    final (baseResp, currentResp) = await (
+    final responses = await Future.wait([
       _client.get<Map<String, dynamic>>(
         '/api/v2/dashboard/base/$ioOption/$netOption',
+        options: Options(receiveTimeout: _dashboardTimeout),
       ),
       _client.get<Map<String, dynamic>>(
         '/api/v2/dashboard/current/$ioOption/$netOption',
+        options: Options(receiveTimeout: _dashboardTimeout),
       ),
-    ).wait;
+    ]);
 
     return DashboardDto.parse(
-      baseJson: ApiResponseParser.map(baseResp),
-      currentJson: ApiResponseParser.map(currentResp),
+      baseJson: ApiResponseParser.map(responses[0]),
+      currentJson: ApiResponseParser.map(responses[1]),
     );
   }
 
@@ -58,6 +62,7 @@ class DashboardApi {
   }) async {
     final resp = await _client.get<Map<String, dynamic>>(
       '/api/v2/dashboard/base/$ioOption/$netOption',
+      options: Options(receiveTimeout: _dashboardTimeout),
     );
     return DashboardDto.parse(baseJson: ApiResponseParser.map(resp));
   }
@@ -69,8 +74,122 @@ class DashboardApi {
   }) async {
     final resp = await _client.get<Map<String, dynamic>>(
       '/api/v2/dashboard/base/$ioOption/$netOption',
+      options: Options(receiveTimeout: _dashboardTimeout),
     );
     return DashboardDto.parseBase(ApiResponseParser.map(resp));
+  }
+
+  /// GET /api/v2/dashboard/quick/option
+  Future<List<Map<String, dynamic>>> getQuickOptions() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/dashboard/quick/option',
+    );
+    return _maps(resp);
+  }
+
+  /// POST /api/v2/dashboard/quick/change
+  Future<void> changeQuick(List<Map<String, dynamic>> quicks) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/dashboard/quick/change',
+      data: {'quicks': quicks},
+    );
+  }
+
+  /// GET /api/v2/dashboard/quick/directory
+  Future<List<Map<String, dynamic>>> getQuickDirectories() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/dashboard/quick/directory',
+    );
+    return _maps(resp);
+  }
+
+  /// POST /api/v2/dashboard/quick/directory
+  Future<void> createQuickDirectory({
+    required String path,
+    String alias = '',
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/dashboard/quick/directory',
+      data: {'path': path, 'alias': alias},
+    );
+  }
+
+  /// POST /api/v2/dashboard/quick/directory/update
+  Future<void> updateQuickDirectory({
+    required int id,
+    required String path,
+    String alias = '',
+    bool legacy = false,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/dashboard/quick/directory/update',
+      data: {'id': id, 'path': path, 'alias': alias, 'legacy': legacy},
+    );
+  }
+
+  /// POST /api/v2/dashboard/quick/directory/del
+  Future<void> deleteQuickDirectory({
+    required int id,
+    bool legacy = false,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/dashboard/quick/directory/del',
+      data: {'id': id, 'legacy': legacy},
+    );
+  }
+
+  /// GET /api/v2/dashboard/app/launcher
+  Future<List<Map<String, dynamic>>> getAppLauncher() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/dashboard/app/launcher',
+    );
+    return _maps(resp);
+  }
+
+  /// POST /api/v2/dashboard/app/launcher/option
+  Future<List<Map<String, dynamic>>> getAppLauncherOptions({
+    String filter = '',
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/dashboard/app/launcher/option',
+      data: {'filter': filter},
+    );
+    return _maps(resp);
+  }
+
+  /// POST /api/v2/dashboard/app/launcher/show
+  Future<void> updateAppLauncherShow({
+    required String key,
+    required bool show,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/dashboard/app/launcher/show',
+      data: {'key': key, 'value': show ? 'True' : 'False'},
+    );
+  }
+
+  /// GET /api/v2/dashboard/current/top/cpu
+  Future<List<Map<String, dynamic>>> getTopCpu() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/dashboard/current/top/cpu',
+    );
+    return _maps(resp);
+  }
+
+  /// GET /api/v2/dashboard/current/top/mem
+  Future<List<Map<String, dynamic>>> getTopMem() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/dashboard/current/top/mem',
+    );
+    return _maps(resp);
+  }
+
+  /// GET /api/v2/dashboard/current/node
+  Future<Map<String, dynamic>> getNodeCurrent() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/dashboard/current/node',
+    );
+    return ApiResponseParser.map(resp);
   }
 
   /// 重启服务器、面板或面板代理。
@@ -89,7 +208,17 @@ class DashboardApi {
   }) async {
     final resp = await _client.get<Map<String, dynamic>>(
       '/api/v2/dashboard/current/$ioOption/$netOption',
+      options: Options(receiveTimeout: _dashboardTimeout),
     );
     return DashboardDto.parseCurrent(ApiResponseParser.map(resp));
+  }
+
+  static List<Map<String, dynamic>> _maps(Response<dynamic> response) {
+    final data = response.data is Map ? (response.data as Map)['data'] : null;
+    if (data is! List) return const [];
+    return data
+        .whereType<Map>()
+        .map(Map<String, dynamic>.from)
+        .toList(growable: false);
   }
 }

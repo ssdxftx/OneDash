@@ -11,7 +11,13 @@ abstract interface class AlertRepository {
   Future<void> cleanAlertLogs();
   Future<AlertConfigInfo> getAlertConfig();
   Future<List<AlertConfigInfo>> getAlertConfigs();
+  Future<PageResult<AlertConfigInfo>> searchAlertConfigs(
+    AlertConfigSearchReq req,
+  );
+  Future<List<ClamAlertInfo>> listClams();
+  Future<List<CronJobAlertInfo>> listAlertCronJobs();
   Future<void> updateAlertConfig(AlertConfigUpdateReq req);
+  Future<void> updateAlertConfigStatus(int id, String status);
   Future<bool> testAlertConfig(AlertConfigTestReq req);
   Future<void> deleteAlertConfig(int id);
   Future<List<Map<String, dynamic>>> listDisks();

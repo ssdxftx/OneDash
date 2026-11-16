@@ -5,7 +5,6 @@ class WebsiteUpdateReq {
     required this.remark,
     required this.webSiteGroupId,
     required this.ipv6,
-    required this.alias,
     required this.favorite,
   });
 
@@ -14,16 +13,14 @@ class WebsiteUpdateReq {
   final String remark;
   final int webSiteGroupId;
   final bool ipv6;
-  final String alias;
   final bool favorite;
 
   Map<String, dynamic> toJson() => {
     'id': id,
     'primaryDomain': primaryDomain,
     'remark': remark,
-    'webSiteGroupId': webSiteGroupId,
+    'webSiteGroupID': webSiteGroupId,
     'IPV6': ipv6,
-    'alias': alias,
     'favorite': favorite,
   };
 }

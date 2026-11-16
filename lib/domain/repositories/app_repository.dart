@@ -24,9 +24,20 @@ abstract interface class AppRepository {
   Future<AppInstalledCheckRes> checkAppInstalled(AppInstalledCheckReq req);
 
   /// 查询已安装应用
+  Future<List<Map<String, dynamic>>> getInstalledDeleteCheck(int installId);
+  Future<void> syncInstalledApps();
+  Future<void> updateInstalledSort(List<Map<String, dynamic>> items);
+  Future<String> getDefaultConfig({required String key, required String name});
+  Future<AppDetailDto> getAppDetailById(int id);
   Future<PageResult<AppInstalledDto>> searchInstalledApps(
     AppInstalledSearchReq req,
   );
+
+  Future<Map<String, dynamic>> checkAppUpdates();
+  Future<void> updateInstalledConfig({
+    required int installId,
+    required String webUI,
+  });
 
   /// 查询已安装应用详情
   Future<AppInstalledInfoDto> getInstalledInfo(int id);

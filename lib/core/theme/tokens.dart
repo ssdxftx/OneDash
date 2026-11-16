@@ -60,6 +60,12 @@ abstract final class AppTokens {
   static const Duration ringFill = Duration(milliseconds: 600);
   static const Duration chartReveal = Duration(milliseconds: 500);
   static const Duration chartMorph = Duration(milliseconds: 300);
+  static const Duration dashboardPoll = Duration(seconds: 1);
+  static const Duration serverHealthPoll = Duration(seconds: 5);
+  static const Duration containerListPoll = Duration(seconds: 5);
+  static const Duration containerStatsPoll = Duration(seconds: 2);
+  static const Duration logFollowPoll = Duration(seconds: 3);
+  static const Duration appStatusPoll = Duration(seconds: 5);
 
   static const Curve curveFast = Curves.easeOutCubic;
   static const Curve curveBase = Curves.easeOutCubic;
@@ -84,6 +90,7 @@ abstract final class AppTokens {
   static const Duration toastDuration = Duration(milliseconds: 2400);
   static const int logBufferLines = 5000;
   static const int pageSizePhone = 20;
+  static const int listEntryAnimationLimit = 8;
   static const int pageSizeTablet = 30;
 }
 

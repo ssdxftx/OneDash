@@ -18,6 +18,7 @@ WHITELIST = {
     'Nginx', 'OpenResty', 'PHP', 'Java', 'Node', 'Python', 'Go',
     'Telegram', 'Discord', 'Slack', "Let's Encrypt", 'ZeroSSL',
     'OneDash', '1Panel', 'API', 'URL', 'URI', 'ID', 'IP', 'DNS', 'CDN',
+    '@ai', '#ai', '/ai',
     'OK', 'JSON', 'YAML', 'TOML', 'CPU%', 'GB', 'MB', 'KB', 'ms', 's',
     'S3', 'OSS', 'SFTP', 'MINIO', 'COS', 'KODO', 'UPYUN', 'ALIYUN',
     'OneDrive', 'WebDAV', 'GoogleDrive', 'LOCAL',

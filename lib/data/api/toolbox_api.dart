@@ -27,6 +27,74 @@ class ToolboxApi {
     return ApiResponseParser.map(resp);
   }
 
+  Future<String> loadDeviceConf(String name) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/device/conf',
+      data: {'name': name},
+    );
+    return '${resp.data?['data'] ?? ''}';
+  }
+
+  Future<void> updateDeviceByFile({
+    required String name,
+    required String file,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/device/update/byconf',
+      data: {'name': name, 'file': file},
+    );
+  }
+
+  Future<void> updateDeviceHosts(List<Map<String, String>> hosts) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/device/update/host',
+      data: hosts,
+    );
+  }
+
+  Future<void> updateDevicePassword({
+    required String user,
+    required String password,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/device/update/passwd',
+      data: {'user': user, 'passwd': base64Encode(utf8.encode(password))},
+    );
+  }
+
+  Future<bool> checkDns({String key = 'form', required String value}) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/device/check/dns',
+      data: {'key': key, 'value': value},
+    );
+    final data = resp.data?['data'];
+    return data == true || data == 'true';
+  }
+
+  Future<void> cleanSystem(List<Map<String, dynamic>> items) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/clean',
+      data: items,
+    );
+  }
+
+  Future<void> deleteClam({
+    required List<int> ids,
+    bool removeInfected = false,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/clam/del',
+      data: {'ids': ids, 'removeInfected': removeInfected},
+    );
+  }
+
+  Future<void> cleanClamRecords(int id) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/clam/record/clean',
+      data: {'id': id},
+    );
+  }
+
   /// GET /api/v2/toolbox/fail2ban/base
   Future<Map<String, dynamic>> getFail2banBase() async {
     final resp = await _client.get<Map<String, dynamic>>(
@@ -120,7 +188,12 @@ class ToolboxApi {
   }) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/toolbox/ftp/search',
-      data: {'page': page, 'pageSize': pageSize},
+      data: {
+        'page': page,
+        'pageSize': pageSize,
+        'orderBy': 'createdAt',
+        'order': 'null',
+      },
     );
     final data = resp.data?['data'];
     if (data is Map && data['items'] is List) {
@@ -158,6 +231,70 @@ class ToolboxApi {
     );
   }
 
+  /// GET /api/v2/toolbox/fail2ban/load/conf
+  Future<String> loadFail2banConf() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/toolbox/fail2ban/load/conf',
+    );
+    return ApiResponseParser.primitive<String>(resp);
+  }
+
+  /// POST /api/v2/toolbox/fail2ban/update/byconf
+  Future<void> updateFail2banByFile(String file) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/fail2ban/update/byconf',
+      data: {'file': file},
+    );
+  }
+
+  /// POST /api/v2/toolbox/ftp/operate
+  Future<void> operateFtp(String operation) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/ftp/operate',
+      data: {'operation': operation},
+    );
+  }
+
+  /// POST /api/v2/toolbox/ftp/sync
+  Future<void> syncFtp() async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/ftp/sync',
+      data: {'ids': <int>[]},
+    );
+  }
+
+  /// POST /api/v2/toolbox/ftp/update
+  Future<void> updateFtp(Map<String, dynamic> data) async {
+    final payload = Map<String, dynamic>.from(data);
+    final password = payload['password']?.toString() ?? '';
+    if (password.isNotEmpty) {
+      payload['password'] = base64Encode(utf8.encode(password));
+    }
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/ftp/update',
+      data: payload,
+    );
+  }
+
+  /// POST /api/v2/toolbox/ftp/log/search
+  Future<Map<String, dynamic>> searchFtpLogs({
+    int page = 1,
+    int pageSize = 50,
+    String user = '',
+    String operation = '',
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/ftp/log/search',
+      data: {
+        'page': page,
+        'pageSize': pageSize,
+        if (user.isNotEmpty) 'user': user,
+        if (operation.isNotEmpty) 'operation': operation,
+      },
+    );
+    return ApiResponseParser.map(resp);
+  }
+
   /// POST /api/v2/toolbox/clam/search
   Future<List<Map<String, dynamic>>> searchClam({
     int page = 1,
@@ -165,7 +302,12 @@ class ToolboxApi {
   }) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/toolbox/clam/search',
-      data: {'page': page, 'pageSize': pageSize},
+      data: {
+        'page': page,
+        'pageSize': pageSize,
+        'orderBy': 'createdAt',
+        'order': 'null',
+      },
     );
     final data = resp.data?['data'];
     if (data is Map && data['items'] is List) {
@@ -233,6 +375,42 @@ class ToolboxApi {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/toolbox/clam/handle',
       data: {'id': id},
+    );
+  }
+
+  /// POST /api/v2/toolbox/clam/update
+  Future<void> updateClam(Map<String, dynamic> data) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/clam/update',
+      data: data,
+    );
+  }
+
+  /// POST /api/v2/toolbox/clam/status/update
+  Future<void> updateClamStatus(int id, String status) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/clam/status/update',
+      data: {'id': id, 'status': status},
+    );
+  }
+
+  /// POST /api/v2/toolbox/clam/file/search
+  Future<String> loadClamFile(String name, {String tail = ''}) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/clam/file/search',
+      data: {'name': name, 'tail': tail},
+    );
+    return ApiResponseParser.primitive<String>(resp);
+  }
+
+  /// POST /api/v2/toolbox/clam/file/update
+  Future<void> updateClamFile({
+    required String name,
+    required String file,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/toolbox/clam/file/update',
+      data: {'name': name, 'file': file},
     );
   }
 

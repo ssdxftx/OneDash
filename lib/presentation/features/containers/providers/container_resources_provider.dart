@@ -65,6 +65,18 @@ final containerVolumesProvider =
       return repository.getVolumes();
     }, name: 'containerVolumesProvider');
 
+final containerVolumeSearchProvider = FutureProvider.autoDispose
+    .family<List<String>, String>((ref, query) async {
+      final repository = await ref.watch(containerRepositoryProvider.future);
+      final data = await repository.searchVolumes(info: query);
+      final items = data['items'] as List? ?? const [];
+      return [
+        for (final item in items)
+          if (item is Map && (item['name']?.toString().isNotEmpty ?? false))
+            item['name'].toString(),
+      ];
+    }, name: 'containerVolumeSearchProvider');
+
 final containerLimitProvider = FutureProvider.autoDispose<ContainerLimitDto>((
   ref,
 ) async {

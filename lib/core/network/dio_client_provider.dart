@@ -19,6 +19,7 @@ Future<DioClient> dioClient(Ref ref, int serverId) async {
     throw const ServerNotFoundException();
   }
   final apiKey = await storage.getApiKey(serverId) ?? '';
+  final session = await storage.getPanelSession(serverId);
   final settings = ref.watch(networkSettingsProvider);
   final userAgent = await DioClient.defaultUserAgent();
 
@@ -29,6 +30,7 @@ Future<DioClient> dioClient(Ref ref, int serverId) async {
     customHeaders: settings.headers,
     userAgent: userAgent,
     allowInsecureConnections: server.allowInsecureConnections,
+    panelSession: session,
   );
   ref.onDispose(client.dispose);
   return client;

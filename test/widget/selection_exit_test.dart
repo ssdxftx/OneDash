@@ -87,8 +87,9 @@ class _FakeContainerRepository implements ContainerRepository {
   }
 
   @override
-  Future<List<ContainerResourceStatsDto>> getContainerResourceStats() async =>
-      [];
+  Future<List<ContainerResourceStatsDto>> getContainerResourceStats({
+    List<String>? ids,
+  }) async => [];
 
   @override
   Future<DockerStatusDto> getDockerStatus() async =>
@@ -287,6 +288,8 @@ void main() {
     expect(handled, isTrue);
     expect(find.byType(ContainersPage), findsOneWidget);
     expect(container.read(bottomNavSuppressedProvider), isFalse);
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pump(const Duration(milliseconds: 600));
   });
 
   testWidgets('deselecting the last item exits selection automatically', (

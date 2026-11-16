@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -28,6 +29,7 @@ import '../widgets/operation_log_row.dart';
 import '../widgets/ssh_log_row.dart';
 import '../widgets/task_log_row.dart';
 import 'log_preview_page.dart';
+import 'system_log_page.dart';
 
 class LogHubPage extends ConsumerWidget {
   const LogHubPage({super.key, required this.serverId});
@@ -41,6 +43,16 @@ class LogHubPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.logs_title,
         actions: [
+          AppIconButton(
+            icon: TablerIcons.refresh,
+            tooltip: l10n.action_refresh,
+            onPressed: () {
+              ref.invalidate(operationLogsProvider);
+              ref.invalidate(loginLogsProvider);
+              ref.invalidate(sshLogsProvider);
+              ref.invalidate(taskLogsProvider);
+            },
+          ),
           AppIconButton(
             icon: TablerIcons.file_text,
             tooltip: l10n.logs_system,
@@ -73,6 +85,34 @@ class LogHubPage extends ConsumerWidget {
 
 extension on LogHubPage {
   Future<void> _openSystemLogs(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final choice = await showSelectionMenu<String>(
+      context,
+      title: l10n.logs_system,
+      options: [
+        SelectionOption(
+          label: l10n.logs_systemServices,
+          value: 'services',
+          icon: TablerIcons.list_details,
+        ),
+        SelectionOption(
+          label: l10n.logs_systemFiles,
+          value: 'files',
+          icon: TablerIcons.file_text,
+        ),
+      ],
+    );
+    if (choice == null || !context.mounted) return;
+    if (choice == 'services') {
+      await Navigator.of(context, rootNavigator: true).push<void>(
+        MaterialPageRoute<void>(builder: (_) => const SystemLogPage()),
+      );
+      return;
+    }
+    await _openSystemLogFiles(context, ref);
+  }
+
+  Future<void> _openSystemLogFiles(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     try {
       final logRepository = await ref.read(logRepositoryProvider.future);
@@ -164,8 +204,14 @@ extension on LogHubPage {
                       logRepositoryProvider.future,
                     );
                     final path = await repository.exportSshLogs();
-                    if (!context.mounted) return;
-                    AppToast.success(context, l10n.logs_exported(path));
+                    final files = await ref.read(fileRepositoryProvider.future);
+                    final bytes = await files.downloadBytes(path);
+                    final saved = await FilePicker.saveFile(
+                      fileName: 'ssh-log.csv',
+                      bytes: bytes,
+                    );
+                    if (!context.mounted || saved == null) return;
+                    AppToast.success(context, l10n.logs_exported(saved));
                   } catch (error) {
                     if (!context.mounted) return;
                     showErrorToast(context, error);

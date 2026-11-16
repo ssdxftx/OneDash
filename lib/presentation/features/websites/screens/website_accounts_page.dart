@@ -128,6 +128,8 @@ class _AcmeTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final email = TextEditingController();
     final url = TextEditingController();
+    final eabKid = TextEditingController();
+    final eabHmacKey = TextEditingController();
     String type = 'letsencrypt';
     bool useEab = false;
     bool useProxy = false;
@@ -178,14 +180,28 @@ class _AcmeTab extends ConsumerWidget {
               value: useEab,
               onChanged: (value) => setState(() => useEab = value),
             ),
+            if (useEab) ...[
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(controller: eabKid, label: l10n.websites_eabKid),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: eabHmacKey,
+                label: l10n.websites_eabHmacKey,
+                obscure: true,
+              ),
+            ],
           ],
         ),
       ),
     );
     final mail = email.text.trim();
     final caUrl = url.text.trim();
+    final eabKidValue = eabKid.text.trim();
+    final eabHmacKeyValue = eabHmacKey.text.trim();
     email.dispose();
     url.dispose();
+    eabKid.dispose();
+    eabHmacKey.dispose();
     if (saved != true || !context.mounted || mail.isEmpty) return;
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
@@ -193,10 +209,10 @@ class _AcmeTab extends ConsumerWidget {
         AcmeAccountCreateReq(
           email: mail,
           type: type,
-          keyType: 'P256',
+          keyType: 'EC256',
           caDirURL: type == 'custom' ? caUrl : '',
-          eabKid: '',
-          eabHmacKey: '',
+          eabKid: useEab ? eabKidValue : '',
+          eabHmacKey: useEab ? eabHmacKeyValue : '',
           useProxy: useProxy,
           useEAB: useEab,
         ),
@@ -216,9 +232,6 @@ class _AcmeTab extends ConsumerWidget {
     WebsiteAcmeAccountDto account,
   ) async {
     final l10n = AppLocalizations.of(context);
-    final email = TextEditingController(text: account.email);
-    final url = TextEditingController(text: account.url);
-    String type = account.type.isEmpty ? 'letsencrypt' : account.type;
     bool useProxy = account.useProxy;
     final saved = await pushFormPage<bool>(
       context,
@@ -227,31 +240,20 @@ class _AcmeTab extends ConsumerWidget {
           title: l10n.action_edit,
           onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            AppTextField(controller: email, label: l10n.websites_email),
-            const SizedBox(height: AppTokens.s12),
-            DropdownButtonFormField<String>(
-              initialValue: type,
-              decoration: InputDecoration(labelText: l10n.websites_acmeType),
-              items: [
-                const DropdownMenuItem(
-                  value: 'letsencrypt',
-                  child: Text('Let\'s Encrypt'),
+            SplitListGroup(
+              children: [
+                SplitListTile(title: l10n.websites_email, value: account.email),
+                SplitListTile(
+                  title: l10n.websites_acmeType,
+                  value: account.type,
                 ),
-                const DropdownMenuItem(
-                  value: 'zerossl',
-                  child: Text('ZeroSSL'),
-                ),
-                DropdownMenuItem(
-                  value: 'custom',
-                  child: Text(l10n.common_custom),
-                ),
+                if (account.url.isNotEmpty)
+                  SplitListTile(
+                    title: l10n.websites_caDirUrl,
+                    value: account.url,
+                  ),
               ],
-              onChanged: (value) {
-                if (value != null) setState(() => type = value);
-              },
             ),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: url, label: l10n.websites_caDirUrl),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.websites_useProxy),
@@ -262,23 +264,12 @@ class _AcmeTab extends ConsumerWidget {
         ),
       ),
     );
-    final mail = email.text.trim();
-    final caUrl = url.text.trim();
-    email.dispose();
-    url.dispose();
-    if (saved != true || !context.mounted || mail.isEmpty) return;
+    if (saved != true || !context.mounted) return;
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
       await repository.updateAcmeAccount({
         'id': account.id,
-        'email': mail,
-        'type': type,
-        'keyType': 'P256',
-        'caDirURL': type == 'custom' ? caUrl : '',
-        'eabKid': '',
-        'eabHmacKey': '',
         'useProxy': useProxy,
-        'useEAB': false,
       });
       ref.invalidate(_acmeProvider);
       if (!context.mounted) return;
@@ -652,7 +643,7 @@ class _CaTab extends ConsumerWidget {
           organizationUnit: '',
           province: '',
           city: '',
-          keyType: 'P256',
+          keyType: 'EC256',
         ),
       );
       ref.invalidate(_caProvider);
@@ -719,15 +710,142 @@ class _CaTab extends ConsumerWidget {
     }
   }
 
-  Future<void> _renew(BuildContext context, WidgetRef ref, CaDto ca) async {
+  Future<void> _importCa(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final name = TextEditingController();
+    final certificate = TextEditingController();
+    final privateKey = TextEditingController();
+    final certificatePath = TextEditingController();
+    final privateKeyPath = TextEditingController();
+    var type = 'paste';
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.websites_importCa,
+          saveLabel: l10n.action_import,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: name, label: l10n.websites_caName),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: type,
+              decoration: InputDecoration(labelText: l10n.websites_importType),
+              items: [
+                DropdownMenuItem(
+                  value: 'paste',
+                  child: Text(l10n.websites_importPaste),
+                ),
+                DropdownMenuItem(
+                  value: 'local',
+                  child: Text(l10n.websites_importLocal),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => type = value);
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            if (type == 'paste') ...[
+              AppTextField(
+                controller: certificate,
+                label: l10n.websites_certificatePem,
+                maxLines: 6,
+              ),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: privateKey,
+                label: l10n.websites_privateKeyPem,
+                maxLines: 6,
+              ),
+            ] else ...[
+              AppTextField(
+                controller: certificatePath,
+                label: l10n.websites_certificatePath,
+              ),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: privateKeyPath,
+                label: l10n.websites_privateKeyPath,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+    final values = (
+      name.text.trim(),
+      certificate.text,
+      privateKey.text,
+      certificatePath.text.trim(),
+      privateKeyPath.text.trim(),
+    );
+    name.dispose();
+    certificate.dispose();
+    privateKey.dispose();
+    certificatePath.dispose();
+    privateKeyPath.dispose();
+    if (saved != true || !context.mounted || values.$1.isEmpty) return;
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
-      final sslId = int.tryParse(ca.sslId) ?? 0;
-      if (sslId == 0) return;
-      await repository.renewCa(sslId);
+      await repository.importCa(
+        name: values.$1,
+        type: type,
+        certificate: values.$2,
+        privateKey: values.$3,
+        certificatePath: values.$4,
+        privateKeyPath: values.$5,
+      );
       ref.invalidate(_caProvider);
       if (!context.mounted) return;
-      AppToast.success(context, AppLocalizations.of(context).action_done);
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _uploadCa(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['zip'],
+        withData: true,
+      );
+      final file = result?.files.firstOrNull;
+      final bytes = file?.bytes;
+      if (file == null || bytes == null || !context.mounted) return;
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.uploadCa(fileName: file.name, bytes: bytes);
+      ref.invalidate(_caProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _renew(BuildContext context, WidgetRef ref, CaDto ca) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final page = await repository.searchSsl({'page': 1, 'pageSize': 500});
+      final sslIds = page.items
+          .where((item) => item.caId == ca.id)
+          .map((item) => item.id)
+          .toList(growable: false);
+      if (sslIds.isEmpty) {
+        if (context.mounted) AppToast.warning(context, l10n.state_empty);
+        return;
+      }
+      for (final sslId in sslIds) {
+        await repository.renewCa(sslId);
+      }
+      ref.invalidate(_caProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);
@@ -838,7 +956,6 @@ class _CaTab extends ConsumerWidget {
                   title: l10n.websites_keyType,
                   value: detail.keyType,
                 ),
-                SplitListTile(title: l10n.websites_sslId, value: detail.sslId),
               ],
             ),
           ],
@@ -858,10 +975,34 @@ class _CaTab extends ConsumerWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(AppTokens.s16),
-          child: PrimaryButton(
-            label: l10n.websites_addCa,
-            icon: TablerIcons.plus,
-            onPressed: () => _add(context, ref),
+          child: Column(
+            children: [
+              PrimaryButton(
+                label: l10n.websites_addCa,
+                icon: TablerIcons.plus,
+                onPressed: () => _add(context, ref),
+              ),
+              const SizedBox(height: AppTokens.s8),
+              Row(
+                children: [
+                  Expanded(
+                    child: SecondaryButton(
+                      label: l10n.websites_importCa,
+                      icon: TablerIcons.file_import,
+                      onPressed: () => _importCa(context, ref),
+                    ),
+                  ),
+                  const SizedBox(width: AppTokens.s8),
+                  Expanded(
+                    child: SecondaryButton(
+                      label: l10n.websites_uploadCa,
+                      icon: TablerIcons.upload,
+                      onPressed: () => _uploadCa(context, ref),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
         Expanded(

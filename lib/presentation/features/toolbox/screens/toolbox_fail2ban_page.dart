@@ -14,6 +14,7 @@ import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/split_list_group.dart';
+import '../../../common/components/sheet_title.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../../../common/formatters/value_labels.dart';
@@ -30,6 +31,7 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
   Map<String, dynamic> _base = const {};
   List<String> _banned = const [];
   bool _loading = true;
+  bool _failed = false;
 
   @override
   void initState() {
@@ -38,7 +40,10 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
   }
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    setState(() {
+      _loading = true;
+      _failed = false;
+    });
     try {
       final repository = await ref.read(toolboxRepositoryProvider.future);
       final base = await repository.getFail2banBase();
@@ -57,6 +62,7 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
       setState(() => _banned = banned);
     } catch (error) {
       if (!mounted) return;
+      setState(() => _failed = true);
       showErrorToast(context, error);
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -65,6 +71,15 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
 
   Future<void> _toggleService(bool enabled) async {
     final l10n = AppLocalizations.of(context);
+    if (!enabled) {
+      final confirmed = await showConfirmSheet(
+        context,
+        title: l10n.toolbox_fail2banStop,
+        message: l10n.toolbox_fail2banStopConfirm,
+        confirmLabel: l10n.toolbox_fail2banStop,
+      );
+      if (!confirmed || !mounted) return;
+    }
     try {
       final repository = await ref.read(toolboxRepositoryProvider.future);
       await repository.operateFail2ban(enabled ? 'start' : 'stop');
@@ -89,7 +104,7 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
     if (!confirmed) return;
     try {
       final repository = await ref.read(toolboxRepositoryProvider.future);
-      await repository.operateFail2banSshd([ip], 'unban');
+      await repository.operateFail2banSshd([ip], 'banned');
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
       unawaited(_load());
@@ -155,6 +170,71 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
     );
     if (!confirmed) return;
     await _saveConf(key, next);
+  }
+
+  Future<void> _showConfFile() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(toolboxRepositoryProvider.future);
+      final content = await repository.loadFail2banConf();
+      if (!mounted) return;
+      final edit = await showAppSheet<bool>(
+        context: context,
+        maxHeightFactor: 0.9,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SheetTitle(
+              title: l10n.toolbox_fail2banConfFile,
+              onClose: () => Navigator.of(sheetContext).pop(false),
+              actions: [
+                IconButton(
+                  tooltip: l10n.action_edit,
+                  onPressed: () => Navigator.of(sheetContext).pop(true),
+                  icon: const Icon(TablerIcons.pencil),
+                ),
+              ],
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                child: SelectableText(
+                  content,
+                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+      if (edit != true || !mounted) return;
+      final controller = TextEditingController(text: content);
+      final confirmed = await pushFormPage<bool>(
+        context,
+        SimpleFormPage(
+          title: l10n.toolbox_fail2banConfFile,
+          onSave: () async =>
+              Navigator.of(context, rootNavigator: true).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.toolbox_fail2banConfFile,
+              maxLines: 24,
+            ),
+          ],
+        ),
+      );
+      final next = controller.text;
+      controller.dispose();
+      if (confirmed != true) return;
+      await repository.updateFail2banByFile(next);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_saved);
+      unawaited(_load());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _editBanAction() async {
@@ -226,9 +306,6 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
     final installed = _base['isExist'] == true;
     final active = installed && _base['isActive'] == true;
     return Scaffold(
@@ -242,7 +319,16 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
           ),
         ],
       ),
-      body: !installed
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _failed
+          ? EmptyState(
+              icon: TablerIcons.alert_triangle,
+              title: l10n.toolbox_loadFailed,
+              actionLabel: l10n.action_retry,
+              onAction: _load,
+            )
+          : !installed
           ? EmptyState(
               icon: TablerIcons.ban,
               title: l10n.toolbox_fail2ban,
@@ -302,6 +388,13 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
                         onTap: _editBanAction,
                       ),
                       _confTile('logPath', l10n.toolbox_logPath),
+                      SplitListTile(
+                        leading: const Icon(TablerIcons.file_code),
+                        title: l10n.toolbox_fail2banConfFile,
+                        subtitle: l10n.toolbox_fail2banConfFileHint,
+                        trailing: const Icon(TablerIcons.chevron_right),
+                        onTap: _showConfFile,
+                      ),
                     ],
                   ),
                 ],

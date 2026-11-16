@@ -10,6 +10,17 @@ abstract interface class BackupRepository {
 
   Future<void> deleteRecords(List<int> ids);
 
+  Future<List<String>> searchRecordFiles(int recordId);
+  Future<PageResult<BackupRecordDto>> searchRecordsByCronjob({
+    required int cronjobId,
+    int page,
+    int pageSize,
+  });
+  Future<void> updateRecordDescription({
+    required int id,
+    required String description,
+  });
+
   Future<void> backupApp({
     required String name,
     required String detailName,
@@ -66,6 +77,8 @@ abstract interface class BackupRepository {
     required String file,
     required String secret,
     required String taskID,
+    int backupRecordID = 0,
+    int timeout = 0,
   });
 
   Future<String> downloadRecord({

@@ -109,5 +109,18 @@ void main() {
     appRouter.go('/s/1/more');
     await tester.pump();
     expect(appContainer.read(activeServerIdProvider), 1);
+
+    await tester.pump(const Duration(seconds: 31));
+    expect(tester.takeException(), isNull);
+
+    appContainer.read(activeServerIdStateProvider.notifier).state = 2;
+    appRouter.go('/s/1/websites');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(
+      appRouter.routerDelegate.currentConfiguration.uri.path,
+      '/s/2/websites',
+      reason: '切换到新服务器后，旧分支路径应重写到当前服务器',
+    );
   });
 }

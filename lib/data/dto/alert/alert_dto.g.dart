@@ -68,7 +68,7 @@ AlertSearchReq _$AlertSearchReqFromJson(Map<String, dynamic> json) =>
       status: json['status'] as String? ?? '',
       method: json['method'] as String? ?? '',
       orderBy: json['orderBy'] as String? ?? 'created_at',
-      order: json['order'] as String?,
+      order: json['order'] as String? ?? 'null',
     );
 
 Map<String, dynamic> _$AlertSearchReqToJson(AlertSearchReq instance) =>
@@ -179,4 +179,60 @@ Map<String, dynamic> _$AlertConfigTestReqToJson(AlertConfigTestReq instance) =>
       'displayName': instance.displayName,
       'encryption': instance.encryption,
       'recipient': instance.recipient,
+    };
+
+AlertConfigSearchReq _$AlertConfigSearchReqFromJson(
+  Map<String, dynamic> json,
+) => AlertConfigSearchReq(
+  page: (json['page'] as num).toInt(),
+  pageSize: (json['pageSize'] as num).toInt(),
+  excludeTypes:
+      (json['excludeTypes'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+);
+
+Map<String, dynamic> _$AlertConfigSearchReqToJson(
+  AlertConfigSearchReq instance,
+) => <String, dynamic>{
+  'page': instance.page,
+  'pageSize': instance.pageSize,
+  'excludeTypes': instance.excludeTypes,
+};
+
+ClamAlertInfo _$ClamAlertInfoFromJson(Map<String, dynamic> json) =>
+    ClamAlertInfo(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String? ?? '',
+      status: json['status'] as String? ?? '',
+      path: json['path'] as String? ?? '',
+      createdAt: json['createdAt'] as String?,
+    );
+
+Map<String, dynamic> _$ClamAlertInfoToJson(ClamAlertInfo instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'status': instance.status,
+      'path': instance.path,
+      'createdAt': instance.createdAt,
+    };
+
+CronJobAlertInfo _$CronJobAlertInfoFromJson(Map<String, dynamic> json) =>
+    CronJobAlertInfo(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String? ?? '',
+      status: json['status'] as String? ?? '',
+      type: json['type'] as String? ?? '',
+      createdAt: json['createdAt'] as String?,
+    );
+
+Map<String, dynamic> _$CronJobAlertInfoToJson(CronJobAlertInfo instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'status': instance.status,
+      'type': instance.type,
+      'createdAt': instance.createdAt,
     };

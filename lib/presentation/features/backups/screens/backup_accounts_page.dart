@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -189,6 +191,7 @@ class BackupAccountsPage extends ConsumerWidget {
         ? rawType
         : backupAccountTypes.first;
     bool rememberAuth = current?['rememberAuth'] == true;
+    var isPublic = current?['isPublic'] == true;
     String? localDir;
     if (isLocalAccount) {
       try {
@@ -243,6 +246,19 @@ class BackupAccountsPage extends ConsumerWidget {
                 child: Text(localDir),
               ),
             ],
+            if (!isLocalAccount)
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.backups_publicAccount),
+                subtitle: Text(
+                  l10n.backups_publicAccountHint,
+                  style: AppTextStyles.bodyS.copyWith(
+                    color: pageContext.scheme.onSurfaceVariant,
+                  ),
+                ),
+                value: isPublic,
+                onChanged: (value) => setState(() => isPublic = value),
+              ),
             const SizedBox(height: AppTokens.s12),
             AppTextField(controller: accessKey, label: l10n.backups_accessKey),
             const SizedBox(height: AppTokens.s12),
@@ -279,10 +295,10 @@ class BackupAccountsPage extends ConsumerWidget {
       if (current?['id'] != null) 'id': current!['id'],
       'name': name.text.trim(),
       'type': type,
-      'isPublic': current?['isPublic'] ?? false,
+      'isPublic': isPublic,
       'bucket': bucket.text.trim(),
-      'accessKey': accessKey.text.trim(),
-      'credential': credential.text.trim(),
+      'accessKey': _encode(accessKey.text.trim()),
+      'credential': _encode(credential.text.trim()),
       'backupPath': backupPath.text.trim(),
       'vars': vars.text.trim(),
       'rememberAuth': rememberAuth,
@@ -297,6 +313,7 @@ class BackupAccountsPage extends ConsumerWidget {
     try {
       final repository = await ref.read(backupAccountRepositoryProvider.future);
       if (current == null) {
+        await repository.checkName(payload['name'] as String);
         await repository.createAccount(payload);
       } else {
         await repository.updateAccount(payload);
@@ -323,8 +340,8 @@ class BackupAccountsPage extends ConsumerWidget {
         'type': account['type'] ?? '',
         'isPublic': account['isPublic'] ?? false,
         'bucket': account['bucket'] ?? '',
-        'accessKey': account['accessKey'] ?? '',
-        'credential': account['credential'] ?? '',
+        'accessKey': _encode('${account['accessKey'] ?? ''}'),
+        'credential': _encode('${account['credential'] ?? ''}'),
         'backupPath': account['backupPath'] ?? '',
         'vars': account['vars'] ?? '',
         'rememberAuth': account['rememberAuth'] ?? false,
@@ -350,12 +367,14 @@ class BackupAccountsPage extends ConsumerWidget {
     'type': account['type'] ?? '',
     'isPublic': account['isPublic'] ?? false,
     'bucket': account['bucket'] ?? '',
-    'accessKey': account['accessKey'] ?? '',
-    'credential': account['credential'] ?? '',
+    'accessKey': _encode('${account['accessKey'] ?? ''}'),
+    'credential': _encode('${account['credential'] ?? ''}'),
     'backupPath': account['backupPath'] ?? '',
     'vars': account['vars'] ?? '',
     'rememberAuth': account['rememberAuth'] ?? false,
   };
+
+  static String _encode(String value) => base64Encode(utf8.encode(value));
 
   Future<void> _buckets(
     BuildContext context,
@@ -399,11 +418,16 @@ class BackupAccountsPage extends ConsumerWidget {
     Map<String, dynamic> account,
   ) async {
     final l10n = AppLocalizations.of(context);
-    final id = account['id'];
-    if (id is! num) return;
+    final id = (account['id'] as num?)?.toInt() ?? 0;
+    final isPublic = account['isPublic'] == true;
+    if (!isPublic && id == 0) return;
     try {
       final repository = await ref.read(backupAccountRepositoryProvider.future);
-      await repository.refreshToken(id.toInt());
+      await repository.refreshToken(
+        id: id,
+        name: '${account['name'] ?? ''}',
+        isPublic: isPublic,
+      );
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);
     } catch (error) {
@@ -418,8 +442,9 @@ class BackupAccountsPage extends ConsumerWidget {
     Map<String, dynamic> account,
   ) async {
     final l10n = AppLocalizations.of(context);
-    final id = account['id'];
-    if (id is! num) return;
+    final id = (account['id'] as num?)?.toInt() ?? 0;
+    final isPublic = account['isPublic'] == true;
+    if (!isPublic && id == 0) return;
     final confirmed = await showConfirmSheet(
       context,
       title: l10n.action_delete,
@@ -429,7 +454,11 @@ class BackupAccountsPage extends ConsumerWidget {
     if (!confirmed || !context.mounted) return;
     try {
       final repository = await ref.read(backupAccountRepositoryProvider.future);
-      await repository.deleteAccount(id.toInt());
+      await repository.deleteAccount(
+        id: id,
+        name: '${account['name'] ?? ''}',
+        isPublic: isPublic,
+      );
       ref.invalidate(_accountsProvider);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);

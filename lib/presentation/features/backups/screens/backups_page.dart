@@ -6,6 +6,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
+import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/backup/backup_record_dto.dart';
@@ -29,19 +30,108 @@ import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
 import '../../../common/formatters/value_labels.dart';
 
-final _backupRecordsProvider = FutureProvider.autoDispose
-    .family<PageResult<BackupRecordDto>, String>((ref, type) async {
-      final repository = await ref.watch(backupRepositoryProvider.future);
-      return repository.searchRecords(
-        BackupRecordSearchReq(
-          page: 1,
-          pageSize: 50,
-          type: type,
-          name: '',
-          detailName: '',
-        ),
+const _databaseBackupTypes = [
+  'mysql',
+  'mariadb',
+  'postgresql',
+  'mongodb',
+  'redis',
+];
+
+final _backupRecordsProvider = AsyncNotifierProvider.autoDispose
+    .family<BackupRecordsController, PageResult<BackupRecordDto>, String>(
+      BackupRecordsController.new,
+      name: 'backupRecordsProvider',
+    );
+
+class BackupRecordsController
+    extends
+        AutoDisposeFamilyAsyncNotifier<PageResult<BackupRecordDto>, String> {
+  static const _pageSize = 50;
+
+  int _page = 1;
+  bool _loadingMore = false;
+  bool _disposed = false;
+
+  @override
+  Future<PageResult<BackupRecordDto>> build(String type) async {
+    _disposed = false;
+    _page = 1;
+    ref.onDispose(() => _disposed = true);
+    return _fetch(type, 1);
+  }
+
+  Future<PageResult<BackupRecordDto>> _fetch(String type, int page) async {
+    final repository = await ref.read(backupRepositoryProvider.future);
+    if (type == 'database') {
+      final pages = await Future.wait([
+        for (final dbType in _databaseBackupTypes)
+          repository.searchRecords(
+            BackupRecordSearchReq(
+              page: page,
+              pageSize: _pageSize,
+              type: dbType,
+              name: '',
+              detailName: '',
+            ),
+          ),
+      ]);
+      final items = pages.expand((page) => page.items).toList()
+        ..sort(
+          (a, b) => (b.createdAt ?? DateTime(0)).compareTo(
+            a.createdAt ?? DateTime(0),
+          ),
+        );
+      return PageResult(
+        total: pages.fold(0, (sum, page) => sum + page.total),
+        items: items,
       );
-    }, name: 'backupRecordsProvider');
+    }
+    return repository.searchRecords(
+      BackupRecordSearchReq(
+        page: page,
+        pageSize: _pageSize,
+        type: type,
+        name: '',
+        detailName: '',
+      ),
+    );
+  }
+
+  Future<void> refresh() async {
+    _page = 1;
+    state = const AsyncLoading<PageResult<BackupRecordDto>>().copyWithPrevious(
+      state,
+    );
+    state = await AsyncValue.guard(() => _fetch(arg, 1));
+  }
+
+  Future<void> loadMore() async {
+    final current = state.valueOrNull;
+    if (current == null || _loadingMore) return;
+    if (current.items.length >= current.total) return;
+    _loadingMore = true;
+    try {
+      final next = await _fetch(arg, _page + 1);
+      if (_disposed) return;
+      _page++;
+      final latest = state.valueOrNull ?? current;
+      final items = [...latest.items, ...next.items]
+        ..sort(
+          (a, b) => (b.createdAt ?? DateTime(0)).compareTo(
+            a.createdAt ?? DateTime(0),
+          ),
+        );
+      state = AsyncData(
+        PageResult<BackupRecordDto>(total: next.total, items: items),
+      );
+    } catch (_) {
+      if (!_disposed) state = AsyncData(current);
+    } finally {
+      _loadingMore = false;
+    }
+  }
+}
 
 class BackupsPage extends ConsumerWidget {
   const BackupsPage({super.key, required this.serverId});
@@ -235,24 +325,28 @@ Future<void> _showSizes(BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context);
   try {
     final repository = await ref.read(backupRepositoryProvider.future);
-    var total = 0;
-    var count = 0;
-    for (final type in const [
+    final types = <String>[
       'app',
-      'database',
       'website',
       'directory',
       'container',
-    ]) {
-      final sizes = await repository.recordSizes(
-        BackupRecordSearchReq(
-          page: 1,
-          pageSize: 1000,
-          type: type,
-          name: '',
-          detailName: '',
+      ..._databaseBackupTypes,
+    ];
+    final results = await Future.wait([
+      for (final type in types)
+        repository.recordSizes(
+          BackupRecordSearchReq(
+            page: 1,
+            pageSize: 1000,
+            type: type,
+            name: '',
+            detailName: '',
+          ),
         ),
-      );
+    ]);
+    var total = 0;
+    var count = 0;
+    for (final sizes in results) {
       count += sizes.length;
       for (final item in sizes) {
         total += item.size;
@@ -426,7 +520,7 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
             stopBefore: stopBefore,
           );
       }
-      for (var attempt = 0; attempt < 120; attempt++) {
+      for (var attempt = 0; attempt < 300; attempt++) {
         final log = await repository.readTaskLog(taskID, latest: true);
         if (log.lines.isNotEmpty) controller.log(log.lines.last);
         final status = log.taskStatus.toLowerCase();
@@ -434,8 +528,9 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
         if (status == 'failed' || status == 'error' || status == 'canceled') {
           throw Exception(log.lines.isEmpty ? 'Task failed' : log.lines.last);
         }
-        await Future<void>.delayed(const Duration(milliseconds: 500));
+        await Future<void>.delayed(const Duration(seconds: 2));
       }
+      throw const TaskFailedException(subject: '备份任务', timedOut: true);
     },
   );
   if (!success || !context.mounted) return;
@@ -454,7 +549,7 @@ class _BackupTab extends ConsumerWidget {
     final records = ref.watch(_backupRecordsProvider(type));
     return AsyncStateView(
       value: records,
-      onRetry: () => ref.invalidate(_backupRecordsProvider(type)),
+      onRetry: () => ref.read(_backupRecordsProvider(type).notifier).refresh(),
       loading: const SkeletonList(itemCount: 8),
       isEmpty: (data) => data.items.isEmpty,
       empty: EmptyState(
@@ -464,83 +559,136 @@ class _BackupTab extends ConsumerWidget {
         actionLabel: l10n.backups_create,
         onAction: () => _create(context, ref),
       ),
-      builder: (data) => ListView.builder(
-        padding: EdgeInsets.all(context.pagePadding),
-        itemCount: data.items.length,
-        itemBuilder: (context, index) {
-          final record = data.items[index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: AppTokens.s12),
-            child: TonalCard(
-              onTap: () => _showActions(context, ref, record),
-              onLongPress: () => _showActions(context, ref, record),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+      builder: (data) => RefreshIndicator(
+        onRefresh: () =>
+            ref.read(_backupRecordsProvider(type).notifier).refresh(),
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            if (notification.metrics.extentAfter < 400) {
+              ref.read(_backupRecordsProvider(type).notifier).loadMore();
+            }
+            return false;
+          },
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.all(context.pagePadding),
+            itemCount: data.items.length,
+            itemBuilder: (context, index) {
+              final record = data.items[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: AppTokens.s12),
+                child: TonalCard(
+                  onTap: () => _showActions(context, ref, record),
+                  onLongPress: () => _showActions(context, ref, record),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      StatusDot(status: record.status.toLowerCase()),
-                      const SizedBox(width: AppTokens.s8),
-                      Expanded(
-                        child: Text(
-                          record.fileName.trim().isEmpty
-                              ? l10n.backups_recordUntitled
-                              : record.fileName,
-                          style: AppTextStyles.titleS,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        formatBytes(record.size),
-                        style: AppTextStyles.caption,
-                      ),
-                      Icon(
-                        TablerIcons.chevron_right,
-                        size: AppTokens.iconList,
-                        color: context.scheme.onSurfaceVariant,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppTokens.s4),
-                  Text(
-                    record.filePath,
-                    style: AppTextStyles.caption.copyWith(
-                      color: context.scheme.onSurfaceVariant,
-                      fontFamily: 'monospace',
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: AppTokens.s8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '${taskStatusLabel(record.status, l10n)} · '
-                          '${record.accountName}',
-                          style: AppTextStyles.caption.copyWith(
+                      Row(
+                        children: [
+                          StatusDot(status: record.status.toLowerCase()),
+                          const SizedBox(width: AppTokens.s8),
+                          Expanded(
+                            child: Text(
+                              record.fileName.trim().isEmpty
+                                  ? l10n.backups_recordUntitled
+                                  : record.fileName,
+                              style: AppTextStyles.titleS,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            formatBytes(record.size),
+                            style: AppTextStyles.caption,
+                          ),
+                          Icon(
+                            TablerIcons.chevron_right,
+                            size: AppTokens.iconList,
                             color: context.scheme.onSurfaceVariant,
                           ),
-                        ),
+                        ],
                       ),
+                      const SizedBox(height: AppTokens.s4),
                       Text(
-                        record.createdAt == null
-                            ? displayValue(context, null)
-                            : formatListTime(record.createdAt, l10n),
+                        record.filePath,
                         style: AppTextStyles.caption.copyWith(
                           color: context.scheme.onSurfaceVariant,
+                          fontFamily: 'monospace',
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: AppTokens.s8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${taskStatusLabel(record.status, l10n)} · '
+                              '${record.accountName}',
+                              style: AppTextStyles.caption.copyWith(
+                                color: context.scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            record.createdAt == null
+                                ? displayValue(context, null)
+                                : formatListTime(record.createdAt, l10n),
+                            style: AppTextStyles.caption.copyWith(
+                              color: context.scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          );
-        },
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
+  }
+
+  Future<void> _editRecordDescription(
+    BuildContext context,
+    WidgetRef ref,
+    BackupRecordDto record,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController(text: record.description);
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.backups_editDescription,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.backups_description,
+            ),
+          ],
+        ),
+      ),
+    );
+    final description = controller.text.trim();
+    controller.dispose();
+    if (saved != true || !context.mounted) return;
+    try {
+      final repository = await ref.read(backupRepositoryProvider.future);
+      await repository.updateRecordDescription(
+        id: record.id,
+        description: description,
+      );
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(_backupRecordsProvider(type));
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Future<void> _showActions(
@@ -600,6 +748,64 @@ class _BackupTab extends ConsumerWidget {
                     _restore(context, ref, record);
                   },
                 ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.edit),
+                title: l10n.backups_editDescription,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _editRecordDescription(context, ref, record);
+                },
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.file_stack),
+                title: l10n.backups_snapshotFiles,
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  try {
+                    final repository = await ref.read(
+                      backupRepositoryProvider.future,
+                    );
+                    final files = await repository.searchRecordFiles(record.id);
+                    if (!context.mounted) return;
+                    await showAppSheet<void>(
+                      context: context,
+                      builder: (filesContext) => Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.backups_snapshotFiles,
+                            style: AppTextStyles.titleL,
+                          ),
+                          const SizedBox(height: AppTokens.s12),
+                          if (files.isEmpty)
+                            EmptyState(
+                              icon: TablerIcons.file_stack,
+                              title: l10n.backups_noSnapshotFiles,
+                              compact: true,
+                            )
+                          else
+                            Flexible(
+                              child: ListView(
+                                shrinkWrap: true,
+                                children: [
+                                  for (final file in files)
+                                    SplitListTile(
+                                      leading: const Icon(TablerIcons.file),
+                                      title: file,
+                                    ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  } catch (error) {
+                    if (!context.mounted) return;
+                    showErrorToast(context, error);
+                  }
+                },
+              ),
               SplitListTile(
                 leading: const Icon(TablerIcons.trash),
                 title: l10n.action_delete,
@@ -719,7 +925,7 @@ class _BackupTab extends ConsumerWidget {
           downloadAccountID: record.downloadAccountID,
           name: name,
           detailName: detail,
-          file: record.fileName,
+          file: record.filePath,
           secret: secret,
           taskID: const Uuid().v4(),
           backupRecordID: record.id,
@@ -730,7 +936,7 @@ class _BackupTab extends ConsumerWidget {
           downloadAccountID: record.downloadAccountID,
           name: name,
           detailName: detail,
-          file: record.fileName,
+          file: record.filePath,
           secret: secret,
           taskID: const Uuid().v4(),
           backupRecordID: record.id,
@@ -741,9 +947,11 @@ class _BackupTab extends ConsumerWidget {
           type: dbType,
           name: name,
           detailName: detail,
-          file: record.fileName,
+          file: record.filePath,
           secret: secret,
           taskID: const Uuid().v4(),
+          backupRecordID: record.id,
+          timeout: 600,
         );
       }
       if (!context.mounted) return;

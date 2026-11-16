@@ -87,7 +87,7 @@ class _WebsiteSslSheetState extends ConsumerState<WebsiteSslSheet> {
           websiteId: widget.websiteId,
           sslId: _certId,
           acmeAccountId: cert.acmeAccountId,
-          type: cert.type,
+          type: 'existed',
           https: https,
         ),
       );

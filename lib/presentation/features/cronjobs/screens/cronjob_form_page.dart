@@ -7,6 +7,7 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/cronjob/cronjob_dto.dart';
 import '../../../../data/dto/cronjob/cronjob_form_data_dto.dart';
+import '../../../../data/repositories_impl/backup_account_repository_impl.dart';
 import '../../../../data/repositories_impl/cronjob_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
@@ -16,9 +17,24 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/form_footer.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/simple_form_page.dart';
+import '../../../common/components/split_list_group.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
 import '../providers/cronjobs_provider.dart';
+
+final _backupAccountOptionsProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+      final repository = await ref.watch(
+        backupAccountRepositoryProvider.future,
+      );
+      final result = await repository.searchAccounts(page: 1, pageSize: 100);
+      final items = result['items'];
+      if (items is! List) return const [];
+      return items
+          .whereType<Map>()
+          .map((item) => item.cast<String, dynamic>())
+          .toList(growable: false);
+    }, name: 'cronjobBackupAccountOptionsProvider');
 
 class CronjobFormPage extends ConsumerStatefulWidget {
   const CronjobFormPage({
@@ -54,10 +70,17 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
   final _timeout = TextEditingController(text: '60');
 
   String _type = 'shell';
+  String _scriptMode = 'input';
+  int? _scriptID;
   bool _isDir = true;
   bool _withImage = false;
   bool _submitting = false;
   bool _loaded = false;
+  int? _backupAccountId;
+  int _alertCount = 0;
+  String _alertTitle = '';
+  String _alertMethod = '';
+  String _alertTriggerMode = '';
 
   static const _types = [
     'shell',
@@ -89,6 +112,8 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
         _name.text = item.name;
         _spec.text = item.spec;
         _script.text = item.script ?? item.command ?? '';
+        _scriptMode = item.scriptMode ?? 'input';
+        _scriptID = item.scriptID;
         _sourceDir.text = item.sourceDir ?? '';
         _url.text = item.url ?? '';
         _website.text = item.website ?? '';
@@ -101,6 +126,11 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
         _timeout.text = '${item.timeout}';
         _isDir = item.isDir ?? true;
         _withImage = item.snapshotRule?.withImage ?? false;
+        _backupAccountId = item.downloadAccountID;
+        _alertCount = item.alertCount;
+        _alertTitle = item.alertTitle;
+        _alertMethod = item.alertMethod;
+        _alertTriggerMode = item.alertTriggerMode;
         _loaded = true;
       });
     } catch (error) {
@@ -127,6 +157,36 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
     super.dispose();
   }
 
+  Future<void> _pickScript() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(cronjobRepositoryProvider.future);
+      final options = await repository.loadScriptOptions();
+      if (!mounted) return;
+      if (options.isEmpty) {
+        AppToast.warning(context, l10n.commandLibrary_empty);
+        return;
+      }
+      final selected = await showSelectionMenu<ScriptOptionDto>(
+        context,
+        title: l10n.cronjobs_pickScript,
+        options: [
+          for (final option in options)
+            SelectionOption(label: option.name, value: option),
+        ],
+      );
+      if (selected == null || !mounted) return;
+      setState(() {
+        _scriptMode = 'library';
+        _scriptID = selected.id;
+        _script.text = selected.name;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context);
     final name = _name.text.trim();
@@ -139,7 +199,9 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
       AppToast.warning(context, l10n.cronjobs_specRequired);
       return;
     }
-    if (_type == 'shell' && _script.text.trim().isEmpty) {
+    if (_type == 'shell' &&
+        _scriptMode == 'input' &&
+        _script.text.trim().isEmpty) {
       AppToast.warning(context, l10n.cronjobs_scriptRequired);
       return;
     }
@@ -156,8 +218,13 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
         type: _type,
         spec: spec,
         specCustom: true,
-        scriptMode: _type == 'shell' ? 'input' : null,
-        script: _type == 'shell' ? _script.text : null,
+        scriptMode: _type == 'shell' ? _scriptMode : null,
+        script: _type == 'shell' && _scriptMode == 'input'
+            ? _script.text
+            : null,
+        scriptID: _type == 'shell' && _scriptMode == 'library'
+            ? _scriptID
+            : null,
         sourceDir: _sourceDir.text.trim().isEmpty
             ? null
             : _sourceDir.text.trim(),
@@ -180,6 +247,12 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
         retainCopies: int.tryParse(_retainCopies.text.trim()),
         retryTimes: int.tryParse(_retryTimes.text.trim()),
         timeout: int.tryParse(_timeout.text.trim()),
+        sourceAccountIDs: _backupAccountId == null ? null : '$_backupAccountId',
+        downloadAccountID: _backupAccountId,
+        alertCount: _alertCount,
+        alertTitle: _alertTitle,
+        alertMethod: _alertMethod,
+        alertTriggerMode: _alertTriggerMode,
       );
       if (widget.isEditing) {
         await repository.updateCronjob(request);
@@ -250,6 +323,20 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
                 label: l10n.cronjobs_script,
                 hint: '#!/bin/bash\n...',
                 maxLines: 8,
+                onChanged: (_) {
+                  if (_scriptMode != 'input') {
+                    setState(() {
+                      _scriptMode = 'input';
+                      _scriptID = null;
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: AppTokens.s8),
+              SecondaryButton(
+                label: l10n.cronjobs_pickScript,
+                icon: TablerIcons.script,
+                onPressed: _pickScript,
               ),
             ],
             if (_type == 'log')
@@ -343,6 +430,55 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
           ],
         ),
       ),
+      if (const {
+        'website',
+        'database',
+        'directory',
+        'app',
+      }.contains(_type)) ...[
+        const SizedBox(height: AppTokens.s24),
+        SectionHeader(title: l10n.backups_accounts),
+        TonalCard(
+          child: Consumer(
+            builder: (context, ref, _) {
+              final accounts = ref
+                  .watch(_backupAccountOptionsProvider)
+                  .valueOrNull;
+              final list = accounts ?? const <Map<String, dynamic>>[];
+              final current = list.where(
+                (item) => item['id'] == _backupAccountId,
+              );
+              final name = current.isEmpty
+                  ? (list.isEmpty
+                        ? l10n.backups_noAccounts
+                        : l10n.panelSettings_notSet)
+                  : '${current.first['name'] ?? _backupAccountId}';
+              return SplitListTile(
+                title: l10n.backups_accounts,
+                subtitle: name,
+                onTap: list.isEmpty
+                    ? null
+                    : () async {
+                        final selected = await showSelectionMenu<int>(
+                          context,
+                          options: [
+                            for (final item in list)
+                              if (item['id'] is num)
+                                SelectionOption<int>(
+                                  label: '${item['name'] ?? item['id']}',
+                                  value: (item['id'] as num).toInt(),
+                                ),
+                          ],
+                        );
+                        if (selected != null && mounted) {
+                          setState(() => _backupAccountId = selected);
+                        }
+                      },
+              );
+            },
+          ),
+        ),
+      ],
       const SizedBox(height: AppTokens.s24),
       SectionHeader(title: l10n.cronjobs_execution),
       TonalCard(

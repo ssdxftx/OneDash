@@ -88,6 +88,68 @@ class AppApi {
   }
 
   /// 查询已安装应用。
+  /// GET /api/v2/apps/checkupdate — 检查应用商店更新状态。
+  Future<Map<String, dynamic>> checkAppUpdates() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/apps/checkupdate',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
+  /// POST /api/v2/apps/installed/config/update — 更新已安装应用 WebUI 地址。
+  Future<void> updateInstalledConfig({
+    required int installId,
+    required String webUI,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/apps/installed/config/update',
+      data: {'installID': installId, 'webUI': webUI},
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getInstalledDeleteCheck(
+    int installId,
+  ) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/apps/installed/delete/check/$installId',
+    );
+    return ApiResponseParser.list(resp, (json) => json);
+  }
+
+  /// 更新已安装应用排序。
+  /// POST /api/v2/apps/installed/sort/update
+  Future<void> updateInstalledSort(List<Map<String, dynamic>> items) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/apps/installed/sort/update',
+      data: {'items': items},
+    );
+  }
+
+  /// 查询应用默认配置。
+  /// POST /api/v2/apps/installed/conf
+  Future<String> getDefaultConfig({
+    required String key,
+    required String name,
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/apps/installed/conf',
+      data: {'type': key, 'name': name},
+    );
+    final data = resp.data?['data'];
+    return data?.toString() ?? '';
+  }
+
+  Future<void> syncInstalledApps() async {
+    await _client.post<Map<String, dynamic>>('/api/v2/apps/installed/sync');
+  }
+
+  Future<AppDetailDto> getAppDetailById(int id) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/apps/details/$id',
+    );
+    return ApiResponseParser.object(resp, AppDetailDto.fromJson);
+  }
+
   Future<PageResult<AppInstalledDto>> searchInstalledApps(
     AppInstalledSearchReq req,
   ) async {
@@ -444,9 +506,19 @@ class AppApi {
     required String scope,
     required bool enable,
   }) async {
+    const scopes = {
+      'uninstallDeleteImage': 'UninstallDeleteImage',
+      'upgradeBackup': 'UpgradeBackup',
+      'upgradeDeleteImage': 'UpgradeDeleteImage',
+      'uninstallDeleteBackup': 'UninstallDeleteBackup',
+      'installAllowPort': 'InstallAllowPort',
+    };
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/core/settings/apps/store/update',
-      data: {'scope': scope, 'status': enable ? 'Enable' : 'Disable'},
+      data: {
+        'scope': scopes[scope] ?? scope,
+        'status': enable ? 'Enable' : 'Disable',
+      },
     );
     ApiResponseParser.ok(resp);
   }

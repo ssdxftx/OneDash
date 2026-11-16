@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
 import '../dto/common/page_result.dart';
@@ -48,6 +52,26 @@ class CronjobApi {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/cronjobs/update',
       data: req.toJson(),
+    );
+  }
+
+  /// 导出计划任务为 JSON 文本。
+  /// POST /api/v2/cronjobs/export
+  Future<String> exportCronjobs(List<int> ids) async {
+    final resp = await _client.post<List<int>>(
+      '/api/v2/cronjobs/export',
+      data: {'ids': ids},
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return utf8.decode(resp.data ?? const <int>[], allowMalformed: true);
+  }
+
+  /// 导入计划任务。
+  /// POST /api/v2/cronjobs/import
+  Future<void> importCronjobs(List<Map<String, dynamic>> items) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/cronjobs/import',
+      data: {'cronjobs': items},
     );
   }
 
@@ -127,6 +151,28 @@ class CronjobApi {
   }
 
   // ── 表单数据加载 ──────────────────────────────────────────
+
+  /// POST /api/v2/cronjobs/next — 计算后续执行时间。
+  Future<List<String>> getNextRun(String spec) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/cronjobs/next',
+      data: {'spec': spec},
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data.map((item) => '$item').toList(growable: false);
+  }
+
+  /// POST /api/v2/cronjobs/group/update
+  Future<void> updateCronjobGroup({
+    required int id,
+    required int groupId,
+  }) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/cronjobs/group/update',
+      data: {'id': id, 'groupID': groupId},
+    );
+  }
 
   /// 获取脚本库选项。
   Future<List<ScriptOptionDto>> loadScriptOptions() async {

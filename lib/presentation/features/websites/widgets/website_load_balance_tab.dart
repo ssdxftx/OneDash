@@ -307,6 +307,46 @@ class _WebsiteLoadBalanceTabState extends ConsumerState<WebsiteLoadBalanceTab> {
     );
   }
 
+  Future<void> _editFile(WebsiteLoadBalanceDto upstream) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController(text: upstream.content);
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_lbEditFile,
+          subtitle: upstream.name,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.websites_lbEditFile,
+              helper: l10n.websites_lbFileHint,
+              maxLines: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+    final content = controller.text;
+    controller.dispose();
+    if (saved != true || !mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.updateLoadBalanceFile(
+        websiteId: widget.websiteId,
+        name: upstream.name,
+        content: content,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.websites_lbSaved);
+      unawaited(_load());
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _save({
     required WebsiteLoadBalanceDto? existing,
     required String name,
@@ -383,6 +423,11 @@ class _WebsiteLoadBalanceTabState extends ConsumerState<WebsiteLoadBalanceTab> {
                           tooltip: l10n.action_edit,
                           icon: const Icon(TablerIcons.edit),
                           onPressed: () => _showForm(existing: upstream),
+                        ),
+                        IconButton(
+                          tooltip: l10n.websites_lbEditFile,
+                          icon: const Icon(TablerIcons.file_code),
+                          onPressed: () => _editFile(upstream),
                         ),
                         IconButton(
                           tooltip: l10n.websites_lbDelete,

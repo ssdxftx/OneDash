@@ -39,6 +39,17 @@ class _FakeAlertRepository implements AlertRepository {
   Future<List<AlertConfigInfo>> getAlertConfigs() async => const [];
 
   @override
+  Future<PageResult<AlertConfigInfo>> searchAlertConfigs(
+    AlertConfigSearchReq req,
+  ) async => const PageResult(total: 0, items: []);
+
+  @override
+  Future<List<ClamAlertInfo>> listClams() async => const [];
+
+  @override
+  Future<List<CronJobAlertInfo>> listAlertCronJobs() async => const [];
+
+  @override
   Future<AlertConfigInfo> getAlertConfig() async => const AlertConfigInfo();
 
   @override
@@ -64,6 +75,9 @@ class _FakeAlertRepository implements AlertRepository {
 
   @override
   Future<void> deleteAlertConfig(int id) async {}
+
+  @override
+  Future<void> updateAlertConfigStatus(int id, String status) async {}
 
   @override
   Future<List<Map<String, dynamic>>> listDisks() async => const [];

@@ -182,6 +182,17 @@ class FirewallApi {
     ApiResponseParser.ok(response);
   }
 
+  Future<void> updatePanelPort({
+    required int oldPort,
+    required int newPort,
+  }) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/firewall/port',
+      data: {'oldPort': oldPort, 'newPort': newPort},
+    );
+    ApiResponseParser.ok(response);
+  }
+
   Future<FirewallBaseInfoDto> getForwardBase() async {
     final response = await _client.post<Map<String, dynamic>>(
       '/api/v2/hosts/firewall/forward/base',
@@ -249,6 +260,67 @@ class FirewallApi {
     );
   }
 
+  Future<void> operateFamily({
+    required String subsystem,
+    required String backend,
+    required String family,
+    required String operation,
+  }) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/firewall/family/operate',
+      data: {
+        'subsystem': subsystem,
+        'backend': backend,
+        'family': family,
+        'operation': operation,
+      },
+    );
+    await _awaitTask(
+      ApiResponseParser.object(response, FirewallTaskResult.fromJson),
+    );
+  }
+
+  Future<void> operateFilterChain({
+    String name = '1PANEL_BASIC',
+    required String operation,
+    String taskID = '',
+  }) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/firewall/filter/operate',
+      data: {
+        'name': name,
+        'operate': operation,
+        if (taskID.isNotEmpty) 'taskID': taskID,
+      },
+    );
+    await _awaitTask(
+      ApiResponseParser.object(response, FirewallTaskResult.fromJson),
+    );
+  }
+
+  Future<void> upsertDockerPolicies(
+    List<Map<String, dynamic>> policies, {
+    bool import = false,
+  }) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/firewall/docker/policies/batch',
+      data: {'policies': policies, 'import': import},
+    );
+    await _awaitTask(
+      ApiResponseParser.object(response, FirewallTaskResult.fromJson),
+    );
+  }
+
+  Future<void> deleteDockerPolicies(List<String> uuids) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/firewall/docker/policies/delete/batch',
+      data: {'uuids': uuids},
+    );
+    await _awaitTask(
+      ApiResponseParser.object(response, FirewallTaskResult.fromJson),
+    );
+  }
+
   Future<List<Map<String, dynamic>>> listRuleBackups() async {
     final response = await _client.get<Map<String, dynamic>>(
       '/api/v2/hosts/firewall/rules/backups',
@@ -290,7 +362,8 @@ class FirewallApi {
     if (!task.queued || task.taskID.isEmpty) return;
     await TaskWaiter(
       _client,
-      maxAttempts: 20,
+      interval: const Duration(seconds: 2),
+      maxAttempts: 300,
     ).waitFor(task.taskID, subject: '防火墙任务');
   }
 

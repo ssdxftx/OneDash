@@ -13,6 +13,7 @@ class AiAgentDto {
     required this.webUIPort,
     required this.appVersion,
     required this.upgradable,
+    required this.agentType,
     required this.createdAt,
   });
 
@@ -29,6 +30,7 @@ class AiAgentDto {
   final int webUIPort;
   final String appVersion;
   final bool upgradable;
+  final String agentType;
   final String createdAt;
 
   factory AiAgentDto.fromJson(Map<String, dynamic> json) {
@@ -46,6 +48,7 @@ class AiAgentDto {
       webUIPort: (json['webUIPort'] as num?)?.toInt() ?? 0,
       appVersion: json['appVersion'] as String? ?? '',
       upgradable: json['upgradable'] == true,
+      agentType: json['agentType'] as String? ?? '',
       createdAt: json['createdAt'] as String? ?? '',
     );
   }

@@ -24,7 +24,7 @@ class TaskWaiter {
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
       final response = await _client.post<Map<String, dynamic>>(
         '/api/v2/logs/tasks/read',
-        data: {'taskID': taskID, 'page': 1, 'pageSize': 200, 'latest': true},
+        data: {'taskID': taskID, 'page': 1, 'pageSize': 50, 'latest': true},
       );
       final log = ApiResponseParser.object(response, TaskLogDto.fromJson);
       onUpdate?.call(log);

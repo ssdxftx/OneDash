@@ -463,8 +463,18 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
                                       value: 'unbind',
                                       icon: TablerIcons.unlink,
                                     ),
+                                    if (role.workspace.isNotEmpty)
+                                      SelectionOption(
+                                        label: l10n.ai_agent_markdown,
+                                        value: 'markdown',
+                                        icon: TablerIcons.file_text,
+                                      ),
                                   ],
                                 );
+                                if (action == 'markdown') {
+                                  await _editRoleMarkdown(agent, role);
+                                  return;
+                                }
                                 if (action == null || !context.mounted) return;
                                 final changed = await _editRoleBinding(
                                   agent,
@@ -545,6 +555,209 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
                             );
                           },
                         ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  String _channelPluginLabel(
+    AppLocalizations l10n,
+    Map<String, dynamic>? status,
+  ) {
+    if (status == null || status['installed'] != true) {
+      return l10n.ai_channel_notInstalled;
+    }
+    if (status['upgradable'] == true) {
+      return l10n.ai_channel_upgradable('${status['latestVersion'] ?? ''}');
+    }
+    final version = '${status['currentVersion'] ?? ''}';
+    return version.isEmpty
+        ? l10n.ai_channel_installed
+        : '${l10n.ai_channel_installed} · $version';
+  }
+
+  Future<void> _approvePairing(AiAgentDto agent) async {
+    final l10n = AppLocalizations.of(context);
+    var type = 'feishu';
+    final code = TextEditingController();
+    final account = TextEditingController();
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.ai_channel_pairing,
+          subtitle: agent.name,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: type,
+              decoration: InputDecoration(labelText: l10n.ai_agent_type),
+              items: [
+                DropdownMenuItem(
+                  value: 'feishu',
+                  child: Text(l10n.ai_channel_feishu),
+                ),
+                DropdownMenuItem(
+                  value: 'telegram',
+                  child: Text(l10n.ai_channel_telegram),
+                ),
+                DropdownMenuItem(
+                  value: 'discord',
+                  child: Text(l10n.ai_channel_discord),
+                ),
+                DropdownMenuItem(
+                  value: 'wecom',
+                  child: Text(l10n.ai_channel_wecom),
+                ),
+                DropdownMenuItem(
+                  value: 'qqbot',
+                  child: Text(l10n.ai_channel_qqbot),
+                ),
+                DropdownMenuItem(
+                  value: 'dingtalk',
+                  child: Text(l10n.ai_channel_dingtalk),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => type = value);
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: code, label: l10n.ai_channel_pairingCode),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: account,
+              label: l10n.ai_channel_pairingAccount,
+            ),
+          ],
+        ),
+      ),
+    );
+    final pairingCode = code.text.trim();
+    final accountId = account.text.trim();
+    code.dispose();
+    account.dispose();
+    if (saved != true || !mounted || pairingCode.isEmpty) return;
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      await repository.approveAgentChannelPairing(
+        agentId: agent.id,
+        type: type,
+        pairingCode: pairingCode,
+        accountId: accountId,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.ai_channel_pairingApproved);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showChannelPlugins(AiAgentDto agent) async {
+    final l10n = AppLocalizations.of(context);
+    const types = ['feishu', 'qqbot', 'wecom', 'dingtalk', 'weixin'];
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final statuses = <String, Map<String, dynamic>>{};
+      for (final type in types) {
+        statuses[type] = await repository.checkAgentChannelPlugin(
+          agentId: agent.id,
+          type: type,
+        );
+      }
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.9,
+        builder: (sheetContext) => StatefulBuilder(
+          builder: (context, setState) => SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.7,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.ai_channel_plugins, style: AppTextStyles.titleM),
+                const SizedBox(height: AppTokens.s8),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      for (final type in types)
+                        ListTile(
+                          dense: true,
+                          leading: const Icon(TablerIcons.puzzle),
+                          title: Text(type),
+                          subtitle: Text(
+                            _channelPluginLabel(l10n, statuses[type]),
+                          ),
+                          onTap: () async {
+                            final installed =
+                                statuses[type]?['installed'] == true;
+                            final upgradable =
+                                statuses[type]?['upgradable'] == true;
+                            final action = await showSelectionMenu<String>(
+                              context,
+                              title: type,
+                              options: [
+                                if (!installed)
+                                  SelectionOption(
+                                    label: l10n.ai_channel_install,
+                                    value: 'install',
+                                    icon: TablerIcons.download,
+                                  ),
+                                if (upgradable)
+                                  SelectionOption(
+                                    label: l10n.ai_channel_upgrade,
+                                    value: 'upgrade',
+                                    icon: TablerIcons.arrow_up_circle,
+                                  ),
+                                if (installed)
+                                  SelectionOption(
+                                    label: l10n.ai_channel_uninstall,
+                                    value: 'uninstall',
+                                    icon: TablerIcons.trash,
+                                    danger: true,
+                                  ),
+                              ],
+                            );
+                            if (action == null || !context.mounted) return;
+                            final taskID = const Uuid().v4();
+                            if (action == 'install') {
+                              await repository.installAgentChannelPlugin(
+                                agentId: agent.id,
+                                type: type,
+                                taskID: taskID,
+                              );
+                            } else if (action == 'upgrade') {
+                              await repository.upgradeAgentChannelPlugin(
+                                agentId: agent.id,
+                                type: type,
+                                taskID: taskID,
+                              );
+                            } else {
+                              await repository.uninstallAgentChannelPlugin(
+                                agentId: agent.id,
+                                type: type,
+                                taskID: taskID,
+                              );
+                            }
+                            if (!context.mounted) return;
+                            final latest = await repository
+                                .checkAgentChannelPlugin(
+                                  agentId: agent.id,
+                                  type: type,
+                                );
+                            setState(() => statuses[type] = latest);
+                          },
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -898,6 +1111,7 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
         'agentId': agent.id,
         'enabled': enabled,
         'threadSession': threadSession,
+        'replyMode': config.replyMode,
         'streaming': streaming,
         'requireMention': requireMention,
         'groupPolicy': groupPolicy,
@@ -964,6 +1178,783 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
     }
   }
 
+  Future<void> _showAgentBatchMenu() async {
+    final l10n = AppLocalizations.of(context);
+    final value = await showSelectionMenu<String>(
+      context,
+      title: l10n.ai_agent_batch,
+      options: [
+        SelectionOption(
+          label: l10n.ai_batch_operation,
+          value: 'operate',
+          icon: TablerIcons.stack_2,
+        ),
+        SelectionOption(
+          label: l10n.ai_batch_install,
+          value: 'install',
+          icon: TablerIcons.download,
+        ),
+        SelectionOption(
+          label: l10n.ai_batch_upgrade,
+          value: 'upgrade',
+          icon: TablerIcons.arrow_up_circle,
+        ),
+      ],
+    );
+    if (value == null || !mounted) return;
+    if (value == 'install') {
+      await _showAgentInstallBatch();
+    } else if (value == 'upgrade') {
+      await _showAgentUpgradeBatch();
+    } else {
+      await _showAgentBatch();
+    }
+  }
+
+  Future<void> _showAgentInstallBatch() async {
+    final l10n = AppLocalizations.of(context);
+    var agentType = 'openclaw';
+    var version = '';
+    var versions = const <String>[];
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      final detail = await repository.getAppDetail(agentType);
+      versions = detail.versions;
+      version = versions.isEmpty ? '' : versions.first;
+    } catch (_) {
+      versions = const [];
+    }
+    if (!mounted) return;
+    final name = TextEditingController();
+    final port = TextEditingController(text: '${_defaultAgentPort(agentType)}');
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.ai_batch_install,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: agentType,
+              decoration: InputDecoration(labelText: l10n.ai_agent_type),
+              items: const [
+                DropdownMenuItem(value: 'openclaw', child: Text('OpenClaw')),
+                DropdownMenuItem(value: 'copaw', child: Text('QwenPaw')),
+                DropdownMenuItem(
+                  value: 'hermes-agent',
+                  child: Text('Hermes Agent'),
+                ),
+              ],
+              onChanged: (value) async {
+                if (value == null) return;
+                setState(() {
+                  agentType = value;
+                  versions = const [];
+                  version = '';
+                  port.text = '${_defaultAgentPort(value)}';
+                });
+                try {
+                  final repository = await ref.read(
+                    appRepositoryProvider.future,
+                  );
+                  final detail = await repository.getAppDetail(value);
+                  if (!mounted || agentType != value) return;
+                  setState(() {
+                    versions = detail.versions;
+                    version = versions.isEmpty ? '' : versions.first;
+                  });
+                } catch (_) {}
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: name, label: l10n.ai_batch_name),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: versions.contains(version) ? version : null,
+              decoration: InputDecoration(labelText: l10n.ai_batch_version),
+              items: [
+                for (final item in versions)
+                  DropdownMenuItem(value: item, child: Text(item)),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => version = value);
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: port,
+              label: l10n.ai_batch_port,
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+      ),
+    );
+    final body = <String, dynamic>{
+      'name': name.text.trim(),
+      'appVersion': version,
+      'webUIPort': int.tryParse(port.text.trim()) ?? 0,
+      'agentType': agentType,
+      'taskID': const Uuid().v4(),
+      'advanced': false,
+      'allowPort': true,
+      'pullImage': true,
+    };
+    name.dispose();
+    port.dispose();
+    if (saved != true || !mounted || version.isEmpty) return;
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final results = await repository.batchInstallAgents(body);
+      if (!mounted) return;
+      final success = results.where((item) => item['success'] != false).length;
+      final skipped = results.where((item) => item['skipped'] == true).length;
+      AppToast.success(context, l10n.ai_batch_result(success, skipped));
+      ref.invalidate(aiAgentsProvider);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showAgentUpgradeBatch() async {
+    final l10n = AppLocalizations.of(context);
+    var agentType = 'openclaw';
+    var backup = true;
+    var pullImage = true;
+    var version = '';
+    var versions = const <String>[];
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      final detail = await repository.getAppDetail(agentType);
+      versions = detail.versions;
+      version = versions.isEmpty ? '' : versions.first;
+    } catch (_) {
+      versions = const [];
+    }
+    if (!mounted) return;
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.ai_batch_upgrade,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: agentType,
+              decoration: InputDecoration(labelText: l10n.ai_agent_type),
+              items: const [
+                DropdownMenuItem(value: 'openclaw', child: Text('OpenClaw')),
+                DropdownMenuItem(value: 'copaw', child: Text('QwenPaw')),
+                DropdownMenuItem(
+                  value: 'hermes-agent',
+                  child: Text('Hermes Agent'),
+                ),
+              ],
+              onChanged: (value) async {
+                if (value == null) return;
+                setState(() {
+                  agentType = value;
+                  versions = const [];
+                  version = '';
+                });
+                try {
+                  final repository = await ref.read(
+                    appRepositoryProvider.future,
+                  );
+                  final detail = await repository.getAppDetail(value);
+                  if (!mounted || agentType != value) return;
+                  setState(() {
+                    versions = detail.versions;
+                    version = versions.isEmpty ? '' : versions.first;
+                  });
+                } catch (_) {}
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: versions.contains(version) ? version : null,
+              decoration: InputDecoration(labelText: l10n.ai_batch_version),
+              items: [
+                for (final item in versions)
+                  DropdownMenuItem(value: item, child: Text(item)),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => version = value);
+              },
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.ai_batch_backup),
+              value: backup,
+              onChanged: (value) => setState(() => backup = value),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.ai_batch_pullImage),
+              value: pullImage,
+              onChanged: (value) => setState(() => pullImage = value),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (saved != true || !mounted || version.isEmpty) return;
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final results = await repository.batchUpgradeAgents({
+        'agentType': agentType,
+        'targetVersion': version,
+        'backup': backup,
+        'pullImage': pullImage,
+        'taskID': const Uuid().v4(),
+      });
+      if (!mounted) return;
+      final success = results.where((item) => item['success'] == true).length;
+      final skipped = results.where((item) => item['skipped'] == true).length;
+      AppToast.success(context, l10n.ai_batch_result(success, skipped));
+      ref.invalidate(aiAgentsProvider);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showAgentBatch() async {
+    final l10n = AppLocalizations.of(context);
+    var agentType = 'openclaw';
+    var operate = 'restart';
+    var forceDelete = false;
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.ai_agent_batch,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: agentType,
+              decoration: InputDecoration(labelText: l10n.ai_batch_type),
+              items: const [
+                DropdownMenuItem(value: 'openclaw', child: Text('OpenClaw')),
+                DropdownMenuItem(value: 'copaw', child: Text('QwenPaw')),
+                DropdownMenuItem(
+                  value: 'hermes-agent',
+                  child: Text('Hermes Agent'),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => agentType = value);
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: operate,
+              decoration: InputDecoration(labelText: l10n.ai_batch_operate),
+              items: [
+                DropdownMenuItem(
+                  value: 'start',
+                  child: Text(l10n.ai_batch_start),
+                ),
+                DropdownMenuItem(
+                  value: 'stop',
+                  child: Text(l10n.ai_batch_stop),
+                ),
+                DropdownMenuItem(
+                  value: 'restart',
+                  child: Text(l10n.ai_batch_restart),
+                ),
+                DropdownMenuItem(
+                  value: 'delete',
+                  child: Text(l10n.ai_batch_delete),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => operate = value);
+              },
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.ai_batch_force),
+              value: forceDelete,
+              onChanged: (value) => setState(() => forceDelete = value),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (saved != true || !mounted) return;
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final results = await repository.batchOperateAgents({
+        'agentType': agentType,
+        'operate': operate,
+        'forceDelete': forceDelete,
+        'taskID': const Uuid().v4(),
+      });
+      if (!mounted) return;
+      final success = results.where((item) => item['success'] == true).length;
+      final skipped = results.where((item) => item['skipped'] == true).length;
+      AppToast.success(context, l10n.ai_batch_result(success, skipped));
+      ref.invalidate(aiAgentsProvider);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showAgentOverview(AiAgentDto agent) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final data = await repository.getAgentOverview(agent.id);
+      if (!mounted) return;
+      final snapshot = data['snapshot'] is Map
+          ? Map<String, dynamic>.from(data['snapshot'] as Map)
+          : const <String, dynamic>{};
+      await showAppSheet<void>(
+        context: context,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.ai_agent_overview, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s16),
+            SplitListGroup(
+              children: [
+                for (final entry in snapshot.entries)
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.info_circle),
+                    title: entry.key,
+                    value: '${entry.value ?? ''}',
+                  ),
+              ],
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showHermesSessions(AiAgentDto agent) async {
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final sessions = await repository.getHermesChatSessions(agent.id);
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        builder: (sheetContext) =>
+            _HermesSessionsSheet(agentId: agent.id, initial: sessions),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showAgentPlugins(AiAgentDto agent) async {
+    await showAppSheet<void>(
+      context: context,
+      builder: (_) => _AgentPluginsSheet(agentId: agent.id),
+    );
+  }
+
+  Future<void> _showAgentSkills(AiAgentDto agent) async {
+    await showAppSheet<void>(
+      context: context,
+      builder: (_) => _AgentSkillsSheet(agentId: agent.id),
+    );
+  }
+
+  Future<void> _editAgentSecurity(AiAgentDto agent) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final origins = await repository.getAgentSecurity(agent.id);
+      if (!mounted) return;
+      final controller = TextEditingController(text: origins.join(','));
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.ai_agent_security,
+            subtitle: agent.name,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              AppTextField(
+                controller: controller,
+                label: l10n.ai_agent_security_origins,
+                helper: l10n.ai_agent_security_hint,
+                maxLines: 3,
+              ),
+            ],
+          ),
+        ),
+      );
+      final items = controller.text
+          .split(',')
+          .map((item) => item.trim())
+          .where((item) => item.isNotEmpty)
+          .toList(growable: false);
+      controller.dispose();
+      if (saved != true || !mounted) return;
+      await repository.updateAgentSecurity(agent.id, items);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _editAgentConfigFile(AiAgentDto agent) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final content = await repository.getAgentConfigFile(agent.id);
+      if (!mounted) return;
+      final controller = TextEditingController(text: content);
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.ai_agent_config_file,
+            subtitle: agent.name,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              AppTextField(
+                controller: controller,
+                label: l10n.ai_agent_config_file,
+                helper: l10n.ai_agent_config_file_hint,
+                maxLines: 16,
+              ),
+            ],
+          ),
+        ),
+      );
+      final value = controller.text;
+      controller.dispose();
+      if (saved != true || !mounted) return;
+      await repository.updateAgentConfigFile(agent.id, value);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_saved);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _editAgentOtherConfig(AiAgentDto agent) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final config = await repository.getAgentOtherConfig(agent.id);
+      if (!mounted) return;
+      final timezone = TextEditingController(
+        text: '${config['userTimezone'] ?? ''}',
+      );
+      final npm = TextEditingController(text: '${config['npmRegistry'] ?? ''}');
+      final username = TextEditingController(
+        text: '${config['dashboardUsername'] ?? ''}',
+      );
+      final password = TextEditingController(
+        text: '${config['dashboardPassword'] ?? ''}',
+      );
+      var browser = config['browserEnabled'] == true;
+      final saved = await pushFormPage<bool>(
+        context,
+        StatefulBuilder(
+          builder: (pageContext, setState) => SimpleFormPage(
+            title: l10n.ai_agent_otherConfig,
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              AppTextField(
+                controller: timezone,
+                label: l10n.ai_agent_otherTimezone,
+                hint: 'Asia/Shanghai',
+              ),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: npm,
+                label: l10n.ai_agent_otherNpm,
+                hint: 'https://registry.npmjs.org',
+              ),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: username,
+                label: l10n.ai_agent_otherUsername,
+              ),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: password,
+                label: l10n.ai_agent_otherPassword,
+                obscure: true,
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.ai_agent_otherBrowser),
+                value: browser,
+                onChanged: (value) => setState(() => browser = value),
+              ),
+            ],
+          ),
+        ),
+      );
+      final body = <String, dynamic>{
+        'agentId': agent.id,
+        'userTimezone': timezone.text.trim(),
+        'browserEnabled': browser,
+        'npmRegistry': npm.text.trim(),
+        'dashboardUsername': username.text.trim(),
+        'dashboardPassword': password.text,
+      };
+      timezone.dispose();
+      npm.dispose();
+      username.dispose();
+      password.dispose();
+      if (saved != true || !mounted) return;
+      await repository.updateAgentOtherConfig(body);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _batchInstallSkill(AiAgentDto agent) async {
+    final l10n = AppLocalizations.of(context);
+    final name = TextEditingController();
+    final path = TextEditingController();
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.ai_agent_batchSkill,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: name, label: l10n.ai_agent_skillName),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: path,
+              label: l10n.ai_agent_skillPackage,
+              hint: '/opt/skills/example.zip',
+            ),
+          ],
+        ),
+      ),
+    );
+    final skillName = name.text.trim();
+    final packagePath = path.text.trim();
+    name.dispose();
+    path.dispose();
+    if (saved != true || !mounted) return;
+    if (skillName.isEmpty || packagePath.isEmpty) {
+      AppToast.warning(context, l10n.apps_required);
+      return;
+    }
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final result = await repository.batchInstallAgentSkill({
+        'agentType': agent.agentType,
+        'skillName': skillName,
+        'packagePath': packagePath,
+        'taskID': const Uuid().v4(),
+      });
+      if (!mounted) return;
+      final failed = result.where((item) => item['success'] != true).length;
+      if (failed > 0) {
+        AppToast.warning(context, '$failed / ${result.length}');
+      } else {
+        AppToast.success(context, l10n.action_done);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _switchFeishuPlugin(AiAgentDto agent) async {
+    final l10n = AppLocalizations.of(context);
+    var streaming = true;
+    var scope = 'group';
+    var mention = 'true';
+    final saved = await pushFormPage<bool>(
+      context,
+      StatefulBuilder(
+        builder: (pageContext, setState) => SimpleFormPage(
+          title: l10n.ai_agent_feishuSwitch,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.ai_agent_streaming),
+              value: streaming,
+              onChanged: (value) => setState(() => streaming = value),
+            ),
+            DropdownButtonFormField<String>(
+              initialValue: scope,
+              decoration: InputDecoration(labelText: l10n.ai_agent_groupScope),
+              items: [
+                for (final scopeValue in const [
+                  'group',
+                  'group_sender',
+                  'group_topic',
+                  'group_topic_sender',
+                ])
+                  DropdownMenuItem(value: scopeValue, child: Text(scopeValue)),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => scope = value);
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: mention,
+              decoration: InputDecoration(
+                labelText: l10n.ai_agent_requireMention,
+              ),
+              items: const [
+                DropdownMenuItem(value: 'true', child: Text('true')),
+                DropdownMenuItem(value: 'false', child: Text('false')),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => mention = value);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+    if (saved != true || !mounted) return;
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      await repository.switchAgentFeishuPlugin({
+        'agentId': agent.id,
+        'taskID': const Uuid().v4(),
+        'streaming': streaming,
+        'groupSessionScope': scope,
+        'requireMention': mention,
+      });
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _editRoleMarkdown(AiAgentDto agent, AiAgentRoleDto role) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final files = await repository.listAgentRoleMarkdownFiles(
+        agentId: agent.id,
+        workspace: role.workspace,
+      );
+      if (!mounted) return;
+      if (files.isEmpty) {
+        AppToast.warning(context, l10n.ai_agent_markdownEmpty);
+        return;
+      }
+      final selected = await showSelectionMenu<Map<String, dynamic>>(
+        context,
+        title: l10n.ai_agent_markdown,
+        options: [
+          for (final file in files)
+            SelectionOption(
+              label: '${file['name'] ?? ''}',
+              value: file,
+              icon: TablerIcons.file_text,
+            ),
+        ],
+      );
+      if (selected == null || !mounted) return;
+      final controller = TextEditingController(
+        text: '${selected['content'] ?? ''}',
+      );
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: '${selected['name'] ?? ''}',
+            onSave: () async => Navigator.of(pageContext).pop(true),
+            children: [
+              AppTextField(
+                controller: controller,
+                label: l10n.ai_agent_markdownContent,
+                maxLines: 20,
+              ),
+            ],
+          ),
+        ),
+      );
+      final content = controller.text;
+      controller.dispose();
+      if (saved != true || !mounted) return;
+      await repository.updateAgentRoleMarkdownFile(
+        agentId: agent.id,
+        workspace: role.workspace,
+        name: '${selected['name'] ?? ''}',
+        content: content,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _confirmDeleteAgent(
+    AiAgentDto agent,
+    AiRepository repository,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final resources = await repository.checkAgentDelete(agent.id);
+      if (!mounted) return;
+      if (resources.isNotEmpty) {
+        await showAppSheet<void>(
+          context: context,
+          builder: (sheetContext) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.ai_agent_deleteResources, style: AppTextStyles.titleL),
+              const SizedBox(height: AppTokens.s12),
+              for (final resource in resources)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text('${resource['name'] ?? ''}'),
+                  subtitle: Text('${resource['type'] ?? ''}'),
+                ),
+            ],
+          ),
+        );
+        if (!mounted) return;
+      }
+      final confirmed = await showConfirmSheet(
+        context,
+        title: l10n.action_delete,
+        message: l10n.ai_agent_delete_confirm(agent.name),
+        confirmLabel: l10n.action_delete,
+        requireText: agent.name,
+      );
+      if (!confirmed || !mounted) return;
+      await repository.deleteAgent(agent.id);
+      if (!mounted) return;
+      ref.invalidate(aiAgentsProvider);
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _showAgentActions(AiAgentDto agent) async {
     final l10n = AppLocalizations.of(context);
     final value = await showSelectionMenu<String>(
@@ -991,6 +1982,47 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
           label: l10n.ai_agent_channels,
           value: 'channels',
           icon: TablerIcons.link,
+        ),
+        SelectionOption(
+          label: l10n.ai_channel_plugins,
+          value: 'channel_plugins',
+          icon: TablerIcons.puzzle,
+        ),
+        SelectionOption(
+          label: l10n.ai_channel_pairing,
+          value: 'pairing',
+          icon: TablerIcons.qrcode,
+        ),
+        SelectionOption(
+          label: l10n.ai_agent_overview,
+          value: 'overview',
+          icon: TablerIcons.dashboard,
+        ),
+        if (agent.agentType == 'hermes-agent')
+          SelectionOption(
+            label: l10n.ai_agent_sessions,
+            value: 'sessions',
+            icon: TablerIcons.messages,
+          ),
+        SelectionOption(
+          label: l10n.ai_agent_security,
+          value: 'security',
+          icon: TablerIcons.shield_lock,
+        ),
+        SelectionOption(
+          label: l10n.ai_agent_config_file,
+          value: 'config_file',
+          icon: TablerIcons.file_code,
+        ),
+        SelectionOption(
+          label: l10n.ai_agent_plugins,
+          value: 'plugins',
+          icon: TablerIcons.puzzle,
+        ),
+        SelectionOption(
+          label: l10n.ai_agent_skills,
+          value: 'skills',
+          icon: TablerIcons.sparkles,
         ),
         SelectionOption(
           label: l10n.ai_agent_feishu,
@@ -1024,6 +2056,23 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
           icon: TablerIcons.edit,
         ),
         SelectionOption(
+          label: l10n.ai_agent_otherConfig,
+          value: 'other',
+          icon: TablerIcons.settings,
+        ),
+        if (const {'openclaw', 'hermes-agent'}.contains(agent.agentType))
+          SelectionOption(
+            label: l10n.ai_agent_batchSkill,
+            value: 'batch_skill',
+            icon: TablerIcons.sparkles,
+          ),
+        if (agent.agentType == 'openclaw')
+          SelectionOption(
+            label: l10n.ai_agent_feishuSwitch,
+            value: 'feishu_switch',
+            icon: TablerIcons.switch_horizontal,
+          ),
+        SelectionOption(
           label: l10n.action_delete,
           value: 'delete',
           icon: TablerIcons.trash,
@@ -1047,6 +2096,30 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
       } else if (value == 'channels') {
         await _showAgentChannels(agent);
         return;
+      } else if (value == 'channel_plugins') {
+        await _showChannelPlugins(agent);
+        return;
+      } else if (value == 'pairing') {
+        await _approvePairing(agent);
+        return;
+      } else if (value == 'overview') {
+        await _showAgentOverview(agent);
+        return;
+      } else if (value == 'sessions') {
+        await _showHermesSessions(agent);
+        return;
+      } else if (value == 'security') {
+        await _editAgentSecurity(agent);
+        return;
+      } else if (value == 'config_file') {
+        await _editAgentConfigFile(agent);
+        return;
+      } else if (value == 'plugins') {
+        await _showAgentPlugins(agent);
+        return;
+      } else if (value == 'skills') {
+        await _showAgentSkills(agent);
+        return;
       } else if (value == 'feishu') {
         await _editFeishuConfig(agent);
         return;
@@ -1058,6 +2131,15 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
         return;
       } else if (value == 'weixin') {
         await _loginWeixin(agent);
+        return;
+      } else if (value == 'other') {
+        await _editAgentOtherConfig(agent);
+        return;
+      } else if (value == 'batch_skill') {
+        await _batchInstallSkill(agent);
+        return;
+      } else if (value == 'feishu_switch') {
+        await _switchFeishuPlugin(agent);
         return;
       } else if (value == 'token') {
         await repository.resetAgentToken(agent.id);
@@ -1083,15 +2165,7 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
         if (saved != true) return;
         await repository.updateAgentRemark(agent.id, remark);
       } else {
-        final confirmed = await showConfirmSheet(
-          context,
-          title: l10n.action_delete,
-          message: l10n.ai_agent_delete_confirm(agent.name),
-          confirmLabel: l10n.action_delete,
-          requireText: agent.name,
-        );
-        if (!confirmed) return;
-        await repository.deleteAgent(agent.id);
+        await _confirmDeleteAgent(agent, repository);
       }
       if (!mounted) return;
       ref.invalidate(aiAgentsProvider);
@@ -1100,5 +2174,571 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
       if (!mounted) return;
       showErrorToast(context, error);
     }
+  }
+}
+
+class _AgentPluginsSheet extends ConsumerStatefulWidget {
+  const _AgentPluginsSheet({required this.agentId});
+
+  final int agentId;
+
+  @override
+  ConsumerState<_AgentPluginsSheet> createState() => _AgentPluginsSheetState();
+}
+
+class _AgentPluginsSheetState extends ConsumerState<_AgentPluginsSheet> {
+  final _search = TextEditingController();
+  List<Map<String, dynamic>> _installed = const [];
+  List<Map<String, dynamic>> _results = const [];
+  bool _loading = true;
+  bool _searching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final items = await repository.listAgentPlugins(widget.agentId);
+      if (!mounted) return;
+      setState(() {
+        _installed = items;
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _runSearch() async {
+    final keyword = _search.text.trim();
+    if (keyword.isEmpty) return;
+    setState(() => _searching = true);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final items = await repository.searchAgentPlugins(
+        agentId: widget.agentId,
+        keyword: keyword,
+      );
+      if (!mounted) return;
+      setState(() => _results = items);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    } finally {
+      if (mounted) setState(() => _searching = false);
+    }
+  }
+
+  Future<void> _install(Map<String, dynamic> item) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      await repository.installAgentMarketPlugin(
+        agentId: widget.agentId,
+        package: '${item['package'] ?? ''}',
+        version: '${item['version'] ?? ''}',
+        taskID: const Uuid().v4(),
+      );
+      await _load();
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _toggle(Map<String, dynamic> item, bool enabled) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      await repository.operateAgentPlugin(
+        agentId: widget.agentId,
+        pluginId: '${item['id'] ?? ''}',
+        operate: enabled ? 'enable' : 'disable',
+        taskID: const Uuid().v4(),
+      );
+      await _load();
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.ai_agent_plugins, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s12),
+        AppTextField(
+          controller: _search,
+          hint: l10n.ai_plugin_searchHint,
+          textInputAction: TextInputAction.search,
+          onSubmitted: (_) => _runSearch(),
+          suffix: IconButton(
+            icon: const Icon(TablerIcons.search),
+            onPressed: _searching ? null : _runSearch,
+          ),
+        ),
+        const SizedBox(height: AppTokens.s16),
+        Flexible(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              SectionHeader(title: l10n.ai_plugin_installed),
+              if (_loading)
+                const SkeletonList(itemCount: 2)
+              else if (_installed.isEmpty)
+                EmptyState(
+                  icon: TablerIcons.puzzle,
+                  title: l10n.ai_plugin_empty,
+                  compact: true,
+                )
+              else
+                SplitListGroup(
+                  children: [
+                    for (final item in _installed)
+                      SplitListTile(
+                        leading: const Icon(TablerIcons.puzzle),
+                        title: '${item['name'] ?? item['id'] ?? ''}',
+                        subtitle:
+                            '${l10n.ai_plugin_version} ${item['version'] ?? ''}',
+                        trailing: Switch(
+                          value: item['enabled'] == true,
+                          onChanged: (value) => _toggle(item, value),
+                        ),
+                      ),
+                  ],
+                ),
+              if (_results.isNotEmpty) ...[
+                const SizedBox(height: AppTokens.s16),
+                SectionHeader(title: l10n.ai_plugin_market),
+                SplitListGroup(
+                  children: [
+                    for (final item in _results)
+                      SplitListTile(
+                        leading: const Icon(TablerIcons.cloud_download),
+                        title: '${item['name'] ?? item['pluginId'] ?? ''}',
+                        subtitle: [
+                          '${item['description'] ?? ''}',
+                          if ('${item['version'] ?? ''}'.isNotEmpty)
+                            '${l10n.ai_plugin_version} ${item['version']}',
+                        ].where((value) => value.isNotEmpty).join(' · '),
+                        trailing: TextButton(
+                          onPressed: () => _install(item),
+                          child: Text(l10n.ai_plugin_install),
+                        ),
+                      ),
+                  ],
+                ),
+              ] else if (_search.text.trim().isNotEmpty && !_searching)
+                EmptyState(
+                  icon: TablerIcons.search_off,
+                  title: l10n.ai_plugin_noResults,
+                  compact: true,
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AgentSkillsSheet extends ConsumerStatefulWidget {
+  const _AgentSkillsSheet({required this.agentId});
+
+  final int agentId;
+
+  @override
+  ConsumerState<_AgentSkillsSheet> createState() => _AgentSkillsSheetState();
+}
+
+class _AgentSkillsSheetState extends ConsumerState<_AgentSkillsSheet> {
+  final _search = TextEditingController();
+  List<Map<String, dynamic>> _installed = const [];
+  List<Map<String, dynamic>> _results = const [];
+  String _source = 'official';
+  bool _loading = true;
+  bool _searching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final items = await repository.listAgentSkills(widget.agentId);
+      if (!mounted) return;
+      setState(() {
+        _installed = items;
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _runSearch() async {
+    final keyword = _search.text.trim();
+    if (keyword.isEmpty) return;
+    setState(() => _searching = true);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final items = await repository.searchAgentSkills(
+        agentId: widget.agentId,
+        source: _source,
+        keyword: keyword,
+      );
+      if (!mounted) return;
+      setState(() => _results = items);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    } finally {
+      if (mounted) setState(() => _searching = false);
+    }
+  }
+
+  Future<void> _install(Map<String, dynamic> item) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      await repository.installAgentSkill(
+        agentId: widget.agentId,
+        source: '${item['source'] ?? _source}',
+        slug: '${item['slug'] ?? item['identifier'] ?? ''}',
+        taskID: const Uuid().v4(),
+      );
+      await _load();
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _toggle(Map<String, dynamic> item, bool enabled) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      await repository.updateAgentSkill(
+        agentId: widget.agentId,
+        name: '${item['name'] ?? ''}',
+        enabled: enabled,
+      );
+      await _load();
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _uninstall(Map<String, dynamic> item) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.ai_skill_uninstall,
+      message: '${item['name'] ?? ''}',
+      confirmLabel: l10n.action_delete,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      await repository.uninstallAgentSkill(
+        agentId: widget.agentId,
+        name: '${item['name'] ?? ''}',
+      );
+      await _load();
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.ai_agent_skills, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s12),
+        DropdownButtonFormField<String>(
+          initialValue: _source,
+          decoration: InputDecoration(labelText: l10n.ai_skill_source),
+          items: [
+            DropdownMenuItem(
+              value: 'official',
+              child: Text(l10n.ai_skill_sourceOfficial),
+            ),
+            DropdownMenuItem(
+              value: 'clawhub-global',
+              child: Text(l10n.ai_skill_sourceClawhubGlobal),
+            ),
+            DropdownMenuItem(
+              value: 'clawhub-cn',
+              child: Text(l10n.ai_skill_sourceClawhubCn),
+            ),
+            DropdownMenuItem(
+              value: 'skillhub',
+              child: Text(l10n.ai_skill_sourceSkillhub),
+            ),
+            DropdownMenuItem(
+              value: 'skills-sh',
+              child: Text(l10n.ai_skill_sourceSkillsSh),
+            ),
+            DropdownMenuItem(
+              value: 'local-hub',
+              child: Text(l10n.ai_skill_sourceLocalHub),
+            ),
+          ],
+          onChanged: (value) {
+            if (value != null) setState(() => _source = value);
+          },
+        ),
+        const SizedBox(height: AppTokens.s12),
+        AppTextField(
+          controller: _search,
+          hint: l10n.ai_skill_searchHint,
+          textInputAction: TextInputAction.search,
+          onSubmitted: (_) => _runSearch(),
+          suffix: IconButton(
+            icon: const Icon(TablerIcons.search),
+            onPressed: _searching ? null : _runSearch,
+          ),
+        ),
+        const SizedBox(height: AppTokens.s16),
+        Flexible(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              SectionHeader(title: l10n.ai_skill_installed),
+              if (_loading)
+                const SkeletonList(itemCount: 2)
+              else if (_installed.isEmpty)
+                EmptyState(
+                  icon: TablerIcons.sparkles,
+                  title: l10n.ai_skill_empty,
+                  compact: true,
+                )
+              else
+                SplitListGroup(
+                  children: [
+                    for (final item in _installed)
+                      SplitListTile(
+                        leading: const Icon(TablerIcons.sparkles),
+                        title: '${item['name'] ?? ''}',
+                        subtitle: '${item['description'] ?? ''}',
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Switch(
+                              value: item['disabled'] != true,
+                              onChanged: (value) => _toggle(item, value),
+                            ),
+                            if (item['uninstallable'] == true)
+                              IconButton(
+                                tooltip: l10n.ai_skill_uninstall,
+                                icon: const Icon(TablerIcons.trash),
+                                onPressed: () => _uninstall(item),
+                              ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              if (_results.isNotEmpty) ...[
+                const SizedBox(height: AppTokens.s16),
+                SectionHeader(title: l10n.ai_skill_market),
+                SplitListGroup(
+                  children: [
+                    for (final item in _results)
+                      SplitListTile(
+                        leading: const Icon(TablerIcons.cloud_download),
+                        title: '${item['name'] ?? item['slug'] ?? ''}',
+                        subtitle: [
+                          '${item['description'] ?? item['summary'] ?? ''}',
+                          '${item['source'] ?? ''}',
+                        ].where((value) => value.isNotEmpty).join(' · '),
+                        trailing: TextButton(
+                          onPressed: () => _install(item),
+                          child: Text(l10n.ai_skill_install),
+                        ),
+                      ),
+                  ],
+                ),
+              ] else if (_search.text.trim().isNotEmpty && !_searching)
+                EmptyState(
+                  icon: TablerIcons.search_off,
+                  title: l10n.ai_skill_noResults,
+                  compact: true,
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HermesSessionsSheet extends ConsumerStatefulWidget {
+  const _HermesSessionsSheet({required this.agentId, required this.initial});
+
+  final int agentId;
+  final List<Map<String, dynamic>> initial;
+
+  @override
+  ConsumerState<_HermesSessionsSheet> createState() =>
+      _HermesSessionsSheetState();
+}
+
+class _HermesSessionsSheetState extends ConsumerState<_HermesSessionsSheet> {
+  late List<Map<String, dynamic>> _sessions = widget.initial;
+
+  Future<void> _refresh() async {
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      final sessions = await repository.getHermesChatSessions(widget.agentId);
+      if (!mounted) return;
+      setState(() => _sessions = sessions);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _rename(Map<String, dynamic> session) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController(text: '${session['title'] ?? ''}');
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.ai_session_rename,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: controller, label: l10n.ai_session_rename),
+          ],
+        ),
+      ),
+    );
+    final title = controller.text.trim();
+    controller.dispose();
+    if (saved != true || title.isEmpty || !mounted) return;
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      await repository.renameHermesChatSession(
+        agentId: widget.agentId,
+        id: '${session['id'] ?? ''}',
+        title: title,
+      );
+      await _refresh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _delete(Map<String, dynamic> session) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.ai_session_delete,
+      message: '${session['title'] ?? ''}',
+      confirmLabel: l10n.action_delete,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(aiRepositoryProvider.future);
+      await repository.deleteHermesChatSession(
+        agentId: widget.agentId,
+        id: '${session['id'] ?? ''}',
+      );
+      await _refresh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.ai_agent_sessions, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s16),
+        if (_sessions.isEmpty)
+          EmptyState(
+            icon: TablerIcons.messages,
+            title: l10n.ai_skill_empty,
+            compact: true,
+          )
+        else
+          Flexible(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                for (final session in _sessions)
+                  SplitListTile(
+                    leading: const Icon(TablerIcons.message),
+                    title: '${session['title'] ?? session['id'] ?? ''}',
+                    subtitle: [
+                      '${session['model'] ?? ''}',
+                      '${session['messageCount'] ?? 0}',
+                      '${session['lastActive'] ?? ''}',
+                    ].where((value) => value.isNotEmpty).join(' · '),
+                    onTap: () => _rename(session),
+                    trailing: IconButton(
+                      tooltip: l10n.ai_session_delete,
+                      icon: const Icon(TablerIcons.trash),
+                      onPressed: () => _delete(session),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+      ],
+    );
   }
 }

@@ -14,6 +14,8 @@ import '../../../../data/dto/website/website_dto.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_text_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/removable_list_item.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -43,6 +45,7 @@ import 'website_advanced_page.dart';
 import 'website_detail_page.dart';
 import 'website_ssl_manage_page.dart';
 import '../widgets/website_log_page.dart';
+import 'openresty_advanced_sheets.dart';
 import 'openresty_config_sheet.dart';
 import 'openresty_performance_sheet.dart';
 import 'openresty_status_sheet.dart';
@@ -118,7 +121,108 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
     }
   }
 
-  static const _filters = ['', 'running', 'stopped', 'static', 'proxy', 'php'];
+  Future<void> _batchOperate(String operate) async {
+    final l10n = AppLocalizations.of(context);
+    final ids = _selected.toList(growable: false);
+    if (ids.isEmpty) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.batchOperateWebsites(ids, operate);
+      if (!mounted) return;
+      _clearSelection();
+      AppToast.success(context, l10n.websites_batchSuccess);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    } finally {
+      await ref.read(websitesProvider.notifier).refresh();
+    }
+  }
+
+  Future<void> _batchGroup() async {
+    final l10n = AppLocalizations.of(context);
+    final ids = _selected.toList(growable: false);
+    if (ids.isEmpty) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final groups = await repository.searchWebsiteGroups();
+      if (!mounted) return;
+      final groupId = await showSelectionMenu<int>(
+        context,
+        title: l10n.websites_selectGroup,
+        options: [
+          for (final group in groups)
+            SelectionOption(
+              label: group.name,
+              value: group.id,
+              icon: TablerIcons.folder,
+            ),
+        ],
+      );
+      if (groupId == null || !mounted) return;
+      await repository.batchSetWebsiteGroup(ids, groupId);
+      if (!mounted) return;
+      _clearSelection();
+      AppToast.success(context, l10n.websites_batchSuccess);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    } finally {
+      await ref.read(websitesProvider.notifier).refresh();
+    }
+  }
+
+  Future<void> _batchSsl() async {
+    final l10n = AppLocalizations.of(context);
+    final ids = _selected.toList(growable: false);
+    if (ids.isEmpty) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final result = await repository.searchSsl({
+        'page': 1,
+        'pageSize': 100,
+        'orderBy': 'created_at',
+        'order': 'descending',
+      });
+      if (!mounted) return;
+      if (result.items.isEmpty) {
+        AppToast.warning(context, l10n.state_empty);
+        return;
+      }
+      final sslId = await showSelectionMenu<int>(
+        context,
+        title: l10n.websites_selectSsl,
+        options: [
+          for (final ssl in result.items)
+            SelectionOption(
+              label: ssl.primaryDomain,
+              value: ssl.id,
+              icon: TablerIcons.shield_check,
+            ),
+        ],
+      );
+      if (sslId == null || !mounted) return;
+      await repository.batchSetWebsiteHttps(ids: ids, sslId: sslId);
+      if (!mounted) return;
+      _clearSelection();
+      AppToast.success(context, l10n.websites_batchSuccess);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    } finally {
+      await ref.read(websitesProvider.notifier).refresh();
+    }
+  }
+
+  static const _filters = [
+    '',
+    'deployment',
+    'static',
+    'proxy',
+    'runtime',
+    'subsite',
+    'stream',
+  ];
 
   @override
   void deactivate() {
@@ -135,11 +239,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
 
   String _filterLabel(String value, AppLocalizations l10n) {
     return switch (value) {
-      'running' => l10n.websites_running,
-      'stopped' => l10n.websites_stopped,
+      'deployment' => l10n.websites_deployment,
       'static' => l10n.websites_static,
       'proxy' => l10n.websites_proxy,
-      'php' => l10n.websites_php,
+      'runtime' => l10n.websites_runtime,
+      'subsite' => l10n.websites_subsite,
+      'stream' => l10n.websites_tunnel,
       _ => l10n.websites_all,
     };
   }
@@ -262,7 +367,9 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                             return RemovableListItem(
                               key: ValueKey('website-${site.id}'),
                               removing: _removing.contains(site.id),
-                              animateIn: entryAnimationEnabled,
+                              animateIn:
+                                  entryAnimationEnabled &&
+                                  index < AppTokens.listEntryAnimationLimit,
                               child: Padding(
                                 padding: const EdgeInsets.only(
                                   bottom: AppTokens.s12,
@@ -305,6 +412,34 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                             style: AppTextStyles.bodyM,
                           ),
                         ),
+                        MenuAnchor(
+                          menuChildren: [
+                            MenuItemButton(
+                              onPressed: () => _batchOperate('start'),
+                              child: Text(l10n.action_enable),
+                            ),
+                            MenuItemButton(
+                              onPressed: () => _batchOperate('stop'),
+                              child: Text(l10n.action_disable),
+                            ),
+                            MenuItemButton(
+                              onPressed: _batchGroup,
+                              child: Text(l10n.websites_changeGroup),
+                            ),
+                            MenuItemButton(
+                              onPressed: _batchSsl,
+                              child: Text(l10n.websites_bindSsl),
+                            ),
+                          ],
+                          builder: (context, controller, child) => IconButton(
+                            tooltip: l10n.websites_batchActions,
+                            icon: const Icon(TablerIcons.dots),
+                            onPressed: () => controller.isOpen
+                                ? controller.close()
+                                : controller.open(),
+                          ),
+                        ),
+                        const SizedBox(width: AppTokens.s8),
                         DangerButton(
                           expanded: false,
                           icon: TablerIcons.trash,
@@ -327,6 +462,60 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
       'stopped' => l10n.websites_stopped,
       _ => l10n.common_unknown,
     };
+  }
+
+  Future<void> _editDefaultHtml() async {
+    final l10n = AppLocalizations.of(context);
+    final type = await showSelectionMenu<String>(
+      context,
+      title: l10n.websites_htmlType,
+      options: [
+        SelectionOption(value: 'index', label: l10n.websites_htmlIndex),
+        SelectionOption(value: '404', label: l10n.websites_html404),
+        SelectionOption(value: 'php', label: l10n.websites_htmlPhp),
+        SelectionOption(value: 'domain404', label: l10n.websites_htmlDomain404),
+        SelectionOption(value: 'stop', label: l10n.websites_htmlStop),
+      ],
+    );
+    if (type == null || !mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final current = await repository.getDefaultHtml(type);
+      if (!mounted) return;
+      final controller = TextEditingController(
+        text: '${current['content'] ?? ''}',
+      );
+      final saved = await pushFormPage<bool>(
+        context,
+        Builder(
+          builder: (pageContext) => SimpleFormPage(
+            title: l10n.websites_defaultHtml,
+            saveLabel: l10n.action_save,
+            onSave: () async {
+              await repository.updateDefaultHtml(
+                type: type,
+                content: controller.text,
+              );
+              if (!pageContext.mounted) return;
+              Navigator.of(pageContext).pop(true);
+            },
+            children: [
+              AppTextField(
+                controller: controller,
+                label: l10n.websites_htmlContent,
+                maxLines: 16,
+              ),
+            ],
+          ),
+        ),
+      );
+
+      if (saved != true || !mounted) return;
+      AppToast.success(context, l10n.websites_htmlSaved);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
   }
 
   Widget _moduleMenu(BuildContext context, AppLocalizations l10n) {
@@ -379,8 +568,24 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
               l10n,
               TablerIcons.arrows_split,
               l10n.websites_tunnel,
-              l10n.websites_tunnelHint,
+              l10n.websites_createStreamTitle,
               'stream',
+            ),
+            _createItem(
+              context,
+              l10n,
+              TablerIcons.rocket,
+              l10n.websites_deployment,
+              l10n.websites_deploymentApp,
+              'deployment',
+            ),
+            _createItem(
+              context,
+              l10n,
+              TablerIcons.folder_symlink,
+              l10n.websites_subsite,
+              l10n.websites_subsitePath,
+              'subsite',
             ),
           ],
           child: _menuRow(
@@ -389,6 +594,12 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
             l10n.websites_create,
             width: 160,
           ),
+        ),
+        _item(
+          context,
+          TablerIcons.file_code,
+          l10n.websites_defaultHtml,
+          _editDefaultHtml,
         ),
         _item(
           context,
@@ -460,6 +671,26 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
           TablerIcons.adjustments,
           l10n.websites_openRestyPerformanceTitle,
           () => _openRestyAction(() => showOpenRestyPerformanceSheet(context)),
+        ),
+        _item(
+          context,
+          TablerIcons.packages,
+          l10n.websites_openRestyModules,
+          () => _openRestyAction(() => showOpenRestyModulesSheet(context)),
+        ),
+        _item(
+          context,
+          TablerIcons.hammer,
+          l10n.websites_openRestyBuild,
+          () => _openRestyAction(
+            () => pushFormPage<void>(context, const OpenRestyBuildPage()),
+          ),
+        ),
+        _item(
+          context,
+          TablerIcons.lock,
+          l10n.websites_openRestyHttps,
+          () => _openRestyAction(() => showOpenRestyHttpsSheet(context)),
         ),
         SubmenuButton(
           menuChildren: [
@@ -960,7 +1191,7 @@ class WebsiteDeleteSheetState extends State<WebsiteDeleteSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final hasDatabase = widget.site.dbID > 0;
+    final hasDatabase = widget.site.type == 'runtime';
     final scheme = context.scheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1101,7 +1332,7 @@ class _WebsiteCard extends StatelessWidget {
                   color: scheme.onSurfaceVariant,
                 ),
               ),
-              if (site.sslExpireDate.isNotEmpty)
+              if (site.protocol.toUpperCase() == 'HTTPS')
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppTokens.s8,

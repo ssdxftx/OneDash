@@ -63,7 +63,7 @@ class LogPreviewPage extends StatefulWidget {
     required this.sources,
     this.subtitle,
     this.pageSize = 500,
-    this.followInterval = const Duration(seconds: 5),
+    this.followInterval = AppTokens.logFollowPoll,
     this.embedded = false,
   });
 
@@ -108,6 +108,11 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   List<String>? _filteredCache;
 
   LogSourceOption get _source => widget.sources[_sourceIndex];
+
+  bool get _isVisible =>
+      mounted &&
+      (ModalRoute.of(context)?.isCurrent ?? true) &&
+      TickerMode.valuesOf(context).enabled;
 
   @override
   void initState() {
@@ -159,6 +164,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   }
 
   Future<void> _load({bool silent = false}) async {
+    if (silent && !_isVisible) return;
     if (_loadInFlight) return;
     _loadInFlight = true;
     if (!silent) {
@@ -180,21 +186,32 @@ class _LogPreviewPageState extends State<LogPreviewPage>
         end = true;
       }
       if (!mounted) return;
-      final unchanged = listEquals(_lines, lines);
-      if (silent && unchanged && _error == null) return;
-      final hasAccess = lines.any((line) => parseLogLine(line).isAccess);
-      setState(() {
-        _lines = lines;
-        _hasAccess = hasAccess;
-        _loading = false;
-        _error = null;
-        _page = 1;
-        _end = end;
-        _window = widget.pageSize;
-        if (!_modePinned) {
-          _mode = hasAccess ? LogDisplayMode.cards : LogDisplayMode.raw;
-        }
-      });
+      if (silent && loadPage != null && _page > 1) {
+        final merged = _appendNewest(lines, _lines);
+        if (listEquals(merged, _lines) && _error == null) return;
+        setState(() {
+          _lines = merged;
+          _hasAccess = merged.any((line) => parseLogLine(line).isAccess);
+          _loading = false;
+          _error = null;
+        });
+      } else {
+        final unchanged = listEquals(_lines, lines);
+        if (silent && unchanged && _error == null) return;
+        final hasAccess = lines.any((line) => parseLogLine(line).isAccess);
+        setState(() {
+          _lines = lines;
+          _hasAccess = hasAccess;
+          _loading = false;
+          _error = null;
+          _page = 1;
+          _end = end;
+          _window = widget.pageSize;
+          if (!_modePinned) {
+            _mode = hasAccess ? LogDisplayMode.cards : LogDisplayMode.raw;
+          }
+        });
+      }
       if (silent &&
           _follow &&
           (_mode == LogDisplayMode.cards ? _atTop : _atBottom)) {
@@ -202,10 +219,15 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       }
     } catch (error) {
       if (!mounted) return;
+      _timer?.cancel();
+      _timer = null;
+      final hasBufferedLines = _lines.isNotEmpty;
       setState(() {
         _loading = false;
-        _error = error;
+        _follow = false;
+        if (!hasBufferedLines) _error = error;
       });
+      if (hasBufferedLines) showErrorToast(context, error);
     } finally {
       _loadInFlight = false;
     }
@@ -225,18 +247,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       if (!mounted) return;
       final incoming = batch.lines;
       final existing = _lines;
-      final maxOverlap = incoming.length < existing.length
-          ? incoming.length
-          : existing.length;
-      var overlap = 0;
-      for (var size = 1; size <= maxOverlap; size++) {
-        if (listEquals(
-          incoming.sublist(incoming.length - size),
-          existing.sublist(0, size),
-        )) {
-          overlap = size;
-        }
-      }
+      final overlap = _suffixPrefixOverlap(incoming, existing);
       final prepend = overlap == incoming.length
           ? const <String>[]
           : incoming.sublist(0, incoming.length - overlap);
@@ -262,6 +273,31 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       setState(() => _loadingEarlier = false);
       showErrorToast(context, error);
     }
+  }
+
+  List<String> _appendNewest(List<String> incoming, List<String> existing) {
+    if (incoming.isEmpty) return existing;
+    final overlap = _suffixPrefixOverlap(incoming, existing);
+    if (overlap == incoming.length) return existing;
+    return [...existing, ...incoming.sublist(overlap)];
+  }
+
+  int _suffixPrefixOverlap(List<String> incoming, List<String> existing) {
+    final maxOverlap = incoming.length < existing.length
+        ? incoming.length
+        : existing.length;
+    for (var size = maxOverlap; size > 0; size--) {
+      final offset = incoming.length - size;
+      var matches = true;
+      for (var index = 0; index < size; index++) {
+        if (incoming[offset + index] != existing[index]) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) return size;
+    }
+    return 0;
   }
 
   void _scrollToFollowEdge() {

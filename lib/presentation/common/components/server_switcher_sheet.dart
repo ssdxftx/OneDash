@@ -7,6 +7,7 @@ import '../../../core/localization/generated/app_localizations.dart';
 import '../states/error_mapper.dart';
 import '../states/error_toast.dart';
 import '../../../core/theme/tokens.dart';
+import '../../features/server_detail/providers/active_server_provider.dart';
 import '../../features/servers/providers/servers_provider.dart';
 import 'bottom_sheet_surface.dart';
 import 'split_list_group.dart';
@@ -87,6 +88,8 @@ class _ServerSwitcherBody extends ConsumerWidget {
                         }
                         navigator.pop();
                         if (server.id != currentServerId) {
+                          ref.read(activeServerIdStateProvider.notifier).state =
+                              server.id;
                           router.go('/s/${server.id}/overview');
                         }
                       },

@@ -32,7 +32,14 @@ class BackupAccountRepositoryImpl implements BackupAccountRepository {
       _api.updateBackupAccount(data);
 
   @override
-  Future<void> deleteAccount(int id) => _api.deleteBackupAccount(id);
+  Future<void> deleteAccount({
+    required int id,
+    required String name,
+    required bool isPublic,
+  }) => _api.deleteBackupAccount(id: id, name: name, isPublic: isPublic);
+
+  @override
+  Future<void> checkName(String name) => _api.checkBackupName(name);
 
   @override
   Future<Map<String, dynamic>> checkConnection(Map<String, dynamic> data) =>
@@ -43,7 +50,11 @@ class BackupAccountRepositoryImpl implements BackupAccountRepository {
       _api.listBuckets(data);
 
   @override
-  Future<void> refreshToken(int id) => _api.refreshToken(id);
+  Future<void> refreshToken({
+    required int id,
+    required String name,
+    required bool isPublic,
+  }) => _api.refreshToken(id: id, name: name, isPublic: isPublic);
 
   @override
   Future<String> getLocalDir() => _api.getLocalDir();

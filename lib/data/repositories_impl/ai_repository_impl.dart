@@ -32,6 +32,286 @@ class AiRepositoryImpl implements AiRepository {
   Future<void> createOllamaModel(String name) => _api.createOllamaModel(name);
 
   @override
+  Future<void> recreateOllamaModel(String name) =>
+      _api.recreateOllamaModel(name);
+
+  @override
+  Future<void> syncOllamaAccount({
+    required int id,
+    required String baseUrlType,
+    String baseUrl = '',
+  }) => _api.syncOllamaAccount(
+    id: id,
+    baseUrlType: baseUrlType,
+    baseUrl: baseUrl,
+  );
+
+  @override
+  Future<Map<String, dynamic>> getGpuOptions() => _api.getGpuOptions();
+
+  @override
+  Future<Map<String, dynamic>> getModelGpuDevices() =>
+      _api.getModelGpuDevices();
+
+  @override
+  Stream<String> chatAccount({
+    required int id,
+    required String model,
+    required List<Map<String, String>> messages,
+  }) => _api.chatAccount(id: id, model: model, messages: messages);
+
+  @override
+  Future<List<Map<String, dynamic>>> listGpuGroups() => _api.listGpuGroups();
+
+  @override
+  Future<void> saveGpuGroup(Map<String, dynamic> body) =>
+      _api.saveGpuGroup(body);
+
+  @override
+  Future<void> deleteGpuGroup(int id) => _api.deleteGpuGroup(id);
+
+  @override
+  Future<Map<String, dynamic>> loadModelGpuUsage(Map<String, dynamic> body) =>
+      _api.loadModelGpuUsage(body);
+
+  @override
+  Future<List<Map<String, dynamic>>> batchOperateAgents(
+    Map<String, dynamic> body,
+  ) => _api.batchOperateAgents(body);
+
+  @override
+  @override
+  Future<List<Map<String, dynamic>>> discoverAgentAccountModels({
+    required String provider,
+    required String baseURL,
+    required String apiKey,
+    required String apiType,
+  }) => _api.discoverAgentAccountModels(
+    provider: provider,
+    baseURL: baseURL,
+    apiKey: apiKey,
+    apiType: apiType,
+  );
+
+  @override
+  Future<void> installAgentChannelPlugin({
+    required int agentId,
+    required String type,
+    required String taskID,
+  }) => _api.installAgentChannelPlugin(
+    agentId: agentId,
+    type: type,
+    taskID: taskID,
+  );
+
+  @override
+  Future<void> upgradeAgentChannelPlugin({
+    required int agentId,
+    required String type,
+    required String taskID,
+  }) => _api.upgradeAgentChannelPlugin(
+    agentId: agentId,
+    type: type,
+    taskID: taskID,
+  );
+
+  @override
+  Future<void> uninstallAgentChannelPlugin({
+    required int agentId,
+    required String type,
+    required String taskID,
+  }) => _api.uninstallAgentChannelPlugin(
+    agentId: agentId,
+    type: type,
+    taskID: taskID,
+  );
+
+  @override
+  Future<void> approveAgentChannelPairing({
+    required int agentId,
+    required String type,
+    required String pairingCode,
+    String accountId = '',
+  }) => _api.approveAgentChannelPairing(
+    agentId: agentId,
+    type: type,
+    pairingCode: pairingCode,
+    accountId: accountId,
+  );
+
+  @override
+  Future<Map<String, dynamic>> checkAgentChannelPlugin({
+    required int agentId,
+    required String type,
+    bool checkLatest = true,
+  }) => _api.checkAgentChannelPlugin(
+    agentId: agentId,
+    type: type,
+    checkLatest: checkLatest,
+  );
+
+  @override
+  Future<List<Map<String, dynamic>>> batchInstallAgents(
+    Map<String, dynamic> body,
+  ) => _api.batchInstallAgents(body);
+
+  @override
+  Future<List<Map<String, dynamic>>> batchUpgradeAgents(
+    Map<String, dynamic> body,
+  ) => _api.batchUpgradeAgents(body);
+
+  @override
+  Future<List<String>> getAgentSecurity(int agentId) =>
+      _api.getAgentSecurity(agentId);
+
+  @override
+  Future<void> updateAgentSecurity(int agentId, List<String> origins) =>
+      _api.updateAgentSecurity(agentId, origins);
+
+  @override
+  Future<String> getAgentConfigFile(int agentId) =>
+      _api.getAgentConfigFile(agentId);
+
+  @override
+  Future<void> updateAgentConfigFile(int agentId, String content) =>
+      _api.updateAgentConfigFile(agentId, content);
+
+  @override
+  Future<Map<String, dynamic>> getAiDomain(int appInstallId) =>
+      _api.getAiDomain(appInstallId);
+
+  @override
+  Future<void> bindAiDomain(Map<String, dynamic> body) =>
+      _api.bindAiDomain(body);
+
+  @override
+  Future<void> updateAiDomain(Map<String, dynamic> body) =>
+      _api.updateAiDomain(body);
+
+  @override
+  Future<Map<String, dynamic>> getAgentOverview(int agentId) =>
+      _api.getAgentOverview(agentId);
+
+  @override
+  Future<List<Map<String, dynamic>>> getHermesChatSessions(int agentId) =>
+      _api.getHermesChatSessions(agentId);
+
+  @override
+  Future<void> renameHermesChatSession({
+    required int agentId,
+    required String id,
+    required String title,
+  }) => _api.renameHermesChatSession(agentId: agentId, id: id, title: title);
+
+  @override
+  Future<void> deleteHermesChatSession({
+    required int agentId,
+    required String id,
+  }) => _api.deleteHermesChatSession(agentId: agentId, id: id);
+
+  @override
+  Future<Map<String, dynamic>> searchGpuMonitor({
+    required DateTime startTime,
+    required DateTime endTime,
+    String deviceID = '',
+    String productName = '',
+    bool legacy = false,
+    String aggregation = '',
+  }) => _api.searchGpuMonitor(
+    startTime: startTime,
+    endTime: endTime,
+    deviceID: deviceID,
+    productName: productName,
+    legacy: legacy,
+    aggregation: aggregation,
+  );
+
+  @override
+  Future<List<Map<String, dynamic>>> getBenchmarkSources({
+    String kind = '',
+    String selected = '',
+  }) => _api.getBenchmarkSources(kind: kind, selected: selected);
+
+  @override
+  Future<List<Map<String, dynamic>>> listAgentPlugins(int agentId) =>
+      _api.listAgentPlugins(agentId);
+
+  @override
+  Future<List<Map<String, dynamic>>> searchAgentPlugins({
+    required int agentId,
+    required String keyword,
+    int limit = 20,
+  }) =>
+      _api.searchAgentPlugins(agentId: agentId, keyword: keyword, limit: limit);
+
+  @override
+  Future<void> installAgentMarketPlugin({
+    required int agentId,
+    required String package,
+    required String version,
+    required String taskID,
+  }) => _api.installAgentMarketPlugin(
+    agentId: agentId,
+    package: package,
+    version: version,
+    taskID: taskID,
+  );
+
+  @override
+  Future<void> operateAgentPlugin({
+    required int agentId,
+    required String pluginId,
+    required String operate,
+    required String taskID,
+  }) => _api.operateAgentPlugin(
+    agentId: agentId,
+    pluginId: pluginId,
+    operate: operate,
+    taskID: taskID,
+  );
+
+  @override
+  Future<List<Map<String, dynamic>>> listAgentSkills(int agentId) =>
+      _api.listAgentSkills(agentId);
+
+  @override
+  Future<List<Map<String, dynamic>>> searchAgentSkills({
+    required int agentId,
+    required String source,
+    required String keyword,
+  }) => _api.searchAgentSkills(
+    agentId: agentId,
+    source: source,
+    keyword: keyword,
+  );
+
+  @override
+  Future<void> installAgentSkill({
+    required int agentId,
+    required String source,
+    required String slug,
+    required String taskID,
+  }) => _api.installAgentSkill(
+    agentId: agentId,
+    source: source,
+    slug: slug,
+    taskID: taskID,
+  );
+
+  @override
+  Future<void> updateAgentSkill({
+    required int agentId,
+    required String name,
+    required bool enabled,
+  }) => _api.updateAgentSkill(agentId: agentId, name: name, enabled: enabled);
+
+  @override
+  Future<void> uninstallAgentSkill({
+    required int agentId,
+    required String name,
+  }) => _api.uninstallAgentSkill(agentId: agentId, name: name);
+
+  @override
   Future<void> deleteOllamaModels(List<int> ids, {bool force = false}) =>
       _api.deleteOllamaModels(ids, force: force);
 
@@ -72,6 +352,10 @@ class AiRepositoryImpl implements AiRepository {
   Future<List<AiProviderDto>> getProviders() => _api.getProviders();
 
   @override
+  Future<Map<String, int>> countAccountsByProviders(List<String> providers) =>
+      _api.countAccountsByProviders(providers);
+
+  @override
   Future<void> createAccount(Map<String, dynamic> body) =>
       _api.createAccount(body);
 
@@ -93,6 +377,45 @@ class AiRepositoryImpl implements AiRepository {
   );
 
   @override
+  Future<List<Map<String, dynamic>>> getAccountModels(int accountId) =>
+      _api.getAccountModels(accountId);
+
+  @override
+  Future<void> createAccountModel({
+    required int accountId,
+    required String id,
+    required String name,
+  }) => _api.createAccountModel(accountId: accountId, id: id, name: name);
+
+  @override
+  Future<void> updateAccountModel({
+    required int accountId,
+    required String id,
+    required String name,
+  }) => _api.updateAccountModel(accountId: accountId, id: id, name: name);
+
+  @override
+  Future<void> deleteAccountModel({
+    required int accountId,
+    required int recordId,
+    bool deleteFiles = false,
+  }) => _api.deleteAccountModel(
+    accountId: accountId,
+    recordId: recordId,
+    deleteFiles: deleteFiles,
+  );
+
+  @override
+  Future<void> setAccountVerifyModel({
+    required int accountId,
+    required int recordId,
+  }) => _api.setAccountVerifyModel(accountId: accountId, recordId: recordId);
+
+  @override
+  Future<void> verifyAccount({required int id, String model = ''}) =>
+      _api.verifyAccount(id: id, model: model);
+
+  @override
   Future<void> deleteAccount(int id) => _api.deleteAccount(id);
 
   @override
@@ -110,6 +433,48 @@ class AiRepositoryImpl implements AiRepository {
   @override
   Future<List<AiAgentRoleDto>> getAgentRoles(int agentId) =>
       _api.getAgentRoles(agentId);
+
+  @override
+  Future<List<Map<String, dynamic>>> listAgentRoleMarkdownFiles({
+    required int agentId,
+    required String workspace,
+  }) => _api.listAgentRoleMarkdownFiles(agentId: agentId, workspace: workspace);
+
+  @override
+  Future<void> updateAgentRoleMarkdownFile({
+    required int agentId,
+    required String workspace,
+    required String name,
+    required String content,
+    bool restart = false,
+  }) => _api.updateAgentRoleMarkdownFile(
+    agentId: agentId,
+    workspace: workspace,
+    name: name,
+    content: content,
+    restart: restart,
+  );
+
+  @override
+  Future<List<Map<String, dynamic>>> batchInstallAgentSkill(
+    Map<String, dynamic> body,
+  ) => _api.batchInstallAgentSkill(body);
+
+  @override
+  Future<void> switchAgentFeishuPlugin(Map<String, dynamic> body) =>
+      _api.switchAgentFeishuPlugin(body);
+
+  @override
+  Future<Map<String, dynamic>> getAgentOtherConfig(int agentId) =>
+      _api.getAgentOtherConfig(agentId);
+
+  @override
+  Future<void> updateAgentOtherConfig(Map<String, dynamic> body) =>
+      _api.updateAgentOtherConfig(body);
+
+  @override
+  Future<List<Map<String, dynamic>>> checkAgentDelete(int agentId) =>
+      _api.checkAgentDelete(agentId);
 
   @override
   Future<void> deleteAgentRole(int agentId, String roleId) =>

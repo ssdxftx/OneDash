@@ -33,7 +33,14 @@ class _FakeBackupAccountRepository implements BackupAccountRepository {
   }
 
   @override
-  Future<void> deleteAccount(int id) async {}
+  Future<void> deleteAccount({
+    required int id,
+    required String name,
+    required bool isPublic,
+  }) async {}
+
+  @override
+  Future<void> checkName(String name) async {}
 
   @override
   Future<Map<String, dynamic>> checkConnection(
@@ -45,7 +52,11 @@ class _FakeBackupAccountRepository implements BackupAccountRepository {
       const [];
 
   @override
-  Future<void> refreshToken(int id) async {}
+  Future<void> refreshToken({
+    required int id,
+    required String name,
+    required bool isPublic,
+  }) async {}
 
   @override
   Future<String> getLocalDir() async => '/backup';

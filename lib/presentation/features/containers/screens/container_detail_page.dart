@@ -30,13 +30,6 @@ final _containerInfoProvider = FutureProvider.autoDispose
           .then((repository) => repository.getContainerInfo(name));
     });
 
-final _containerStatsProvider = FutureProvider.autoDispose
-    .family<ContainerStatsDto, String>((ref, name) {
-      return ref
-          .watch(containerRepositoryProvider.future)
-          .then((repository) => repository.getContainerStats(name));
-    });
-
 class ContainerDetailPage extends ConsumerStatefulWidget {
   const ContainerDetailPage({
     super.key,
@@ -66,14 +59,28 @@ class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _startTimer();
   }
 
   void _startTimer() {
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (_tabIndex == 1 && !_paused) _fetchLogs();
-    });
+    _timer = null;
+    if (_tabIndex != 1 || _paused) return;
+    _timer = Timer.periodic(AppTokens.logFollowPoll, (_) => _fetchLogs());
+  }
+
+  void _stopTimer() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  void _setPaused(bool value) {
+    _paused = value;
+    if (value) {
+      _stopTimer();
+    } else {
+      _startTimer();
+      if (_tabIndex == 1) _fetchLogs();
+    }
   }
 
   @override
@@ -82,7 +89,7 @@ class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage>
       _startTimer();
       if (_tabIndex == 1 && !_paused) _fetchLogs();
     } else {
-      _timer?.cancel();
+      _stopTimer();
     }
   }
 
@@ -124,7 +131,7 @@ class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _timer?.cancel();
+    _stopTimer();
     super.dispose();
   }
 
@@ -136,19 +143,24 @@ class _ContainerDetailPageState extends ConsumerState<ContainerDetailPage>
       scrollable: !widget.embedded,
       labels: [l10n.nav_overview, l10n.containers_logs, l10n.containers_config],
       onChanged: (index) {
-        if (index == 1 && _tabIndex != 1) {
-          _tabIndex = index;
+        if (index == _tabIndex) return;
+        setState(() => _tabIndex = index);
+        if (index == 1) {
+          _startTimer();
           _fetchLogs();
-          return;
+        } else {
+          _stopTimer();
         }
-        _tabIndex = index;
       },
       children: [
-        _OverviewTab(containerName: widget.containerName),
+        _OverviewTab(
+          containerName: widget.containerName,
+          active: _tabIndex == 0,
+        ),
         LogView(
           lines: _logBuffer.lines,
           paused: _paused,
-          onPauseChanged: (value) => setState(() => _paused = value),
+          onPauseChanged: (value) => setState(() => _setPaused(value)),
           onClear: () => setState(_logBuffer.clear),
         ),
         _ConfigTab(containerName: widget.containerName),
@@ -206,19 +218,97 @@ Future<void> showContainerDetailSheet(
   );
 }
 
-class _OverviewTab extends ConsumerWidget {
-  const _OverviewTab({required this.containerName});
+class _OverviewTab extends ConsumerStatefulWidget {
+  const _OverviewTab({required this.containerName, required this.active});
 
   final String containerName;
+  final bool active;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_OverviewTab> createState() => _OverviewTabState();
+}
+
+class _OverviewTabState extends ConsumerState<_OverviewTab>
+    with WidgetsBindingObserver {
+  ContainerStatsDto? _stats;
+  Timer? _timer;
+  bool _inFlight = false;
+  bool _appActive = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    if (widget.active) {
+      _load();
+      _startTimer();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _OverviewTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.active == widget.active) return;
+    if (widget.active) {
+      _load();
+      _startTimer();
+    } else {
+      _stopTimer();
+    }
+  }
+
+  void _startTimer() {
+    _stopTimer();
+    if (!_appActive) return;
+    _timer = Timer.periodic(AppTokens.containerStatsPoll, (_) => _load());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _appActive = state == AppLifecycleState.resumed;
+    if (_appActive && widget.active) {
+      _startTimer();
+    } else {
+      _stopTimer();
+    }
+  }
+
+  void _stopTimer() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  Future<void> _load() async {
+    if (_inFlight) return;
+    _inFlight = true;
+    try {
+      final repository = await ref.read(containerRepositoryProvider.future);
+      final stats = await repository.getContainerStats(widget.containerName);
+      if (!mounted) return;
+      setState(() => _stats = stats);
+    } catch (_) {
+      // 监控失败保留上一帧数据。
+    } finally {
+      _inFlight = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _stopTimer();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final info = ref.watch(_containerInfoProvider(containerName));
-    final stats = ref.watch(_containerStatsProvider(containerName));
+    final info = ref.watch(_containerInfoProvider(widget.containerName));
+    final stats = _stats;
     return AsyncStateView(
       value: info,
-      onRetry: () => ref.invalidate(_containerInfoProvider(containerName)),
+      onRetry: () =>
+          ref.invalidate(_containerInfoProvider(widget.containerName)),
       builder: (data) => ListView(
         padding: EdgeInsets.all(context.pagePadding),
         children: [
@@ -260,7 +350,7 @@ class _OverviewTab extends ConsumerWidget {
                       Text(l10n.dashboard_cpu, style: AppTextStyles.bodyS),
                       const SizedBox(height: AppTokens.s8),
                       MetricRing(
-                        value: stats.valueOrNull?.cpuPercent ?? 0,
+                        value: stats?.cpuPercent ?? 0,
                         label: l10n.dashboard_cpu,
                         size: 72,
                       ),
@@ -276,12 +366,10 @@ class _OverviewTab extends ConsumerWidget {
                       Text(l10n.dashboard_memory, style: AppTextStyles.bodyS),
                       const SizedBox(height: AppTokens.s8),
                       MetricRing(
-                        value: stats.valueOrNull == null
+                        value: stats == null
                             ? 0
-                            : (stats.value!.memory /
-                                      (stats.value!.memory +
-                                          stats.value!.cache +
-                                          1) *
+                            : (stats.memory /
+                                      (stats.memory + stats.cache + 1) *
                                       100)
                                   .clamp(0, 100)
                                   .toDouble(),
@@ -289,9 +377,9 @@ class _OverviewTab extends ConsumerWidget {
                         size: 72,
                       ),
                       Text(
-                        stats.valueOrNull == null
+                        stats == null
                             ? displayValue(context, null)
-                            : formatBytes(stats.value!.memory),
+                            : formatBytes(stats.memory * 1024 * 1024),
                         style: AppTextStyles.caption,
                       ),
                     ],

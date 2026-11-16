@@ -86,6 +86,10 @@ class ApiCompatibility {
     scopeCache[cacheKey] = variant.name;
   }
 
+  static void clearScope(Object scope) {
+    _variantCache.remove(scope);
+  }
+
   static bool isMissingEndpoint(Object error) {
     if (error is AppNetworkException) {
       return error.statusCode == 404 || error.statusCode == 405;

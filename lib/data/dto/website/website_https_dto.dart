@@ -10,6 +10,7 @@ class WebsiteHttpsDto {
     required this.hsts,
     required this.hstsIncludeSubDomains,
     required this.httpsPort,
+    this.httpsPorts = const [],
     required this.http3,
   });
 
@@ -21,6 +22,7 @@ class WebsiteHttpsDto {
   final bool hsts;
   final bool hstsIncludeSubDomains;
   final String httpsPort;
+  final List<int> httpsPorts;
   final bool http3;
 
   factory WebsiteHttpsDto.fromJson(Map<String, dynamic> json) {
@@ -37,8 +39,26 @@ class WebsiteHttpsDto {
       hsts: json['hsts'] as bool? ?? false,
       hstsIncludeSubDomains: json['hstsIncludeSubDomains'] as bool? ?? false,
       httpsPort: json['httpsPort'] as String? ?? '',
+      httpsPorts: _ports(json['httpsPorts'], json['httpsPort']),
       http3: json['http3'] as bool? ?? false,
     );
+  }
+
+  static List<int> _ports(Object? list, Object? joined) {
+    final result = <int>{};
+    if (list is List) {
+      for (final item in list) {
+        final value = item is num ? item.toInt() : int.tryParse('$item');
+        if (value != null && value > 0) result.add(value);
+      }
+    }
+    if (joined is String) {
+      for (final item in joined.split(',')) {
+        final value = int.tryParse(item.trim());
+        if (value != null && value > 0) result.add(value);
+      }
+    }
+    return result.toList(growable: false);
   }
 }
 
@@ -61,12 +81,12 @@ Map<String, dynamic> buildWebsiteHttpsPayload({
     'certificate': '',
     'privateKeyPath': '',
     'certificatePath': '',
-    'httpConfig': https.httpConfig,
+    'httpConfig': https.httpConfig.isEmpty ? 'HTTPToHTTPS' : https.httpConfig,
     'hsts': https.hsts,
     'hstsIncludeSubDomains': https.hstsIncludeSubDomains,
     'algorithm': https.algorithm,
     'SSLProtocol': https.sslProtocol ?? const ['TLSv1.2', 'TLSv1.3'],
-    'httpsPort': https.httpsPort.isEmpty ? '443' : https.httpsPort,
+    'httpsPorts': https.httpsPorts.isEmpty ? const [443] : https.httpsPorts,
     'http3': https.http3,
   };
 }

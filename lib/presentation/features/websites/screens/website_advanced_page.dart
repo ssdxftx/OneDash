@@ -469,7 +469,6 @@ class _BasicTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final site = detail.website;
     final remark = TextEditingController(text: site.remark);
-    final alias = TextEditingController(text: detail.alias);
     bool favorite = detail.favorite;
     final saved = await showAppSheet<bool>(
       context: context,
@@ -483,10 +482,6 @@ class _BasicTab extends ConsumerWidget {
             children: [
               AppTextField(controller: remark, label: l10n.websites_remark),
               const SizedBox(height: AppTokens.s12),
-              AppTextField(
-                controller: alias,
-                label: l10n.websites_websiteAlias,
-              ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.websites_favorite),
@@ -503,12 +498,10 @@ class _BasicTab extends ConsumerWidget {
       primaryDomain: site.primaryDomain,
       remark: remark.text.trim(),
       webSiteGroupId: 0,
-      ipv6: false,
-      alias: alias.text.trim(),
+      ipv6: detail.ipv6,
       favorite: favorite,
     );
     remark.dispose();
-    alias.dispose();
     if (saved != true || !context.mounted) return;
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
@@ -1030,6 +1023,10 @@ class _SecurityTab extends ConsumerWidget {
                 setState(() => formError = l10n.websites_usernameRequired);
                 return;
               }
+              if (enable && password.text.isEmpty) {
+                setState(() => formError = l10n.databases_passwordRequired);
+                return;
+              }
               Navigator.of(context).pop(
                 WebsiteAuthUpdateReq(
                   websiteId: websiteId,
@@ -1473,9 +1470,11 @@ class _RewriteTabState extends ConsumerState<_RewriteTab> {
             runSpacing: AppTokens.s8,
             children: [
               for (final template in _templates)
-                ActionChip(
+                InputChip(
                   label: Text(template),
                   onPressed: () => _loadTemplate(template),
+                  deleteButtonTooltipMessage: l10n.action_delete,
+                  onDeleted: () => _deleteTemplate(template),
                 ),
             ],
           ),
@@ -1499,6 +1498,28 @@ class _RewriteTabState extends ConsumerState<_RewriteTab> {
     );
   }
 
+  Future<void> _deleteTemplate(String name) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.action_delete,
+      message: name,
+      confirmLabel: l10n.action_delete,
+      danger: true,
+    );
+    if (!confirmed) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.manageCustomRewrite(name: name, operate: 'delete');
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _saveAsCustom() async {
     final l10n = AppLocalizations.of(context);
     if (_name.text.trim().isEmpty) return;
@@ -1506,7 +1527,7 @@ class _RewriteTabState extends ConsumerState<_RewriteTab> {
       final repository = await ref.read(websiteRepositoryProvider.future);
       await repository.manageCustomRewrite(
         name: _name.text.trim(),
-        operate: 'add',
+        operate: 'create',
         content: _content.text,
       );
       if (!mounted) return;
@@ -1523,6 +1544,41 @@ class _RedirectTab extends ConsumerWidget {
   const _RedirectTab({required this.websiteId});
 
   final int websiteId;
+
+  Future<void> _changeRedirect(
+    BuildContext context,
+    WidgetRef ref,
+    WebsiteRedirectDto item,
+    String operate,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    if (operate == 'delete') {
+      final confirmed = await showConfirmSheet(
+        context,
+        title: l10n.websites_deleteRedirect,
+        message: item.name,
+        confirmLabel: l10n.action_delete,
+        danger: true,
+      );
+      if (!confirmed) return;
+    }
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.updateWebsiteRedirect({
+        ...item.toJson(),
+        'operate': operate,
+      });
+      ref.invalidate(_redirectProvider(websiteId));
+      if (!context.mounted) return;
+      AppToast.success(
+        context,
+        operate == 'delete' ? l10n.websites_redirectDeleted : l10n.action_done,
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
 
   Future<void> _editSource(
     BuildContext context,
@@ -1665,6 +1721,7 @@ class _RedirectTab extends ConsumerWidget {
     final request = WebsiteRedirectDto(
       websiteID: websiteId,
       name: name.text.trim(),
+      operate: current == null ? 'create' : 'edit',
       domains: domains.text
           .split(',')
           .map((item) => item.trim())
@@ -1765,6 +1822,31 @@ class _RedirectTab extends ConsumerWidget {
                             ),
                           ],
                         ),
+                      ),
+                      IconButton(
+                        tooltip: l10n.action_more,
+                        icon: const Icon(TablerIcons.dots),
+                        onPressed: () async {
+                          final action = await showSelectionMenu<String>(
+                            context,
+                            options: [
+                              SelectionOption(
+                                label: item.enable
+                                    ? l10n.action_disable
+                                    : l10n.action_enable,
+                                value: item.enable ? 'disable' : 'enable',
+                              ),
+                              SelectionOption(
+                                label: l10n.action_delete,
+                                value: 'delete',
+                                danger: true,
+                              ),
+                            ],
+                          );
+                          if (action != null && context.mounted) {
+                            await _changeRedirect(context, ref, item, action);
+                          }
+                        },
                       ),
                       IconButton(
                         tooltip: l10n.websites_editSource,

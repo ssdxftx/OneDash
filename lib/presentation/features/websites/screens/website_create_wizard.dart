@@ -8,12 +8,18 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../data/dto/app/app_installed_dto.dart';
+import '../../../../data/dto/app/app_installed_search_req.dart';
 import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/dto/cronjob/cronjob_form_data_dto.dart';
 import '../../../../data/dto/runtime/runtime_dto.dart';
 import '../../../../data/dto/website/ssl_manage_dtos.dart';
 import '../../../../data/dto/website/website_create_req.dart';
+import '../../../../data/dto/website/website_dto.dart';
+import '../../../../data/dto/website/website_search_req.dart';
+import '../../../../data/dto/website/website_template_dto.dart';
 import '../../../../data/dto/website/website_domain_req.dart';
+import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../../../data/repositories_impl/runtime_repository_impl.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
@@ -24,6 +30,7 @@ import '../../../common/components/section_header.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
 import '../providers/websites_provider.dart';
+import 'website_ssl_manage_page.dart';
 
 class WebsiteCreateWizard extends ConsumerStatefulWidget {
   const WebsiteCreateWizard({
@@ -44,6 +51,10 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
   final _domainController = TextEditingController();
   final _aliasController = TextEditingController();
   final _proxyController = TextEditingController();
+  final _streamPortsController = TextEditingController(text: '8080');
+  final _streamNameController = TextEditingController();
+  final _streamServerController = TextEditingController(text: '127.0.0.1:80');
+  final _subsitePathController = TextEditingController(text: '/');
   final _portController = TextEditingController(text: '80');
   final _remarkController = TextEditingController();
   final _ftpUserController = TextEditingController();
@@ -56,6 +67,8 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
   final List<String> _domains = [];
   String _protocol = 'http://';
   String _runtimeType = 'php';
+  String _streamAlgorithm = 'roundrobin';
+  bool _streamUdp = false;
   String _dbType = 'mysql';
   bool _aliasTouched = false;
   bool _enableSsl = false;
@@ -67,8 +80,15 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
   int? _sslId;
   int? _acmeId;
   RuntimeDto? _runtime;
+  int? _parentId;
+  List<WebsiteDto> _parents = const [];
+  List<AppInstalledDto> _apps = const [];
+  List<WebsitePreInstallCheckDto> _appChecks = const [];
+  bool _checkingApps = false;
+  int? _appInstallId;
   List<RuntimeDto> _runtimes = const [];
   List<SslManageDto> _certificates = const [];
+  bool _sslLoading = false;
 
   @override
   void initState() {
@@ -76,9 +96,12 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
     _aliasController.addListener(() {
       if (_aliasController.text.trim().isNotEmpty) _aliasTouched = true;
     });
-    if (widget.type == 'runtime') {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _loadRuntimes());
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCertificates();
+      if (widget.type == 'runtime') _loadRuntimes();
+      if (widget.type == 'subsite') _loadParents();
+      if (widget.type == 'deployment') _loadApps();
+    });
   }
 
   @override
@@ -86,6 +109,10 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
     _domainController.dispose();
     _aliasController.dispose();
     _proxyController.dispose();
+    _streamPortsController.dispose();
+    _streamNameController.dispose();
+    _streamServerController.dispose();
+    _subsitePathController.dispose();
     _portController.dispose();
     _remarkController.dispose();
     _ftpUserController.dispose();
@@ -132,7 +159,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
       }
     });
     if (_domains.length == 1) {
-      _loadCertificates(value);
+      _loadCertificates();
     }
   }
 
@@ -187,19 +214,44 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
     }
   }
 
-  Future<void> _loadCertificates(String domain) async {
+  Future<void> _loadCertificates() async {
+    if (!mounted || _sslLoading) return;
+    setState(() => _sslLoading = true);
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
-      final result = await repository.searchSsl({
-        'page': 1,
-        'pageSize': 100,
-        'domain': domain,
-      });
+      final result = await repository.searchSsl({'page': 1, 'pageSize': 100});
       if (!mounted) return;
-      setState(() => _certificates = result.items);
+      setState(() {
+        _certificates = [
+          for (final cert in result.items)
+            if (cert.pem.isNotEmpty) cert,
+        ];
+        _sslLoading = false;
+        _selectDefaultCertificate();
+      });
     } catch (_) {
-      // Certificates are optional; keep the form usable when the query fails.
+      if (!mounted) return;
+      setState(() => _sslLoading = false);
     }
+  }
+
+  void _selectDefaultCertificate() {
+    if (!_enableSsl || _certificates.isEmpty) return;
+    if (_certificates.any((cert) => cert.id == _sslId)) return;
+    final cert = _certificates.first;
+    _sslId = cert.id;
+    _acmeId = cert.acmeAccountId;
+  }
+
+  Future<void> _manageCertificates() async {
+    await showWebsiteSslSheet(
+      context,
+      serverId: widget.serverId,
+      websiteId: 0,
+      domain: _domains.isEmpty ? '' : _domains.first,
+    );
+    if (!mounted) return;
+    await _loadCertificates();
   }
 
   Future<void> _loadRuntimes() async {
@@ -223,9 +275,75 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
     }
   }
 
+  Future<void> _loadApps() async {
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      final result = await repository.searchInstalledApps(
+        const AppInstalledSearchReq(page: 1, pageSize: 100),
+      );
+      if (!mounted) return;
+      setState(() {
+        _apps = result.items;
+        _appInstallId = _apps.isEmpty ? null : _apps.first.id;
+      });
+      await _checkApps();
+    } catch (_) {
+      // Application list is optional; server validates the request.
+    }
+  }
+
+  Future<void> _checkApps() async {
+    if (_apps.isEmpty) {
+      setState(() => _appChecks = const []);
+      return;
+    }
+    setState(() => _checkingApps = true);
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final checks = await repository.checkWebsiteInstall(
+        _apps.map((app) => app.id).toList(growable: false),
+      );
+      if (!mounted) return;
+      setState(() => _appChecks = checks);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _appChecks = const []);
+    } finally {
+      if (mounted) setState(() => _checkingApps = false);
+    }
+  }
+
+  WebsitePreInstallCheckDto? get _selectedCheck {
+    for (final check in _appChecks) {
+      if (check.name.isEmpty) continue;
+      for (final app in _apps) {
+        if (app.id == _appInstallId && app.name == check.name) return check;
+      }
+    }
+    return _appChecks.length == 1 ? _appChecks.first : null;
+  }
+
+  Future<void> _loadParents() async {
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final result = await repository.searchWebsites(
+        const WebsiteSearchReq(page: 1, pageSize: 100),
+      );
+      if (!mounted) return;
+      setState(() {
+        _parents = result.items
+            .where((item) => item.type != 'subsite')
+            .toList(growable: false);
+        _parentId ??= _parents.isEmpty ? null : _parents.first.id;
+      });
+    } catch (_) {
+      // Parent list is optional; server validates the request.
+    }
+  }
+
   Future<void> _create() async {
     final l10n = AppLocalizations.of(context);
-    if (_domains.isEmpty) {
+    if (widget.type != 'stream' && _domains.isEmpty) {
       AppToast.error(context, l10n.websites_domainAtLeastOne);
       return;
     }
@@ -235,6 +353,20 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
     }
     if (widget.type == 'runtime' && _runtime == null) {
       AppToast.error(context, l10n.state_empty);
+      return;
+    }
+    if (widget.type == 'stream' &&
+        (_streamPortsController.text.trim().isEmpty ||
+            _streamServerController.text.trim().isEmpty)) {
+      AppToast.error(context, l10n.state_empty);
+      return;
+    }
+    if (widget.type == 'subsite' && _parentId == null) {
+      AppToast.error(context, l10n.websites_parentWebsite);
+      return;
+    }
+    if (widget.type == 'deployment' && _appInstallId == null) {
+      AppToast.error(context, l10n.websites_deploymentApp);
       return;
     }
     if (_enableSsl && _sslId == null) {
@@ -251,9 +383,11 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
       final repository = await ref.read(websiteRepositoryProvider.future);
       await repository.createWebsite(
         WebsiteCreateReq(
-          alias: _aliasController.text.trim().isEmpty
+          alias: _aliasController.text.trim().isNotEmpty
+              ? _aliasController.text.trim()
+              : _domains.isNotEmpty
               ? _aliasFromDomain(_domains.first)
-              : _aliasController.text.trim(),
+              : _streamNameController.text.trim(),
           type: widget.type,
           domains: [
             for (final domain in _domains)
@@ -271,7 +405,37 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
               : '',
           port: port,
           runtimeID: _runtime?.id ?? 0,
-          siteDir: _domains.first,
+          parentWebsiteID: widget.type == 'subsite' ? (_parentId ?? 0) : 0,
+          appType: 'installed',
+          appInstallID: widget.type == 'deployment' ? (_appInstallId ?? 0) : 0,
+          streamPorts: widget.type == 'stream'
+              ? _streamPortsController.text.trim()
+              : '',
+          name: widget.type == 'stream'
+              ? (_streamNameController.text.trim().isEmpty
+                    ? _aliasController.text.trim()
+                    : _streamNameController.text.trim())
+              : '',
+          algorithm: widget.type == 'stream' ? _streamAlgorithm : '',
+          udp: widget.type == 'stream' && _streamUdp,
+          servers: widget.type == 'stream'
+              ? [
+                  {
+                    'server': _streamServerController.text.trim(),
+                    'weight': 1,
+                    'failTimeout': 10,
+                    'failTimeoutUnit': 's',
+                    'maxFails': 3,
+                    'maxConns': 0,
+                    'flag': '',
+                  },
+                ]
+              : const [],
+          siteDir: widget.type == 'subsite'
+              ? _subsitePathController.text.trim()
+              : _domains.isEmpty
+              ? ''
+              : _domains.first,
           taskID: const Uuid().v4(),
           enableSSL: _enableSsl,
           websiteSSLID: _enableSsl ? (_sslId ?? 0) : 0,
@@ -516,6 +680,147 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
               ),
             ),
           ],
+          if (widget.type == 'deployment') ...[
+            const SizedBox(height: AppTokens.s24),
+            SectionHeader(title: l10n.websites_deployment),
+            TonalCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DropdownButtonFormField<int>(
+                    initialValue: _appInstallId,
+                    decoration: InputDecoration(
+                      labelText: l10n.websites_deploymentApp,
+                    ),
+                    items: [
+                      for (final app in _apps)
+                        DropdownMenuItem(
+                          value: app.id,
+                          child: Text(app.displayName),
+                        ),
+                    ],
+                    onChanged: (value) => setState(() => _appInstallId = value),
+                  ),
+                  if (_checkingApps) ...[
+                    const SizedBox(height: AppTokens.s8),
+                    const LinearProgressIndicator(),
+                  ] else if (_selectedCheck != null) ...[
+                    const SizedBox(height: AppTokens.s8),
+                    Row(
+                      children: [
+                        Icon(
+                          _selectedCheck!.isRunning
+                              ? TablerIcons.circle_check
+                              : TablerIcons.alert_circle,
+                          size: AppTokens.iconList,
+                          color: _selectedCheck!.isRunning
+                              ? context.appColors.success
+                              : context.appColors.warning,
+                        ),
+                        const SizedBox(width: AppTokens.s8),
+                        Expanded(
+                          child: Text(
+                            _selectedCheck!.isRunning
+                                ? l10n.websites_deploymentRunning
+                                : l10n.websites_deploymentStopped,
+                            style: AppTextStyles.bodyS,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+          if (widget.type == 'subsite') ...[
+            const SizedBox(height: AppTokens.s24),
+            SectionHeader(title: l10n.websites_subsite),
+            TonalCard(
+              child: Column(
+                children: [
+                  DropdownButtonFormField<int>(
+                    initialValue: _parentId,
+                    decoration: InputDecoration(
+                      labelText: l10n.websites_parentWebsite,
+                    ),
+                    items: [
+                      for (final site in _parents)
+                        DropdownMenuItem(
+                          value: site.id,
+                          child: Text(site.primaryDomain),
+                        ),
+                    ],
+                    onChanged: (value) => setState(() => _parentId = value),
+                  ),
+                  const SizedBox(height: AppTokens.s12),
+                  AppTextField(
+                    controller: _subsitePathController,
+                    label: l10n.websites_subsitePath,
+                    hint: '/sub',
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (widget.type == 'stream') ...[
+            const SizedBox(height: AppTokens.s24),
+            SectionHeader(title: l10n.websites_createStreamTitle),
+            TonalCard(
+              child: Column(
+                children: [
+                  AppTextField(
+                    controller: _streamPortsController,
+                    label: l10n.websites_streamPorts,
+                    helper: '8080,8443',
+                  ),
+                  const SizedBox(height: AppTokens.s12),
+                  AppTextField(
+                    controller: _streamNameController,
+                    label: l10n.websites_streamName,
+                  ),
+                  const SizedBox(height: AppTokens.s12),
+                  DropdownButtonFormField<String>(
+                    initialValue: _streamAlgorithm,
+                    decoration: InputDecoration(
+                      labelText: l10n.websites_streamAlgorithm,
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'roundrobin',
+                        child: Text(l10n.websites_lbRoundRobin),
+                      ),
+                      DropdownMenuItem(
+                        value: 'least_conn',
+                        child: Text(l10n.websites_lbLeastConnections),
+                      ),
+                      DropdownMenuItem(
+                        value: 'ip_hash',
+                        child: Text(l10n.websites_lbIpHashShort),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _streamAlgorithm = value);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: AppTokens.s12),
+                  AppTextField(
+                    controller: _streamServerController,
+                    label: l10n.websites_streamServer,
+                    hint: '127.0.0.1:80',
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.websites_streamUdp),
+                    value: _streamUdp,
+                    onChanged: (value) => setState(() => _streamUdp = value),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: AppTokens.s24),
           SectionHeader(title: l10n.websites_enableSsl),
           TonalCard(
@@ -525,31 +830,83 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                   contentPadding: EdgeInsets.zero,
                   title: Text(l10n.websites_enableSsl),
                   value: _enableSsl,
-                  onChanged: (value) => setState(() => _enableSsl = value),
+                  onChanged: (value) => setState(() {
+                    _enableSsl = value;
+                    if (value) _selectDefaultCertificate();
+                  }),
                 ),
-                if (_enableSsl)
-                  DropdownButtonFormField<int>(
-                    initialValue: _sslId,
-                    decoration: InputDecoration(
-                      labelText: l10n.websites_sslCertificate,
+                if (_enableSsl) ...[
+                  if (_sslLoading)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: AppTokens.s12),
+                      child: LinearProgressIndicator(),
                     ),
-                    items: [
-                      for (final certificate in _certificates)
-                        DropdownMenuItem(
-                          value: certificate.id,
-                          child: Text(certificate.primaryDomain),
-                        ),
-                    ],
-                    onChanged: (value) {
-                      final picked = _certificates
-                          .where((item) => item.id == value)
-                          .firstOrNull;
-                      setState(() {
-                        _sslId = value;
-                        _acmeId = picked?.acmeAccountId;
-                      });
-                    },
-                  ),
+                  if (_certificates.isEmpty && !_sslLoading)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.websites_noSslCertificate,
+                            style: AppTextStyles.bodyS.copyWith(
+                              color: context.scheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: AppTokens.s8),
+                          TextButton.icon(
+                            onPressed: _manageCertificates,
+                            icon: const Icon(TablerIcons.shield),
+                            label: Text(l10n.websites_sslManage),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (_certificates.isNotEmpty) ...[
+                    DropdownButtonFormField<int>(
+                      key: ValueKey(
+                        'ssl-$_sslId-${_certificates.map((c) => c.id).join(',')}',
+                      ),
+                      initialValue: _certificates.any((c) => c.id == _sslId)
+                          ? _sslId
+                          : null,
+                      decoration: InputDecoration(
+                        labelText: l10n.websites_sslCertificate,
+                      ),
+                      hint: Text(l10n.ssl_selectCertificate),
+                      isExpanded: true,
+                      items: [
+                        for (final certificate in _certificates)
+                          DropdownMenuItem(
+                            value: certificate.id,
+                            child: Text(
+                              certificate.expireDate.isEmpty
+                                  ? certificate.primaryDomain
+                                  : '${certificate.primaryDomain} · ${certificate.expireDate}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                      ],
+                      onChanged: (value) {
+                        final picked = _certificates
+                            .where((item) => item.id == value)
+                            .firstOrNull;
+                        setState(() {
+                          _sslId = value;
+                          _acmeId = picked?.acmeAccountId;
+                        });
+                      },
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: _manageCertificates,
+                        icon: const Icon(TablerIcons.settings, size: 18),
+                        label: Text(l10n.websites_sslManage),
+                      ),
+                    ),
+                  ],
+                ],
               ],
             ),
           ),

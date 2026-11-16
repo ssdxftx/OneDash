@@ -139,6 +139,46 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
     super.dispose();
   }
 
+  Future<void> _editPanelPort(String current) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController();
+    final saved = await pushFormPage<int>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.firewall_panelPort,
+          subtitle: current,
+          saveLabel: l10n.action_save,
+          onSave: () async {
+            final port = int.tryParse(controller.text.trim());
+            if (port == null || port <= 0 || port > 65535) return;
+            Navigator.of(pageContext).pop(port);
+          },
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.firewall_newPort,
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+      ),
+    );
+    controller.dispose();
+    final oldPort = int.tryParse(current);
+    if (saved == null || oldPort == null || !mounted) return;
+    try {
+      final repository = await ref.read(firewallRepositoryProvider.future);
+      await repository.updatePanelPort(oldPort: oldPort, newPort: saved);
+      if (!mounted) return;
+      AppToast.success(context, l10n.firewall_portChanged);
+      await _refresh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _refresh() async {
     ref.invalidate(_firewallProvider);
     await ref.read(_firewallProvider.future);
@@ -160,6 +200,13 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
             tooltip: l10n.action_refresh,
             onPressed: _refresh,
           ),
+          if (firewall.valueOrNull != null)
+            AppIconButton(
+              icon: TablerIcons.plug,
+              tooltip: l10n.firewall_panelPort,
+              onPressed: () =>
+                  _editPanelPort(firewall.valueOrNull!.settings.panelPort),
+            ),
           if (_tab == 0 || _tab == 1)
             AppIconButton(
               icon: TablerIcons.plus,
@@ -265,6 +312,8 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
                     data: data,
                     operating: _operating,
                     onToggle: _toggleDockerGuard,
+                    onEditPolicy: _editDockerPolicy,
+                    onDeletePolicy: _deleteDockerPolicy,
                   ),
                   _ => _SettingsTab(
                     data: data,
@@ -274,6 +323,8 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
                         _showWhitelistSheet(existing: rule),
                     onDeleteWhitelist: _deleteWhitelist,
                     onSelectBackend: _selectBackend,
+                    onFamilyOperation: _showFamilyOperation,
+                    onFilterChain: _showFilterChain,
                     onResetRules: _resetRules,
                     onRestoreBackup: (file) => _resetRules(backupFile: file),
                     onNativeDetail: _showNativeDetail,
@@ -484,11 +535,15 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
     }
   }
 
-  Future<void> _selectBackend() async {
+  Future<void> _selectBackend(String subsystem) async {
     final data = ref.read(_firewallProvider).valueOrNull;
     if (data == null) return;
     final l10n = AppLocalizations.of(context);
-    final group = data.settings.system;
+    final group = switch (subsystem) {
+      'forwarding' => data.settings.forwarding,
+      'docker' => data.settings.docker,
+      _ => data.settings.system,
+    };
     final options = group.options
         .where((option) => option.supported && option.installed)
         .toList();
@@ -536,13 +591,141 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
     try {
       final repository = await ref.read(firewallRepositoryProvider.future);
       await repository.operateBackend(
-        subsystem: 'system',
+        subsystem: subsystem,
         backend: selected,
         operation: 'select',
       );
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
       ref.invalidate(_firewallProvider);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showFamilyOperation() async {
+    final data = ref.read(_firewallProvider).valueOrNull;
+    if (data == null) return;
+    final l10n = AppLocalizations.of(context);
+    final request = await pushFormPage<_FamilyOperationRequest>(
+      context,
+      _FamilyOperationSheet(data: data),
+    );
+    if (request == null || !mounted) return;
+    try {
+      final repository = await ref.read(firewallRepositoryProvider.future);
+      await repository.operateFamily(
+        subsystem: request.subsystem,
+        backend: request.backend,
+        family: request.family,
+        operation: request.operation,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      await _refresh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showFilterChain() async {
+    final l10n = AppLocalizations.of(context);
+    final operation = await showAppSheet<String>(
+      context: context,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.firewall_filterChain, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s16),
+          SplitListGroup(
+            children: [
+              SplitListTile(
+                leading: const Icon(TablerIcons.arrow_down),
+                title: l10n.firewall_filterInit,
+                onTap: () => Navigator.of(sheetContext).pop('init-base'),
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.link),
+                title: l10n.firewall_filterBind,
+                onTap: () => Navigator.of(sheetContext).pop('bind-base'),
+              ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.unlink),
+                title: l10n.firewall_filterUnbind,
+                onTap: () => Navigator.of(sheetContext).pop('unbind-base'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+    if (operation == null || !mounted) return;
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.firewall_filterChain,
+      message: l10n.firewall_filterChainHint,
+      confirmLabel: l10n.action_confirm,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(firewallRepositoryProvider.future);
+      await repository.operateFilterChain(operation: operation);
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      await _refresh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _editDockerPolicy(DockerGuardEndpoint endpoint) async {
+    final l10n = AppLocalizations.of(context);
+    final policy = await pushFormPage<_DockerPolicyRequest>(
+      context,
+      _DockerPolicySheet(endpoint: endpoint),
+    );
+    if (policy == null || !mounted) return;
+    try {
+      final repository = await ref.read(firewallRepositoryProvider.future);
+      await repository.upsertDockerPolicies([
+        {
+          'family': endpoint.family,
+          'hostIP': endpoint.hostIP,
+          'hostPort': endpoint.hostPort,
+          'protocol': endpoint.protocol,
+          'mode': policy.mode,
+          'sources': policy.sources,
+        },
+      ]);
+      if (!mounted) return;
+      AppToast.success(context, l10n.firewall_dockerPolicySaved);
+      await _refresh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _deleteDockerPolicy(DockerGuardEndpoint endpoint) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.firewall_dockerPolicy,
+      message: '${endpoint.hostPort}/${endpoint.protocol}',
+      confirmLabel: l10n.action_delete,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(firewallRepositoryProvider.future);
+      await repository.deleteDockerPolicies([endpoint.policyUUID]);
+      if (!mounted) return;
+      AppToast.success(context, l10n.firewall_dockerPolicyDeleted);
+      await _refresh();
     } catch (error) {
       if (!mounted) return;
       showErrorToast(context, error);
@@ -1118,11 +1301,15 @@ class _DockerTab extends StatelessWidget {
     required this.data,
     required this.operating,
     required this.onToggle,
+    required this.onEditPolicy,
+    required this.onDeletePolicy,
   });
 
   final _FirewallData data;
   final bool operating;
   final ValueChanged<bool> onToggle;
+  final ValueChanged<DockerGuardEndpoint> onEditPolicy;
+  final ValueChanged<DockerGuardEndpoint> onDeletePolicy;
 
   @override
   Widget build(BuildContext context) {
@@ -1194,7 +1381,18 @@ class _DockerTab extends StatelessWidget {
                   subtitle: [
                     endpoint.containerName,
                     endpoint.hostIP.isEmpty ? '0.0.0.0' : endpoint.hostIP,
+                    if (endpoint.mode.isNotEmpty) endpoint.mode,
+                    if (endpoint.sources.isNotEmpty)
+                      endpoint.sources.join(', '),
                   ].where((value) => value.isNotEmpty).join(' · '),
+                  onTap: () => onEditPolicy(endpoint),
+                  trailing: endpoint.policyUUID.isEmpty
+                      ? const Icon(TablerIcons.chevron_right)
+                      : IconButton(
+                          tooltip: l10n.action_delete,
+                          icon: const Icon(TablerIcons.trash),
+                          onPressed: () => onDeletePolicy(endpoint),
+                        ),
                 ),
             ],
           ),
@@ -1211,6 +1409,8 @@ class _SettingsTab extends StatelessWidget {
     required this.onEditWhitelist,
     required this.onDeleteWhitelist,
     required this.onSelectBackend,
+    required this.onFamilyOperation,
+    required this.onFilterChain,
     required this.onResetRules,
     required this.onRestoreBackup,
     required this.onNativeDetail,
@@ -1221,7 +1421,9 @@ class _SettingsTab extends StatelessWidget {
   final VoidCallback onAddWhitelist;
   final ValueChanged<FirewallWhitelistRule> onEditWhitelist;
   final ValueChanged<FirewallWhitelistRule> onDeleteWhitelist;
-  final VoidCallback onSelectBackend;
+  final ValueChanged<String> onSelectBackend;
+  final VoidCallback onFamilyOperation;
+  final VoidCallback onFilterChain;
   final VoidCallback onResetRules;
   final ValueChanged<String> onRestoreBackup;
   final VoidCallback onNativeDetail;
@@ -1235,6 +1437,32 @@ class _SettingsTab extends StatelessWidget {
       );
     }
     return formatLocalDateTime('${value ?? ''}');
+  }
+
+  Widget _backendTile(
+    BuildContext context,
+    _FirewallData data,
+    String subsystem,
+    String title,
+    FirewallBackendGroup group,
+  ) {
+    final l10n = AppLocalizations.of(context);
+    final current = group.current.isEmpty
+        ? (subsystem == 'system' ? data.base.backend : group.selected)
+        : group.current;
+    return SplitListTile(
+      leading: const Icon(TablerIcons.server),
+      title: title,
+      subtitle: l10n.firewall_settingsBackendHint,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(current.isEmpty ? '--' : current),
+          const Icon(TablerIcons.chevron_right),
+        ],
+      ),
+      onTap: () => onSelectBackend(subsystem),
+    );
   }
 
   @override
@@ -1252,22 +1480,26 @@ class _SettingsTab extends StatelessWidget {
         SectionHeader(title: l10n.firewall_tabSettings),
         SplitListGroup(
           children: [
-            SplitListTile(
-              leading: const Icon(TablerIcons.server),
-              title: l10n.firewall_settingsBackend,
-              subtitle: l10n.firewall_settingsBackendHint,
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    settings.system.current.isEmpty
-                        ? data.base.backend
-                        : settings.system.current,
-                  ),
-                  const Icon(TablerIcons.chevron_right),
-                ],
-              ),
-              onTap: onSelectBackend,
+            _backendTile(
+              context,
+              data,
+              'system',
+              l10n.firewall_backendSystem,
+              settings.system,
+            ),
+            _backendTile(
+              context,
+              data,
+              'forwarding',
+              l10n.firewall_backendForwarding,
+              settings.forwarding,
+            ),
+            _backendTile(
+              context,
+              data,
+              'docker',
+              l10n.firewall_backendDocker,
+              settings.docker,
             ),
             SplitListTile(
               leading: const Icon(TablerIcons.file_code),
@@ -1284,6 +1516,26 @@ class _SettingsTab extends StatelessWidget {
                 value: settings.ipv6Enabled,
                 onChanged: onIpv6Changed,
               ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppTokens.s24),
+        SectionHeader(title: l10n.firewall_advanced),
+        SplitListGroup(
+          children: [
+            SplitListTile(
+              leading: const Icon(TablerIcons.shield_cog),
+              title: l10n.firewall_familyOperation,
+              subtitle: l10n.firewall_familyOperationHint,
+              trailing: const Icon(TablerIcons.chevron_right),
+              onTap: onFamilyOperation,
+            ),
+            SplitListTile(
+              leading: const Icon(TablerIcons.link),
+              title: l10n.firewall_filterChain,
+              subtitle: l10n.firewall_filterChainHint,
+              trailing: const Icon(TablerIcons.chevron_right),
+              onTap: onFilterChain,
             ),
           ],
         ),
@@ -1407,7 +1659,7 @@ class _RuleDraft {
   }) {
     return {
       ...existing,
-      'scope': FirewallApi.scopeFor(provider, family),
+      'scope': existing['scope'] ?? FirewallApi.scopeFor(provider, family),
       'nativeKind': 'rule',
       'protocol': protocol,
       'sourceAddress': address,
@@ -1892,6 +2144,249 @@ class _NativeDetailSheetState extends ConsumerState<_NativeDetailSheet> {
             ),
           ),
         ],
+      ],
+    );
+  }
+}
+
+class _FamilyOperationRequest {
+  const _FamilyOperationRequest({
+    required this.subsystem,
+    required this.backend,
+    required this.family,
+    required this.operation,
+  });
+
+  final String subsystem;
+  final String backend;
+  final String family;
+  final String operation;
+}
+
+class _FamilyOperationSheet extends StatefulWidget {
+  const _FamilyOperationSheet({required this.data});
+
+  final _FirewallData data;
+
+  @override
+  State<_FamilyOperationSheet> createState() => _FamilyOperationSheetState();
+}
+
+class _FamilyOperationSheetState extends State<_FamilyOperationSheet> {
+  String _subsystem = 'system';
+  String _family = 'ipv4';
+  String _operation = 'initialize';
+  late String _backend = _defaultBackend(_subsystem);
+
+  FirewallBackendGroup _group(String subsystem) {
+    return switch (subsystem) {
+      'forwarding' => widget.data.settings.forwarding,
+      'docker' => widget.data.settings.docker,
+      _ => widget.data.settings.system,
+    };
+  }
+
+  String _defaultBackend(String subsystem) {
+    final group = _group(subsystem);
+    if (group.current.isNotEmpty) return group.current;
+    if (group.selected.isNotEmpty) return group.selected;
+    final available = group.options
+        .where((option) => option.supported && option.installed)
+        .map((option) => option.name)
+        .toList();
+    if (available.isNotEmpty) return available.first;
+    return widget.data.base.name.isEmpty ? 'iptables' : widget.data.base.name;
+  }
+
+  List<String> _backendOptions() {
+    final options = _group(_subsystem).options
+        .where((option) => option.supported && option.installed)
+        .map((option) => option.name)
+        .toList();
+    if (options.isEmpty) return const ['iptables', 'nftables'];
+    if (!options.contains(_backend)) options.insert(0, _backend);
+    return options;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final backendOptions = _backendOptions();
+    return SimpleFormPage(
+      title: l10n.firewall_familyOperation,
+      subtitle: l10n.firewall_familyOperationHint,
+      onSave: () async {
+        Navigator.of(context).pop(
+          _FamilyOperationRequest(
+            subsystem: _subsystem,
+            backend: _backend,
+            family: _family,
+            operation: _operation,
+          ),
+        );
+      },
+      children: [
+        DropdownButtonFormField<String>(
+          initialValue: _subsystem,
+          decoration: InputDecoration(labelText: l10n.firewall_subsystem),
+          items: [
+            DropdownMenuItem(
+              value: 'system',
+              child: Text(l10n.firewall_subsystemSystem),
+            ),
+            DropdownMenuItem(
+              value: 'forwarding',
+              child: Text(l10n.firewall_subsystemForwarding),
+            ),
+            DropdownMenuItem(
+              value: 'docker',
+              child: Text(l10n.firewall_subsystemDocker),
+            ),
+          ],
+          onChanged: (value) {
+            if (value == null) return;
+            setState(() {
+              _subsystem = value;
+              _backend = _defaultBackend(value);
+            });
+          },
+        ),
+        const SizedBox(height: AppTokens.s12),
+        DropdownButtonFormField<String>(
+          initialValue: _backend,
+          decoration: InputDecoration(labelText: l10n.firewall_settingsBackend),
+          items: [
+            for (final option in backendOptions)
+              DropdownMenuItem(value: option, child: Text(option)),
+          ],
+          onChanged: (value) {
+            if (value != null) setState(() => _backend = value);
+          },
+        ),
+        const SizedBox(height: AppTokens.s12),
+        DropdownButtonFormField<String>(
+          initialValue: _family,
+          decoration: InputDecoration(labelText: l10n.firewall_family),
+          items: const [
+            DropdownMenuItem(value: 'ipv4', child: Text('IPv4')),
+            DropdownMenuItem(value: 'ipv6', child: Text('IPv6')),
+          ],
+          onChanged: (value) {
+            if (value != null) setState(() => _family = value);
+          },
+        ),
+        const SizedBox(height: AppTokens.s12),
+        DropdownButtonFormField<String>(
+          initialValue: _operation,
+          decoration: InputDecoration(labelText: l10n.firewall_operation),
+          items: [
+            DropdownMenuItem(
+              value: 'initialize',
+              child: Text(l10n.firewall_operationInitialize),
+            ),
+            DropdownMenuItem(
+              value: 'repair',
+              child: Text(l10n.firewall_operationRepair),
+            ),
+            DropdownMenuItem(
+              value: 'bind',
+              child: Text(l10n.firewall_operationBind),
+            ),
+          ],
+          onChanged: (value) {
+            if (value != null) setState(() => _operation = value);
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _DockerPolicyRequest {
+  const _DockerPolicyRequest({required this.mode, required this.sources});
+
+  final String mode;
+  final List<String> sources;
+}
+
+class _DockerPolicySheet extends StatefulWidget {
+  const _DockerPolicySheet({required this.endpoint});
+
+  final DockerGuardEndpoint endpoint;
+
+  @override
+  State<_DockerPolicySheet> createState() => _DockerPolicySheetState();
+}
+
+class _DockerPolicySheetState extends State<_DockerPolicySheet> {
+  late String _mode = widget.endpoint.mode.isEmpty
+      ? 'accept_all'
+      : widget.endpoint.mode;
+  late final TextEditingController _sources = TextEditingController(
+    text: widget.endpoint.sources.join(', '),
+  );
+
+  @override
+  void dispose() {
+    _sources.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final endpoint = widget.endpoint;
+    return SimpleFormPage(
+      title: l10n.firewall_dockerPolicy,
+      subtitle:
+          '${endpoint.hostIP.isEmpty ? '0.0.0.0' : endpoint.hostIP}:${endpoint.hostPort}/${endpoint.protocol}',
+      onSave: () async {
+        final sources = _sources.text
+            .split(RegExp(r'[,，\s]+'))
+            .map((value) => value.trim())
+            .where((value) => value.isNotEmpty)
+            .toList(growable: false);
+        if (_mode.endsWith('_sources') && sources.isEmpty) return;
+        Navigator.of(
+          context,
+        ).pop(_DockerPolicyRequest(mode: _mode, sources: sources));
+      },
+      children: [
+        DropdownButtonFormField<String>(
+          initialValue: _mode,
+          decoration: InputDecoration(labelText: l10n.firewall_dockerMode),
+          items: [
+            DropdownMenuItem(
+              value: 'deny_sources',
+              child: Text(l10n.firewall_dockerModeDenySources),
+            ),
+            DropdownMenuItem(
+              value: 'allow_sources',
+              child: Text(l10n.firewall_dockerModeAllowSources),
+            ),
+            DropdownMenuItem(
+              value: 'deny_all',
+              child: Text(l10n.firewall_dockerModeDenyAll),
+            ),
+            DropdownMenuItem(
+              value: 'accept_sources',
+              child: Text(l10n.firewall_dockerModeAcceptSources),
+            ),
+            DropdownMenuItem(
+              value: 'accept_all',
+              child: Text(l10n.firewall_dockerModeAcceptAll),
+            ),
+          ],
+          onChanged: (value) {
+            if (value != null) setState(() => _mode = value);
+          },
+        ),
+        const SizedBox(height: AppTokens.s12),
+        AppTextField(
+          controller: _sources,
+          label: l10n.firewall_dockerSources,
+          hint: l10n.firewall_dockerSourcesHint,
+        ),
       ],
     );
   }

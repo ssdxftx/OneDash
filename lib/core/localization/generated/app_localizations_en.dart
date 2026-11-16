@@ -201,6 +201,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_appearance_modeDark => 'Dark';
 
   @override
+  String get firewall_panelPort => 'Panel port';
+
+  @override
+  String get firewall_portChanged => 'Port updated';
+
+  @override
+  String get firewall_newPort => 'New port';
+
+  @override
   String get firewall_title => 'Firewall';
 
   @override
@@ -242,6 +251,95 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get panelSettings_panelUsername => 'Panel Username';
+
+  @override
+  String get panelSettings_apiKeyManagement => 'Independent API keys';
+
+  @override
+  String get panelSettings_apiKeyManagementHint =>
+      'Create, view and manage independent API keys.';
+
+  @override
+  String get panelSettings_apiKeyCreate => 'Create API key';
+
+  @override
+  String get panelSettings_apiKeyName => 'Name';
+
+  @override
+  String get panelSettings_apiKeyDescription => 'Description';
+
+  @override
+  String get panelSettings_apiKeyIpWhiteList => 'IP allowlist';
+
+  @override
+  String get panelSettings_apiKeyTrustedProxies => 'Trusted proxies';
+
+  @override
+  String get panelSettings_apiKeyValidity => 'Timestamp validity (minutes)';
+
+  @override
+  String get panelSettings_apiKeyAllowAppBinding => 'Allow app binding';
+
+  @override
+  String get panelSettings_apiKeyReveal => 'Reveal key';
+
+  @override
+  String get panelSettings_apiKeyEnable => 'Enable';
+
+  @override
+  String get panelSettings_apiKeyDisable => 'Disable';
+
+  @override
+  String get panelSettings_apiKeyRevoke => 'Revoke';
+
+  @override
+  String get panelSettings_apiKeyDelete => 'Delete';
+
+  @override
+  String get panelSettings_apiKeyEmpty => 'No independent API keys';
+
+  @override
+  String get panelSettings_apiKeyCreated => 'API key created and copied';
+
+  @override
+  String get panelSettings_apiKeyRevokeConfirm =>
+      'Revoke cannot be undone. Continue?';
+
+  @override
+  String get panelSettings_apiKeyDeleteConfirm =>
+      'Delete cannot be undone. Continue?';
+
+  @override
+  String get panelSettings_apiKeyExpires => 'Expires';
+
+  @override
+  String get panelSettings_panelLogin => 'Panel login';
+
+  @override
+  String get panelSettings_panelLoggedIn =>
+      'Signed in. Password, MFA, Passkey and API Key management are available.';
+
+  @override
+  String get panelSettings_panelNotLoggedIn =>
+      'Not signed in. Password, MFA, Passkey and API Key management require a panel session.';
+
+  @override
+  String get panelSettings_username => 'Username';
+
+  @override
+  String get panelSettings_password => 'Password';
+
+  @override
+  String get panelSettings_login => 'Sign in';
+
+  @override
+  String get panelSettings_loginRequired => 'Sign in to the panel first.';
+
+  @override
+  String get panelSettings_captcha => 'Verification code';
+
+  @override
+  String get panelSettings_logout => 'Sign out';
 
   @override
   String get panelSettings_panelLoginPassword => 'Panel Login Password';
@@ -914,6 +1012,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get files_compress => 'Compress';
 
   @override
+  String get files_preview => 'Preview';
+
+  @override
+  String get files_directoryTree => 'Directory tree';
+
+  @override
+  String get files_remark => 'Remark';
+
+  @override
+  String get files_remarkSaved => 'Remark saved';
+
+  @override
+  String get files_shareQr => 'Share QR code';
+
+  @override
+  String get files_mounts => 'System mounts';
+
+  @override
+  String get files_mountPoint => 'Mount point';
+
+  @override
   String get files_share => 'Share';
 
   @override
@@ -949,6 +1068,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_proxy => 'Reverse proxy';
+
+  @override
+  String get websites_deployment => 'Application';
+
+  @override
+  String get websites_subsite => 'Subsite';
 
   @override
   String get websites_php => 'PHP';
@@ -1381,6 +1506,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get files_downloadTooLarge =>
       'File exceeds 50 MB. Use the web version to download.';
+
+  @override
+  String get files_downloadReady =>
+      'File is ready. Save or share it from the share sheet.';
 
   @override
   String files_savedTo(String path) {
@@ -2524,6 +2653,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get host_monitor => 'Monitoring';
 
   @override
+  String get host_cleanSshLog => 'Clean SSH logs';
+
+  @override
+  String get dashboard_cleanMonitor => 'Clean monitor data';
+
+  @override
+  String get dashboard_cleanMonitorConfirm =>
+      'Collected monitoring data will be deleted. Continue?';
+
+  @override
   String get host_ssh => 'SSH';
 
   @override
@@ -2761,6 +2900,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get host_diagnostics => 'Diagnostics';
+
+  @override
+  String get host_remoteHosts => 'Remote hosts';
+
+  @override
+  String get host_addRemote => 'Add remote host';
+
+  @override
+  String get host_noRemote => 'No remote hosts';
+
+  @override
+  String get host_noRemoteHint => 'Remote hosts can be used from the terminal.';
+
+  @override
+  String get host_remoteName => 'Name';
+
+  @override
+  String get host_address => 'Address';
+
+  @override
+  String get host_port => 'Port';
+
+  @override
+  String get host_user => 'User';
+
+  @override
+  String get host_authMode => 'Authentication';
+
+  @override
+  String get host_authPassword => 'Password';
+
+  @override
+  String get host_authKey => 'Private key';
+
+  @override
+  String get host_password => 'Password';
+
+  @override
+  String get host_privateKey => 'Private key';
+
+  @override
+  String get host_passphrase => 'Key passphrase';
+
+  @override
+  String get host_rememberPassword => 'Remember password';
+
+  @override
+  String get host_description => 'Description';
+
+  @override
+  String get host_group => 'Group';
+
+  @override
+  String get host_noGroup => 'No group';
+
+  @override
+  String get host_testConnection => 'Test connection';
+
+  @override
+  String get host_connectionOk => 'Connection succeeded';
+
+  @override
+  String get host_connectionFailed => 'Connection failed';
+
+  @override
+  String get host_deleteRemote => 'Delete remote host';
+
+  @override
+  String host_deleteRemoteMessage(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String get host_remoteSaved => 'Remote host saved';
+
+  @override
+  String get action_test => 'Test';
 
   @override
   String get host_diskSystem => 'System disks';
@@ -3030,7 +3246,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_templateRemark => 'Remark';
 
   @override
-  String get websites_templateVariables => 'Variables';
+  String get websites_templateVariables => 'Template variables';
 
   @override
   String get websites_templateAddVariable => 'Add variable';
@@ -3275,6 +3491,106 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get firewall_settingsBackendHint =>
       'Tap to switch the managed backend';
+
+  @override
+  String get firewall_backendSystem => 'System rules';
+
+  @override
+  String get firewall_backendForwarding => 'Port forwarding';
+
+  @override
+  String get firewall_backendDocker => 'Docker rules';
+
+  @override
+  String get firewall_advanced => 'Advanced actions';
+
+  @override
+  String get firewall_familyOperation => 'Initialize or repair firewall family';
+
+  @override
+  String get firewall_familyOperationHint =>
+      'Initialize, repair or bind a subsystem for IPv4 or IPv6';
+
+  @override
+  String get firewall_filterChain => 'Base chain operations';
+
+  @override
+  String get firewall_filterChainHint =>
+      'Initialize, bind or unbind the 1PANEL_BASIC chain';
+
+  @override
+  String get firewall_subsystem => 'Subsystem';
+
+  @override
+  String get firewall_family => 'Family';
+
+  @override
+  String get firewall_operation => 'Operation';
+
+  @override
+  String get firewall_subsystemSystem => 'System rules';
+
+  @override
+  String get firewall_subsystemForwarding => 'Port forwarding';
+
+  @override
+  String get firewall_subsystemDocker => 'Docker rules';
+
+  @override
+  String get firewall_operationInitialize => 'Initialize';
+
+  @override
+  String get firewall_operationRepair => 'Repair';
+
+  @override
+  String get firewall_operationBind => 'Bind';
+
+  @override
+  String get firewall_filterInit => 'Initialize base chain';
+
+  @override
+  String get firewall_filterBind => 'Bind base chain';
+
+  @override
+  String get firewall_filterUnbind => 'Unbind base chain';
+
+  @override
+  String get firewall_dockerPolicy => 'Port guard policy';
+
+  @override
+  String get firewall_dockerPolicyHint =>
+      'Restrict sources for a published container port';
+
+  @override
+  String get firewall_dockerMode => 'Policy mode';
+
+  @override
+  String get firewall_dockerSources => 'Source addresses';
+
+  @override
+  String get firewall_dockerSourcesHint =>
+      'Separate multiple addresses with commas';
+
+  @override
+  String get firewall_dockerPolicySaved => 'Port guard policy saved';
+
+  @override
+  String get firewall_dockerPolicyDeleted => 'Port guard policy deleted';
+
+  @override
+  String get firewall_dockerModeDenySources => 'Deny specified sources';
+
+  @override
+  String get firewall_dockerModeAllowSources => 'Allow only specified sources';
+
+  @override
+  String get firewall_dockerModeDenyAll => 'Deny all sources';
+
+  @override
+  String get firewall_dockerModeAcceptSources => 'Accept specified sources';
+
+  @override
+  String get firewall_dockerModeAcceptAll => 'Accept all sources';
 
   @override
   String get host_sshCheckFailed =>
@@ -4005,6 +4321,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String get files_batchPermission => 'Batch permissions';
 
   @override
+  String get files_convert => 'Convert format';
+
+  @override
+  String get files_convertFormat => 'Output format';
+
+  @override
+  String get files_convertOutput => 'Output directory';
+
+  @override
+  String get files_convertDeleteSource =>
+      'Delete source files after conversion';
+
+  @override
+  String get files_convertStarted => 'Conversion task submitted';
+
+  @override
+  String get files_convertOnlyFiles =>
+      'Only files can be converted, not directories';
+
+  @override
+  String get files_convertNoFile => 'Select files to convert first';
+
+  @override
+  String get files_uploadRecords => 'Upload records';
+
+  @override
+  String get files_noUploadRecords => 'No upload records';
+
+  @override
+  String get files_noUploadRecordsHint =>
+      'Uploaded files in the current directory appear here.';
+
+  @override
+  String get files_convertLogs => 'Conversion records';
+
+  @override
+  String get files_noConvertLogs => 'No conversion records';
+
+  @override
+  String get files_noConvertLogsHint =>
+      'Completed file conversions appear here.';
+
+  @override
+  String get files_removeDownloadRecord => 'Remove record';
+
+  @override
   String get files_copyMode => 'Copy instead of move';
 
   @override
@@ -4061,6 +4423,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_dirPermissionHint => 'Change the runtime user and group';
 
   @override
+  String get action_enable => 'Enable';
+
+  @override
+  String get action_disable => 'Disable';
+
+  @override
   String get websites_enabled => 'Enabled';
 
   @override
@@ -4080,6 +4448,99 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_owner => 'User';
+
+  @override
+  String get websites_batchActions => 'Batch actions';
+
+  @override
+  String get websites_batchSuccess => 'Batch operation completed';
+
+  @override
+  String get websites_changeGroup => 'Change group';
+
+  @override
+  String get websites_bindSsl => 'Bind certificate';
+
+  @override
+  String get websites_selectGroup => 'Select group';
+
+  @override
+  String get websites_selectSsl => 'Select certificate';
+
+  @override
+  String get websites_defaultSite => 'Default site';
+
+  @override
+  String get websites_crossSite => 'Cross-site access';
+
+  @override
+  String get websites_proxyCache => 'Proxy cache';
+
+  @override
+  String get websites_cacheLimit => 'Cache limit';
+
+  @override
+  String get websites_cacheShare => 'Shared cache';
+
+  @override
+  String get websites_cacheExpire => 'Cache expiry';
+
+  @override
+  String get websites_clearProxyCache => 'Clear proxy cache';
+
+  @override
+  String get websites_composer => 'Composer';
+
+  @override
+  String get websites_composerCommand => 'Command';
+
+  @override
+  String get websites_composerMirror => 'Mirror';
+
+  @override
+  String get websites_composerDir => 'Working directory';
+
+  @override
+  String get websites_composerUser => 'Run as user';
+
+  @override
+  String get websites_cacheCleared => 'Proxy cache cleared';
+
+  @override
+  String get websites_pushSsl => 'Push to nodes';
+
+  @override
+  String get websites_nodes => 'Nodes';
+
+  @override
+  String get websites_mergeGroup => 'Move to group';
+
+  @override
+  String get websites_defaultHtml => 'Default pages';
+
+  @override
+  String get websites_htmlType => 'Page type';
+
+  @override
+  String get websites_htmlContent => 'HTML content';
+
+  @override
+  String get websites_htmlSaved => 'Default page saved';
+
+  @override
+  String get websites_htmlIndex => 'index.html';
+
+  @override
+  String get websites_html404 => '404.html';
+
+  @override
+  String get websites_htmlPhp => 'index.php';
+
+  @override
+  String get websites_htmlDomain404 => 'domain404.html';
+
+  @override
+  String get websites_htmlStop => 'stop/index.html';
 
   @override
   String get websites_group => 'Group';
@@ -4149,6 +4610,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get websites_editRedirect => 'Edit redirect';
+
+  @override
+  String get websites_deleteRedirect => 'Delete redirect';
+
+  @override
+  String get websites_redirectDeleted => 'Redirect deleted';
 
   @override
   String get websites_redirectType => 'Type';
@@ -4637,6 +5104,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_useProxy => 'Use proxy';
 
   @override
+  String get websites_eabKid => 'EAB Kid';
+
+  @override
+  String get websites_eabHmacKey => 'EAB HmacKey';
+
+  @override
   String get websites_useEab => 'Use EAB';
 
   @override
@@ -4694,6 +5167,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get files_exactSize => 'Calculate exact size';
+
+  @override
+  String get containers_rename => 'Rename';
+
+  @override
+  String get containers_newName => 'New name';
+
+  @override
+  String get containers_checkImageUpdates => 'Check image updates';
+
+  @override
+  String get containers_imageUpdatesDone => 'Image update check started';
+
+  @override
+  String get containers_searchRemote => 'Search remote images';
+
+  @override
+  String get containers_scheduleImageUpdates => 'Schedule image update checks';
+
+  @override
+  String get containers_downloadLog => 'Download logs';
+
+  @override
+  String get containers_fileBrowser => 'Container files';
+
+  @override
+  String get containers_uploadFile => 'Upload file';
+
+  @override
+  String get containers_fileContent => 'File content';
+
+  @override
+  String get containers_binaryFile => 'Binary file, cannot preview';
+
+  @override
+  String get containers_parentDir => 'Parent directory';
+
+  @override
+  String get containers_fileDeleted => 'File deleted';
+
+  @override
+  String get containers_fileEmpty => 'Directory is empty';
+
+  @override
+  String get containers_composeEnv => 'Compose environment';
+
+  @override
+  String get containers_pinCompose => 'Pin compose';
+
+  @override
+  String get containers_unpinCompose => 'Unpin compose';
 
   @override
   String get containers_cleanLogs => 'Clear container logs';
@@ -4800,6 +5324,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get files_pickOwner => 'Pick user or group';
 
   @override
+  String get panelSettings_apiConfigUnavailable =>
+      'The API Key mode cannot safely read the API whitelist. Update it in the panel web UI.';
+
+  @override
   String get panelSettings_apiInterfaceToggleHint =>
       'Allow API access for this panel';
 
@@ -4885,6 +5413,105 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get files_checkExistence => 'Verify existence';
+
+  @override
+  String get panelSettings_closeMfa => 'Close MFA';
+
+  @override
+  String get panelSettings_mfaClosed => 'MFA closed';
+
+  @override
+  String get panelSettings_resetExpiredPassword => 'Reset expired password';
+
+  @override
+  String get panelSettings_passwordReset => 'Password reset';
+
+  @override
+  String get panelSettings_commandLibrary => 'Command library';
+
+  @override
+  String get commandLibrary_add => 'New command';
+
+  @override
+  String get commandLibrary_name => 'Command name';
+
+  @override
+  String get commandLibrary_command => 'Command';
+
+  @override
+  String get commandLibrary_empty => 'No commands';
+
+  @override
+  String get commandLibrary_tree => 'Command tree';
+
+  @override
+  String get commandLibrary_import => 'Import commands';
+
+  @override
+  String get commandLibrary_export => 'Export commands';
+
+  @override
+  String get commandLibrary_imported => 'Commands imported';
+
+  @override
+  String get commandLibrary_exported => 'Commands exported';
+
+  @override
+  String get commandLibrary_importEmpty => 'No importable commands in CSV';
+
+  @override
+  String get commandLibrary_copied => 'Command copied';
+
+  @override
+  String get scriptLibrary_run => 'Run script';
+
+  @override
+  String get panelSettings_groupManagement => 'Group management';
+
+  @override
+  String get group_add => 'New group';
+
+  @override
+  String get group_name => 'Group name';
+
+  @override
+  String get group_empty => 'No groups';
+
+  @override
+  String get group_typeScript => 'Script';
+
+  @override
+  String get group_typeCommand => 'Command';
+
+  @override
+  String get group_typeCronjob => 'Cronjob';
+
+  @override
+  String get panelSettings_scriptLibrary => 'Script library';
+
+  @override
+  String get scriptLibrary_add => 'New script';
+
+  @override
+  String get scriptLibrary_name => 'Script name';
+
+  @override
+  String get scriptLibrary_description => 'Description';
+
+  @override
+  String get scriptLibrary_content => 'Script content';
+
+  @override
+  String get scriptLibrary_interactive => 'Interactive script';
+
+  @override
+  String get scriptLibrary_sync => 'Sync scripts';
+
+  @override
+  String get scriptLibrary_syncStarted => 'Sync task started';
+
+  @override
+  String get scriptLibrary_empty => 'No scripts';
 
   @override
   String get panelSettings_mfa => 'Two-factor authentication';
@@ -5830,6 +6457,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ai_account_add => 'Add model account';
 
   @override
+  String get ai_account_models => 'Models';
+
+  @override
+  String get ai_model_id => 'Model ID';
+
+  @override
+  String get ai_model_verify => 'Set as verification model';
+
+  @override
+  String get ai_model_verified => 'Verification model';
+
+  @override
+  String get ai_account_verify => 'Verify account';
+
+  @override
   String get ai_account_edit => 'Edit model account';
 
   @override
@@ -5946,7 +6588,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ai_agent_require_mention => 'Require mention';
 
   @override
-  String get ai_agent_streaming => 'Streaming';
+  String get ai_agent_streaming => 'Streaming replies';
 
   @override
   String get ai_agent_thread_session => 'Thread session';
@@ -6239,4 +6881,1988 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logs_result => 'Result';
+
+  @override
+  String get ai_agent_plugins => 'Plugins';
+
+  @override
+  String get ai_agent_skills => 'Skills';
+
+  @override
+  String get ai_plugin_installed => 'Installed plugins';
+
+  @override
+  String get ai_plugin_market => 'Plugin marketplace';
+
+  @override
+  String get ai_plugin_searchHint => 'Search plugins';
+
+  @override
+  String get ai_plugin_enable => 'Enable';
+
+  @override
+  String get ai_plugin_disable => 'Disable';
+
+  @override
+  String get ai_plugin_version => 'Version';
+
+  @override
+  String get ai_plugin_install => 'Install';
+
+  @override
+  String get ai_plugin_empty => 'No installed plugins';
+
+  @override
+  String get ai_plugin_noResults => 'No matching plugins';
+
+  @override
+  String get ai_skill_installed => 'Installed skills';
+
+  @override
+  String get ai_skill_market => 'Skill marketplace';
+
+  @override
+  String get ai_skill_searchHint => 'Search skills';
+
+  @override
+  String get ai_skill_source => 'Source';
+
+  @override
+  String get ai_skill_install => 'Install';
+
+  @override
+  String get ai_skill_uninstall => 'Uninstall';
+
+  @override
+  String get ai_skill_empty => 'No installed skills';
+
+  @override
+  String get ai_skill_noResults => 'No matching skills';
+
+  @override
+  String get ai_model_syncAccount => 'Sync to account';
+
+  @override
+  String get ai_model_recreate => 'Recreate';
+
+  @override
+  String get ai_model_baseUrlType => 'Address type';
+
+  @override
+  String get ai_model_baseUrl => 'Base URL';
+
+  @override
+  String get ai_gpu_monitor => 'GPU monitor';
+
+  @override
+  String get ai_gpu_benchmark => 'Benchmark sources';
+
+  @override
+  String get ai_gpu_benchmarkEmpty => 'No benchmark sources';
+
+  @override
+  String get ai_gpu_utilizationChart => 'GPU utilization';
+
+  @override
+  String get ai_gpu_memoryChart => 'Memory usage';
+
+  @override
+  String get ai_model_baseUrlContainer => 'Container';
+
+  @override
+  String get ai_model_baseUrlLocalhost => 'Localhost';
+
+  @override
+  String get ai_model_baseUrlSystemIp => 'Panel IP';
+
+  @override
+  String get ai_model_baseUrlCustom => 'Custom';
+
+  @override
+  String get ai_skill_sourceOfficial => 'Official';
+
+  @override
+  String get ai_skill_sourceClawhubGlobal => 'ClawHub global';
+
+  @override
+  String get ai_skill_sourceClawhubCn => 'ClawHub China';
+
+  @override
+  String get ai_skill_sourceSkillhub => 'SkillHub';
+
+  @override
+  String get ai_skill_sourceSkillsSh => 'skills.sh';
+
+  @override
+  String get ai_skill_sourceLocalHub => 'Local skill hub';
+
+  @override
+  String get ai_vllm_monitor => 'vLLM monitor';
+
+  @override
+  String get ai_vllm_app => 'vLLM app';
+
+  @override
+  String get ai_vllm_noApps => 'No vLLM apps found';
+
+  @override
+  String get ai_vllm_samples => 'Samples';
+
+  @override
+  String get ai_vllm_running => 'Running requests';
+
+  @override
+  String get ai_vllm_waiting => 'Waiting requests';
+
+  @override
+  String get ai_vllm_cache => 'Cache usage';
+
+  @override
+  String get ai_agent_sessions => 'Chat sessions';
+
+  @override
+  String get ai_session_rename => 'Rename session';
+
+  @override
+  String get ai_session_delete => 'Delete session';
+
+  @override
+  String get ai_agent_batch => 'Batch operations';
+
+  @override
+  String get ai_batch_type => 'App type';
+
+  @override
+  String get ai_batch_operate => 'Operation';
+
+  @override
+  String get ai_batch_start => 'Start';
+
+  @override
+  String get ai_batch_stop => 'Stop';
+
+  @override
+  String get ai_batch_restart => 'Restart';
+
+  @override
+  String get ai_batch_delete => 'Delete';
+
+  @override
+  String get ai_batch_force => 'Force delete';
+
+  @override
+  String ai_batch_result(int success, int skipped) {
+    return 'Succeeded $success, skipped $skipped';
+  }
+
+  @override
+  String get ai_agent_overview => 'Agent overview';
+
+  @override
+  String get ai_vllm_clean => 'Clean monitor data';
+
+  @override
+  String get dashboard_nodeInfo => 'Node info';
+
+  @override
+  String get dashboard_quickJumps => 'Quick jumps';
+
+  @override
+  String get dashboard_manageQuick => 'Manage quick jumps and directories';
+
+  @override
+  String get dashboard_quickDirectories => 'Quick directories';
+
+  @override
+  String get dashboard_quickDirectoryPath => 'Directory path';
+
+  @override
+  String get dashboard_quickDirectoryAlias => 'Alias';
+
+  @override
+  String get dashboard_launcher => 'App launcher';
+
+  @override
+  String get dashboard_manageLauncher => 'Manage launcher';
+
+  @override
+  String get dashboard_topCpu => 'Top CPU processes';
+
+  @override
+  String get dashboard_topMem => 'Top memory processes';
+
+  @override
+  String get dashboard_noData => 'No data';
+
+  @override
+  String get dashboard_appInstalled => 'Installed';
+
+  @override
+  String get dashboard_appNotInstalled => 'Not installed';
+
+  @override
+  String get dashboard_addQuickDirectory => 'Add quick directory';
+
+  @override
+  String get dashboard_editQuickDirectory => 'Edit quick directory';
+
+  @override
+  String get files_openShare => 'Open share';
+
+  @override
+  String get backups_editDescription => 'Edit description';
+
+  @override
+  String get backups_snapshotFiles => 'Snapshot files';
+
+  @override
+  String get backups_noSnapshotFiles => 'No snapshot files';
+
+  @override
+  String get cronjobs_nextRun => 'Next run';
+
+  @override
+  String get cronjobs_updateGroup => 'Change group';
+
+  @override
+  String get apps_checkUpdates => 'Check store updates';
+
+  @override
+  String get apps_storeCanUpdate => 'App store update available';
+
+  @override
+  String get apps_storeLatest => 'App store is up to date';
+
+  @override
+  String get apps_editWebUi => 'Edit WebUI URL';
+
+  @override
+  String get apps_webUi => 'WebUI URL';
+
+  @override
+  String get alerts_clamScans => 'Clam scans';
+
+  @override
+  String get alerts_cronjobTargets => 'Cron jobs';
+
+  @override
+  String get alerts_targetsEmpty => 'No alert targets available';
+
+  @override
+  String alerts_targetPath(String path) {
+    return 'Path: $path';
+  }
+
+  @override
+  String alerts_targetType(String type) {
+    return 'Type: $type';
+  }
+
+  @override
+  String get host_sshLogs => 'SSH login logs';
+
+  @override
+  String get host_sshLogsHint => 'View and filter SSH login records';
+
+  @override
+  String get host_sshLogInfo => 'Keyword';
+
+  @override
+  String get host_sshLogInfoHint => 'User, IP or message';
+
+  @override
+  String get host_sshLogStatus => 'Status';
+
+  @override
+  String get host_sshLogAll => 'All';
+
+  @override
+  String get host_sshLogSuccess => 'Success';
+
+  @override
+  String get host_sshLogFailed => 'Failed';
+
+  @override
+  String get host_sshLogRange => 'Time range';
+
+  @override
+  String host_sshLogDays(String days) {
+    return '$days days';
+  }
+
+  @override
+  String get host_sshLogEmpty => 'No SSH login logs match the filters';
+
+  @override
+  String get host_sshLogExport => 'Export logs';
+
+  @override
+  String host_sshLogExported(String path) {
+    return 'Logs exported to $path';
+  }
+
+  @override
+  String get host_sshLogSearch => 'Search';
+
+  @override
+  String get ai_batch_operation => 'Batch operate';
+
+  @override
+  String get ai_batch_install => 'Batch install';
+
+  @override
+  String get ai_batch_upgrade => 'Batch upgrade';
+
+  @override
+  String get ai_batch_version => 'Target version';
+
+  @override
+  String get ai_batch_backup => 'Backup before upgrade';
+
+  @override
+  String get ai_batch_pullImage => 'Pull image';
+
+  @override
+  String get ai_batch_port => 'WebUI port';
+
+  @override
+  String get ai_batch_name => 'Name (auto when empty)';
+
+  @override
+  String get ai_agent_security => 'Security config';
+
+  @override
+  String get ai_agent_security_origins => 'Allowed origins';
+
+  @override
+  String get ai_agent_security_hint => 'Separate multiple origins with commas';
+
+  @override
+  String get ai_agent_config_file => 'Agent config file';
+
+  @override
+  String get ai_agent_config_file_hint =>
+      'Edit the channel config file directly';
+
+  @override
+  String get ai_domain => 'AI domain binding';
+
+  @override
+  String get ai_domain_name => 'Domain';
+
+  @override
+  String get ai_domain_ssl => 'SSL ID';
+
+  @override
+  String get ai_domain_website => 'Website ID';
+
+  @override
+  String get ai_domain_ipList => 'Allowed IPs';
+
+  @override
+  String get ai_domain_hint => 'Separate multiple IPs with commas';
+
+  @override
+  String get ai_domain_noApp => 'No installed Ollama app found';
+
+  @override
+  String ai_domain_bound(String domain) {
+    return 'Bound domain: $domain';
+  }
+
+  @override
+  String get ai_domain_saved => 'Domain settings saved';
+
+  @override
+  String get files_batchMove => 'Batch move/copy';
+
+  @override
+  String get files_pickFromTree => 'Pick from directory tree';
+
+  @override
+  String get vm_title => 'Virtual machines';
+
+  @override
+  String get vm_subtitle => 'KVM virtual machine management';
+
+  @override
+  String get vm_environment => 'Runtime environment';
+
+  @override
+  String get vm_envReady => 'Runtime environment ready';
+
+  @override
+  String get vm_envNotReady => 'Runtime environment not ready';
+
+  @override
+  String get vm_enable => 'Enable runtime environment';
+
+  @override
+  String get vm_enabled => 'Runtime environment enabled';
+
+  @override
+  String get vm_arch => 'Architecture';
+
+  @override
+  String get vm_kvm => 'KVM';
+
+  @override
+  String get vm_libvirt => 'libvirt';
+
+  @override
+  String get vm_storage => 'Storage';
+
+  @override
+  String get vm_empty => 'No virtual machines';
+
+  @override
+  String get vm_emptyHint =>
+      'Enable the KVM runtime environment before creating a VM';
+
+  @override
+  String get vm_create => 'New virtual machine';
+
+  @override
+  String get vm_update => 'Edit virtual machine';
+
+  @override
+  String get vm_name => 'Name';
+
+  @override
+  String get vm_cpu => 'CPU cores';
+
+  @override
+  String get vm_memory => 'Memory (MB)';
+
+  @override
+  String get vm_disk => 'Disk (GB)';
+
+  @override
+  String get vm_network => 'Network';
+
+  @override
+  String get vm_osType => 'OS type';
+
+  @override
+  String get vm_description => 'Description';
+
+  @override
+  String get vm_start => 'Start';
+
+  @override
+  String get vm_shutdown => 'Shut down';
+
+  @override
+  String get vm_reboot => 'Reboot';
+
+  @override
+  String get vm_destroy => 'Force stop';
+
+  @override
+  String get vm_suspend => 'Suspend';
+
+  @override
+  String get vm_resume => 'Resume';
+
+  @override
+  String get vm_delete => 'Delete virtual machine';
+
+  @override
+  String get vm_rename => 'Rename';
+
+  @override
+  String get vm_newName => 'New name';
+
+  @override
+  String get vm_stats => 'Runtime status';
+
+  @override
+  String get vm_snapshots => 'Snapshots';
+
+  @override
+  String get vm_snapshotCreate => 'Create snapshot';
+
+  @override
+  String get vm_snapshotName => 'Snapshot name';
+
+  @override
+  String get vm_snapshotRecover => 'Recover snapshot';
+
+  @override
+  String get vm_snapshotDelete => 'Delete snapshot';
+
+  @override
+  String get vm_snapshotEmpty => 'No snapshots';
+
+  @override
+  String get vm_needEnv => 'Enable the VM runtime environment first';
+
+  @override
+  String vm_confirmDelete(String name) {
+    return 'Delete virtual machine $name?';
+  }
+
+  @override
+  String get vm_forceDelete => 'Force delete';
+
+  @override
+  String get vm_startAfterCreate => 'Start after creation';
+
+  @override
+  String get vm_autoStart => 'Start on boot';
+
+  @override
+  String vm_limit(String limit) {
+    return 'Quota $limit VMs';
+  }
+
+  @override
+  String get vm_osOther => 'Other';
+
+  @override
+  String get vm_sync => 'Sync virtual machines';
+
+  @override
+  String get vm_storagePool => 'Storage pool';
+
+  @override
+  String get vm_template => 'Template (optional)';
+
+  @override
+  String get vm_osLinux => 'Linux';
+
+  @override
+  String get vm_osWindows => 'Windows';
+
+  @override
+  String get ai_account_discover => 'Discover models';
+
+  @override
+  String get ai_account_discover_empty => 'No models found';
+
+  @override
+  String ai_account_discover_result(String count) {
+    return 'Found $count models';
+  }
+
+  @override
+  String get ai_channel_plugins => 'Channel plugins';
+
+  @override
+  String get ai_channel_installed => 'Installed';
+
+  @override
+  String get ai_channel_notInstalled => 'Not installed';
+
+  @override
+  String ai_channel_upgradable(String version) {
+    return 'Upgrade to $version';
+  }
+
+  @override
+  String get ai_channel_install => 'Install plugin';
+
+  @override
+  String get ai_channel_upgrade => 'Upgrade plugin';
+
+  @override
+  String get ai_channel_uninstall => 'Uninstall plugin';
+
+  @override
+  String get vm_resources => 'Resources';
+
+  @override
+  String get vm_networks => 'Networks';
+
+  @override
+  String get vm_storages => 'Storages';
+
+  @override
+  String get vm_templates => 'Templates';
+
+  @override
+  String get vm_isos => 'ISO images';
+
+  @override
+  String get vm_type => 'Type';
+
+  @override
+  String get vm_path => 'Path';
+
+  @override
+  String get vm_cidr => 'CIDR';
+
+  @override
+  String get vm_gateway => 'Gateway';
+
+  @override
+  String get vm_sourceInterface => 'Source interface';
+
+  @override
+  String get vm_templateName => 'Template name';
+
+  @override
+  String get vm_sourceVm => 'Source virtual machine';
+
+  @override
+  String get vm_isoType => 'Image type';
+
+  @override
+  String get vm_resourceEmpty => 'No resources';
+
+  @override
+  String vm_deleteResource(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String get vm_deleteFile => 'Delete file as well';
+
+  @override
+  String get vm_isoImage => 'ISO image';
+
+  @override
+  String get vm_isoDisk => 'Disk';
+
+  @override
+  String get vm_netNat => 'NAT';
+
+  @override
+  String get vm_netBridge => 'Bridge';
+
+  @override
+  String get vm_netMacvtap => 'Macvtap';
+
+  @override
+  String get ai_channel_pairing => 'Approve pairing';
+
+  @override
+  String get ai_channel_pairingCode => 'Pairing code';
+
+  @override
+  String get ai_channel_pairingAccount => 'Account ID (optional)';
+
+  @override
+  String get ai_channel_pairingApproved => 'Pairing approved';
+
+  @override
+  String get ai_channel_feishu => 'Feishu';
+
+  @override
+  String get ai_channel_telegram => 'Telegram';
+
+  @override
+  String get ai_channel_discord => 'Discord';
+
+  @override
+  String get ai_channel_wecom => 'WeCom';
+
+  @override
+  String get ai_channel_qqbot => 'QQBot';
+
+  @override
+  String get ai_channel_dingtalk => 'DingTalk';
+
+  @override
+  String get vm_console => 'Console';
+
+  @override
+  String get vm_consoleConnecting => 'Connecting to console…';
+
+  @override
+  String get vm_consoleFailed => 'Console connection failed';
+
+  @override
+  String get vm_consoleHint =>
+      'Drag to move the pointer, use the keyboard to type';
+
+  @override
+  String get vm_consoleDisconnected => 'Console disconnected';
+
+  @override
+  String get websites_clearLog => 'Clear logs';
+
+  @override
+  String get websites_logType => 'Log type';
+
+  @override
+  String get websites_lbEditFile => 'Edit source file';
+
+  @override
+  String get websites_lbFileHint =>
+      'Edit the load balance configuration directly';
+
+  @override
+  String get websites_streamPorts => 'Listen ports';
+
+  @override
+  String get websites_streamName => 'Upstream name';
+
+  @override
+  String get websites_streamAlgorithm => 'Algorithm';
+
+  @override
+  String get websites_streamServer => 'Backend address';
+
+  @override
+  String get websites_streamUdp => 'UDP forwarding';
+
+  @override
+  String get websites_lbRoundRobin => 'Round robin';
+
+  @override
+  String get websites_lbLeastConnections => 'Least connections';
+
+  @override
+  String get websites_lbIpHashShort => 'IP hash';
+
+  @override
+  String get websites_parentWebsite => 'Parent website';
+
+  @override
+  String get websites_subsitePath => 'Subsite directory';
+
+  @override
+  String get websites_deploymentApp => 'Application';
+
+  @override
+  String get websites_templatePreview => 'Preview template';
+
+  @override
+  String get websites_deploymentRunning => 'Application is running and ready';
+
+  @override
+  String get websites_deploymentStopped =>
+      'Application is stopped; start it first';
+
+  @override
+  String get websites_templatePreviewResult => 'Preview result';
+
+  @override
+  String get websites_templatePreviewFailed => 'No preview available';
+
+  @override
+  String get websites_templateOutputDetail => 'Output detail';
+
+  @override
+  String get websites_templateOutputTemplate => 'Template';
+
+  @override
+  String get websites_templateOutputVariables => 'Variable values';
+
+  @override
+  String get websites_templateOutputCreatedAt => 'Created at';
+
+  @override
+  String get websites_templateOutputPath => 'Output path';
+
+  @override
+  String get panelSettings_aiSettings => 'AI settings';
+
+  @override
+  String get panelSettings_aiSettingsHint =>
+      'Terminal and file management AI assistant';
+
+  @override
+  String get panelSettings_terminalAi => 'Terminal AI';
+
+  @override
+  String get panelSettings_fileAi => 'File AI';
+
+  @override
+  String get panelSettings_aiEnabled => 'Enable AI';
+
+  @override
+  String get panelSettings_aiPrefix => 'Trigger prefix';
+
+  @override
+  String get panelSettings_aiAccount => 'AI account ID';
+
+  @override
+  String get panelSettings_aiAccountHint => 'Enter a configured AI account ID';
+
+  @override
+  String get panelSettings_aiRiskCommands => 'Risk command prompt';
+
+  @override
+  String get panelSettings_aiRiskCommandsHint =>
+      'Describe risky commands to block';
+
+  @override
+  String get panelSettings_fileHistory => 'File history';
+
+  @override
+  String get panelSettings_fileHistoryHint =>
+      'Revision history and quota for configuration files';
+
+  @override
+  String get panelSettings_fileHistoryEnable => 'Enable file history';
+
+  @override
+  String get panelSettings_fileHistoryMaxPerPath => 'Revisions per path';
+
+  @override
+  String get panelSettings_fileHistoryQuota => 'Disk quota (MB)';
+
+  @override
+  String get panelSettings_localSsh => 'Local SSH connection';
+
+  @override
+  String get panelSettings_localSshHint => 'SSH credentials for the panel host';
+
+  @override
+  String get panelSettings_testConnection => 'Test connection';
+
+  @override
+  String get panelSettings_sshCheckOk => 'SSH connection is healthy';
+
+  @override
+  String get panelSettings_sshRequired => 'Address and user are required';
+
+  @override
+  String get panelSettings_sshAddress => 'Address';
+
+  @override
+  String get panelSettings_sshPort => 'Port';
+
+  @override
+  String get panelSettings_sshUser => 'Username';
+
+  @override
+  String get panelSettings_sshAuthMode => 'Authentication';
+
+  @override
+  String get panelSettings_sshAuthPassword => 'Password';
+
+  @override
+  String get panelSettings_sshAuthKey => 'Key';
+
+  @override
+  String get panelSettings_sshPassword => 'Password';
+
+  @override
+  String get panelSettings_sshPrivateKey => 'Private key';
+
+  @override
+  String get panelSettings_sshPassPhrase => 'Key passphrase';
+
+  @override
+  String get panelSettings_defaultSshConn => 'Default terminal connection';
+
+  @override
+  String get panelSettings_defaultSshConnHint =>
+      'Connection used when opening the terminal';
+
+  @override
+  String get panelSettings_defaultSshConnPlaceholder =>
+      'Enter a connection name or address';
+
+  @override
+  String get panelSettings_resetMenu => 'Restore default menu';
+
+  @override
+  String get panelSettings_resetMenuHint =>
+      'Restore the panel menu to default visibility';
+
+  @override
+  String get panelSettings_resetMenuConfirm => 'Restore the default menu?';
+
+  @override
+  String get websites_openRestyModules => 'OpenResty modules';
+
+  @override
+  String get websites_openRestyModuleAdd => 'Add module';
+
+  @override
+  String get websites_openRestyModuleDelete => 'Delete module';
+
+  @override
+  String websites_openRestyModuleDeleteConfirm(Object name) {
+    return 'Delete module $name?';
+  }
+
+  @override
+  String get websites_openRestyModuleEmpty => 'No custom modules';
+
+  @override
+  String get websites_openRestyModuleName => 'Module name';
+
+  @override
+  String get websites_openRestyModuleProvider => 'Provider';
+
+  @override
+  String get websites_openRestyModuleBuildMode => 'Build mode';
+
+  @override
+  String get websites_openRestyModuleLoadOrder => 'Load order';
+
+  @override
+  String get websites_openRestyModulePackages => 'Packages';
+
+  @override
+  String get websites_openRestyModuleParams => 'Build parameters';
+
+  @override
+  String get websites_openRestyModuleScript => 'Build script';
+
+  @override
+  String get websites_openRestyBuild => 'Build OpenResty';
+
+  @override
+  String get websites_openRestyBuildHint =>
+      'Select modules and rebuild in the background';
+
+  @override
+  String get websites_openRestyBuildModules => 'Modules to build';
+
+  @override
+  String get websites_openRestyMirror => 'Download mirror';
+
+  @override
+  String get websites_openRestyForce => 'Force rebuild';
+
+  @override
+  String get websites_openRestyBuildSubmitted => 'Build task submitted';
+
+  @override
+  String get websites_openRestyHttps => 'Default HTTPS';
+
+  @override
+  String get websites_openRestyHttpsHint =>
+      'Control HTTPS behavior for the default site';
+
+  @override
+  String get websites_openRestyHttpsReject => 'Reject unmatched SSL handshakes';
+
+  @override
+  String get logs_systemServices => 'System service logs';
+
+  @override
+  String get logs_systemFiles => 'Log files';
+
+  @override
+  String get logs_service => 'Service';
+
+  @override
+  String get logs_serviceAll => 'All services';
+
+  @override
+  String get logs_priority => 'Priority';
+
+  @override
+  String get logs_priorityAll => 'All priorities';
+
+  @override
+  String get logs_keyword => 'Keyword';
+
+  @override
+  String get logs_loadMore => 'Load more';
+
+  @override
+  String get logs_noSystemLog => 'No system logs';
+
+  @override
+  String get toolbox_updateVirusDatabase => 'Update virus database';
+
+  @override
+  String get toolbox_updateVirusDatabaseHint =>
+      'Fetch the latest ClamAV signatures';
+
+  @override
+  String get toolbox_enableScan => 'Enable scan rule';
+
+  @override
+  String get toolbox_disableScan => 'Disable scan rule';
+
+  @override
+  String get toolbox_clamConfigFile => 'Scan configuration file';
+
+  @override
+  String get toolbox_ftpEdit => 'Edit FTP account';
+
+  @override
+  String get toolbox_ftpPasswordKeep =>
+      'Leave empty to keep the current password';
+
+  @override
+  String get toolbox_ftpStatus => 'Status';
+
+  @override
+  String get toolbox_ftpService => 'FTP service actions';
+
+  @override
+  String get toolbox_ftpStart => 'Start';
+
+  @override
+  String get toolbox_ftpStop => 'Stop';
+
+  @override
+  String get toolbox_ftpRestart => 'Restart';
+
+  @override
+  String get toolbox_ftpReload => 'Reload';
+
+  @override
+  String get toolbox_ftpSync => 'Sync FTP accounts';
+
+  @override
+  String get toolbox_ftpSyncDone => 'FTP accounts synced';
+
+  @override
+  String get toolbox_ftpLogs => 'FTP operation logs';
+
+  @override
+  String get toolbox_ftpLogEmpty => 'No operation logs';
+
+  @override
+  String get toolbox_fail2banConfFile => 'Fail2ban configuration file';
+
+  @override
+  String get toolbox_fail2banConfFileHint =>
+      'View and update the full jail configuration';
+
+  @override
+  String get panelSettings_panelUpgrade => 'Panel upgrade';
+
+  @override
+  String get panelSettings_panelUpgradeHint =>
+      'Check for and install 1Panel updates';
+
+  @override
+  String get panelSettings_upgradeAvailable => 'New version available';
+
+  @override
+  String get panelSettings_upToDate => 'Already up to date';
+
+  @override
+  String panelSettings_upgradeTo(Object version) {
+    return 'Upgrade to $version';
+  }
+
+  @override
+  String panelSettings_upgradeConfirm(Object version) {
+    return 'The panel will upgrade to $version. Services restart briefly.';
+  }
+
+  @override
+  String get panelSettings_upgradeSubmitted => 'Upgrade task submitted';
+
+  @override
+  String get panelSettings_latestVersion => 'Latest version';
+
+  @override
+  String get panelSettings_testVersion => 'Test version';
+
+  @override
+  String get panelSettings_releaseNotesTitle => 'Release history';
+
+  @override
+  String panelSettings_newCount(Object count) {
+    return '$count new';
+  }
+
+  @override
+  String panelSettings_fixCount(Object count) {
+    return '$count fixes';
+  }
+
+  @override
+  String panelSettings_optimizationCount(Object count) {
+    return '$count optimizations';
+  }
+
+  @override
+  String get backups_publicAccount => 'Panel-level backup account';
+
+  @override
+  String get backups_publicAccountHint =>
+      'Stored on the panel and shared across nodes';
+
+  @override
+  String get panelSettings_sshCheckFailed => 'SSH connection failed';
+
+  @override
+  String get panelSettings_loadFailed =>
+      'Failed to load settings. Please retry.';
+
+  @override
+  String get panelSettings_noReleaseNotes => 'No release notes yet';
+
+  @override
+  String get toolbox_ftpPasswordRequired => 'Enter a new FTP password';
+
+  @override
+  String get toolbox_loadFailed => 'Failed to load. Please retry.';
+
+  @override
+  String get toolbox_clamAdd => 'New scan task';
+
+  @override
+  String get websites_groupCreate => 'New group';
+
+  @override
+  String get websites_groupMergeEmpty => 'No other group to merge into';
+
+  @override
+  String get websites_templateNameRequired => 'Enter a template name';
+
+  @override
+  String get websites_templateFileRequired => 'Upload the template file';
+
+  @override
+  String get websites_templateOutputNameRequired => 'Enter an output name';
+
+  @override
+  String get logs_loadFailed => 'Failed to load logs. Please retry.';
+
+  @override
+  String get host_sshLogLoadFailed => 'Failed to load SSH logs';
+
+  @override
+  String vm_forceStopConfirm(Object name) {
+    return 'Force stop $name? Data loss is possible.';
+  }
+
+  @override
+  String vm_snapshotRecoverConfirm(Object name) {
+    return 'Restore snapshot $name? The current state will be replaced.';
+  }
+
+  @override
+  String vm_snapshotDeleteConfirm(Object name) {
+    return 'Delete snapshot $name?';
+  }
+
+  @override
+  String get vm_statsCpu => 'CPU';
+
+  @override
+  String get vm_statsMemory => 'Memory';
+
+  @override
+  String get vm_statsDisk => 'Disk R/W';
+
+  @override
+  String get vm_statsNetwork => 'Network RX/TX';
+
+  @override
+  String get websites_openRestyHttpsLoadFailed =>
+      'Failed to load HTTPS settings';
+
+  @override
+  String get toolbox_ftpServiceConfirm =>
+      'This interrupts active FTP connections. Continue?';
+
+  @override
+  String get toolbox_fail2banStop => 'Stop Fail2ban';
+
+  @override
+  String get toolbox_fail2banStopConfirm =>
+      'Brute-force protection stops until restarted. Continue?';
+
+  @override
+  String get panelMcp_title => 'MCP';
+
+  @override
+  String get panelMcp_subtitle =>
+      'Panel MCP service, credentials and invocations';
+
+  @override
+  String get panelMcp_service => 'MCP service';
+
+  @override
+  String get panelMcp_notInstalled => 'Not installed';
+
+  @override
+  String get panelMcp_installed => 'Installed';
+
+  @override
+  String get panelMcp_ready => 'Ready';
+
+  @override
+  String get panelMcp_serviceRunning => 'Service running';
+
+  @override
+  String get panelMcp_serviceStopped => 'Service stopped';
+
+  @override
+  String get panelMcp_install => 'Install MCP service';
+
+  @override
+  String get panelMcp_start => 'Start';
+
+  @override
+  String get panelMcp_stop => 'Stop';
+
+  @override
+  String get panelMcp_restart => 'Restart';
+
+  @override
+  String get panelMcp_logs => 'Service logs';
+
+  @override
+  String get panelMcp_settings => 'Runtime settings';
+
+  @override
+  String get panelMcp_endpoint => 'Endpoint';
+
+  @override
+  String get panelMcp_runtimeType => 'Runtime type';
+
+  @override
+  String get panelMcp_dockerImage => 'Docker image';
+
+  @override
+  String get panelMcp_listenPort => 'Listen port';
+
+  @override
+  String get panelMcp_externalUrl => 'External URL';
+
+  @override
+  String get panelMcp_accessPolicy => 'Access policy';
+
+  @override
+  String get panelMcp_allowedIPs => 'Allowed IPs';
+
+  @override
+  String get panelMcp_allowedIPsHint => 'One IP or CIDR per line';
+
+  @override
+  String get panelMcp_saveSettings => 'Save settings';
+
+  @override
+  String get panelMcp_website => 'Website binding';
+
+  @override
+  String get panelMcp_unbound => 'Unbound';
+
+  @override
+  String get panelMcp_bound => 'Bound';
+
+  @override
+  String get panelMcp_domain => 'Domain';
+
+  @override
+  String get panelMcp_enableSsl => 'Enable SSL';
+
+  @override
+  String get panelMcp_sslId => 'SSL ID';
+
+  @override
+  String get panelMcp_bindWebsite => 'Bind website';
+
+  @override
+  String get panelMcp_updateWebsite => 'Update binding';
+
+  @override
+  String get panelMcp_unbindWebsite => 'Unbind website';
+
+  @override
+  String get panelMcp_deleteWebsite => 'Delete linked website';
+
+  @override
+  String panelMcp_unbindConfirm(String domain) {
+    return 'Unbind MCP website $domain?';
+  }
+
+  @override
+  String get panelMcp_credentials => 'Credentials';
+
+  @override
+  String get panelMcp_createCredential => 'Create credential';
+
+  @override
+  String get panelMcp_editCredential => 'Edit credential';
+
+  @override
+  String get panelMcp_credentialName => 'Credential name';
+
+  @override
+  String get panelMcp_credentialDescription => 'Description';
+
+  @override
+  String get panelMcp_expiresAt => 'Expires at (ISO 8601, optional)';
+
+  @override
+  String get panelMcp_tools => 'Allowed tools';
+
+  @override
+  String get panelMcp_nodes => 'Nodes';
+
+  @override
+  String get panelMcp_noCredentials => 'No MCP credentials';
+
+  @override
+  String get panelMcp_noInvocations => 'No MCP invocations';
+
+  @override
+  String get panelMcp_invocations => 'Invocations';
+
+  @override
+  String get panelMcp_tool => 'Tool';
+
+  @override
+  String get panelMcp_credential => 'Credential';
+
+  @override
+  String get panelMcp_revealToken => 'Reveal token';
+
+  @override
+  String get panelMcp_rotateToken => 'Rotate token';
+
+  @override
+  String get panelMcp_exportCredential => 'Export enrollment';
+
+  @override
+  String get panelMcp_revoke => 'Revoke';
+
+  @override
+  String panelMcp_revokeConfirm(String name) {
+    return 'Revoke credential $name?';
+  }
+
+  @override
+  String panelMcp_deleteConfirm(String name) {
+    return 'Delete credential $name?';
+  }
+
+  @override
+  String get panelMcp_tokenTitle => 'MCP token';
+
+  @override
+  String get panelMcp_tokenHint =>
+      'Copy this token now. It will not be shown again.';
+
+  @override
+  String get panelMcp_exportTitle => 'Enrollment document';
+
+  @override
+  String get panelMcp_exportClient => 'Client';
+
+  @override
+  String get panelMcp_exportClientHint => 'For example: claude, cursor, vscode';
+
+  @override
+  String get panelMcp_catalog => 'Tool catalog';
+
+  @override
+  String get panelMcp_catalogHint => 'Tools available to this panel';
+
+  @override
+  String panelMcp_serviceConfirm(String operation) {
+    return 'Operate MCP service: $operation?';
+  }
+
+  @override
+  String get panelMcp_requiredFields => 'Fill in required fields';
+
+  @override
+  String get panelMcp_status => 'Status';
+
+  @override
+  String get panelMcp_reason => 'Reason';
+
+  @override
+  String get panelMcp_noNodes => 'No nodes';
+
+  @override
+  String get panelMcp_operationCompleted => 'Operation completed';
+
+  @override
+  String get panelMcp_loadFailed => 'Failed to load MCP data';
+
+  @override
+  String get panelMcp_createSuccess => 'Credential created';
+
+  @override
+  String get panelMcp_revision => 'Revision';
+
+  @override
+  String panelMcp_pending(String operation) {
+    return 'Pending request: $operation';
+  }
+
+  @override
+  String get panelMcp_sslHint => 'Required when SSL is enabled';
+
+  @override
+  String get panelMcp_websiteState => 'Website state';
+
+  @override
+  String get panelMcp_installing => 'Installing MCP service';
+
+  @override
+  String get panelMcp_taskId => 'Task ID';
+
+  @override
+  String get panelMcp_saved => 'MCP settings saved';
+
+  @override
+  String panelMcp_toolsCount(int count) {
+    return '$count tools';
+  }
+
+  @override
+  String get panelMcp_tokenCopied => 'Token copied';
+
+  @override
+  String get ai_gpuGroups => 'GPU groups';
+
+  @override
+  String get ai_gpuGroupsEmpty => 'No GPU groups';
+
+  @override
+  String get ai_gpuGroupAdd => 'Add GPU group';
+
+  @override
+  String get ai_gpuGroupEdit => 'Edit GPU group';
+
+  @override
+  String get ai_gpuGroupName => 'Group name';
+
+  @override
+  String get ai_gpuGroupDescription => 'Description';
+
+  @override
+  String get ai_gpuGroupImageType => 'GPU type';
+
+  @override
+  String get ai_gpuGroupDevices => 'GPU devices';
+
+  @override
+  String get ai_gpuGroupCapabilities => 'Capabilities (comma separated)';
+
+  @override
+  String ai_gpuGroupDeleteConfirm(String name) {
+    return 'Delete GPU group $name?';
+  }
+
+  @override
+  String get ai_gpuUsage => 'GPU usage check';
+
+  @override
+  String get ai_gpuUsageCompose => 'Docker Compose';
+
+  @override
+  String get ai_gpuUsageEnv => 'Environment variables';
+
+  @override
+  String get ai_gpuUsageResult => 'GPU usage result';
+
+  @override
+  String get ai_gpuUsageWarnings => 'Warnings';
+
+  @override
+  String get ai_gpuUsagePossible => 'Possible deployments';
+
+  @override
+  String get ai_chat_title => 'Model chat';
+
+  @override
+  String get ai_chat_model => 'Model';
+
+  @override
+  String get ai_chat_input => 'Message';
+
+  @override
+  String get ai_chat_send => 'Send';
+
+  @override
+  String get ai_chat_empty => 'Send a message to test this model';
+
+  @override
+  String get ai_chat_failed => 'Chat failed';
+
+  @override
+  String get ai_chat_stop => 'Stop';
+
+  @override
+  String get ai_chat_noModels => 'No models configured for this account';
+
+  @override
+  String get ai_agent_otherConfig => 'Other configuration';
+
+  @override
+  String get ai_agent_otherTimezone => 'User timezone';
+
+  @override
+  String get ai_agent_otherBrowser => 'Enable browser';
+
+  @override
+  String get ai_agent_otherNpm => 'NPM registry';
+
+  @override
+  String get ai_agent_otherUsername => 'Dashboard username';
+
+  @override
+  String get ai_agent_otherPassword => 'Dashboard password';
+
+  @override
+  String get ai_agent_markdown => 'Markdown files';
+
+  @override
+  String get ai_agent_markdownEmpty => 'No markdown files';
+
+  @override
+  String get ai_agent_markdownContent => 'Content';
+
+  @override
+  String get ai_agent_batchSkill => 'Batch install skill';
+
+  @override
+  String get ai_agent_skillName => 'Skill name';
+
+  @override
+  String get ai_agent_skillPackage => 'Package path';
+
+  @override
+  String get ai_agent_feishuSwitch => 'Switch Feishu plugin';
+
+  @override
+  String get ai_agent_groupScope => 'Group session scope';
+
+  @override
+  String get ai_agent_requireMention => 'Require mention';
+
+  @override
+  String get ai_agent_deleteResources => 'Resources linked to this agent';
+
+  @override
+  String get ai_agent_noDeleteResources => 'No linked resources';
+
+  @override
+  String get databases_editUser => 'Edit user';
+
+  @override
+  String get databases_savePassword => 'Save password locally';
+
+  @override
+  String get databases_grantsSummary => 'Grant summary';
+
+  @override
+  String get databases_commonInfo => 'Instance information';
+
+  @override
+  String get databases_editDescription => 'Edit description';
+
+  @override
+  String get databases_rootPassword => 'Root password';
+
+  @override
+  String get vm_resizeDisk => 'Resize disk';
+
+  @override
+  String get vm_diskTarget => 'Disk target';
+
+  @override
+  String get vm_diskSizeNew => 'New size (GiB)';
+
+  @override
+  String get vm_healthCheck => 'Health check';
+
+  @override
+  String get vm_healthPass => 'Passed';
+
+  @override
+  String get vm_healthWarn => 'Warnings';
+
+  @override
+  String get vm_healthFail => 'Failed';
+
+  @override
+  String get vm_orphans => 'Orphan resources';
+
+  @override
+  String get vm_orphansEmpty => 'No orphan resources';
+
+  @override
+  String get vm_orphansScan => 'Scan orphan resources';
+
+  @override
+  String get vm_orphansClean => 'Clean selected';
+
+  @override
+  String vm_cleanConfirm(int count) {
+    return 'Delete $count orphan resources?';
+  }
+
+  @override
+  String get runtime_phpConfig => 'PHP configuration';
+
+  @override
+  String get runtime_phpParams => 'PHP parameters (JSON)';
+
+  @override
+  String get runtime_disableFunctions => 'Disabled functions';
+
+  @override
+  String get runtime_uploadMaxSize => 'Upload limit';
+
+  @override
+  String get runtime_maxExecutionTime => 'Max execution time';
+
+  @override
+  String get runtime_container => 'PHP container';
+
+  @override
+  String get runtime_containerName => 'Container name';
+
+  @override
+  String get runtime_exposedPorts => 'Exposed ports (JSON)';
+
+  @override
+  String get runtime_environments => 'Environment variables (JSON)';
+
+  @override
+  String get runtime_volumes => 'Volumes (JSON)';
+
+  @override
+  String get runtime_extraHosts => 'Extra hosts (JSON)';
+
+  @override
+  String get runtime_jsonHint => 'Enter a valid JSON array';
+
+  @override
+  String get toolbox_hosts => 'Hosts file';
+
+  @override
+  String get toolbox_hostsEdit => 'Edit hosts file';
+
+  @override
+  String get toolbox_password => 'Root password';
+
+  @override
+  String get toolbox_passwordChanged => 'Root password updated';
+
+  @override
+  String get toolbox_dnsCheck => 'Test DNS resolution';
+
+  @override
+  String get toolbox_dnsOk => 'DNS resolution works';
+
+  @override
+  String get toolbox_dnsFail => 'DNS resolution failed';
+
+  @override
+  String get toolbox_systemClean => 'Clean system junk';
+
+  @override
+  String get toolbox_systemCleanConfirm => 'Clean scanned junk files?';
+
+  @override
+  String get toolbox_users => 'System users';
+
+  @override
+  String get toolbox_addHost => 'Add host entry';
+
+  @override
+  String get panelMcp_accessInherit => 'Inherit';
+
+  @override
+  String get panelMcp_accessAll => 'All';
+
+  @override
+  String get panelMcp_accessRestricted => 'Restricted';
+
+  @override
+  String get ai_gpuTypeNvidia => 'NVIDIA';
+
+  @override
+  String get ai_gpuTypeIntel => 'Intel';
+
+  @override
+  String get ai_gpuTypeAscend => 'Ascend';
+
+  @override
+  String get apps_linkedResources => 'Linked resources';
+
+  @override
+  String get files_wgetDetails => 'Download details';
+
+  @override
+  String files_wgetProgress(Object percent) {
+    return 'Progress: $percent%';
+  }
+
+  @override
+  String get files_wgetWaiting => 'Waiting for download progress...';
+
+  @override
+  String get runtime_presetNew => 'New extension preset';
+
+  @override
+  String get runtime_presetName => 'Preset name';
+
+  @override
+  String get runtime_presetExtensions => 'Extensions';
+
+  @override
+  String get runtime_presetExtensionsHint =>
+      'Separate extensions with commas, e.g. redis,opcache';
+
+  @override
+  String get runtime_presetImport => 'Import extension preset';
+
+  @override
+  String get runtime_presetImported => 'Extension preset imported';
+
+  @override
+  String get runtime_presetSkipped =>
+      'Preset already exists with the same content';
+
+  @override
+  String get runtime_presetPush => 'Push preset';
+
+  @override
+  String get runtime_presetSourceNode => 'Source node';
+
+  @override
+  String get runtime_presetTargetNodes => 'Target nodes';
+
+  @override
+  String get runtime_presetNodesHint => 'Separate nodes with commas';
+
+  @override
+  String runtime_presetDeleteConfirm(Object name) {
+    return 'Delete extension preset \"$name\"?';
+  }
+
+  @override
+  String get runtime_presetPushed => 'Push task submitted';
+
+  @override
+  String get runtime_supervisor => 'Supervisor';
+
+  @override
+  String get vm_isoSearch => 'Search ISO';
+
+  @override
+  String get vm_isoSearchHint => 'Name keyword';
+
+  @override
+  String get vm_isoCreateRecord => 'Add image record';
+
+  @override
+  String get vm_isoImport => 'Import from path';
+
+  @override
+  String get vm_networkInterfaces => 'Network interfaces';
+
+  @override
+  String get apps_sort => 'Installed app order';
+
+  @override
+  String get apps_sortHint => 'Smaller values appear first';
+
+  @override
+  String get apps_defaultConfig => 'Default config';
+
+  @override
+  String get apps_defaultConfigEmpty => 'No default config';
+
+  @override
+  String get databases_redisCliInstalled => 'redis-cli is installed';
+
+  @override
+  String get databases_redisCliMissing =>
+      'redis-cli is missing; remote Redis terminal is unavailable';
+
+  @override
+  String get cronjobs_export => 'Export cron jobs';
+
+  @override
+  String get cronjobs_import => 'Import cron jobs';
+
+  @override
+  String get cronjobs_exported => 'Cron jobs exported';
+
+  @override
+  String get cronjobs_imported => 'Cron jobs imported';
+
+  @override
+  String get cronjobs_importEmpty => 'No cron jobs found in the file';
+
+  @override
+  String get websites_importCa => 'Import CA';
+
+  @override
+  String get websites_uploadCa => 'Upload CA archive';
+
+  @override
+  String get websites_caName => 'CA name';
+
+  @override
+  String get websites_importType => 'Import type';
+
+  @override
+  String get websites_importPaste => 'Paste certificate';
+
+  @override
+  String get websites_importLocal => 'Server files';
+
+  @override
+  String get websites_certificatePath => 'Certificate path';
+
+  @override
+  String ai_accountCountLabel(String name, int count) {
+    return '$name: $count';
+  }
+
+  @override
+  String get panelSettings_proxy => 'Server proxy';
+
+  @override
+  String get panelSettings_proxyHint =>
+      'Configure HTTP/HTTPS/SOCKS5 proxy for outbound panel traffic';
+
+  @override
+  String get panelSettings_proxyType => 'Proxy type';
+
+  @override
+  String get panelSettings_proxyHttp => 'HTTP';
+
+  @override
+  String get panelSettings_proxyHttps => 'HTTPS';
+
+  @override
+  String get panelSettings_proxySocks5 => 'SOCKS5';
+
+  @override
+  String get panelSettings_proxyClose => 'Disable proxy';
+
+  @override
+  String get panelSettings_proxyUrl => 'Proxy host';
+
+  @override
+  String get panelSettings_proxyUrlHint =>
+      'e.g. 127.0.0.1 or proxy.example.com';
+
+  @override
+  String get panelSettings_proxyPort => 'Proxy port';
+
+  @override
+  String get panelSettings_proxyUser => 'Proxy user';
+
+  @override
+  String get panelSettings_proxyPassword => 'Proxy password';
+
+  @override
+  String get panelSettings_proxyPasswordHint =>
+      'Leave empty to clear the saved proxy password';
+
+  @override
+  String get panelSettings_proxyDocker => 'Proxy Docker too';
+
+  @override
+  String get panelSettings_proxyRestartDocker =>
+      'Restart Docker after applying';
+
+  @override
+  String get panelSettings_proxyRequired => 'Enter proxy host and port';
+
+  @override
+  String get panelSettings_downloadPreference => 'Download preference';
+
+  @override
+  String get panelSettings_downloadPreferenceHint =>
+      'Choose the filename used when downloading files';
+
+  @override
+  String get panelSettings_useServerFilename => 'Use server filename';
+
+  @override
+  String get panelSettings_useServerFilenameHint =>
+      'Prefer the original filename returned by the server';
+
+  @override
+  String get panelSettings_downloadSsl => 'Download panel certificate';
+
+  @override
+  String get panelSettings_downloadSslHint =>
+      'Export the panel self-signed SSL certificate for trust';
+
+  @override
+  String get panelSettings_terminalAppearance => 'Terminal appearance';
+
+  @override
+  String get panelSettings_terminalAppearanceHint =>
+      'Adjust the font, colors and cursor of the panel web terminal';
+
+  @override
+  String get panelSettings_terminalBehavior => 'Terminal behavior';
+
+  @override
+  String get panelSettings_showTerminalButton => 'Show terminal button';
+
+  @override
+  String get panelSettings_showTerminalButtonHint =>
+      'Show a shortcut to open the terminal in the panel';
+
+  @override
+  String get panelSettings_cursorBlink => 'Blinking cursor';
+
+  @override
+  String get panelSettings_cursorStyle => 'Cursor style';
+
+  @override
+  String get panelSettings_cursorBlock => 'Block';
+
+  @override
+  String get panelSettings_cursorUnderline => 'Underline';
+
+  @override
+  String get panelSettings_cursorBar => 'Bar';
+
+  @override
+  String get panelSettings_scrollback => 'Scrollback lines';
+
+  @override
+  String get panelSettings_scrollSensitivity => 'Scroll sensitivity';
+
+  @override
+  String get panelSettings_terminalTypography => 'Typography';
+
+  @override
+  String get panelSettings_fontFamily => 'Font family';
+
+  @override
+  String get panelSettings_fontFamilyHint =>
+      'Leave empty to use the panel default font';
+
+  @override
+  String get panelSettings_fontSize => 'Font size';
+
+  @override
+  String get panelSettings_lineHeight => 'Line height';
+
+  @override
+  String get panelSettings_letterSpacing => 'Letter spacing';
+
+  @override
+  String get panelSettings_terminalColors => 'Colors';
+
+  @override
+  String get panelSettings_backgroundColor => 'Background color';
+
+  @override
+  String get panelSettings_foregroundColor => 'Foreground color';
+
+  @override
+  String get panelSettings_colorHint => 'Hex color such as #1e1e1e';
+
+  @override
+  String get panelSettings_registerPasskey => 'Register in browser';
+
+  @override
+  String get panelSettings_registerPasskeyHint =>
+      'Passkeys bind to the current domain, so finish registration in the panel web page';
+
+  @override
+  String get host_sshTerminal => 'SSH terminal';
+
+  @override
+  String get websites_editStream => 'Edit tunnel';
+
+  @override
+  String get cronjobs_pickScript => 'Choose from library';
 }

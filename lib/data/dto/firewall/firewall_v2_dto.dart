@@ -238,6 +238,10 @@ class DockerGuardEndpoint {
   String get protocol => '${json['protocol'] ?? ''}';
   String get containerName => '${json['containerName'] ?? ''}';
   int get containerPort => (json['containerPort'] as num?)?.toInt() ?? 0;
+  String get policyUUID => '${json['policyUUID'] ?? ''}';
+  String get mode => '${json['mode'] ?? ''}';
+  List<String> get sources =>
+      (json['sources'] as List? ?? const []).map((e) => '$e').toList();
   bool get effective => json['effective'] == true;
 }
 
@@ -263,5 +267,10 @@ class DockerGuardInfo {
       .map(DockerGuardEndpoint.new)
       .toList(growable: false);
 
+  List<DockerGuardEndpoint> get orphanPolicies => _maps(
+    json['orphanPolicies'],
+  ).map(DockerGuardEndpoint.new).toList(growable: false);
+
+  bool get ipv6Enabled => base['ipv6Enabled'] == true;
   bool get isEffective => ipv4.effective || ipv6.effective;
 }

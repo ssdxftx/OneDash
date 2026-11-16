@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:uuid/uuid.dart';
@@ -26,6 +27,99 @@ import '../providers/app_store_provider.dart';
 /// Shared installed-app actions so the store sheet and detail page stay in sync.
 class InstalledAppActions {
   const InstalledAppActions._();
+
+  static Future<void> editWebUi(
+    BuildContext context,
+    WidgetRef ref,
+    AppInstalledDto app,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController();
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.apps_editWebUi,
+          subtitle: app.displayName,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(controller: controller, label: l10n.apps_webUi),
+          ],
+        ),
+      ),
+    );
+    final webUI = controller.text.trim();
+    controller.dispose();
+    if (saved != true || webUI.isEmpty || !context.mounted) return;
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      await repository.updateInstalledConfig(installId: app.id, webUI: webUI);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+      invalidateInstalledAppLists(ref);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  static Future<void> showDefaultConfig(
+    BuildContext context,
+    WidgetRef ref,
+    AppInstalledDto app,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      final content = await repository.getDefaultConfig(
+        key: app.appKey,
+        name: app.name,
+      );
+      if (!context.mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.85,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.apps_defaultConfig, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s4),
+            Text(
+              app.displayName,
+              style: AppTextStyles.bodyS.copyWith(
+                color: sheetContext.scheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: AppTokens.s12),
+            Flexible(
+              child: SingleChildScrollView(
+                child: SelectableText(
+                  content.isEmpty ? l10n.apps_defaultConfigEmpty : content,
+                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                ),
+              ),
+            ),
+            if (content.isNotEmpty) ...[
+              const SizedBox(height: AppTokens.s12),
+              SecondaryButton(
+                label: l10n.action_copy,
+                icon: TablerIcons.copy,
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: content));
+                  if (!sheetContext.mounted) return;
+                  AppToast.success(sheetContext, l10n.action_done);
+                },
+              ),
+            ],
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
 
   static Future<void> operate(
     BuildContext context,
@@ -60,7 +154,7 @@ class InstalledAppActions {
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);
       ref.invalidate(installedInfoProvider(app.id));
-      ref.invalidate(installedAppsProvider);
+      invalidateInstalledAppLists(ref);
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);
@@ -145,7 +239,7 @@ class InstalledAppActions {
         task: (controller) async {
           await repository.upgradeApp(
             installId: app.id,
-            detailId: app.appDetailId,
+            detailId: selected.detailId,
             version: selected.version,
             dockerCompose: selected.dockerCompose,
             taskID: taskID,
@@ -157,7 +251,7 @@ class InstalledAppActions {
       );
       if (!success || !context.mounted) return;
       ref.invalidate(installedInfoProvider(app.id));
-      ref.invalidate(installedAppsProvider);
+      invalidateInstalledAppLists(ref);
       AppToast.success(context, l10n.action_done);
     } catch (error) {
       if (!context.mounted) return;
@@ -190,7 +284,7 @@ class InstalledAppActions {
       );
       if (!context.mounted) return;
       ref.invalidate(installedInfoProvider(app.id));
-      ref.invalidate(installedAppsProvider);
+      invalidateInstalledAppLists(ref);
       AppToast.success(context, l10n.action_done);
     } catch (error) {
       if (!context.mounted) return;
@@ -442,7 +536,7 @@ class InstalledAppActions {
       final repository = await ref.read(appRepositoryProvider.future);
       await repository.changePort(key: app.appKey, name: app.name, port: value);
       ref.invalidate(installedInfoProvider(app.id));
-      ref.invalidate(installedAppsProvider);
+      invalidateInstalledAppLists(ref);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_saved);
     } catch (error) {
@@ -507,6 +601,14 @@ class InstalledAppActions {
     bool deleteBackup = false;
     bool deleteImage = false;
     bool force = false;
+    List<Map<String, dynamic>> resources = const [];
+    try {
+      final repository = await ref.read(appRepositoryProvider.future);
+      resources = await repository.getInstalledDeleteCheck(app.id);
+    } catch (_) {
+      resources = const [];
+    }
+    if (!context.mounted) return;
     final confirmed = await showAppSheet<bool>(
       context: context,
       builder: (sheetContext) => StatefulBuilder(
@@ -522,6 +624,17 @@ class InstalledAppActions {
                 color: context.scheme.onSurfaceVariant,
               ),
             ),
+            if (resources.isNotEmpty) ...[
+              Text(l10n.apps_linkedResources, style: AppTextStyles.titleS),
+              for (final resource in resources)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  title: Text('${resource['name'] ?? ''}'),
+                  subtitle: Text('${resource['type'] ?? ''}'),
+                ),
+              const SizedBox(height: AppTokens.s8),
+            ],
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.apps_deleteDatabase),
@@ -578,7 +691,7 @@ class InstalledAppActions {
       );
       if (!success || !context.mounted) return;
       ref.invalidate(installedInfoProvider(app.id));
-      ref.invalidate(installedAppsProvider);
+      invalidateInstalledAppLists(ref);
       AppToast.success(context, l10n.action_done);
       if (popOnDone && context.mounted) Navigator.of(context).maybePop();
     } catch (error) {
@@ -595,10 +708,10 @@ class InstalledAppActions {
     final l10n = AppLocalizations.of(context);
     try {
       final repository = await ref.read(appRepositoryProvider.future);
-      final ignored = await repository.getIgnoredApps();
+      final ignored = await ref.read(ignoredAppsProvider.future);
       int? ignoredId;
       for (final item in ignored) {
-        if (item.appId == app.id) {
+        if (item.appId == app.appId) {
           ignoredId = item.id;
           break;
         }
@@ -612,14 +725,15 @@ class InstalledAppActions {
           return;
         }
         await repository.ignoreUpdate(
-          appId: app.id,
+          appId: app.appId,
           appDetailId: app.appDetailId,
-          scope: 'app',
+          scope: 'version',
         );
       }
       ref.invalidate(installedInfoProvider(app.id));
+      ref.invalidate(ignoredAppsProvider);
       ref.invalidate(installedIgnoredProvider(app.id));
-      ref.invalidate(installedAppsProvider);
+      invalidateInstalledAppLists(ref);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);
     } catch (error) {
@@ -633,7 +747,7 @@ class InstalledAppActions {
     dynamic repository,
     String taskID,
   ) async {
-    for (var attempt = 0; attempt < 120; attempt++) {
+    for (var attempt = 0; attempt < 300; attempt++) {
       final log = await repository.readTaskLog(taskID);
       if (log.lines.isNotEmpty) controller.log(log.lines.last);
       final status = log.taskStatus.toLowerCase();
@@ -641,7 +755,7 @@ class InstalledAppActions {
       if (status == 'failed' || status == 'error' || status == 'canceled') {
         throw Exception(log.lines.isEmpty ? 'Task failed' : log.lines.last);
       }
-      await Future<void>.delayed(const Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(seconds: 2));
     }
     throw const TaskFailedException(subject: 'Task', timedOut: true);
   }

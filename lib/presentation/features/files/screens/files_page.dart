@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,7 +19,9 @@ import '../../../../core/utils/debouncer.dart';
 import '../../../../core/utils/file_type_utils.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/file/file_item_dto.dart';
+import '../../../../data/dto/file/file_tree_dto.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
+import '../../../../data/repositories_impl/log_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
@@ -25,6 +30,7 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/search_field.dart';
 import '../../../common/components/skeleton.dart';
+import '../../../common/components/task_log_sheet.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
@@ -60,6 +66,36 @@ class _FilesPageState extends ConsumerState<FilesPage> {
   bool get _selectionMode => _selecting;
 
   String get _path => widget.initialPath.isEmpty ? '/' : widget.initialPath;
+
+  Future<bool> _runFileTask({
+    required String taskID,
+    required String title,
+    required Future<void> Function() stop,
+  }) async {
+    final repository = await ref.read(fileRepositoryProvider.future);
+    final logRepository = await ref.read(logRepositoryProvider.future);
+    if (!mounted) return false;
+    var stopped = false;
+    Object? failure;
+    final waiting = repository.waitTask(taskID).catchError((Object error) {
+      failure = error;
+    });
+    await showTaskLogSheet(
+      context,
+      title: title,
+      taskID: taskID,
+      reader: logRepository.readTaskLog,
+      closeOnFinish: true,
+      onStop: () async {
+        stopped = true;
+        await stop();
+      },
+    );
+    await waiting;
+    if (stopped) return false;
+    if (failure != null) throw failure!;
+    return true;
+  }
 
   @override
   void deactivate() {
@@ -233,13 +269,20 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     if (name == null || name.isEmpty) return;
     try {
       final repository = await ref.read(fileRepositoryProvider.future);
+      final taskID = '${DateTime.now().microsecondsSinceEpoch}';
       await repository.compressFiles(
         files: [item.path],
         type: 'zip',
         dst: _path,
         name: name,
+        taskID: taskID,
       );
-      if (!mounted) return;
+      final completed = await _runFileTask(
+        taskID: taskID,
+        title: l10n.files_compress,
+        stop: () => repository.stopCompress(taskID),
+      );
+      if (!completed || !mounted) return;
       AppToast.success(context, l10n.action_done);
       ref.invalidate(filesProvider(_path));
     } catch (error) {
@@ -261,12 +304,19 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     try {
       final repository = await ref.read(fileRepositoryProvider.future);
       final type = item.extension.replaceFirst('.', '');
+      final taskID = '${DateTime.now().microsecondsSinceEpoch}';
       await repository.decompressFile(
         path: item.path,
         type: type.isEmpty ? 'zip' : type,
         dst: _path,
+        taskID: taskID,
       );
-      if (!mounted) return;
+      final completed = await _runFileTask(
+        taskID: taskID,
+        title: l10n.files_extractTitle,
+        stop: () => repository.stopDecompress(taskID),
+      );
+      if (!completed || !mounted) return;
       AppToast.success(context, l10n.action_done);
       ref.invalidate(filesProvider(_path));
     } catch (error) {
@@ -383,26 +433,29 @@ class _FilesPageState extends ConsumerState<FilesPage> {
   }
 
   Future<void> _download(FileItemDto item) async {
-    if (item.size > 50 * 1024 * 1024) {
-      AppToast.warning(
-        context,
-        AppLocalizations.of(context).files_downloadTooLarge,
-      );
-      return;
-    }
     try {
       final repository = await ref.read(fileRepositoryProvider.future);
-      final bytes = await repository.downloadBytes(item.path);
+      final tempDir = await getTemporaryDirectory();
+      final safeName = item.name.replaceAll(RegExp(r'[/\\:*?"<>|]'), '_');
+      final localPath =
+          '${tempDir.path}/onedash_${DateTime.now().microsecondsSinceEpoch}_$safeName';
+      try {
+        await repository.downloadFileTo(path: item.path, savePath: localPath);
+      } catch (_) {
+        final bytes = await repository.chunkDownload(
+          path: item.path,
+          name: item.name,
+        );
+        await File(localPath).writeAsBytes(bytes, flush: true);
+      }
       if (!mounted) return;
-      final savePath = await FilePicker.saveFile(
-        fileName: item.name,
-        bytes: bytes,
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(localPath, name: item.name)]),
       );
-      if (savePath == null) return;
       if (!mounted) return;
       AppToast.success(
         context,
-        AppLocalizations.of(context).files_savedTo(savePath),
+        AppLocalizations.of(context).files_downloadReady,
       );
     } catch (error) {
       if (!mounted) return;
@@ -410,7 +463,234 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     }
   }
 
+  Future<void> _preview(FileItemDto item) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      final info = await repository.previewFile(item.path, isDetail: true);
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.9,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(item.name, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s12),
+            if (info.content.isEmpty)
+              Text(l10n.state_empty, style: AppTextStyles.bodyM)
+            else
+              Flexible(
+                child: SingleChildScrollView(
+                  child: SelectableText(
+                    info.content,
+                    style: AppTextStyles.bodyS.copyWith(
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _showTree() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      final nodes = await repository.getFileTree(path: _path, containSub: true);
+      if (!mounted) return;
+      final rows = <({int depth, FileTreeNodeDto node})>[];
+      void walk(FileTreeNodeDto node, int depth) {
+        rows.add((depth: depth, node: node));
+        for (final child in node.children) {
+          walk(child, depth + 1);
+        }
+      }
+
+      for (final node in nodes) {
+        walk(node, 0);
+      }
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.9,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.files_directoryTree, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s12),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final row in rows)
+                    InkWell(
+                      onTap: row.node.isDir
+                          ? () {
+                              Navigator.of(sheetContext).pop();
+                              _openPath(row.node.path);
+                            }
+                          : null,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: row.depth * AppTokens.s16,
+                          bottom: AppTokens.s4,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              row.node.isDir
+                                  ? TablerIcons.folder
+                                  : TablerIcons.file,
+                              size: AppTokens.iconList,
+                            ),
+                            const SizedBox(width: AppTokens.s8),
+                            Expanded(
+                              child: Text(
+                                row.node.name,
+                                style: AppTextStyles.bodyM,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (row.node.isDir)
+                              Icon(
+                                TablerIcons.chevron_right,
+                                size: AppTokens.iconList,
+                                color: context.scheme.onSurfaceVariant,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<String?> _pickTreeDirectory() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      final nodes = await repository.getFileTree(path: _path, containSub: true);
+      if (!mounted) return null;
+      final rows = <({int depth, FileTreeNodeDto node})>[];
+      void walk(FileTreeNodeDto node, int depth) {
+        rows.add((depth: depth, node: node));
+        for (final child in node.children) {
+          walk(child, depth + 1);
+        }
+      }
+
+      for (final node in nodes) {
+        walk(node, 0);
+      }
+      return await showAppSheet<String>(
+        context: context,
+        maxHeightFactor: 0.9,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.files_pickFromTree, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s12),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final row in rows)
+                    if (row.node.isDir)
+                      InkWell(
+                        onTap: () =>
+                            Navigator.of(sheetContext).pop(row.node.path),
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            left: row.depth * AppTokens.s16,
+                            bottom: AppTokens.s4,
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                TablerIcons.folder,
+                                size: AppTokens.iconList,
+                              ),
+                              const SizedBox(width: AppTokens.s8),
+                              Expanded(
+                                child: Text(
+                                  row.node.name,
+                                  style: AppTextStyles.bodyM,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return null;
+      showErrorToast(context, error);
+      return null;
+    }
+  }
+
+  Future<void> _editRemark(FileItemDto item) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController();
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.files_remark,
+          saveLabel: l10n.action_save,
+          onSave: () async => Navigator.of(pageContext).pop(true),
+          children: [
+            AppTextField(
+              controller: controller,
+              label: l10n.files_remark,
+              maxLines: 4,
+            ),
+          ],
+        ),
+      ),
+    );
+    final remark = controller.text.trim();
+    controller.dispose();
+    if (saved != true || !mounted) return;
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      await repository.setFileRemark(path: item.path, remark: remark);
+      if (!mounted) return;
+      AppToast.success(context, l10n.files_remarkSaved);
+      ref.invalidate(filesProvider(_path));
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _share(FileItemDto item) async {
+    final l10n = AppLocalizations.of(context);
     try {
       final repository = await ref.read(fileRepositoryProvider.future);
       final share = await repository.createFileShare(
@@ -419,8 +699,26 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       );
       if (!mounted) return;
       await Clipboard.setData(ClipboardData(text: share.code));
+      final qr = await repository.getFileShareQrCode(share.code);
       if (!mounted) return;
-      AppToast.success(context, share.code);
+      await showAppSheet<void>(
+        context: context,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.files_shareQr, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s12),
+            if (qr.isNotEmpty)
+              Center(child: Image.memory(Uint8List.fromList(qr), width: 220)),
+            const SizedBox(height: AppTokens.s12),
+            SelectableText(
+              '${l10n.files_shareCode}: ${share.code}',
+              style: AppTextStyles.bodyM,
+            ),
+          ],
+        ),
+      );
     } catch (error) {
       if (!mounted) return;
       showErrorToast(context, error);
@@ -477,18 +775,70 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     final l10n = AppLocalizations.of(context);
     final request = await pushFormPage<_MoveRequest>(
       context,
-      _MoveSheet(sourcePath: item.path, sourceDir: _path),
+      _MoveSheet(
+        sourcePath: item.path,
+        sourceDir: _path,
+        onPickDirectory: _pickTreeDirectory,
+      ),
     );
     if (request == null || !mounted) return;
     try {
       final repository = await ref.read(fileRepositoryProvider.future);
+      final taskID = '${DateTime.now().microsecondsSinceEpoch}';
       await repository.moveCopyFiles(
         oldPaths: [item.path],
         newPath: request.target,
         type: request.copy ? 'copy' : 'cut',
         cover: request.cover,
+        taskID: taskID,
       );
+      final completed = await _runFileTask(
+        taskID: taskID,
+        title: l10n.files_moveCopy,
+        stop: () => repository.stopMove(taskID),
+      );
+      if (!completed || !mounted) return;
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(filesProvider(_path));
+      if (request.target != _path) {
+        ref.invalidate(filesProvider(request.target));
+      }
+    } catch (error) {
       if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _batchMove() async {
+    final l10n = AppLocalizations.of(context);
+    final paths = _selected.toList(growable: false);
+    if (paths.isEmpty) return;
+    final request = await pushFormPage<_MoveRequest>(
+      context,
+      _MoveSheet(
+        sourcePath: l10n.files_selectCount(paths.length),
+        sourceDir: _path,
+        onPickDirectory: _pickTreeDirectory,
+      ),
+    );
+    if (request == null || !mounted) return;
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      final taskID = '${DateTime.now().microsecondsSinceEpoch}';
+      await repository.moveCopyFiles(
+        oldPaths: paths,
+        newPath: request.target,
+        type: request.copy ? 'copy' : 'cut',
+        cover: request.cover,
+        taskID: taskID,
+      );
+      final completed = await _runFileTask(
+        taskID: taskID,
+        title: l10n.files_moveCopy,
+        stop: () => repository.stopMove(taskID),
+      );
+      if (!completed || !mounted) return;
+      setState(_selected.clear);
       AppToast.success(context, l10n.action_done);
       ref.invalidate(filesProvider(_path));
       if (request.target != _path) {
@@ -526,6 +876,69 @@ class _FilesPageState extends ConsumerState<FilesPage> {
       if (!mounted) return;
       showErrorToast(context, error);
     }
+  }
+
+  Future<void> _batchConvert(List<FileItemDto> items) async {
+    final l10n = AppLocalizations.of(context);
+    final selected = items
+        .where((item) => _selected.contains(item.path))
+        .toList(growable: false);
+    if (selected.isEmpty) {
+      AppToast.error(context, l10n.files_convertNoFile);
+      return;
+    }
+    if (selected.any((item) => item.isDir)) {
+      AppToast.error(context, l10n.files_convertOnlyFiles);
+      return;
+    }
+    final request = await pushFormPage<_ConvertRequest>(
+      context,
+      _ConvertSheet(outputPath: _path),
+    );
+    if (request == null || !mounted) return;
+    final taskID = '${DateTime.now().microsecondsSinceEpoch}';
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      await repository.convertFiles(
+        files: selected
+            .map(
+              (item) => {
+                'type': _convertType(request.format),
+                'path': _path,
+                'inputFile': item.name,
+                'extension': _extensionOf(item.name),
+                'outputFormat': request.format,
+              },
+            )
+            .toList(growable: false),
+        outputPath: request.outputPath,
+        deleteSource: request.deleteSource,
+        taskID: taskID,
+      );
+      await repository.waitTask(taskID, subject: l10n.files_convert);
+      if (!mounted) return;
+      AppToast.success(context, l10n.files_convertStarted);
+      ref.invalidate(filesProvider(_path));
+      if (request.outputPath != _path) {
+        ref.invalidate(filesProvider(request.outputPath));
+      }
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  String _extensionOf(String name) {
+    final index = name.lastIndexOf('.');
+    return index < 0 ? '' : name.substring(index);
+  }
+
+  String _convertType(String format) {
+    const images = {'png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp', 'tiff'};
+    const videos = {'mp4', 'avi', 'mov', 'mkv'};
+    if (images.contains(format)) return 'image';
+    if (videos.contains(format)) return 'video';
+    return 'audio';
   }
 
   Future<void> _calculateDirSize(FileItemDto item) async {
@@ -652,6 +1065,23 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   _download(item);
+                },
+              ),
+              if (!item.isDir)
+                SplitListTile(
+                  leading: const Icon(TablerIcons.eye),
+                  title: l10n.files_preview,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _preview(item);
+                  },
+                ),
+              SplitListTile(
+                leading: const Icon(TablerIcons.note),
+                title: l10n.files_remark,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _editRemark(item);
                 },
               ),
               SplitListTile(
@@ -847,12 +1277,17 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                         showErrorToast(context, error);
                       }
                     } else if (value == 'tools') {
-                      await context.push('/s/${widget.serverId}/files/tools');
+                      await context.push(
+                        '/s/${widget.serverId}/files/tools'
+                        '?path=${Uri.encodeComponent(_path)}',
+                      );
                     } else if (value == 'ai') {
                       await context.push(
                         '/s/${widget.serverId}/files/ai-search'
                         '?path=${Uri.encodeComponent(_path)}',
                       );
+                    } else if (value == 'tree') {
+                      await _showTree();
                     }
                   },
                   itemBuilder: (context) => [
@@ -867,6 +1302,10 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                     PopupMenuItem(
                       value: 'ai',
                       child: Text(l10n.files_aiSearch),
+                    ),
+                    PopupMenuItem(
+                      value: 'tree',
+                      child: Text(l10n.files_directoryTree),
                     ),
                   ],
                 ),
@@ -938,6 +1377,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                 final item = state.items[index];
                 return _FileTile(
                   item: item,
+                  remark: state.remarks[item.path] ?? '',
                   selected: _selected.contains(item.path),
                   dirSize: _dirSizes[item.path],
                   calculating: _calculating.contains(item.path),
@@ -986,9 +1426,30 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                     SizedBox(
                       width: double.infinity,
                       child: SecondaryButton(
+                        label: l10n.files_batchMove,
+                        icon: TablerIcons.arrows_move,
+                        onPressed: _batchMove,
+                      ),
+                    ),
+                    const SizedBox(height: AppTokens.s8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: SecondaryButton(
                         label: l10n.files_batchPermission,
                         icon: TablerIcons.shield_lock,
                         onPressed: _batchPermission,
+                      ),
+                    ),
+                    const SizedBox(height: AppTokens.s8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: SecondaryButton(
+                        label: l10n.files_convert,
+                        icon: TablerIcons.transform,
+                        onPressed: () => _batchConvert(
+                          ref.read(filesProvider(_path)).valueOrNull?.items ??
+                              const [],
+                        ),
                       ),
                     ),
                   ],
@@ -1042,10 +1503,15 @@ class _MoveRequest {
 }
 
 class _MoveSheet extends StatefulWidget {
-  const _MoveSheet({required this.sourcePath, required this.sourceDir});
+  const _MoveSheet({
+    required this.sourcePath,
+    required this.sourceDir,
+    this.onPickDirectory,
+  });
 
   final String sourcePath;
   final String sourceDir;
+  final Future<String?> Function()? onPickDirectory;
 
   @override
   State<_MoveSheet> createState() => _MoveSheetState();
@@ -1085,6 +1551,18 @@ class _MoveSheetState extends State<_MoveSheet> {
           hint: '/opt',
           autofocus: true,
         ),
+        if (widget.onPickDirectory != null) ...[
+          const SizedBox(height: AppTokens.s8),
+          SecondaryButton(
+            label: l10n.files_pickFromTree,
+            icon: TablerIcons.folder_search,
+            onPressed: () async {
+              final picked = await widget.onPickDirectory!();
+              if (picked == null || !mounted) return;
+              setState(() => _target.text = picked);
+            },
+          ),
+        ],
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.files_copyMode),
@@ -1176,6 +1654,99 @@ class _BatchRoleSheetState extends State<_BatchRoleSheet> {
   }
 }
 
+class _ConvertRequest {
+  const _ConvertRequest({
+    required this.outputPath,
+    required this.format,
+    required this.deleteSource,
+  });
+
+  final String outputPath;
+  final String format;
+  final bool deleteSource;
+}
+
+class _ConvertSheet extends StatefulWidget {
+  const _ConvertSheet({required this.outputPath});
+
+  final String outputPath;
+
+  @override
+  State<_ConvertSheet> createState() => _ConvertSheetState();
+}
+
+class _ConvertSheetState extends State<_ConvertSheet> {
+  static const _formats = [
+    'mp4',
+    'avi',
+    'mov',
+    'mkv',
+    'mp3',
+    'wav',
+    'flac',
+    'aac',
+    'png',
+    'jpg',
+    'jpeg',
+    'webp',
+    'gif',
+    'bmp',
+    'tiff',
+  ];
+
+  late final TextEditingController _output = TextEditingController(
+    text: widget.outputPath,
+  );
+  String _format = 'mp4';
+  bool _deleteSource = false;
+
+  @override
+  void dispose() {
+    _output.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return SimpleFormPage(
+      title: l10n.files_convert,
+      onSave: () async {
+        final outputPath = _output.text.trim();
+        if (outputPath.isEmpty) return;
+        Navigator.of(context).pop(
+          _ConvertRequest(
+            outputPath: outputPath,
+            format: _format,
+            deleteSource: _deleteSource,
+          ),
+        );
+      },
+      children: [
+        DropdownButtonFormField<String>(
+          initialValue: _format,
+          decoration: InputDecoration(labelText: l10n.files_convertFormat),
+          items: [
+            for (final format in _formats)
+              DropdownMenuItem(value: format, child: Text(format)),
+          ],
+          onChanged: (value) {
+            if (value != null) setState(() => _format = value);
+          },
+        ),
+        const SizedBox(height: AppTokens.s12),
+        AppTextField(controller: _output, label: l10n.files_convertOutput),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.files_convertDeleteSource),
+          value: _deleteSource,
+          onChanged: (value) => setState(() => _deleteSource = value),
+        ),
+      ],
+    );
+  }
+}
+
 class _Breadcrumb extends StatelessWidget {
   const _Breadcrumb({required this.path, required this.onTap});
 
@@ -1238,6 +1809,7 @@ class _FileTile extends StatelessWidget {
     required this.item,
     required this.onTap,
     required this.onLongPress,
+    this.remark = '',
     this.selected = false,
     this.dirSize,
     this.calculating = false,
@@ -1247,6 +1819,7 @@ class _FileTile extends StatelessWidget {
   final FileItemDto item;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final String remark;
   final bool selected;
   final int? dirSize;
   final bool calculating;
@@ -1300,11 +1873,14 @@ class _FileTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    item.isDir
-                        ? (item.itemTotal > 0
-                              ? l10n.files_itemCount(item.itemTotal)
-                              : l10n.files_folder)
-                        : '${formatBytes(item.size)} · ${formatListTime(DateTime.tryParse(item.modTime), l10n, fallback: item.modTime)}',
+                    [
+                      item.isDir
+                          ? (item.itemTotal > 0
+                                ? l10n.files_itemCount(item.itemTotal)
+                                : l10n.files_folder)
+                          : '${formatBytes(item.size)} · ${formatListTime(DateTime.tryParse(item.modTime), l10n, fallback: item.modTime)}',
+                      if (remark.isNotEmpty) remark,
+                    ].join(' · '),
                     style: AppTextStyles.caption.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),

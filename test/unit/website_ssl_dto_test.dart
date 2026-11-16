@@ -19,6 +19,22 @@ void main() {
     expect(detail.isSslBound, isFalse);
   });
 
+  test('bound SSL id wins over a zero-value embedded SSL object', () {
+    final detail = WebsiteDetailDto.fromJson({
+      'id': 1,
+      'webSiteSSLId': 9,
+      'webSiteSSL': {
+        'id': 0,
+        'primaryDomain': '',
+        'provider': '',
+        'type': '',
+        'status': '',
+        'expireDate': '0001-01-01T00:00:00Z',
+      },
+    });
+    expect(detail.isSslBound, isTrue);
+  });
+
   test('bound SSL requires a non-zero certificate id', () {
     final detail = WebsiteDetailDto.fromJson({
       'id': 1,

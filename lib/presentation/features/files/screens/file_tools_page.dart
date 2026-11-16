@@ -1,15 +1,24 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
+import '../../../../data/dto/file/file_convert_dto.dart';
 import '../../../../data/dto/file/file_favorite_dto.dart';
 import '../../../../data/dto/file/file_share_dto.dart';
+import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
+import '../../../../domain/repositories/file_repository.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
@@ -17,7 +26,9 @@ import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/skeleton.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/split_list_group.dart';
+import '../../../common/components/status_pill.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
@@ -64,16 +75,120 @@ final _wgetProvider = FutureProvider.autoDispose<List<String>>((ref) async {
   return repository.wgetProcessKeys();
 }, name: 'fileWgetProvider');
 
+final _uploadRecordsProvider = FutureProvider.autoDispose
+    .family<PageResult<FileUploadDto>, String>((ref, path) async {
+      final repository = await ref.watch(fileRepositoryProvider.future);
+      return repository.searchUploadFiles(path: path, page: 1, pageSize: 100);
+    }, name: 'fileUploadRecordsProvider');
+
+final _convertLogsProvider =
+    FutureProvider.autoDispose<PageResult<FileConvertLogDto>>((ref) async {
+      final repository = await ref.watch(fileRepositoryProvider.future);
+      return repository.convertLogs(page: 1, pageSize: 50);
+    }, name: 'fileConvertLogsProvider');
+
 class FileToolsPage extends ConsumerStatefulWidget {
-  const FileToolsPage({super.key, required this.serverId});
+  const FileToolsPage({
+    super.key,
+    required this.serverId,
+    this.initialPath = '/',
+  });
 
   final int serverId;
+  final String initialPath;
 
   @override
   ConsumerState<FileToolsPage> createState() => _FileToolsPageState();
 }
 
 class _FileToolsPageState extends ConsumerState<FileToolsPage> {
+  Future<void> _showMounts() async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      final mounts = await repository.getHostMounts();
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        maxHeightFactor: 0.85,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.files_mounts, style: AppTextStyles.titleL),
+            const SizedBox(height: AppTokens.s12),
+            if (mounts.isEmpty)
+              Text(l10n.state_empty, style: AppTextStyles.bodyM)
+            else
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    for (final mount in mounts)
+                      ListTile(
+                        leading: const Icon(TablerIcons.device_sd_card),
+                        title: Text(
+                          '${mount['mountPoint'] ?? mount['path'] ?? ''}',
+                        ),
+                        subtitle: Text(
+                          '${mount['device'] ?? ''} ${mount['type'] ?? ''}'
+                              .trim(),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _openShare() async {
+    final request = await pushFormPage<_ShareOpenRequest>(
+      context,
+      const _ShareOpenForm(),
+    );
+    if (request == null || !mounted) return;
+    try {
+      final repository = await ref.read(fileRepositoryProvider.future);
+      final info = await repository.getPublicShareInfo(request.code);
+      if (!mounted) return;
+      await showAppSheet<void>(
+        context: context,
+        builder: (sheetContext) => _SharePublicSheet(
+          code: request.code,
+          password: request.password,
+          info: info,
+          onDownload: () async {
+            final tempDir = await getTemporaryDirectory();
+            final name = '${info['fileName'] ?? 'share'}';
+            final savePath =
+                '${tempDir.path}/onedash_${DateTime.now().microsecondsSinceEpoch}_$name';
+            await repository.checkFileShare(
+              code: request.code,
+              password: request.password,
+            );
+            await repository.downloadSharedFile(
+              code: request.code,
+              savePath: savePath,
+              password: request.password,
+            );
+            await SharePlus.instance.share(
+              ShareParams(files: [XFile(savePath, name: name)]),
+            );
+          },
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -89,7 +204,19 @@ class _FileToolsPageState extends ConsumerState<FileToolsPage> {
               ref.invalidate(_recycleProvider);
               ref.invalidate(_sharesProvider);
               ref.invalidate(_wgetProvider);
+              ref.invalidate(_convertLogsProvider);
+              ref.invalidate(_uploadRecordsProvider);
             },
+          ),
+          AppIconButton(
+            icon: TablerIcons.link,
+            tooltip: l10n.files_openShare,
+            onPressed: _openShare,
+          ),
+          AppIconButton(
+            icon: TablerIcons.server,
+            tooltip: l10n.files_mounts,
+            onPressed: _showMounts,
           ),
         ],
       ),
@@ -99,12 +226,16 @@ class _FileToolsPageState extends ConsumerState<FileToolsPage> {
           l10n.files_recycleBin,
           l10n.files_shares,
           l10n.files_remoteDownload,
+          l10n.files_uploadRecords,
+          l10n.files_convertLogs,
         ],
         children: [
           _FavoritesTab(serverId: widget.serverId),
           const _RecycleTab(),
           const _SharesTab(),
           _RemoteDownloadTab(serverId: widget.serverId),
+          _UploadRecordsTab(path: widget.initialPath),
+          const _ConvertLogsTab(),
         ],
       ),
     );
@@ -558,6 +689,7 @@ class _RemoteDownloadTab extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final key = data[index];
                 return TonalCard(
+                  onTap: () => _showWgetDetails(context, ref, key),
                   child: Row(
                     children: [
                       const Icon(TablerIcons.download),
@@ -587,6 +719,22 @@ class _RemoteDownloadTab extends ConsumerWidget {
                         },
                         child: Text(l10n.action_stop),
                       ),
+                      IconButton(
+                        tooltip: l10n.files_removeDownloadRecord,
+                        icon: const Icon(TablerIcons.trash),
+                        onPressed: () async {
+                          try {
+                            final repository = await ref.read(
+                              fileRepositoryProvider.future,
+                            );
+                            await repository.removeWgetRecords([key]);
+                            ref.invalidate(_wgetProvider);
+                          } catch (error) {
+                            if (!context.mounted) return;
+                            showErrorToast(context, error);
+                          }
+                        },
+                      ),
                     ],
                   ),
                 );
@@ -595,6 +743,311 @@ class _RemoteDownloadTab extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Future<void> _showWgetDetails(
+    BuildContext context,
+    WidgetRef ref,
+    String key,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final repository = await ref.read(fileRepositoryProvider.future);
+    if (!context.mounted) return;
+    await showAppSheet<void>(
+      context: context,
+      maxHeightFactor: 0.72,
+      builder: (_) => _WgetProcessSheet(
+        repository: repository,
+        keys: [key],
+        title: l10n.files_wgetDetails,
+      ),
+    );
+  }
+}
+
+class _WgetProcessSheet extends StatefulWidget {
+  const _WgetProcessSheet({
+    required this.repository,
+    required this.keys,
+    required this.title,
+  });
+
+  final FileRepository repository;
+  final List<String> keys;
+  final String title;
+
+  @override
+  State<_WgetProcessSheet> createState() => _WgetProcessSheetState();
+}
+
+class _WgetProcessSheetState extends State<_WgetProcessSheet> {
+  WebSocketChannel? _channel;
+  StreamSubscription<dynamic>? _subscription;
+  Timer? _timer;
+  List<Map<String, dynamic>> _items = const [];
+  Object? _error;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _connect();
+  }
+
+  Future<void> _connect() async {
+    try {
+      final channel = await widget.repository.connectWgetProcessWebSocket();
+      if (!mounted) {
+        await channel.sink.close();
+        return;
+      }
+      _channel = channel;
+      _subscription = channel.stream.listen(
+        (message) {
+          if (!mounted) return;
+          try {
+            final decoded = jsonDecode('$message');
+            if (decoded is! List) return;
+            setState(() {
+              _items = decoded
+                  .whereType<Map>()
+                  .map((item) => item.cast<String, dynamic>())
+                  .toList(growable: false);
+              _loading = false;
+              _error = null;
+            });
+          } catch (error) {
+            setState(() => _error = error);
+          }
+        },
+        onError: (Object error) {
+          if (mounted) setState(() => _error = error);
+        },
+      );
+      _send();
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) => _send());
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _error = error;
+          _loading = false;
+        });
+      }
+    }
+  }
+
+  void _send() {
+    final channel = _channel;
+    if (channel == null) return;
+    channel.sink.add(
+      jsonEncode({
+        'type': 'wget',
+        'downloadProgress': {'keys': widget.keys},
+      }),
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _subscription?.cancel();
+    _channel?.sink.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(widget.title, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s12),
+        if (_loading)
+          const Center(child: CircularProgressIndicator())
+        else if (_error != null)
+          Text(describeError(_error!, l10n))
+        else if (_items.isEmpty)
+          Text(l10n.files_wgetWaiting, style: AppTextStyles.bodyM)
+        else
+          Flexible(
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: _items.length,
+              separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
+              itemBuilder: (context, index) {
+                final item = _items[index];
+                final percent = (item['percent'] as num?)?.toDouble() ?? 0;
+                final written = item['written'];
+                final total = item['total'];
+                final error = '${item['error'] ?? ''}'.trim();
+                return TonalCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${item['name'] ?? item['key'] ?? ''}',
+                        style: AppTextStyles.titleS,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: AppTokens.s4),
+                      Text(
+                        l10n.files_wgetProgress(
+                          percent.clamp(0, 100).toStringAsFixed(1),
+                        ),
+                        style: AppTextStyles.bodyS,
+                      ),
+                      Text(
+                        '${formatBytes(written)} / ${formatBytes(total)}',
+                        style: AppTextStyles.caption.copyWith(
+                          color: context.scheme.onSurfaceVariant,
+                        ),
+                      ),
+                      if (error.isNotEmpty)
+                        Text(
+                          error,
+                          style: AppTextStyles.caption.copyWith(
+                            color: context.appColors.danger,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _UploadRecordsTab extends ConsumerWidget {
+  const _UploadRecordsTab({required this.path});
+
+  final String path;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final records = ref.watch(_uploadRecordsProvider(path));
+    return AsyncStateView(
+      value: records,
+      onRetry: () => ref.invalidate(_uploadRecordsProvider(path)),
+      loading: const SkeletonList(itemCount: 5),
+      isEmpty: (result) => result.items.isEmpty,
+      empty: EmptyState(
+        icon: TablerIcons.upload,
+        title: l10n.files_noUploadRecords,
+        message: l10n.files_noUploadRecordsHint,
+      ),
+      builder: (result) => ListView.separated(
+        padding: EdgeInsets.all(context.pagePadding),
+        itemCount: result.items.length,
+        separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
+        itemBuilder: (context, index) {
+          final item = result.items[index];
+          return TonalCard(
+            child: Row(
+              children: [
+                const Icon(TablerIcons.file_upload),
+                const SizedBox(width: AppTokens.s12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.name,
+                        style: AppTextStyles.titleM,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${formatBytes(item.size)}  ${item.createdAt}',
+                        style: AppTextStyles.caption.copyWith(
+                          color: context.scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ConvertLogsTab extends ConsumerWidget {
+  const _ConvertLogsTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final logs = ref.watch(_convertLogsProvider);
+    return AsyncStateView(
+      value: logs,
+      onRetry: () => ref.invalidate(_convertLogsProvider),
+      loading: const SkeletonList(itemCount: 5),
+      isEmpty: (result) => result.items.isEmpty,
+      empty: EmptyState(
+        icon: TablerIcons.transform,
+        title: l10n.files_noConvertLogs,
+        message: l10n.files_noConvertLogsHint,
+      ),
+      builder: (result) => ListView.separated(
+        padding: EdgeInsets.all(context.pagePadding),
+        itemCount: result.items.length,
+        separatorBuilder: (_, _) => const SizedBox(height: AppTokens.s8),
+        itemBuilder: (context, index) {
+          final item = result.items[index];
+          final success = item.status.toUpperCase() == 'SUCCESS';
+          return TonalCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(item.type, style: AppTextStyles.titleM),
+                    ),
+                    StatusPill(
+                      label: item.status,
+                      tone: success
+                          ? context.appColors.success
+                          : context.appColors.danger,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppTokens.s4),
+                Text(
+                  item.log,
+                  style: AppTextStyles.caption.copyWith(
+                    color: context.scheme.onSurfaceVariant,
+                    fontFamily: 'monospace',
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: AppTokens.s4),
+                Text(
+                  '${item.date}  ${item.message}',
+                  style: AppTextStyles.caption.copyWith(
+                    color: context.scheme.onSurfaceVariant,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -683,6 +1136,128 @@ class _WgetSheetState extends State<_WgetSheet> {
               ),
             );
           },
+        ),
+      ],
+    );
+  }
+}
+
+class _ShareOpenRequest {
+  const _ShareOpenRequest({required this.code, this.password});
+
+  final String code;
+  final String? password;
+}
+
+class _ShareOpenForm extends StatefulWidget {
+  const _ShareOpenForm();
+
+  @override
+  State<_ShareOpenForm> createState() => _ShareOpenFormState();
+}
+
+class _ShareOpenFormState extends State<_ShareOpenForm> {
+  final _code = TextEditingController();
+  final _password = TextEditingController();
+
+  @override
+  void dispose() {
+    _code.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return SimpleFormPage(
+      title: l10n.files_openShare,
+      onSave: () async {
+        final code = _code.text.trim();
+        if (code.isEmpty) return;
+        Navigator.of(context).pop(
+          _ShareOpenRequest(
+            code: code,
+            password: _password.text.isEmpty ? null : _password.text,
+          ),
+        );
+      },
+      children: [
+        AppTextField(controller: _code, label: l10n.files_shareCodeLabel),
+        const SizedBox(height: AppTokens.s12),
+        AppTextField(
+          controller: _password,
+          label: l10n.files_sharePassword,
+          obscure: true,
+        ),
+      ],
+    );
+  }
+}
+
+class _SharePublicSheet extends StatelessWidget {
+  const _SharePublicSheet({
+    required this.code,
+    required this.password,
+    required this.info,
+    required this.onDownload,
+  });
+
+  final String code;
+  final String? password;
+  final Map<String, dynamic> info;
+  final Future<void> Function() onDownload;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.files_shareDetail, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s12),
+        SplitListGroup(
+          children: [
+            SplitListTile(
+              title: l10n.files_name,
+              subtitle: '${info['fileName'] ?? ''}',
+            ),
+            SplitListTile(title: l10n.files_shareCodeLabel, subtitle: code),
+            SplitListTile(
+              title: l10n.files_shareExpire,
+              subtitle: info['permanent'] == true
+                  ? l10n.files_permanentShare
+                  : formatLocalDateTime(
+                      DateTime.fromMillisecondsSinceEpoch(
+                        ((info['expiresAt'] as num?)?.toInt() ?? 0) * 1000,
+                      ).toIso8601String(),
+                    ),
+            ),
+            if (info['hasPassword'] == true)
+              SplitListTile(
+                title: l10n.files_sharePassword,
+                subtitle: password == null ? '******' : '******',
+              ),
+          ],
+        ),
+        const SizedBox(height: AppTokens.s16),
+        SizedBox(
+          width: double.infinity,
+          child: PrimaryButton(
+            label: l10n.files_download,
+            icon: TablerIcons.download,
+            onPressed: () async {
+              try {
+                await onDownload();
+                if (!context.mounted) return;
+                AppToast.success(context, l10n.files_downloadReady);
+              } catch (error) {
+                if (!context.mounted) return;
+                showErrorToast(context, error);
+              }
+            },
+          ),
         ),
       ],
     );
