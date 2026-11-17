@@ -944,7 +944,9 @@ class _PanelSettingsBody extends ConsumerWidget {
 
   bool _canOfferPasskey(_PanelSettingsData data, Uri? serverUrl) {
     final bindDomain = data.value('bindDomain');
-    if (bindDomain.isEmpty || serverUrl == null || serverUrl.scheme != 'https') {
+    if (bindDomain.isEmpty ||
+        serverUrl == null ||
+        serverUrl.scheme != 'https') {
       return false;
     }
     final bindHost =
@@ -1031,9 +1033,8 @@ class _PanelSettingsBody extends ConsumerWidget {
               ),
               const SizedBox(height: AppTokens.s8),
               OutlinedButton.icon(
-                onPressed: () => Navigator.of(
-                  pageContext,
-                ).pop(const [_passkeyLoginMarker]),
+                onPressed: () =>
+                    Navigator.of(pageContext).pop(const [_passkeyLoginMarker]),
                 icon: const Icon(TablerIcons.fingerprint),
                 label: Text(l10n.panelSettings_usePasskey),
               ),
@@ -1523,9 +1524,8 @@ class _PanelSettingsBody extends ConsumerWidget {
             const SizedBox(height: AppTokens.s4),
             Text(
               item.keyHint,
-              style: AppTextStyles.bodyS.copyWith(
+              style: AppTextStyles.mono.copyWith(
                 color: sheetContext.scheme.onSurfaceVariant,
-                fontFamily: 'monospace',
               ),
             ),
           ],
@@ -1775,7 +1775,7 @@ class _PanelSettingsBody extends ConsumerWidget {
             children: [
               SelectableText(
                 secret.isEmpty ? l10n.state_empty : secret,
-                style: AppTextStyles.bodyM.copyWith(fontFamily: 'monospace'),
+                style: AppTextStyles.mono,
               ),
               const SizedBox(height: AppTokens.s16),
               AppTextField(

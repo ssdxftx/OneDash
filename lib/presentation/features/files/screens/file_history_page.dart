@@ -151,7 +151,7 @@ class _FileHistoryPageState extends ConsumerState<FileHistoryPage> {
               child: SingleChildScrollView(
                 child: SelectableText(
                   '${data['content'] ?? ''}',
-                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                  style: AppTextStyles.mono,
                 ),
               ),
             ),

@@ -37,7 +37,10 @@ class PillAppBar extends StatelessWidget implements PreferredSizeWidget {
             _Pill(
               background: scheme.surfaceContainerHighest,
               onTap: onBack ?? () => Navigator.of(context).maybePop(),
-              child: const Icon(TablerIcons.arrow_left, size: 18),
+              child: const Icon(
+                TablerIcons.arrow_left,
+                size: AppTokens.iconInline,
+              ),
             ),
             Expanded(
               child: Text(

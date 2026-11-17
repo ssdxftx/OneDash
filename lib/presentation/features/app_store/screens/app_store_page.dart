@@ -881,7 +881,7 @@ class _AppRow extends ConsumerWidget {
                       const SizedBox(width: AppTokens.s8),
                       Icon(
                         TablerIcons.circle_check,
-                        size: 16,
+                        size: AppTokens.iconSmall,
                         color: context.appColors.success,
                       ),
                     ],

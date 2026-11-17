@@ -912,7 +912,10 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed: _manageCertificates,
-                        icon: const Icon(TablerIcons.settings, size: 18),
+                        icon: const Icon(
+                          TablerIcons.settings,
+                          size: AppTokens.iconInline,
+                        ),
                         label: Text(l10n.websites_sslManage),
                       ),
                     ),

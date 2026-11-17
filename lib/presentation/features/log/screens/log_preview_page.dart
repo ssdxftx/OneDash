@@ -516,7 +516,10 @@ class _LogPreviewPageState extends State<LogPreviewPage>
                     alignment: Alignment.centerLeft,
                     child: TextButton.icon(
                       onPressed: _loadEarlier,
-                      icon: const Icon(TablerIcons.chevron_up, size: 18),
+                      icon: const Icon(
+                        TablerIcons.chevron_up,
+                        size: AppTokens.iconInline,
+                      ),
                       label: Text(l10n.logs_loadEarlier),
                     ),
                   ),
@@ -618,7 +621,10 @@ class _LogPreviewPageState extends State<LogPreviewPage>
               )
             : TextButton.icon(
                 onPressed: _loadEarlier,
-                icon: const Icon(TablerIcons.chevron_up, size: 18),
+                icon: const Icon(
+                  TablerIcons.chevron_up,
+                  size: AppTokens.iconInline,
+                ),
                 label: Text(l10n.logs_loadEarlier),
               ),
       ),
@@ -805,27 +811,20 @@ class _AccessLogCard extends StatelessWidget {
     final largeText = MediaQuery.textScalerOf(context).scale(1) > 1.4;
     final statusText = Text(
       status?.toString() ?? '-',
-      style: AppTextStyles.bodyS.copyWith(
-        fontFamily: 'monospace',
+      style: AppTextStyles.mono.copyWith(
         fontWeight: FontWeight.w600,
         color: statusColor,
       ),
     );
     final methodText = Text(
       parsed.method ?? '-',
-      style: AppTextStyles.caption.copyWith(
-        fontFamily: 'monospace',
-        color: scheme.onSurfaceVariant,
-      ),
+      style: AppTextStyles.monoSmall.copyWith(color: scheme.onSurfaceVariant),
     );
     final ipText = Text(
       parsed.ip ?? l10n.format_relativeUnknown,
       maxLines: largeText ? 2 : 1,
       overflow: TextOverflow.ellipsis,
-      style: AppTextStyles.bodyS.copyWith(
-        fontFamily: 'monospace',
-        fontWeight: FontWeight.w600,
-      ),
+      style: AppTextStyles.mono.copyWith(fontWeight: FontWeight.w600),
     );
     final timeText = Text(
       formatRelativeTime(time, l10n),
@@ -892,15 +891,14 @@ class _AccessLogCard extends StatelessWidget {
                   parsed.path ?? parsed.message,
                   maxLines: largeText ? 2 : 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.bodyS.copyWith(
-                    fontFamily: 'monospace',
+                  style: AppTextStyles.mono.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
                 ),
               ),
               Icon(
                 expanded ? TablerIcons.chevron_up : TablerIcons.chevron_down,
-                size: 16,
+                size: AppTokens.iconSmall,
                 color: scheme.onSurfaceVariant,
               ),
             ],
@@ -966,7 +964,7 @@ class _AccessLogDetails extends StatelessWidget {
                 l10n.common_copiedLabel(l10n.logs_rawData),
               );
             },
-            icon: const Icon(TablerIcons.copy, size: 16),
+            icon: const Icon(TablerIcons.copy, size: AppTokens.iconSmall),
             label: Text(l10n.action_copy),
           ),
         ),
@@ -990,12 +988,7 @@ class _AccessLogDetails extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppTokens.s8),
-          Expanded(
-            child: SelectableText(
-              value,
-              style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
-            ),
-          ),
+          Expanded(child: SelectableText(value, style: AppTextStyles.mono)),
         ],
       ),
     );
@@ -1025,7 +1018,7 @@ class _PlainLogCard extends StatelessWidget {
             raw,
             maxLines: expanded ? null : 4,
             overflow: expanded ? null : TextOverflow.ellipsis,
-            style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+            style: AppTextStyles.mono,
           ),
           if (expanded)
             Align(
@@ -1041,7 +1034,7 @@ class _PlainLogCard extends StatelessWidget {
                     ),
                   );
                 },
-                icon: const Icon(TablerIcons.copy, size: 16),
+                icon: const Icon(TablerIcons.copy, size: AppTokens.iconSmall),
                 label: Text(AppLocalizations.of(context).action_copy),
               ),
             ),
@@ -1077,8 +1070,7 @@ class _RawLine extends StatelessWidget {
             child: Text(
               '$number',
               textAlign: TextAlign.right,
-              style: AppTextStyles.caption.copyWith(
-                fontFamily: 'monospace',
+              style: AppTextStyles.monoSmall.copyWith(
                 color: AppTokens.consoleMuted,
               ),
             ),
@@ -1094,8 +1086,7 @@ class _RawLine extends StatelessWidget {
                     child: Text(
                       raw,
                       softWrap: false,
-                      style: AppTextStyles.bodyS.copyWith(
-                        fontFamily: 'monospace',
+                      style: AppTextStyles.mono.copyWith(
                         color: color,
                         height: 1.5,
                       ),
@@ -1225,10 +1216,7 @@ class _StructuredLineState extends State<_StructuredLine> {
       path,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: AppTextStyles.bodyS.copyWith(
-        fontFamily: 'monospace',
-        color: AppTokens.consoleForeground,
-      ),
+      style: AppTextStyles.mono.copyWith(color: AppTokens.consoleForeground),
     );
     final durationStyle = AppTextStyles.caption.copyWith(
       color: AppTokens.consoleMuted,
@@ -1350,8 +1338,7 @@ class _StructuredLineState extends State<_StructuredLine> {
               _shortTime(parsed.time!),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.caption.copyWith(
-                fontFamily: 'monospace',
+              style: AppTextStyles.monoSmall.copyWith(
                 color: AppTokens.consoleMuted,
               ),
             ),
@@ -1381,8 +1368,7 @@ class _StructuredLineState extends State<_StructuredLine> {
             parsed.message,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.bodyS.copyWith(
-              fontFamily: 'monospace',
+            style: AppTextStyles.mono.copyWith(
               color: AppTokens.consoleForeground,
             ),
           ),
@@ -1407,10 +1393,7 @@ class _StructuredLineState extends State<_StructuredLine> {
       child: Text(
         '${widget.number}',
         textAlign: TextAlign.right,
-        style: AppTextStyles.caption.copyWith(
-          fontFamily: 'monospace',
-          color: AppTokens.consoleMuted,
-        ),
+        style: AppTextStyles.monoSmall.copyWith(color: AppTokens.consoleMuted),
       ),
     );
   }
@@ -1451,11 +1434,7 @@ class _StructuredLineState extends State<_StructuredLine> {
           ),
         SelectableText(
           widget.raw,
-          style: AppTextStyles.bodyS.copyWith(
-            fontFamily: 'monospace',
-            color: color,
-            height: 1.45,
-          ),
+          style: AppTextStyles.mono.copyWith(color: color, height: 1.45),
         ),
         const SizedBox(height: AppTokens.s4),
         TextButton.icon(
@@ -1464,7 +1443,7 @@ class _StructuredLineState extends State<_StructuredLine> {
             if (!context.mounted) return;
             AppToast.success(context, l10n.logs_copied);
           },
-          icon: const Icon(TablerIcons.copy, size: 16),
+          icon: const Icon(TablerIcons.copy, size: AppTokens.iconSmall),
           label: Text(l10n.logs_copyRaw),
         ),
       ],
@@ -1489,8 +1468,7 @@ class _StructuredLineState extends State<_StructuredLine> {
           Expanded(
             child: SelectableText(
               value,
-              style: AppTextStyles.caption.copyWith(
-                fontFamily: 'monospace',
+              style: AppTextStyles.monoSmall.copyWith(
                 color: AppTokens.consoleForeground,
               ),
             ),

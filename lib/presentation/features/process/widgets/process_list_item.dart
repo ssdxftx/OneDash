@@ -214,7 +214,7 @@ class _ProcessMetaChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: color),
+          Icon(icon, size: AppTokens.iconMicro, color: color),
           const SizedBox(width: AppTokens.s4),
           Text(
             label,

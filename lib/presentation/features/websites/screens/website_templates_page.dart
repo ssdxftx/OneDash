@@ -116,7 +116,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
             child: SingleChildScrollView(
               child: SelectableText(
                 template.isSingle ? template.content : template.filePath,
-                style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                style: AppTextStyles.mono,
               ),
             ),
           ),
@@ -561,7 +561,7 @@ class _TemplateEditorSheetState extends ConsumerState<_TemplateEditorSheet> {
             controller: _content,
             minLines: 8,
             maxLines: 14,
-            style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+            style: AppTextStyles.mono,
             decoration: InputDecoration(
               labelText: l10n.websites_templateContent,
               hintText: '<html><body><h1>{{title}}</h1></body></html>',
@@ -842,10 +842,7 @@ class _TemplateOutputSheetState extends ConsumerState<_TemplateOutputSheet> {
             child: SizedBox(
               width: double.infinity,
               child: SingleChildScrollView(
-                child: SelectableText(
-                  _previewHtml!,
-                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
-                ),
+                child: SelectableText(_previewHtml!, style: AppTextStyles.mono),
               ),
             ),
           ),
@@ -930,7 +927,7 @@ class _TemplateOutputsSheetState extends ConsumerState<_TemplateOutputsSheet> {
               child: SingleChildScrollView(
                 child: SelectableText(
                   detail.variableValues,
-                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                  style: AppTextStyles.mono,
                 ),
               ),
             ),

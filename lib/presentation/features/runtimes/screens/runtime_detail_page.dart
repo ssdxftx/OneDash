@@ -406,8 +406,8 @@ class _PhpIniTabState extends ConsumerState<_PhpIniTab> {
           child: CodeEditor(
             controller: _controller!,
             style: CodeEditorStyle(
-              fontSize: 14,
-              fontFamilyFallback: const ['monospace'],
+              fontSize: AppTextStyles.mono.fontSize!,
+              fontFamilyFallback: AppTextStyles.monoFontFallback,
               textColor: context.scheme.onSurface,
               cursorColor: context.scheme.primary,
             ),
@@ -1407,7 +1407,7 @@ class _PhpSupervisorTabState extends ConsumerState<_PhpSupervisorTab> {
               child: SingleChildScrollView(
                 child: SelectableText(
                   content.isEmpty ? l10n.state_empty : content,
-                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                  style: AppTextStyles.mono,
                 ),
               ),
             ),

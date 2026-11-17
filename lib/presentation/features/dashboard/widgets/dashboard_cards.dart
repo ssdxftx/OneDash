@@ -81,7 +81,7 @@ Widget _panelTitle(
 }) {
   return Row(
     children: [
-      Icon(icon, size: 16, color: color),
+      Icon(icon, size: AppTokens.iconSmall, color: color),
       const SizedBox(width: AppTokens.s8),
       Expanded(
         child: Text(
@@ -134,12 +134,7 @@ class _ServerHeaderCard extends StatelessWidget {
                       base.hostname.isEmpty
                           ? l10n.dashboard_hostDetails
                           : base.hostname,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        height: 1.2,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                      ),
+                      style: AppTextStyles.titleM.copyWith(letterSpacing: -0.3),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -223,15 +218,18 @@ class _HeaderMetric extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 12, color: scheme.onSurfaceVariant),
+            Icon(
+              icon,
+              size: AppTokens.iconMicro,
+              color: scheme.onSurfaceVariant,
+            ),
             const SizedBox(width: 4),
             Flexible(
               child: Text(
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
+                style: AppTextStyles.caption.copyWith(
                   height: 1.1,
                   fontWeight: FontWeight.w500,
                   color: scheme.onSurfaceVariant,
@@ -251,8 +249,7 @@ class _HeaderMetric extends StatelessWidget {
           child: Text(
             value,
             maxLines: 1,
-            style: TextStyle(
-              fontSize: 14,
+            style: AppTextStyles.bodyM.copyWith(
               height: 1.2,
               fontWeight: FontWeight.w600,
               color: scheme.onSurface,
@@ -463,7 +460,7 @@ class _ResourceRow extends StatelessWidget {
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 18, color: color),
+            child: Icon(icon, size: AppTokens.iconInline, color: color),
           ),
           const SizedBox(width: AppTokens.s12),
           Expanded(
@@ -475,11 +472,7 @@ class _ResourceRow extends StatelessWidget {
                     Expanded(
                       child: Text(
                         label,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          height: 1.2,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppTextStyles.label.copyWith(height: 1.2),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -487,11 +480,10 @@ class _ResourceRow extends StatelessWidget {
                     const SizedBox(width: AppTokens.s8),
                     Text(
                       '${clamped.toStringAsFixed(0)}%',
-                      style: const TextStyle(
-                        fontSize: 13,
+                      style: AppTextStyles.label.copyWith(
                         height: 1.2,
                         fontWeight: FontWeight.w600,
-                        fontFeatures: [FontFeature.tabularFigures()],
+                        fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                     ),
                   ],
@@ -757,17 +749,13 @@ class _TrafficRow extends StatelessWidget {
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 18, color: color),
+            child: Icon(icon, size: AppTokens.iconInline, color: color),
           ),
           const SizedBox(width: AppTokens.s12),
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 13,
-                height: 1.1,
-                fontWeight: FontWeight.w500,
-              ),
+              style: AppTextStyles.label.copyWith(height: 1.1),
             ),
           ),
           const SizedBox(width: AppTokens.s8),
@@ -777,8 +765,7 @@ class _TrafficRow extends StatelessWidget {
               textAlign: TextAlign.end,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 14,
+              style: AppTextStyles.bodyM.copyWith(
                 height: 1.1,
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.2,
@@ -955,7 +942,7 @@ class _LegendItem extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 13, color: color),
+        Icon(icon, size: AppTokens.iconMicro, color: color),
         const SizedBox(width: 4),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 132),
@@ -964,8 +951,7 @@ class _LegendItem extends StatelessWidget {
             child: Text(
               label,
               textAlign: TextAlign.end,
-              style: TextStyle(
-                fontSize: 12,
+              style: AppTextStyles.caption.copyWith(
                 height: 1.1,
                 fontWeight: FontWeight.w600,
                 color: context.scheme.onSurfaceVariant,
@@ -1021,7 +1007,7 @@ class _SpeedChartYAxis extends StatelessWidget {
               child: Text(
                 formatByteRate(scale * (1 - index / steps)),
                 textAlign: TextAlign.end,
-                style: TextStyle(fontSize: 11, height: 1, color: color),
+                style: AppTextStyles.caption.copyWith(height: 1, color: color),
               ),
             ),
         ],
@@ -1249,7 +1235,11 @@ class _DiskUsageRow extends StatelessWidget {
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(TablerIcons.database, size: 18, color: color),
+            child: Icon(
+              TablerIcons.database,
+              size: AppTokens.iconInline,
+              color: color,
+            ),
           ),
           const SizedBox(width: AppTokens.s12),
           Expanded(
@@ -1261,8 +1251,7 @@ class _DiskUsageRow extends StatelessWidget {
                     Expanded(
                       child: Text(
                         path,
-                        style: const TextStyle(
-                          fontSize: 14,
+                        style: AppTextStyles.bodyM.copyWith(
                           height: 1.2,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1273,8 +1262,7 @@ class _DiskUsageRow extends StatelessWidget {
                     const SizedBox(width: AppTokens.s12),
                     Text(
                       '${percent.toStringAsFixed(0)}%',
-                      style: const TextStyle(
-                        fontSize: 13,
+                      style: AppTextStyles.label.copyWith(
                         height: 1.2,
                         fontWeight: FontWeight.w700,
                       ),
@@ -1402,7 +1390,7 @@ class _ConfigRow extends StatelessWidget {
             child: Text(
               value.trim().isEmpty ? '-' : value,
               textAlign: TextAlign.end,
-              style: const TextStyle(fontSize: 14, height: 1.4),
+              style: AppTextStyles.bodyM,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

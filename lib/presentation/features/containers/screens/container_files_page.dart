@@ -181,9 +181,7 @@ class _ContainerFilesPageState extends ConsumerState<ContainerFilesPage> {
                     content.truncated
                         ? '${content.content}\n...'
                         : content.content,
-                    style: AppTextStyles.bodyS.copyWith(
-                      fontFamily: 'monospace',
-                    ),
+                    style: AppTextStyles.mono.copyWith(),
                   ),
                 ),
               ),

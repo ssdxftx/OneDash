@@ -814,7 +814,7 @@ class _ConfigTab extends ConsumerWidget {
               TextField(
                 controller: controller,
                 maxLines: 14,
-                style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                style: AppTextStyles.mono,
                 decoration: const InputDecoration(border: OutlineInputBorder()),
               ),
             ],
@@ -1228,9 +1228,8 @@ class _ProxyTab extends ConsumerWidget {
                           ),
                           Text(
                             '${proxy.match} -> ${proxy.proxyPass}',
-                            style: AppTextStyles.caption.copyWith(
+                            style: AppTextStyles.monoSmall.copyWith(
                               color: context.scheme.onSurfaceVariant,
-                              fontFamily: 'monospace',
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -1246,13 +1245,16 @@ class _ProxyTab extends ConsumerWidget {
                                       _editSource(context, ref, proxy),
                                   icon: const Icon(
                                     TablerIcons.file_code,
-                                    size: 16,
+                                    size: AppTokens.iconSmall,
                                   ),
                                   label: Text(l10n.websites_editSource),
                                 ),
                                 TextButton.icon(
                                   onPressed: () => _delete(context, ref, proxy),
-                                  icon: const Icon(TablerIcons.trash, size: 16),
+                                  icon: const Icon(
+                                    TablerIcons.trash,
+                                    size: AppTokens.iconSmall,
+                                  ),
                                   label: Text(l10n.action_delete),
                                   style: TextButton.styleFrom(
                                     foregroundColor: context.appColors.danger,

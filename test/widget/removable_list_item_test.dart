@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:onedash/core/motion/list_animation_scope.dart';
 import 'package:onedash/core/theme/app_theme.dart';
 import 'package:onedash/presentation/common/components/removable_list_item.dart';
 
@@ -71,6 +72,31 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.getSize(find.byType(RemovableListItem)).height, 100);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('app list animation switch skips entry animation', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ListAnimationScope(
+        enabled: false,
+        child: MaterialApp(
+          theme: AppTheme.build(Brightness.light),
+          home: const Scaffold(
+            body: SizedBox(
+              width: 300,
+              child: RemovableListItem(
+                removing: false,
+                animateIn: true,
+                child: SizedBox(height: 100, child: Text('row')),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byType(RemovableListItem)).height, 100);
   });
 
   testWidgets('入场动画只播一次，回收重建后保持完整高度', (tester) async {

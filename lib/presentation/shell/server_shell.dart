@@ -52,6 +52,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
   bool _visible = true;
   bool _navPresent = true;
   bool _navRevealPending = false;
+  bool _modalHidden = false;
   bool _atTabRoot = true;
   double _accum = 0;
   ModalRoute<dynamic>? _route;
@@ -105,27 +106,26 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
     if (appRouteObserver.popupDepth.value > 0) {
       final reduceMotion =
           MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+      setState(() => _modalHidden = true);
       _navRemoveTimer = Timer(
-        reduceMotion ? Duration.zero : const Duration(milliseconds: 120),
+        reduceMotion ? Duration.zero : AppTokens.dEmphasis,
         () {
           if (mounted && appRouteObserver.popupDepth.value > 0) {
             setState(() => _navPresent = false);
           }
         },
       );
-      setState(() {});
+    } else if (!_navPresent) {
+      setState(() {
+        _navPresent = true;
+        _navRevealPending = true;
+        _modalHidden = false;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _navRevealPending = false);
+      });
     } else {
-      if (!_navPresent) {
-        setState(() {
-          _navPresent = true;
-          _navRevealPending = true;
-        });
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) setState(() => _navRevealPending = false);
-        });
-      } else {
-        setState(() {});
-      }
+      setState(() => _modalHidden = false);
     }
   }
 
@@ -201,7 +201,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
     final shown =
         _visible &&
         _atTabRoot &&
-        !modalOpen &&
+        !_modalHidden &&
         !_navRevealPending &&
         !ref.watch(bottomNavSuppressedProvider);
     final hideDuration = context.motion(const Duration(milliseconds: 240));

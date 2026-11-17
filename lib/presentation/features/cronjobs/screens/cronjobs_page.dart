@@ -609,10 +609,7 @@ class _CronjobCard extends StatelessWidget {
           const SizedBox(height: AppTokens.s8),
           Text(
             displayValue(context, item.spec),
-            style: AppTextStyles.bodyS.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontFamily: 'monospace',
-            ),
+            style: AppTextStyles.mono.copyWith(color: scheme.onSurfaceVariant),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -621,7 +618,7 @@ class _CronjobCard extends StatelessWidget {
             children: [
               Icon(
                 TablerIcons.history,
-                size: 14,
+                size: AppTokens.iconMicro,
                 color: scheme.onSurfaceVariant,
               ),
               const SizedBox(width: 4),

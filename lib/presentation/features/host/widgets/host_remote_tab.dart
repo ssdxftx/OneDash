@@ -182,9 +182,8 @@ class _HostRemoteTabState extends ConsumerState<HostRemoteTab> {
                           const SizedBox(height: 2),
                           Text(
                             '${host.user}@${host.addr}:${host.port}',
-                            style: AppTextStyles.caption.copyWith(
+                            style: AppTextStyles.monoSmall.copyWith(
                               color: context.scheme.onSurfaceVariant,
-                              fontFamily: 'monospace',
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

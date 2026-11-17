@@ -138,9 +138,8 @@ class RuntimesPage extends ConsumerWidget {
                       const SizedBox(height: AppTokens.s8),
                       Text(
                         imageLine,
-                        style: AppTextStyles.caption.copyWith(
+                        style: AppTextStyles.monoSmall.copyWith(
                           color: context.scheme.onSurfaceVariant,
-                          fontFamily: 'monospace',
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

@@ -444,8 +444,7 @@ class _ConfigTab extends ConsumerWidget {
                   title: l10n.containers_envVars,
                   subtitle: data.env.join('\n'),
                   subtitleMaxLines: null,
-                  subtitleStyle: AppTextStyles.bodyM.copyWith(
-                    fontFamily: 'monospace',
+                  subtitleStyle: AppTextStyles.mono.copyWith(
                     color: context.scheme.onSurface,
                   ),
                 ),
@@ -454,8 +453,7 @@ class _ConfigTab extends ConsumerWidget {
                   title: l10n.containers_command,
                   subtitle: data.cmd!.join(' '),
                   subtitleMaxLines: null,
-                  subtitleStyle: AppTextStyles.bodyM.copyWith(
-                    fontFamily: 'monospace',
+                  subtitleStyle: AppTextStyles.mono.copyWith(
                     color: context.scheme.onSurface,
                   ),
                 ),
@@ -464,8 +462,7 @@ class _ConfigTab extends ConsumerWidget {
                   title: l10n.containers_entrypoint,
                   subtitle: data.entrypoint!.join(' '),
                   subtitleMaxLines: null,
-                  subtitleStyle: AppTextStyles.bodyM.copyWith(
-                    fontFamily: 'monospace',
+                  subtitleStyle: AppTextStyles.mono.copyWith(
                     color: context.scheme.onSurface,
                   ),
                 ),

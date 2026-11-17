@@ -310,10 +310,7 @@ class _TaskLogSheetState extends State<_TaskLogSheet>
                         width: double.infinity,
                         child: SelectableText(
                           line,
-                          style: AppTextStyles.bodyS.copyWith(
-                            fontFamily: 'monospace',
-                            height: 1.45,
-                          ),
+                          style: AppTextStyles.mono.copyWith(height: 1.45),
                         ),
                       ),
                     ),

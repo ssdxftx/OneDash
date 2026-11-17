@@ -611,9 +611,8 @@ class _BackupTab extends ConsumerWidget {
                       const SizedBox(height: AppTokens.s4),
                       Text(
                         record.filePath,
-                        style: AppTextStyles.caption.copyWith(
+                        style: AppTextStyles.monoSmall.copyWith(
                           color: context.scheme.onSurfaceVariant,
-                          fontFamily: 'monospace',
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -707,9 +706,8 @@ class _BackupTab extends ConsumerWidget {
           const SizedBox(height: AppTokens.s4),
           Text(
             record.filePath,
-            style: AppTextStyles.bodyS.copyWith(
+            style: AppTextStyles.mono.copyWith(
               color: context.scheme.onSurfaceVariant,
-              fontFamily: 'monospace',
             ),
           ),
           const SizedBox(height: AppTokens.s16),

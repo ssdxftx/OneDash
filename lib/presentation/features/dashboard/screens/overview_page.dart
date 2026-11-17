@@ -563,7 +563,11 @@ class _TopProcessCard extends StatelessWidget {
                       color: accent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(icon, size: 18, color: accent),
+                    child: Icon(
+                      icon,
+                      size: AppTokens.iconInline,
+                      color: accent,
+                    ),
                   ),
                   const SizedBox(width: AppTokens.s12),
                   Expanded(
@@ -678,8 +682,7 @@ class _ProcessRankRow extends StatelessWidget {
               children: [
                 Text(
                   name.isEmpty ? pid : name,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: AppTextStyles.bodyM.copyWith(
                     height: 1.2,
                     fontWeight: FontWeight.w600,
                   ),

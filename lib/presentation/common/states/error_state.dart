@@ -106,8 +106,7 @@ class _ErrorStateState extends State<ErrorState> {
                   ),
                   child: SelectableText(
                     widget.data.detail!,
-                    style: AppTextStyles.bodyS.copyWith(
-                      fontFamily: 'monospace',
+                    style: AppTextStyles.mono.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
                   ),

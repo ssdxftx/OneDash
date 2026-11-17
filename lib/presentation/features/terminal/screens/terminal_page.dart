@@ -411,10 +411,7 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
                 focusNode: _focusNode,
                 autofocus: true,
                 deleteDetection: true,
-                textStyle: TerminalStyle(
-                  fontSize: _fontSize,
-                  fontFamily: 'monospace',
-                ),
+                textStyle: TerminalStyle(fontSize: _fontSize),
                 theme: TerminalThemes.defaultTheme,
               ),
             ),

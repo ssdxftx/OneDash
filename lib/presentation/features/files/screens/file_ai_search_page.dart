@@ -80,9 +80,8 @@ class _FileAiSearchPageState extends ConsumerState<FileAiSearchPage> {
         children: [
           Text(
             widget.initialPath,
-            style: AppTextStyles.bodyS.copyWith(
+            style: AppTextStyles.mono.copyWith(
               color: context.scheme.onSurfaceVariant,
-              fontFamily: 'monospace',
             ),
           ),
           const SizedBox(height: AppTokens.s12),

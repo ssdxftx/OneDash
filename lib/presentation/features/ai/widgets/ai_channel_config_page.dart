@@ -356,7 +356,7 @@ class _AiChannelConfigPageState extends State<AiChannelConfigPage> {
         Expanded(child: Text(l10n.ai_agent_bots, style: AppTextStyles.titleM)),
         TextButton.icon(
           onPressed: _addBot,
-          icon: const Icon(Icons.add, size: 18),
+          icon: const Icon(Icons.add, size: AppTokens.iconInline),
           label: Text(l10n.ai_agent_add_bot),
         ),
       ],
@@ -672,7 +672,6 @@ class _BotDraft {
     'systemPrompt': systemPrompt.text.trim(),
   };
 }
-
 
 String _listText(Object? value) {
   if (value is List) return value.map((item) => '$item').join(', ');

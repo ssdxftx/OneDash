@@ -278,7 +278,10 @@ mixin _AiAccountsActions on ConsumerState<AiPage> {
                     ),
                     TextButton.icon(
                       onPressed: add,
-                      icon: const Icon(TablerIcons.plus, size: 18),
+                      icon: const Icon(
+                        TablerIcons.plus,
+                        size: AppTokens.iconInline,
+                      ),
                       label: Text(l10n.ai_model_add),
                     ),
                   ],

@@ -488,9 +488,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                 child: SingleChildScrollView(
                   child: SelectableText(
                     info.content,
-                    style: AppTextStyles.bodyS.copyWith(
-                      fontFamily: 'monospace',
-                    ),
+                    style: AppTextStyles.mono.copyWith(),
                   ),
                 ),
               ),
@@ -1782,7 +1780,7 @@ class _Breadcrumb extends StatelessWidget {
     final scheme = context.scheme;
     final separator = Icon(
       TablerIcons.chevron_right,
-      size: 16,
+      size: AppTokens.iconSmall,
       color: scheme.onSurfaceVariant.withValues(alpha: 0.6),
     );
     return SizedBox(

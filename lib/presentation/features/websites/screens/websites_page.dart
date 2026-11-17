@@ -5,6 +5,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../website_status.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/theme/tokens.dart';
@@ -483,14 +484,6 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
     );
   }
 
-  String _statusLabel(String status, AppLocalizations l10n) {
-    return switch (status.toLowerCase()) {
-      'running' => l10n.websites_running,
-      'stopped' => l10n.websites_stopped,
-      _ => l10n.common_unknown,
-    };
-  }
-
   Future<void> _editDefaultHtml() async {
     final l10n = AppLocalizations.of(context);
     final type = await showSelectionMenu<String>(
@@ -801,7 +794,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
       width: width,
       child: Row(
         children: [
-          Icon(icon, size: 18),
+          Icon(icon, size: AppTokens.iconInline),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -1004,7 +997,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
           title: site.primaryDomain,
           subtitle: site.type,
           trailing: ActionSheetStatusPill(
-            label: _statusLabel(site.status, l10n),
+            label: websiteStatusLabel(site.status, l10n),
             color: running ? colors.success : colors.info,
           ),
         ),
@@ -1432,7 +1425,7 @@ class _WebsiteCard extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               StatusPill(
-                label: _statusLabel(site.status, l10n),
+                label: websiteStatusLabel(site.status, l10n),
                 tone: context.appColors.status(site.status),
                 dense: true,
                 showDot: true,
@@ -1477,7 +1470,11 @@ class _WebsiteCard extends StatelessWidget {
             const SizedBox(height: AppTokens.s8),
             Row(
               children: [
-                Icon(TablerIcons.calendar_event, size: 14, color: expiryColor),
+                Icon(
+                  TablerIcons.calendar_event,
+                  size: AppTokens.iconMicro,
+                  color: expiryColor,
+                ),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
@@ -1496,14 +1493,6 @@ class _WebsiteCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _statusLabel(String status, AppLocalizations l10n) {
-    return switch (status.toLowerCase()) {
-      'running' => l10n.websites_running,
-      'stopped' => l10n.websites_stopped,
-      _ => l10n.common_unknown,
-    };
   }
 
   DateTime _parseDate(String raw) {

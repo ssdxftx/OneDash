@@ -418,9 +418,7 @@ class SupervisorPage extends ConsumerWidget {
               else
                 SelectableText(
                   content.isEmpty ? l10n.state_empty : content,
-                  style: AppTextStyles.caption.copyWith(
-                    fontFamily: 'monospace',
-                  ),
+                  style: AppTextStyles.monoSmall.copyWith(),
                 ),
             ],
           ),

@@ -291,9 +291,8 @@ class _FavoritesTab extends ConsumerWidget {
                       const SizedBox(height: 2),
                       Text(
                         item.path,
-                        style: AppTextStyles.caption.copyWith(
+                        style: AppTextStyles.monoSmall.copyWith(
                           color: context.scheme.onSurfaceVariant,
-                          fontFamily: 'monospace',
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -702,9 +701,7 @@ class _RemoteDownloadTab extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           key,
-                          style: AppTextStyles.bodyM.copyWith(
-                            fontFamily: 'monospace',
-                          ),
+                          style: AppTextStyles.mono.copyWith(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -1032,9 +1029,8 @@ class _ConvertLogsTab extends ConsumerWidget {
                 const SizedBox(height: AppTokens.s4),
                 Text(
                   item.log,
-                  style: AppTextStyles.caption.copyWith(
+                  style: AppTextStyles.monoSmall.copyWith(
                     color: context.scheme.onSurfaceVariant,
-                    fontFamily: 'monospace',
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

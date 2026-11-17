@@ -710,7 +710,7 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
             ),
             TextButton.icon(
               onPressed: _loading ? null : _edit,
-              icon: const Icon(TablerIcons.plus, size: 18),
+              icon: const Icon(TablerIcons.plus, size: AppTokens.iconInline),
               label: Text(l10n.databases_addRemote),
             ),
           ],

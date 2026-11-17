@@ -194,7 +194,7 @@ class _FilePermissionSheetState extends ConsumerState<_FilePermissionSheet> {
           alignment: Alignment.centerRight,
           child: TextButton.icon(
             onPressed: _pickOwner,
-            icon: const Icon(TablerIcons.users, size: 18),
+            icon: const Icon(TablerIcons.users, size: AppTokens.iconInline),
             label: Text(l10n.files_pickOwner),
           ),
         ),

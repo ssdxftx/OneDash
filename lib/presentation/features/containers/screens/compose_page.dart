@@ -134,7 +134,10 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                 ),
                 TextButton.icon(
                   onPressed: () => Navigator.of(sheetContext).pop('import'),
-                  icon: const Icon(TablerIcons.upload, size: 18),
+                  icon: const Icon(
+                    TablerIcons.upload,
+                    size: AppTokens.iconInline,
+                  ),
                   label: Text(l10n.containers_importTemplates),
                 ),
               ],
@@ -444,9 +447,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                 child: SingleChildScrollView(
                   child: SelectableText(
                     lines.join('\n'),
-                    style: AppTextStyles.bodyS.copyWith(
-                      fontFamily: 'monospace',
-                    ),
+                    style: AppTextStyles.mono.copyWith(),
                   ),
                 ),
               ),
@@ -537,10 +538,7 @@ class _ComposeCard extends StatelessWidget {
           const SizedBox(height: AppTokens.s4),
           Text(
             item.path,
-            style: AppTextStyles.bodyS.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontFamily: 'monospace',
-            ),
+            style: AppTextStyles.mono.copyWith(color: scheme.onSurfaceVariant),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

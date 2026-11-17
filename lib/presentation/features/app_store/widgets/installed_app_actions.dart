@@ -96,7 +96,7 @@ class InstalledAppActions {
               child: SingleChildScrollView(
                 child: SelectableText(
                   content.isEmpty ? l10n.apps_defaultConfigEmpty : content,
-                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
+                  style: AppTextStyles.mono,
                 ),
               ),
             ),

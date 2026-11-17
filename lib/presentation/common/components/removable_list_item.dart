@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/motion/list_animation_scope.dart';
 import '../../../core/theme/tokens.dart';
 
 class RemovableListItem extends StatelessWidget {
@@ -16,10 +17,13 @@ class RemovableListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!animateIn && !removing) return child;
+    final animate = animateIn && ListAnimationScope.of(context);
+    if (!animate && !removing) return child;
     return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: animateIn ? 0 : 1, end: removing ? 0 : 1),
-      duration: context.motion(AppTokens.dBase),
+      tween: Tween<double>(begin: animate ? 0 : 1, end: removing ? 0 : 1),
+      duration: (animate || removing)
+          ? context.motion(AppTokens.dBase)
+          : Duration.zero,
       curve: AppTokens.curveBase,
       child: child,
       builder: (context, value, child) {

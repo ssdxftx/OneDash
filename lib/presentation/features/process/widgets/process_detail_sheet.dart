@@ -341,8 +341,7 @@ class _DetailContent extends StatelessWidget {
                             .trim(),
                     subtitle:
                         '${_formatAddress(connect['localaddr'])} → ${_formatAddress(connect['remoteaddr'])}',
-                    subtitleStyle: AppTextStyles.caption.copyWith(
-                      fontFamily: 'monospace',
+                    subtitleStyle: AppTextStyles.monoSmall.copyWith(
                       color: context.scheme.onSurfaceVariant,
                     ),
                   ),
@@ -363,8 +362,7 @@ class _DetailContent extends StatelessWidget {
             ),
             child: SelectableText(
               envs.join('\n'),
-              style: AppTextStyles.caption.copyWith(
-                fontFamily: 'monospace',
+              style: AppTextStyles.monoSmall.copyWith(
                 height: 1.5,
                 color: context.scheme.onSurfaceVariant,
               ),
@@ -456,10 +454,7 @@ class _DetailRow extends StatelessWidget {
       title: label,
       value: value,
       valueStyle: mono
-          ? AppTextStyles.caption.copyWith(
-              fontFamily: 'monospace',
-              color: context.scheme.onSurface,
-            )
+          ? AppTextStyles.monoSmall.copyWith(color: context.scheme.onSurface)
           : null,
     );
   }

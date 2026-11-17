@@ -149,8 +149,7 @@ class _LogViewState extends State<LogView> {
                         final line = widget.lines[index];
                         return Text(
                           widget.showLineNumbers ? '${index + 1}  $line' : line,
-                          style: AppTextStyles.bodyS.copyWith(
-                            fontFamily: 'monospace',
+                          style: AppTextStyles.mono.copyWith(
                             color: AppTokens.consoleForeground,
                             height: 1.5,
                           ),

@@ -66,7 +66,7 @@ class CronjobRecordsSheet extends ConsumerWidget {
               const SizedBox(height: AppTokens.s12),
               SelectableText(
                 log.isEmpty ? l10n.cronjobs_recordLogEmpty : log,
-                style: AppTextStyles.caption.copyWith(fontFamily: 'monospace'),
+                style: AppTextStyles.monoSmall,
               ),
             ],
           );

@@ -28,7 +28,7 @@ class StatusIconBlock extends StatelessWidget {
         color: tone.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTokens.rXs),
       ),
-      child: Icon(icon, size: 18, color: tone),
+      child: Icon(icon, size: AppTokens.iconInline, color: tone),
     );
   }
 }
@@ -46,7 +46,7 @@ class MetaInfo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 13, color: scheme.onSurfaceVariant),
+        Icon(icon, size: AppTokens.iconMicro, color: scheme.onSurfaceVariant),
         const SizedBox(width: AppTokens.s4),
         Flexible(
           child: Text(

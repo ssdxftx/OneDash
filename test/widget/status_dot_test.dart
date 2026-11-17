@@ -37,6 +37,30 @@ void main() {
     expect(StatusPulse.debugReferences, 0);
   });
 
+  testWidgets('danger statuses share the pulse', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            StatusDot(status: 'error'),
+            SizedBox(width: 8),
+            StatusDot(status: 'unhealthy'),
+            SizedBox(width: 8),
+            StatusDot(status: 'offline'),
+            SizedBox(width: 8),
+            StatusDot(status: 'dead'),
+          ],
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(StatusPulse.debugReferences, 4);
+    await tester.pumpWidget(const SizedBox.shrink());
+    expect(StatusPulse.debugReferences, 0);
+  });
+
   testWidgets('减少动态效果时错误状态点不启动脉冲', (tester) async {
     await tester.pumpWidget(
       _wrap(const StatusDot(status: 'error'), reduceMotion: true),

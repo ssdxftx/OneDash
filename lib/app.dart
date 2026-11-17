@@ -9,6 +9,7 @@ import 'package:toastification/toastification.dart';
 import 'core/localization/generated/app_localizations.dart';
 import 'core/localization/locale_controller.dart';
 import 'core/platform/secure_screen.dart';
+import 'core/motion/list_animation_scope.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/tokens.dart';
@@ -79,14 +80,16 @@ class OneDashApp extends ConsumerWidget {
             builder: (context, child) {
               final systemScale = MediaQuery.textScalerOf(context).scale(1);
               final scale = (systemScale * theme.textScale).clamp(0.85, 1.5);
-              final reduceMotion =
-                  MediaQuery.disableAnimationsOf(context) || !listAnimations;
-              return MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                  textScaler: TextScaler.linear(scale),
-                  disableAnimations: reduceMotion,
+              final reduceMotion = MediaQuery.disableAnimationsOf(context);
+              return ListAnimationScope(
+                enabled: listAnimations && !reduceMotion,
+                child: MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: TextScaler.linear(scale),
+                    disableAnimations: reduceMotion,
+                  ),
+                  child: child ?? const SizedBox.shrink(),
                 ),
-                child: child ?? const SizedBox.shrink(),
               );
             },
           ),

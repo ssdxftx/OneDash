@@ -1158,7 +1158,7 @@ class _ReposTab extends ConsumerWidget {
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               onPressed: () => _search(context, ref),
-              icon: const Icon(TablerIcons.search, size: 18),
+              icon: const Icon(TablerIcons.search, size: AppTokens.iconInline),
               label: Text(l10n.action_search),
             ),
           ),

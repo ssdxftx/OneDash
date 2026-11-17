@@ -309,7 +309,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
                         child: Icon(
                           TablerIcons.chevron_right,
                           key: const Key('segmentedTabsMoreHint'),
-                          size: 18,
+                          size: AppTokens.iconInline,
                           color: scheme.onSurfaceVariant,
                         ),
                       ),

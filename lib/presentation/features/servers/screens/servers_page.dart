@@ -580,7 +580,7 @@ class _ServerCard extends ConsumerWidget {
             children: [
               Icon(
                 TablerIcons.history,
-                size: 14,
+                size: AppTokens.iconMicro,
                 color: scheme.onSurfaceVariant,
               ),
               const SizedBox(width: AppTokens.s4),
@@ -705,7 +705,7 @@ class _ServerStatusPill extends StatelessWidget {
         children: [
           Icon(
             online ? TablerIcons.activity_heartbeat : TablerIcons.wifi_off,
-            size: 12,
+            size: AppTokens.iconMicro,
             color: color,
           ),
           const SizedBox(width: AppTokens.s4),
@@ -835,7 +835,7 @@ class _ServerCount extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
+          Icon(icon, size: AppTokens.iconMicro, color: color),
           const SizedBox(width: AppTokens.s4),
           Text(
             '$label ${value ?? '--'}',

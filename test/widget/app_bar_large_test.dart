@@ -27,4 +27,17 @@ void main() {
     await tester.pump();
     expect(taps, 2);
   });
+
+  testWidgets('compact variant uses the compact toolbar height', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(appBar: AppBarLarge(title: 'Editor', compact: true)),
+      ),
+    );
+
+    final appBar = tester.widget<AppBar>(find.byType(AppBar));
+    expect(appBar.toolbarHeight, lessThan(64));
+  });
 }

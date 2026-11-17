@@ -198,10 +198,7 @@ class _ToolboxFail2banPageState extends ConsumerState<ToolboxFail2banPage> {
             ),
             Flexible(
               child: SingleChildScrollView(
-                child: SelectableText(
-                  content,
-                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
-                ),
+                child: SelectableText(content, style: AppTextStyles.mono),
               ),
             ),
           ],

@@ -211,7 +211,7 @@ class SimpleMarkdown extends StatelessWidget {
         spans.add(
           TextSpan(
             text: token.substring(1, token.length - 1),
-            style: const TextStyle(fontFamily: 'monospace'),
+            style: AppTextStyles.mono,
           ),
         );
       } else if (token.startsWith('![')) {
@@ -306,8 +306,7 @@ class _CodeBlock extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: SelectableText(
               lines.join('\n'),
-              style: AppTextStyles.bodyS.copyWith(
-                fontFamily: 'monospace',
+              style: AppTextStyles.mono.copyWith(
                 color: AppTokens.consoleForeground,
                 height: 1.5,
               ),

@@ -680,7 +680,7 @@ class _DiagnosisRow extends StatelessWidget {
                 height: 18,
                 child: CircularProgressIndicator(strokeWidth: 2, color: color),
               )
-            : Icon(icon, size: 18, color: color),
+            : Icon(icon, size: AppTokens.iconInline, color: color),
         const SizedBox(width: AppTokens.s8),
         Expanded(
           child: Column(

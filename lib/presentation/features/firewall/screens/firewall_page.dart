@@ -2142,10 +2142,7 @@ class _NativeDetailSheetState extends ConsumerState<_NativeDetailSheet> {
               borderRadius: BorderRadius.circular(AppTokens.rMd),
             ),
             child: SingleChildScrollView(
-              child: SelectableText(
-                _content!,
-                style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
-              ),
+              child: SelectableText(_content!, style: AppTextStyles.mono),
             ),
           ),
         ],

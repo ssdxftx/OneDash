@@ -282,6 +282,25 @@ abstract final class AppTextStyles {
     fontSize: 12,
     height: 1.35,
   );
+  static const monoFontFallback = <String>[
+    'Roboto Mono',
+    'Menlo',
+    'Courier New',
+  ];
+  static const mono = TextStyle(
+    fontFamily: 'monospace',
+    fontFamilyFallback: monoFontFallback,
+    fontSize: 13,
+    height: 1.45,
+    fontFeatures: _tabular,
+  );
+  static const monoSmall = TextStyle(
+    fontFamily: 'monospace',
+    fontFamilyFallback: monoFontFallback,
+    fontSize: 12,
+    height: 1.4,
+    fontFeatures: _tabular,
+  );
   static const numeric = TextStyle(
     fontFamily: 'MiSans',
     fontSize: 14,

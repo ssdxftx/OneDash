@@ -118,7 +118,7 @@ class _HostSshLogsSheetState extends ConsumerState<_HostSshLogsSheet> {
     }
   }
 
-  String _statusLabel(AppLocalizations l10n, String status) {
+  String _sshStatusLabel(AppLocalizations l10n, String status) {
     return switch (status) {
       'Success' => l10n.host_sshLogSuccess,
       'Failed' => l10n.host_sshLogFailed,
@@ -160,7 +160,7 @@ class _HostSshLogsSheetState extends ConsumerState<_HostSshLogsSheet> {
         const SizedBox(height: AppTokens.s8),
         AppFilterChips<String>(
           options: const ['All', 'Success', 'Failed'],
-          labelOf: (value) => _statusLabel(l10n, value),
+          labelOf: (value) => _sshStatusLabel(l10n, value),
           selected: {_status},
           onChanged: (values) {
             if (values.isEmpty) return;

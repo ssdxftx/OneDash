@@ -65,10 +65,7 @@ class ProcessNetworkItem extends StatelessWidget {
               Expanded(
                 child: Text(
                   local,
-                  style: AppTextStyles.bodyS.copyWith(
-                    fontFamily: 'monospace',
-                    color: scheme.onSurface,
-                  ),
+                  style: AppTextStyles.mono.copyWith(color: scheme.onSurface),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -77,7 +74,7 @@ class ProcessNetworkItem extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: AppTokens.s8),
                 child: Icon(
                   TablerIcons.arrow_right,
-                  size: 14,
+                  size: AppTokens.iconMicro,
                   color: scheme.onSurfaceVariant,
                 ),
               ),
@@ -85,10 +82,7 @@ class ProcessNetworkItem extends StatelessWidget {
                 child: Text(
                   remote,
                   textAlign: TextAlign.end,
-                  style: AppTextStyles.bodyS.copyWith(
-                    fontFamily: 'monospace',
-                    color: scheme.onSurface,
-                  ),
+                  style: AppTextStyles.mono.copyWith(color: scheme.onSurface),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

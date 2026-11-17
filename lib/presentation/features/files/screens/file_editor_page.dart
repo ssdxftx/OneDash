@@ -163,8 +163,8 @@ class _FileEditorPageState extends ConsumerState<FileEditorPage> {
                 focusNode: _focusNode,
                 autofocus: false,
                 style: CodeEditorStyle(
-                  fontSize: 14,
-                  fontFamilyFallback: const ['monospace'],
+                  fontSize: AppTextStyles.mono.fontSize!,
+                  fontFamilyFallback: AppTextStyles.monoFontFallback,
                   textColor: scheme.onSurface,
                   cursorColor: scheme.primary,
                   selectionColor: scheme.primary.withValues(alpha: 0.22),

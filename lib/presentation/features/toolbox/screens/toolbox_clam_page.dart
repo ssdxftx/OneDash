@@ -375,10 +375,7 @@ class _ToolboxClamPageState extends ConsumerState<ToolboxClamPage> {
             ),
             Flexible(
               child: SingleChildScrollView(
-                child: SelectableText(
-                  content,
-                  style: AppTextStyles.bodyS.copyWith(fontFamily: 'monospace'),
-                ),
+                child: SelectableText(content, style: AppTextStyles.mono),
               ),
             ),
           ],

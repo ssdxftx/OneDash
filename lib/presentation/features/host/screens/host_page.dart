@@ -1186,8 +1186,6 @@ class _HostPageState extends ConsumerState<HostPage> {
       'prohibit-password',
       'forbid-password',
     };
-    return known.contains(value)
-        ? null
-        : AppTextStyles.bodyS.copyWith(fontFamily: 'monospace');
+    return known.contains(value) ? null : AppTextStyles.mono;
   }
 }

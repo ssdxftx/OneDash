@@ -223,9 +223,7 @@ class SnapshotPage extends ConsumerWidget {
                 child: SingleChildScrollView(
                   child: SelectableText(
                     pretty,
-                    style: AppTextStyles.bodyS.copyWith(
-                      fontFamily: 'monospace',
-                    ),
+                    style: AppTextStyles.mono.copyWith(),
                   ),
                 ),
               ),

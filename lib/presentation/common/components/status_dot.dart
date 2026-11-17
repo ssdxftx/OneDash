@@ -22,15 +22,13 @@ class StatusDot extends StatefulWidget {
 class _StatusDotState extends State<StatusDot> {
   bool _attached = false;
 
-  bool get _shouldPulse {
-    final status = widget.status.toLowerCase();
-    return status == 'error' || status == 'failed' || status == 'dead';
+  bool get _pulsing {
+    final isDanger =
+        context.appColors.status(widget.status) == context.appColors.danger;
+    return isDanger &&
+        !context.reduceMotion &&
+        TickerMode.valuesOf(context).enabled;
   }
-
-  bool get _pulsing =>
-      _shouldPulse &&
-      !context.reduceMotion &&
-      TickerMode.valuesOf(context).enabled;
 
   @override
   void didChangeDependencies() {

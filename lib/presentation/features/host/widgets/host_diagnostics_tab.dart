@@ -159,10 +159,7 @@ class _HostDiagnosticsTabState extends ConsumerState<HostDiagnosticsTab> {
           const SizedBox(height: AppTokens.s16),
           SelectableText(
             group.stack.join('\n'),
-            style: AppTextStyles.bodyS.copyWith(
-              fontFamily: 'monospace',
-              height: 1.5,
-            ),
+            style: AppTextStyles.mono.copyWith(height: 1.5),
           ),
         ],
       ),
