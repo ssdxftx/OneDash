@@ -50,10 +50,15 @@ class _ProcessPageState extends ConsumerState<ProcessPage> {
   _ProcessSortKey _sortKey = _ProcessSortKey.cpu;
   bool _sortAsc = false;
 
+  bool _bootstrapped = false;
+
   @override
-  void initState() {
-    super.initState();
-    _connect();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_bootstrapped) {
+      _bootstrapped = true;
+      _connect();
+    }
   }
 
   @override

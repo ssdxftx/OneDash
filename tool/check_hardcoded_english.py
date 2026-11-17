@@ -80,6 +80,11 @@ WHITELIST = {
     'firewalld',
     'ufw',
 }
+# Linux/process metric abbreviations stay in English because they match top/ps.
+TECHNICAL_TERMS = {
+    'PID', 'PPID', 'RSS', 'VMS', 'PSS', 'USS', 'HWM',
+    'Shared', 'Swap', 'Dirty', 'CPU', 'MEM', 'IO', 'TTL', 'SSL', 'SSH',
+}
 PATTERN = re.compile(
     r"""(?:Text|label|title|subtitle|hintText|tooltip|semanticLabel)\s*[:(]\s*'([^'\\\n]{3,60})'"""
 )
@@ -101,7 +106,7 @@ def main():
                 value = match.group(1)
                 if CJK.search(value) or '$' in value or not WORD.search(value):
                     continue
-                if value in WHITELIST:
+                if value in WHITELIST or value in TECHNICAL_TERMS:
                     continue
                 hits.append(f'{path}:{number}  {value!r}')
     if hits:

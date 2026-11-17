@@ -11,18 +11,25 @@ ROOT = Path(__file__).resolve().parents[1]
 FEATURES = ROOT / "lib" / "presentation"
 
 
-def action_icons(source: str) -> list[str]:
+def top_level_action_icons(actions_src: str) -> list[str]:
+    """只取 actions 数组顶层的按钮图标，忽略 onPressed 闭包里的菜单项。"""
     icons: list[str] = []
-    for match in re.finditer(r"actions:\s*\[", source):
-        index = match.end()
-        depth = 1
-        while index < len(source) and depth:
-            if source[index] == "[":
-                depth += 1
-            elif source[index] == "]":
-                depth -= 1
-            index += 1
-        icons.extend(re.findall(r"TablerIcons\.(\w+)", source[match.end() : index - 1]))
+    depth = 0
+    index = 0
+    while index < len(actions_src):
+        char = actions_src[index]
+        if char in "([{":
+            depth += 1
+        elif char in ")]}":
+            depth -= 1
+        elif depth == 0 and actions_src.startswith("AppIconButton(", index):
+            body = _balanced_block(actions_src, index + len("AppIconButton"), "(", ")")
+            match = re.search(r"icon:\s*([^,\n]+)", body)
+            if match:
+                icons.append(match.group(1).strip())
+            index += len("AppIconButton(") + len(body)
+            continue
+        index += 1
     return icons
 
 
@@ -63,14 +70,23 @@ def main() -> int:
                 elif block[cursor] == "]":
                     depth -= 1
                 cursor += 1
-            icons = re.findall(r"TablerIcons\.(\w+)", block[: cursor - 1])
+            icons = top_level_action_icons(block[: cursor - 1])
             line = source[: match.start()].count("\n") + 1
-            if "refresh" in icons and icons.index("refresh") != 0:
+            if any("refresh" in icon for icon in icons) and not (
+                icons and "refresh" in icons[0]
+            ):
                 failures.append(f"{relative}:{line}: refresh must be the first action")
-            duplicates = {icon for icon in icons if icons.count(icon) > 1}
-            for icon in sorted(duplicates):
-                failures.append(f"{relative}:{line}: duplicate action icon {icon}")
-            if "plus" in icons and icons[-1] != "plus":
+            names = [
+                name
+                for icon in icons
+                for name in re.findall(r"TablerIcons\.(\w+)", icon)
+            ]
+            duplicates = {name for name in names if names.count(name) > 1}
+            for name in sorted(duplicates):
+                failures.append(f"{relative}:{line}: duplicate action icon {name}")
+            if any("plus" in icon for icon in icons) and not (
+                icons and "plus" in icons[-1]
+            ):
                 failures.append(
                     f"{relative}:{line}: create action must be the last action"
                 )

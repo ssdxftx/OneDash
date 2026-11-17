@@ -30,3 +30,9 @@ file_api.dart:readRuntimeLog
 # Reviewed exceptions for the mobile client.
 # These endpoints are web-only flows, helper/internal calls, or require device
 # file pickers / app-detail context that OneDash does not expose yet.
+
+# Quick-entry directory CRUD: mobile client exposes read-only quick links for v1.
+dashboard_api.dart:changeQuick
+dashboard_api.dart:createQuickDirectory
+dashboard_api.dart:updateQuickDirectory
+dashboard_api.dart:deleteQuickDirectory

@@ -179,6 +179,7 @@ class CommandLibraryPage extends ConsumerWidget {
         bytes: bytes,
         filename: file.name,
       );
+      if (!context.mounted) return;
       if (items.isEmpty) {
         AppToast.warning(context, l10n.commandLibrary_importEmpty);
         return;

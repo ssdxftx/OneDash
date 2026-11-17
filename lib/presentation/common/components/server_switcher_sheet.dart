@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -90,7 +92,9 @@ class _ServerSwitcherBody extends ConsumerWidget {
                         if (server.id != currentServerId) {
                           ref.read(activeServerIdStateProvider.notifier).state =
                               server.id;
-                          router.pushReplacement('/s/${server.id}/overview');
+                          unawaited(
+                            router.pushReplacement('/s/${server.id}/overview'),
+                          );
                         }
                       },
                     ),

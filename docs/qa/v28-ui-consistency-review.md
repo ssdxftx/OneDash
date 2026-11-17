@@ -54,12 +54,7 @@
 
 ## 验证
 
-- `flutter analyze --fatal-infos`：No issues found
-- `flutter test test/unit test/widget test/app_smoke_test.dart`：87 / 87
-- `bash tool/check_error_leaks.sh`：exit 0
-- `bash tool/check_action_reachability.sh`：exit 0（unwired 0，allowlist 23）
-- `flutter gen-l10n`：通过
-- `git diff --check`：通过
+本回执不再记录手写的“已验证”结论。守卫与 analyze/test 的原始输出以 CI run 的 `ui-guards` artifact 和 workflow 日志为准。
 
 ## 仍受环境限制
 
