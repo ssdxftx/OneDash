@@ -35,6 +35,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
   bool _canScrollRight = false;
   bool _overflows = false;
   double? _indicatorLeft;
+  double _indicatorWidth = 20;
   double? _lastRowWidth;
   double? _lastViewportWidth;
 
@@ -100,11 +101,19 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
     final index = widget.selectedIndex.clamp(0, _keys.length - 1);
     final tab = _keys[index].currentContext?.findRenderObject();
     if (row is! RenderBox || tab is! RenderBox || !row.hasSize) return;
+    final width = (tab.size.width - AppTokens.s12 * 2).clamp(20.0, 56.0);
     final left =
         tab.localToGlobal(Offset.zero, ancestor: row).dx +
-        (tab.size.width - 20) / 2;
-    if (_indicatorLeft != null && (_indicatorLeft! - left).abs() < 0.5) return;
-    setState(() => _indicatorLeft = left);
+        (tab.size.width - width) / 2;
+    if (_indicatorLeft != null &&
+        (_indicatorLeft! - left).abs() < 0.5 &&
+        (_indicatorWidth - width).abs() < 0.5) {
+      return;
+    }
+    setState(() {
+      _indicatorLeft = left;
+      _indicatorWidth = width;
+    });
   }
 
   void _handleViewportWidth(double width) {
@@ -175,7 +184,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
                       fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 9),
+                  const SizedBox(height: AppTokens.s8),
                 ],
               ),
             ),
@@ -200,7 +209,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
             curve: AppTokens.curveBase,
             left: _indicatorLeft,
             bottom: 0,
-            width: 20,
+            width: _indicatorWidth,
             height: 3,
             child: DecoratedBox(
               decoration: BoxDecoration(

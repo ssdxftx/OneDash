@@ -13,6 +13,7 @@ class AppBarLarge extends StatelessWidget implements PreferredSizeWidget {
     this.leading,
     this.onTitleTap,
     this.bottom,
+    this.compact = false,
   });
 
   final String title;
@@ -21,23 +22,35 @@ class AppBarLarge extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
   final VoidCallback? onTitleTap;
   final PreferredSizeWidget? bottom;
+  final bool compact;
 
   @override
   Size get preferredSize => Size.fromHeight(
-    (subtitle == null ? AppTokens.appBarHeight : AppTokens.appBarLargeHeight) +
+    (compact
+            ? AppTokens.appBarCompactHeight
+            : subtitle == null
+            ? AppTokens.appBarHeight
+            : AppTokens.appBarLargeHeight) +
         (bottom?.preferredSize.height ?? 0),
   );
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: subtitle == null
+      toolbarHeight: compact
+          ? AppTokens.appBarCompactHeight
+          : subtitle == null
           ? AppTokens.appBarHeight
           : AppTokens.appBarLargeHeight,
       leading: leading,
       actions: actions,
       bottom: bottom,
-      title: _TitleBlock(title: title, subtitle: subtitle, onTap: onTitleTap),
+      title: _TitleBlock(
+        title: title,
+        subtitle: subtitle,
+        onTap: onTitleTap,
+        compact: compact,
+      ),
     );
   }
 }
@@ -83,11 +96,17 @@ class SliverAppBarLarge extends StatelessWidget {
 }
 
 class _TitleBlock extends StatelessWidget {
-  const _TitleBlock({required this.title, this.subtitle, this.onTap});
+  const _TitleBlock({
+    required this.title,
+    this.subtitle,
+    this.onTap,
+    this.compact = false,
+  });
 
   final String title;
   final String? subtitle;
   final VoidCallback? onTap;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -107,9 +126,9 @@ class _TitleBlock extends StatelessWidget {
               Flexible(
                 child: Text(
                   title,
-                  style: AppTextStyles.headline.copyWith(
-                    color: scheme.onSurface,
-                  ),
+                  style:
+                      (compact ? AppTextStyles.titleM : AppTextStyles.headline)
+                          .copyWith(color: scheme.onSurface),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -118,7 +137,7 @@ class _TitleBlock extends StatelessWidget {
                 const SizedBox(width: AppTokens.s4),
                 Icon(
                   TablerIcons.chevron_down,
-                  size: 18,
+                  size: AppTokens.iconInline,
                   color: scheme.onSurfaceVariant,
                   semanticLabel: null,
                 ),

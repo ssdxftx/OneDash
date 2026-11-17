@@ -10,6 +10,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/website/website_template_dto.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -171,20 +172,24 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
       appBar: AppBarLarge(
         title: l10n.websites_templates,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: _load,
-          ),
-          AppIconButton(
-            icon: TablerIcons.folder,
-            tooltip: l10n.websites_templateOutputs,
-            onPressed: _showOutputs,
-          ),
-          AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.websites_templateAdd,
-            onPressed: _openEditor,
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: _load,
+              ),
+              AppBarAction(
+                icon: TablerIcons.folder,
+                tooltip: l10n.websites_templateOutputs,
+                onPressed: _showOutputs,
+              ),
+              AppBarAction(
+                icon: TablerIcons.plus,
+                tooltip: l10n.websites_templateAdd,
+                onPressed: _openEditor,
+              ),
+            ],
           ),
         ],
       ),
@@ -209,7 +214,7 @@ class _WebsiteTemplatesPageState extends ConsumerState<WebsiteTemplatesPage> {
                 ? const SkeletonList(itemCount: 5)
                 : _templates.isEmpty
                 ? EmptyState(
-                    icon: TablerIcons.layout,
+                    icon: TablerIcons.template,
                     title: l10n.websites_templatesEmptyTitle,
                     message: l10n.websites_templateEmpty,
                     actionLabel: l10n.websites_templateAdd,

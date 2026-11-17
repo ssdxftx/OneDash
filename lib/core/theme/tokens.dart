@@ -27,14 +27,20 @@ abstract final class AppTokens {
   static const double rSheet = 28;
   static const double rFull = 999;
 
+  static const double iconMicro = 14;
+  static const double iconSmall = 16;
+  static const double iconInline = 18;
   static const double iconList = 20;
   static const double iconLeading = 22;
   static const double iconNav = 24;
   static const double iconEmpty = 28;
 
   static const double appBarHeight = 64;
+  static const double appBarCompactHeight = 56;
   static const double menuRowHeight = 40;
   static const double appBarLargeHeight = 84;
+
+  static const double cardBorderAlpha = 0.16;
 
   static const double bottomNavHeight = 72;
   static const double bottomNavMaxWidth = 480;

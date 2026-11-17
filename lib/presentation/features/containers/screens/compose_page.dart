@@ -12,6 +12,7 @@ import '../../../../data/dto/container/container_compose_dto.dart';
 import '../widgets/container_log_page.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
@@ -61,20 +62,24 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       appBar: AppBarLarge(
         title: l10n.containers_compose,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(containerComposeProvider),
-          ),
-          AppIconButton(
-            icon: TablerIcons.folder,
-            tooltip: l10n.containers_composeTemplates,
-            onPressed: () => _showTemplates(context, ref),
-          ),
-          AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.containers_createCompose,
-            onPressed: () => context.push('/s/$serverId/more/compose/form'),
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () => ref.invalidate(containerComposeProvider),
+              ),
+              AppBarAction(
+                icon: TablerIcons.folder,
+                tooltip: l10n.containers_composeTemplates,
+                onPressed: () => _showTemplates(context, ref),
+              ),
+              AppBarAction(
+                icon: TablerIcons.plus,
+                tooltip: l10n.containers_createCompose,
+                onPressed: () => context.push('/s/$serverId/more/compose/form'),
+              ),
+            ],
           ),
         ],
       ),
@@ -349,7 +354,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                   ('up', l10n.containers_up, TablerIcons.player_play),
                   ('restart', l10n.action_restart, TablerIcons.refresh),
                   ('down', l10n.containers_down, TablerIcons.player_stop),
-                  ('stop', l10n.containers_stop, TablerIcons.player_pause),
+                  ('stop', l10n.containers_stop, TablerIcons.player_stop),
                   ('rebuild', l10n.containers_rebuild, TablerIcons.reload),
                 ])
                   ActionSheetRow(

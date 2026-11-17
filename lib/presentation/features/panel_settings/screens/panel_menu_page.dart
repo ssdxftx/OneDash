@@ -7,6 +7,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/setting/panel_menu_dto.dart';
 import '../../../../data/repositories_impl/setting_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/skeleton.dart';
@@ -153,20 +154,24 @@ class _PanelMenuPageState extends ConsumerState<PanelMenuPage> {
       appBar: AppBarLarge(
         title: l10n.panelSettings_menuSettings,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: _saving ? null : _load,
-          ),
-          AppIconButton(
-            icon: TablerIcons.restore,
-            tooltip: l10n.panelSettings_resetMenu,
-            onPressed: _saving ? null : _reset,
-          ),
-          AppIconButton(
-            icon: TablerIcons.check,
-            tooltip: l10n.action_save,
-            onPressed: nodes == null || _saving ? null : _save,
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: _saving ? null : _load,
+              ),
+              AppBarAction(
+                icon: TablerIcons.restore,
+                tooltip: l10n.panelSettings_resetMenu,
+                onPressed: _saving ? null : _reset,
+              ),
+              AppBarAction(
+                icon: TablerIcons.check,
+                tooltip: l10n.action_save,
+                onPressed: nodes == null || _saving ? null : _save,
+              ),
+            ],
           ),
         ],
       ),

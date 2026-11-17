@@ -18,6 +18,7 @@ import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/form_footer.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/skeleton.dart';
@@ -612,14 +613,6 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
           ],
         ),
       ),
-      const SizedBox(height: AppTokens.s24),
-      if (!widget.embedded)
-        PrimaryButton(
-          label: l10n.server_edit_save,
-          icon: TablerIcons.device_floppy,
-          loading: _saving,
-          onPressed: _saving ? null : _save,
-        ),
       const SizedBox(height: AppTokens.s32),
     ];
     if (widget.embedded) {
@@ -641,8 +634,21 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: EdgeInsets.all(context.pagePadding),
+          padding: EdgeInsets.fromLTRB(
+            context.pagePadding,
+            AppTokens.s8,
+            context.pagePadding,
+            AppTokens.s32,
+          ),
           children: children,
+        ),
+      ),
+      bottomNavigationBar: FormFooter(
+        child: PrimaryButton(
+          label: l10n.server_edit_save,
+          icon: TablerIcons.device_floppy,
+          loading: _saving,
+          onPressed: _saving ? null : _save,
         ),
       ),
     );

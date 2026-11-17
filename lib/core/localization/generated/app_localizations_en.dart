@@ -3300,7 +3300,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_templateEdit => 'Edit template';
 
   @override
-  String get websites_templateEmpty => 'No templates yet';
+  String get websites_templateEmpty =>
+      'Save a site configuration as a template and reuse it next time';
 
   @override
   String get websites_templateName => 'Template name';
@@ -5910,7 +5911,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get runtime_modulesEmptyTitle => 'No modules installed';
 
   @override
-  String get websites_templatesEmptyTitle => 'No templates yet';
+  String get websites_templatesEmptyTitle => 'No website templates yet';
 
   @override
   String get websites_templateOutputsEmptyTitle => 'No generated websites yet';

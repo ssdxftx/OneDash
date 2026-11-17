@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tokens.dart';
+import 'status_pill.dart';
 
 /// 底部动作面板骨架：可选信息卡 + 分组动作。
 class ActionSheetScaffold extends StatelessWidget {
@@ -94,6 +95,7 @@ class ActionSheetInfoCard extends StatelessWidget {
 }
 
 /// 状态徽章。
+@Deprecated('Use StatusPill directly.')
 class ActionSheetStatusPill extends StatelessWidget {
   const ActionSheetStatusPill({
     super.key,
@@ -105,25 +107,8 @@ class ActionSheetStatusPill extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTokens.s8,
-        vertical: AppTokens.s4,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppTokens.rFull),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.caption.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      StatusPill(label: label, tone: color, dense: true);
 }
 
 /// 动作分组：标题行 + 组内动作。

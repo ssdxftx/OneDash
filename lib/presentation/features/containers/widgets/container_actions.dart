@@ -212,7 +212,7 @@ class _ContainerActionsBody extends StatelessWidget {
               },
             ),
             ActionSheetRow(
-              icon: TablerIcons.player_pause,
+              icon: TablerIcons.player_stop,
               iconColor: colors.warning,
               title: l10n.containers_pause,
               enabled: running,

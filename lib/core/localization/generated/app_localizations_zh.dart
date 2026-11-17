@@ -3226,7 +3226,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_templateEdit => '编辑模板';
 
   @override
-  String get websites_templateEmpty => '暂无模板';
+  String get websites_templateEmpty => '把常用站点配置存成模板，下次建站一键套用';
 
   @override
   String get websites_templateName => '模板名称';
@@ -5774,7 +5774,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get runtime_modulesEmptyTitle => '暂无已安装模块';
 
   @override
-  String get websites_templatesEmptyTitle => '暂无模板';
+  String get websites_templatesEmptyTitle => '还没有网站模板';
 
   @override
   String get websites_templateOutputsEmptyTitle => '暂无生成网站';

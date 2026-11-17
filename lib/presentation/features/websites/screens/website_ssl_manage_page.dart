@@ -11,6 +11,7 @@ import '../../../../data/dto/website/ssl_manage_dtos.dart';
 import '../../../../data/dto/website/website_https_dto.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
@@ -177,20 +178,24 @@ class WebsiteSslManagePage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.websites_sslManage,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_sslListProvider),
-          ),
-          AppIconButton(
-            icon: TablerIcons.upload,
-            tooltip: l10n.websites_uploadSsl,
-            onPressed: () => _upload(context, ref),
-          ),
-          AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.websites_applySsl,
-            onPressed: () => _apply(context, ref, domain),
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () => ref.invalidate(_sslListProvider),
+              ),
+              AppBarAction(
+                icon: TablerIcons.upload,
+                tooltip: l10n.websites_uploadSsl,
+                onPressed: () => _upload(context, ref),
+              ),
+              AppBarAction(
+                icon: TablerIcons.plus,
+                tooltip: l10n.websites_applySsl,
+                onPressed: () => _apply(context, ref, domain),
+              ),
+            ],
           ),
         ],
       ),

@@ -7,6 +7,7 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/file/file_ai_search_dto.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
+import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
@@ -73,7 +74,7 @@ class _FileAiSearchPageState extends ConsumerState<FileAiSearchPage> {
     final l10n = AppLocalizations.of(context);
     final result = _result;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.files_aiSearch)),
+      appBar: AppBarLarge(title: l10n.files_aiSearch),
       body: ListView(
         padding: EdgeInsets.all(context.pagePadding),
         children: [

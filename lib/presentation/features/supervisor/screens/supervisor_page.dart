@@ -7,6 +7,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/host_tool/supervisor_dto.dart';
 import '../../../../data/repositories_impl/host_tool_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
@@ -54,23 +55,27 @@ class SupervisorPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.supervisor_title,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_supervisorProvider),
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () => ref.invalidate(_supervisorProvider),
+              ),
+              if (ready)
+                AppBarAction(
+                  icon: TablerIcons.file_settings,
+                  tooltip: l10n.supervisor_configFile,
+                  onPressed: () => _editConfig(context, ref),
+                ),
+              if (ready)
+                AppBarAction(
+                  icon: TablerIcons.plus,
+                  tooltip: l10n.supervisor_createProcess,
+                  onPressed: () => _openForm(context, ref),
+                ),
+            ],
           ),
-          if (ready)
-            AppIconButton(
-              icon: TablerIcons.file_settings,
-              tooltip: l10n.supervisor_configFile,
-              onPressed: () => _editConfig(context, ref),
-            ),
-          if (ready)
-            AppIconButton(
-              icon: TablerIcons.plus,
-              tooltip: l10n.supervisor_createProcess,
-              onPressed: () => _openForm(context, ref),
-            ),
         ],
       ),
       body: AsyncStateView(

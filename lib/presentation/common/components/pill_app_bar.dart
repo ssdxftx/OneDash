@@ -4,6 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../core/theme/tokens.dart';
 
 /// Three-part capsule app bar: back, centred title and primary action.
+@Deprecated('Use AppBarLarge; removed in v30')
 class PillAppBar extends StatelessWidget implements PreferredSizeWidget {
   const PillAppBar({
     super.key,

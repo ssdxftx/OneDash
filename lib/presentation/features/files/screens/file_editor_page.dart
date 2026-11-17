@@ -6,6 +6,7 @@ import 'package:re_editor/re_editor.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
+import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/states/error_toast.dart';
 
@@ -124,8 +125,10 @@ class _FileEditorPageState extends ConsumerState<FileEditorPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.path.split('/').last, style: AppTextStyles.titleM),
+        // The editor keeps a compact header to pair the title with save.
+        appBar: AppBarLarge(
+          title: widget.path.split('/').last,
+          compact: true,
           actions: [
             IconButton(
               tooltip: l10n.files_history,

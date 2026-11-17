@@ -30,6 +30,7 @@ class BottomSheetSurface extends StatelessWidget {
     final scheme = context.scheme;
     final maxHeight = MediaQuery.sizeOf(context).height * maxHeightFactor;
     return Container(
+      width: double.infinity,
       constraints: BoxConstraints(maxHeight: maxHeight),
       decoration: BoxDecoration(
         color: scheme.surfaceContainer,

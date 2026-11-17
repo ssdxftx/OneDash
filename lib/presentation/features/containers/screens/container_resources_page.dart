@@ -10,6 +10,7 @@ import '../../../../data/dto/container/image_dtos.dart';
 import '../../../../data/dto/container/network_dtos.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/split_list_group.dart';
@@ -63,45 +64,49 @@ class _ContainerResourcesPageState
       appBar: AppBarLarge(
         title: _title(l10n),
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () {
-              ref.invalidate(containerImagesProvider);
-              ref.invalidate(containerNetworksProvider);
-              ref.invalidate(containerReposProvider);
-            },
-          ),
-          if (_tab == 0)
-            AppIconButton(
-              icon: TablerIcons.refresh_dot,
-              tooltip: l10n.containers_checkImageUpdates,
-              onPressed: _checkImageUpdates,
-            ),
-          if (_tab == 0)
-            AppIconButton(
-              icon: TablerIcons.calendar_repeat,
-              tooltip: l10n.containers_scheduleImageUpdates,
-              onPressed: _toggleImageUpdateSchedule,
-            ),
-          if (_tab == 0)
-            AppIconButton(
-              icon: TablerIcons.cloud_search,
-              tooltip: l10n.containers_searchRemote,
-              onPressed: _searchRemoteImages,
-            ),
-          AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: _tab == 0
-                ? l10n.containers_pullImage
-                : _tab == 1
-                ? l10n.containers_createNetwork
-                : l10n.containers_addRepo,
-            onPressed: _tab == 0
-                ? _pullImage
-                : _tab == 1
-                ? _createNetwork
-                : _createRepo,
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () {
+                  ref.invalidate(containerImagesProvider);
+                  ref.invalidate(containerNetworksProvider);
+                  ref.invalidate(containerReposProvider);
+                },
+              ),
+              if (_tab == 0)
+                AppBarAction(
+                  icon: TablerIcons.refresh_dot,
+                  tooltip: l10n.containers_checkImageUpdates,
+                  onPressed: _checkImageUpdates,
+                ),
+              if (_tab == 0)
+                AppBarAction(
+                  icon: TablerIcons.calendar_repeat,
+                  tooltip: l10n.containers_scheduleImageUpdates,
+                  onPressed: _toggleImageUpdateSchedule,
+                ),
+              if (_tab == 0)
+                AppBarAction(
+                  icon: TablerIcons.cloud_search,
+                  tooltip: l10n.containers_searchRemote,
+                  onPressed: _searchRemoteImages,
+                ),
+              AppBarAction(
+                icon: TablerIcons.plus,
+                tooltip: _tab == 0
+                    ? l10n.containers_pullImage
+                    : _tab == 1
+                    ? l10n.containers_createNetwork
+                    : l10n.containers_addRepo,
+                onPressed: _tab == 0
+                    ? _pullImage
+                    : _tab == 1
+                    ? _createNetwork
+                    : _createRepo,
+              ),
+            ],
           ),
         ],
       ),

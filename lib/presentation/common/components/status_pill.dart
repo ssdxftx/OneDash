@@ -9,15 +9,29 @@ class StatusPill extends StatelessWidget {
     required this.label,
     required this.tone,
     this.dense = false,
+    this.showDot = false,
+    this.minWidth,
   });
 
   final String label;
   final Color tone;
   final bool dense;
+  final bool showDot;
+  final double? minWidth;
 
   @override
   Widget build(BuildContext context) {
+    final text = Text(
+      label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: AppTextStyles.caption.copyWith(
+        color: tone,
+        fontWeight: FontWeight.w600,
+      ),
+    );
     return Container(
+      constraints: BoxConstraints(minWidth: minWidth ?? 0),
       padding: EdgeInsets.symmetric(
         horizontal: dense ? AppTokens.s8 : AppTokens.s12,
         vertical: dense ? 2 : 4,
@@ -26,13 +40,23 @@ class StatusPill extends StatelessWidget {
         color: tone.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppTokens.rXs),
       ),
-      child: Text(
-        label,
-        style: AppTextStyles.caption.copyWith(
-          color: tone,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      child: showDot
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: AppTokens.rXs,
+                  height: AppTokens.rXs,
+                  decoration: BoxDecoration(
+                    color: tone,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: AppTokens.s4),
+                Flexible(child: text),
+              ],
+            )
+          : text,
     );
   }
 }

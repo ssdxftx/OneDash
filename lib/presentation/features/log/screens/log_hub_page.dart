@@ -8,6 +8,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../../data/repositories_impl/log_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
@@ -43,25 +44,29 @@ class LogHubPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.logs_title,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () {
-              ref.invalidate(operationLogsProvider);
-              ref.invalidate(loginLogsProvider);
-              ref.invalidate(sshLogsProvider);
-              ref.invalidate(taskLogsProvider);
-            },
-          ),
-          AppIconButton(
-            icon: TablerIcons.file_text,
-            tooltip: l10n.logs_system,
-            onPressed: () => _openSystemLogs(context, ref),
-          ),
-          AppIconButton(
-            icon: TablerIcons.trash,
-            tooltip: l10n.logs_clean,
-            onPressed: () => _openActions(context, ref),
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () {
+                  ref.invalidate(operationLogsProvider);
+                  ref.invalidate(loginLogsProvider);
+                  ref.invalidate(sshLogsProvider);
+                  ref.invalidate(taskLogsProvider);
+                },
+              ),
+              AppBarAction(
+                icon: TablerIcons.file_text,
+                tooltip: l10n.logs_system,
+                onPressed: () => _openSystemLogs(context, ref),
+              ),
+              AppBarAction(
+                icon: TablerIcons.trash,
+                tooltip: l10n.logs_clean,
+                onPressed: () => _openActions(context, ref),
+              ),
+            ],
           ),
         ],
       ),

@@ -705,7 +705,7 @@ class _ContainerCard extends StatelessWidget {
                       : l10n.containers_start,
                   icon: Icon(
                     item.state.toLowerCase() == 'running'
-                        ? TablerIcons.player_pause
+                        ? TablerIcons.player_stop
                         : TablerIcons.player_play,
                     size: AppTokens.iconList,
                   ),

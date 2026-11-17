@@ -9,6 +9,7 @@ import '../../../../data/dto/database/database_instance_dto.dart';
 import '../../../../data/repositories_impl/database_repository_impl.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
@@ -123,20 +124,24 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage>
       appBar: AppBarLarge(
         title: l10n.databases_title,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_databasesProvider),
-          ),
-          AppIconButton(
-            icon: TablerIcons.server,
-            tooltip: l10n.databases_remoteInstances,
-            onPressed: _showRemote,
-          ),
-          AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.databases_create,
-            onPressed: () => _showCreateType(state),
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () => ref.invalidate(_databasesProvider),
+              ),
+              AppBarAction(
+                icon: TablerIcons.server,
+                tooltip: l10n.databases_remoteInstances,
+                onPressed: _showRemote,
+              ),
+              AppBarAction(
+                icon: TablerIcons.plus,
+                tooltip: l10n.databases_create,
+                onPressed: () => _showCreateType(state),
+              ),
+            ],
           ),
         ],
       ),

@@ -18,6 +18,7 @@ import '../../../../data/repositories_impl/cronjob_repository_impl.dart';
 import '../../../../data/repositories_impl/setting_repository_impl.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/removable_list_item.dart';
@@ -118,26 +119,30 @@ class _CronjobsPageState extends ConsumerState<CronjobsPage>
       appBar: AppBarLarge(
         title: l10n.cronjobs_title,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.read(cronjobsProvider.notifier).refresh(),
-          ),
-          AppIconButton(
-            icon: TablerIcons.file_import,
-            tooltip: l10n.cronjobs_import,
-            onPressed: _import,
-          ),
-          AppIconButton(
-            icon: TablerIcons.file_export,
-            tooltip: l10n.cronjobs_export,
-            onPressed: _export,
-          ),
-          AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.cronjobs_create,
-            onPressed: () =>
-                context.push('/s/${widget.serverId}/more/cronjobs/form'),
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () => ref.read(cronjobsProvider.notifier).refresh(),
+              ),
+              AppBarAction(
+                icon: TablerIcons.file_import,
+                tooltip: l10n.cronjobs_import,
+                onPressed: _import,
+              ),
+              AppBarAction(
+                icon: TablerIcons.file_export,
+                tooltip: l10n.cronjobs_export,
+                onPressed: _export,
+              ),
+              AppBarAction(
+                icon: TablerIcons.plus,
+                tooltip: l10n.cronjobs_create,
+                onPressed: () =>
+                    context.push('/s/${widget.serverId}/more/cronjobs/form'),
+              ),
+            ],
           ),
         ],
       ),

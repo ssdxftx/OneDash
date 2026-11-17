@@ -8,6 +8,7 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../domain/entities/dashboard.dart';
+import '../../../common/components/status_pill.dart';
 import '../../../common/components/tonal_card.dart';
 import '../providers/overview_provider.dart';
 import '../utils/dashboard_health.dart';
@@ -155,7 +156,15 @@ class _ServerHeaderCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppTokens.s8),
-              _StatusPill(online: online),
+              StatusPill(
+                label: online ? l10n.servers_online : l10n.servers_offline,
+                tone: online
+                    ? context.appColors.success
+                    : context.appColors.danger,
+                showDot: true,
+                minWidth: 76,
+                dense: true,
+              ),
             ],
           ),
           const SizedBox(height: AppTokens.s16),
@@ -185,46 +194,6 @@ class _ServerHeaderCard extends StatelessWidget {
                 value: base.kernelArch.isEmpty ? '-' : base.kernelArch,
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatusPill extends StatelessWidget {
-  const _StatusPill({required this.online});
-
-  final bool online;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final color = online ? context.appColors.success : context.appColors.danger;
-    return Container(
-      width: 76,
-      height: 26,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(TablerIcons.activity_heartbeat, size: 12, color: color),
-          const SizedBox(width: 4),
-          Flexible(
-            child: Text(
-              online ? l10n.servers_online : l10n.servers_offline,
-              style: TextStyle(
-                fontSize: 12,
-                height: 1,
-                fontWeight: FontWeight.w700,
-                color: color,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
           ),
         ],
       ),

@@ -10,6 +10,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/vm_repository_impl.dart';
 import '../../../../domain/repositories/vm_repository.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -83,50 +84,54 @@ class VmPage extends ConsumerWidget {
         title: l10n.vm_title,
         subtitle: l10n.vm_subtitle,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () {
-              ref.invalidate(vmEnvironmentProvider);
-              ref.invalidate(vmListProvider);
-            },
-          ),
-          if (ready)
-            AppIconButton(
-              icon: TablerIcons.trash,
-              tooltip: l10n.vm_orphansScan,
-              onPressed: () => _showOrphans(context, ref),
-            ),
-          if (ready)
-            AppIconButton(
-              icon: TablerIcons.stack_2,
-              tooltip: l10n.vm_resources,
-              onPressed: () => showVmResourcesSheet(context),
-            ),
-          if (ready)
-            AppIconButton(
-              icon: TablerIcons.arrows_exchange,
-              tooltip: l10n.vm_sync,
-              onPressed: () async {
-                try {
-                  final repository = await ref.read(
-                    vmRepositoryProvider.future,
-                  );
-                  await repository.syncVms();
-                  if (!context.mounted) return;
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () {
+                  ref.invalidate(vmEnvironmentProvider);
                   ref.invalidate(vmListProvider);
-                } catch (error) {
-                  if (!context.mounted) return;
-                  showErrorToast(context, error);
-                }
-              },
-            ),
-          if (ready)
-            AppIconButton(
-              icon: TablerIcons.plus,
-              tooltip: l10n.vm_create,
-              onPressed: () => _createVm(context, ref),
-            ),
+                },
+              ),
+              if (ready)
+                AppBarAction(
+                  icon: TablerIcons.trash,
+                  tooltip: l10n.vm_orphansScan,
+                  onPressed: () => _showOrphans(context, ref),
+                ),
+              if (ready)
+                AppBarAction(
+                  icon: TablerIcons.stack_2,
+                  tooltip: l10n.vm_resources,
+                  onPressed: () => showVmResourcesSheet(context),
+                ),
+              if (ready)
+                AppBarAction(
+                  icon: TablerIcons.arrows_exchange,
+                  tooltip: l10n.vm_sync,
+                  onPressed: () async {
+                    try {
+                      final repository = await ref.read(
+                        vmRepositoryProvider.future,
+                      );
+                      await repository.syncVms();
+                      if (!context.mounted) return;
+                      ref.invalidate(vmListProvider);
+                    } catch (error) {
+                      if (!context.mounted) return;
+                      showErrorToast(context, error);
+                    }
+                  },
+                ),
+              if (ready)
+                AppBarAction(
+                  icon: TablerIcons.plus,
+                  tooltip: l10n.vm_create,
+                  onPressed: () => _createVm(context, ref),
+                ),
+            ],
+          ),
         ],
       ),
       body: AsyncStateView(

@@ -13,6 +13,8 @@ String describeError(Object error, AppLocalizations l10n) {
   return l10n.common_errorLine(data.title, message);
 }
 
+/// Only for failures of user-initiated actions (save, delete, connection test).
+/// List and detail load failures belong in ErrorState, not a duplicate toast.
 void showErrorToast(BuildContext context, Object error, {String? prefix}) {
   final l10n = AppLocalizations.of(context);
   final text = describeError(error, l10n);

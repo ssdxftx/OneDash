@@ -7,6 +7,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/container_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -233,20 +234,24 @@ class _DockerSettingsPageState extends ConsumerState<DockerSettingsPage> {
       appBar: AppBarLarge(
         title: l10n.containers_dockerSettings,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: _load,
-          ),
-          AppIconButton(
-            icon: TablerIcons.key,
-            tooltip: l10n.containers_daemonKeyValue,
-            onPressed: _editDaemonKey,
-          ),
-          AppIconButton(
-            icon: TablerIcons.chart_pie,
-            tooltip: l10n.containers_diskUsage,
-            onPressed: _showStats,
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: _load,
+              ),
+              AppBarAction(
+                icon: TablerIcons.key,
+                tooltip: l10n.containers_daemonKeyValue,
+                onPressed: _editDaemonKey,
+              ),
+              AppBarAction(
+                icon: TablerIcons.chart_pie,
+                tooltip: l10n.containers_diskUsage,
+                onPressed: _showStats,
+              ),
+            ],
           ),
         ],
       ),

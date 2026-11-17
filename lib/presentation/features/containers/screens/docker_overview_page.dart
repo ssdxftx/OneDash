@@ -9,6 +9,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../data/dto/container/container_item_stats_dto.dart';
 import '../../../../data/dto/container/container_status_dto.dart';
 import '../../../../data/dto/container/docker_status_dto.dart';
+import '../../../common/components/status_pill.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/back_to_servers_button.dart';
 import '../../../common/components/server_switcher_sheet.dart';
@@ -178,9 +179,11 @@ class _DockerBody extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppTokens.s8),
-          _StatusPill(
+          StatusPill(
             label: running ? l10n.containers_running : l10n.containers_stopped,
-            color: running ? colors.success : colors.warning,
+            tone: running ? colors.success : colors.warning,
+            showDot: true,
+            dense: true,
           ),
           IconButton(
             tooltip: l10n.containers_dockerSettings,
@@ -490,39 +493,6 @@ class _DiskRow extends StatelessWidget {
                 ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatusPill extends StatelessWidget {
-  const _StatusPill({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTokens.s8,
-        vertical: AppTokens.s4,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppTokens.rFull),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: AppTokens.s4),
-          Text(label, style: AppTextStyles.caption.copyWith(color: color)),
         ],
       ),
     );

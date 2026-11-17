@@ -25,6 +25,7 @@ import '../../../common/states/empty_state.dart';
 
 enum _TerminalStatus { connecting, connected, disconnected, error }
 
+// Terminal uses a console-themed app bar as an intentional immersive exception.
 class TerminalPage extends ConsumerStatefulWidget {
   const TerminalPage({
     super.key,

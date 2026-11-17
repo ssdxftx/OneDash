@@ -12,6 +12,7 @@ import '../../../../data/dto/setting/command_library_dto.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../../data/repositories_impl/setting_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -41,30 +42,34 @@ class CommandLibraryPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.panelSettings_commandLibrary,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_commandsProvider),
-          ),
-          AppIconButton(
-            icon: TablerIcons.sitemap,
-            tooltip: l10n.commandLibrary_tree,
-            onPressed: () => _showTree(context, ref),
-          ),
-          AppIconButton(
-            icon: TablerIcons.file_import,
-            tooltip: l10n.commandLibrary_import,
-            onPressed: () => _import(context, ref),
-          ),
-          AppIconButton(
-            icon: TablerIcons.file_export,
-            tooltip: l10n.commandLibrary_export,
-            onPressed: () => _export(context, ref),
-          ),
-          AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.commandLibrary_add,
-            onPressed: () => _edit(context, ref),
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () => ref.invalidate(_commandsProvider),
+              ),
+              AppBarAction(
+                icon: TablerIcons.sitemap,
+                tooltip: l10n.commandLibrary_tree,
+                onPressed: () => _showTree(context, ref),
+              ),
+              AppBarAction(
+                icon: TablerIcons.file_import,
+                tooltip: l10n.commandLibrary_import,
+                onPressed: () => _import(context, ref),
+              ),
+              AppBarAction(
+                icon: TablerIcons.file_export,
+                tooltip: l10n.commandLibrary_export,
+                onPressed: () => _export(context, ref),
+              ),
+              AppBarAction(
+                icon: TablerIcons.plus,
+                tooltip: l10n.commandLibrary_add,
+                onPressed: () => _edit(context, ref),
+              ),
+            ],
           ),
         ],
       ),

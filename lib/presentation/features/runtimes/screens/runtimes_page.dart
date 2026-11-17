@@ -10,6 +10,7 @@ import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/dto/runtime/runtime_dto.dart';
 import '../../../../data/repositories_impl/runtime_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
@@ -43,31 +44,35 @@ class RuntimesPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.more_runtimes,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_runtimesProvider),
-          ),
-          AppIconButton(
-            icon: TablerIcons.cloud_download,
-            tooltip: l10n.runtimes_sync,
-            onPressed: () async {
-              try {
-                final repository = await ref.read(
-                  runtimeRepositoryProvider.future,
-                );
-                await repository.syncRuntimes();
-                ref.invalidate(_runtimesProvider);
-              } catch (error) {
-                if (!context.mounted) return;
-                showErrorToast(context, error);
-              }
-            },
-          ),
-          AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.runtime_create,
-            onPressed: () => _create(context, ref),
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () => ref.invalidate(_runtimesProvider),
+              ),
+              AppBarAction(
+                icon: TablerIcons.cloud_download,
+                tooltip: l10n.runtimes_sync,
+                onPressed: () async {
+                  try {
+                    final repository = await ref.read(
+                      runtimeRepositoryProvider.future,
+                    );
+                    await repository.syncRuntimes();
+                    ref.invalidate(_runtimesProvider);
+                  } catch (error) {
+                    if (!context.mounted) return;
+                    showErrorToast(context, error);
+                  }
+                },
+              ),
+              AppBarAction(
+                icon: TablerIcons.plus,
+                tooltip: l10n.runtime_create,
+                onPressed: () => _create(context, ref),
+              ),
+            ],
           ),
         ],
       ),

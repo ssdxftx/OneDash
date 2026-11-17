@@ -10,6 +10,7 @@ import '../../../../data/dto/setting/script_library_dto.dart';
 import '../../../../data/repositories_impl/setting_repository_impl.dart';
 import '../../server_detail/providers/active_server_provider.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -39,20 +40,24 @@ class ScriptLibraryPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.panelSettings_scriptLibrary,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_scriptsProvider),
-          ),
-          AppIconButton(
-            icon: TablerIcons.cloud_download,
-            tooltip: l10n.scriptLibrary_sync,
-            onPressed: () => _sync(context, ref),
-          ),
-          AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.scriptLibrary_add,
-            onPressed: () => _edit(context, ref),
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () => ref.invalidate(_scriptsProvider),
+              ),
+              AppBarAction(
+                icon: TablerIcons.cloud_download,
+                tooltip: l10n.scriptLibrary_sync,
+                onPressed: () => _sync(context, ref),
+              ),
+              AppBarAction(
+                icon: TablerIcons.plus,
+                tooltip: l10n.scriptLibrary_add,
+                onPressed: () => _edit(context, ref),
+              ),
+            ],
           ),
         ],
       ),

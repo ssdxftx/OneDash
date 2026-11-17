@@ -11,6 +11,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/backup_account_repository_impl.dart';
 import '../../../../data/repositories_impl/setting_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
@@ -46,20 +47,24 @@ class SnapshotPage extends ConsumerWidget {
       appBar: AppBarLarge(
         title: l10n.panelSettings_snapshots,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () => ref.invalidate(_snapshotsProvider),
-          ),
-          AppIconButton(
-            icon: TablerIcons.upload,
-            tooltip: l10n.panelSettings_importSnapshot,
-            onPressed: () => _import(context, ref),
-          ),
-          AppIconButton(
-            icon: TablerIcons.plus,
-            tooltip: l10n.panelSettings_createSnapshot,
-            onPressed: () => _create(context, ref),
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () => ref.invalidate(_snapshotsProvider),
+              ),
+              AppBarAction(
+                icon: TablerIcons.upload,
+                tooltip: l10n.panelSettings_importSnapshot,
+                onPressed: () => _import(context, ref),
+              ),
+              AppBarAction(
+                icon: TablerIcons.plus,
+                tooltip: l10n.panelSettings_createSnapshot,
+                onPressed: () => _create(context, ref),
+              ),
+            ],
           ),
         ],
       ),

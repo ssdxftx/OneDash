@@ -28,16 +28,16 @@ abstract final class AppToast {
       context: context,
       type: toastType,
       style: ToastificationStyle.flat,
-      alignment: Alignment.topCenter,
+      alignment: Alignment.bottomCenter,
       autoCloseDuration: duration,
       showProgressBar: false,
       margin: EdgeInsets.only(
-        top:
-            MediaQuery.paddingOf(context).top +
-            AppTokens.appBarLargeHeight +
-            AppTokens.s8,
         left: AppTokens.s16,
         right: AppTokens.s16,
+        bottom:
+            MediaQuery.paddingOf(context).bottom +
+            AppTokens.bottomNavClearance +
+            AppTokens.s8,
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: AppTokens.s16,

@@ -26,11 +26,16 @@ class TonalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
+    final fill = color ?? scheme.surfaceContainerLow;
+    final borderColor = Color.alphaBlend(
+      scheme.onSurface.withValues(alpha: AppTokens.cardBorderAlpha),
+      fill,
+    );
     return Material(
-      color: color ?? scheme.surfaceContainerLow,
+      color: fill,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
-        side: BorderSide(color: scheme.outlineVariant),
+        side: BorderSide(color: borderColor),
       ),
       clipBehavior: clipBehavior,
       child: InkWell(

@@ -6299,7 +6299,7 @@ abstract class AppLocalizations {
   /// Empty website template list.
   ///
   /// In en, this message translates to:
-  /// **'No templates yet'**
+  /// **'Save a site configuration as a template and reuse it next time'**
   String get websites_templateEmpty;
 
   /// Website template name.
@@ -11297,7 +11297,7 @@ abstract class AppLocalizations {
   /// Empty state title for website templates.
   ///
   /// In en, this message translates to:
-  /// **'No templates yet'**
+  /// **'No website templates yet'**
   String get websites_templatesEmptyTitle;
 
   /// Empty state title for template outputs.

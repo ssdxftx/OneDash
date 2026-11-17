@@ -25,7 +25,7 @@ import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/app_toast.dart';
-import '../../../common/components/pill_app_bar.dart';
+import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
@@ -476,12 +476,23 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
       _groupId = defaultGroup.id;
     }
     return Scaffold(
-      appBar: PillAppBar(
+      appBar: AppBarLarge(
         title: _title(l10n),
-        onBack: () => context.pop(),
-        actionLabel: l10n.action_create,
-        actionBusy: _creating,
-        onAction: _creating ? null : _create,
+        leading: BackButton(onPressed: () => context.pop()),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: AppTokens.s12),
+            child: TextButton(
+              onPressed: _creating ? null : _create,
+              child: _creating
+                  ? const SizedBox.square(
+                      dimension: AppTokens.iconSmall,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(l10n.action_create),
+            ),
+          ),
+        ],
       ),
       body: ListView(
         padding: EdgeInsets.fromLTRB(

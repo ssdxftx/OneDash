@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
+import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
@@ -450,7 +451,7 @@ class _OpenRestyBuildPageState extends ConsumerState<OpenRestyBuildPage> {
     final l10n = AppLocalizations.of(context);
     if (_loading) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.websites_openRestyBuild)),
+        appBar: AppBarLarge(title: l10n.websites_openRestyBuild),
         body: const Center(child: CircularProgressIndicator()),
       );
     }

@@ -12,6 +12,7 @@ import '../../../shell/nav_visibility.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../data/dto/website/website_dto.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
+import '../../../common/components/status_pill.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/back_to_servers_button.dart';
@@ -1430,11 +1431,11 @@ class _WebsiteCard extends StatelessWidget {
             runSpacing: AppTokens.s8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text(
-                _statusLabel(site.status, l10n),
-                style: AppTextStyles.caption.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
+              StatusPill(
+                label: _statusLabel(site.status, l10n),
+                tone: context.appColors.status(site.status),
+                dense: true,
+                showDot: true,
               ),
               Container(
                 padding: const EdgeInsets.symmetric(

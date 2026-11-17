@@ -20,6 +20,7 @@ import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../../domain/repositories/file_repository.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -196,27 +197,31 @@ class _FileToolsPageState extends ConsumerState<FileToolsPage> {
       appBar: AppBarLarge(
         title: l10n.files_tools,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: () {
-              ref.invalidate(_favoritesProvider);
-              ref.invalidate(_recycleProvider);
-              ref.invalidate(_sharesProvider);
-              ref.invalidate(_wgetProvider);
-              ref.invalidate(_convertLogsProvider);
-              ref.invalidate(_uploadRecordsProvider);
-            },
-          ),
-          AppIconButton(
-            icon: TablerIcons.link,
-            tooltip: l10n.files_openShare,
-            onPressed: _openShare,
-          ),
-          AppIconButton(
-            icon: TablerIcons.server,
-            tooltip: l10n.files_mounts,
-            onPressed: _showMounts,
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: () {
+                  ref.invalidate(_favoritesProvider);
+                  ref.invalidate(_recycleProvider);
+                  ref.invalidate(_sharesProvider);
+                  ref.invalidate(_wgetProvider);
+                  ref.invalidate(_convertLogsProvider);
+                  ref.invalidate(_uploadRecordsProvider);
+                },
+              ),
+              AppBarAction(
+                icon: TablerIcons.link,
+                tooltip: l10n.files_openShare,
+                onPressed: _openShare,
+              ),
+              AppBarAction(
+                icon: TablerIcons.server,
+                tooltip: l10n.files_mounts,
+                onPressed: _showMounts,
+              ),
+            ],
           ),
         ],
       ),

@@ -11,6 +11,7 @@ import '../../../../core/storage/storage_service.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/api/process_api.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/search_field.dart';
 import '../../../common/components/segmented_tabs.dart';
@@ -343,22 +344,26 @@ class _ProcessPageState extends ConsumerState<ProcessPage> {
       appBar: AppBarLarge(
         title: l10n.process_title,
         actions: [
-          AppIconButton(
-            icon: _searching ? TablerIcons.x : TablerIcons.search,
-            tooltip: _searching ? l10n.action_close : l10n.common_search,
-            onPressed: _toggleSearch,
-          ),
-          AppIconButton(
-            icon: _sortAsc
-                ? TablerIcons.sort_ascending
-                : TablerIcons.sort_descending,
-            tooltip: l10n.process_sort,
-            onPressed: _showSort,
-          ),
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: _refresh,
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: _searching ? TablerIcons.x : TablerIcons.search,
+                tooltip: _searching ? l10n.action_close : l10n.common_search,
+                onPressed: _toggleSearch,
+              ),
+              AppBarAction(
+                icon: _sortAsc
+                    ? TablerIcons.sort_ascending
+                    : TablerIcons.sort_descending,
+                tooltip: l10n.process_sort,
+                onPressed: _showSort,
+              ),
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: _refresh,
+              ),
+            ],
           ),
         ],
       ),

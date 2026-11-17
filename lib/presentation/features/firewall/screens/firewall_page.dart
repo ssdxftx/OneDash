@@ -10,6 +10,7 @@ import '../../../../data/dto/firewall/firewall_base_info_dto.dart';
 import '../../../../data/dto/firewall/firewall_v2_dto.dart';
 import '../../../../data/repositories_impl/firewall_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
@@ -195,26 +196,30 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
         title: l10n.firewall_title,
         subtitle: server?.displayName,
         actions: [
-          AppIconButton(
-            icon: TablerIcons.refresh,
-            tooltip: l10n.action_refresh,
-            onPressed: _refresh,
+          AppBarActions(
+            actions: [
+              AppBarAction(
+                icon: TablerIcons.refresh,
+                tooltip: l10n.action_refresh,
+                onPressed: _refresh,
+              ),
+              if (firewall.valueOrNull != null)
+                AppBarAction(
+                  icon: TablerIcons.plug,
+                  tooltip: l10n.firewall_panelPort,
+                  onPressed: () =>
+                      _editPanelPort(firewall.valueOrNull!.settings.panelPort),
+                ),
+              if (_tab == 0 || _tab == 1)
+                AppBarAction(
+                  icon: TablerIcons.plus,
+                  tooltip: _tab == 0
+                      ? l10n.firewall_add_rule
+                      : l10n.firewall_addForward,
+                  onPressed: _openAdd,
+                ),
+            ],
           ),
-          if (firewall.valueOrNull != null)
-            AppIconButton(
-              icon: TablerIcons.plug,
-              tooltip: l10n.firewall_panelPort,
-              onPressed: () =>
-                  _editPanelPort(firewall.valueOrNull!.settings.panelPort),
-            ),
-          if (_tab == 0 || _tab == 1)
-            AppIconButton(
-              icon: TablerIcons.plus,
-              tooltip: _tab == 0
-                  ? l10n.firewall_add_rule
-                  : l10n.firewall_addForward,
-              onPressed: _openAdd,
-            ),
         ],
       ),
       body: NotificationListener<UserScrollNotification>(

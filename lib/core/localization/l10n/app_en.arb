@@ -4429,7 +4429,7 @@
   "@websites_templateEdit": {
     "description": "Edit a website template."
   },
-  "websites_templateEmpty": "No templates yet",
+  "websites_templateEmpty": "Save a site configuration as a template and reuse it next time",
   "@websites_templateEmpty": {
     "description": "Empty website template list."
   },
@@ -7884,7 +7884,7 @@
   "@runtime_modulesEmptyTitle": {
     "description": "Empty state title for Node modules."
   },
-  "websites_templatesEmptyTitle": "No templates yet",
+  "websites_templatesEmptyTitle": "No website templates yet",
   "@websites_templatesEmptyTitle": {
     "description": "Empty state title for website templates."
   },
