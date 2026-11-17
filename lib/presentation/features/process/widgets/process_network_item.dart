@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/theme/tokens.dart';
+import '../../../common/components/status_pill.dart';
 import '../../../common/components/tonal_card.dart';
 import 'process_list_item.dart';
 
@@ -34,10 +35,10 @@ class ProcessNetworkItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              _TypePill(type: type),
+              _NetworkTypeBadge(type: type),
               if (status.isNotEmpty) ...[
                 const SizedBox(width: AppTokens.s8),
-                _StatusPill(status: status),
+                _NetworkStatusBadge(status: status),
               ],
               const Spacer(),
               if (pid > 0)
@@ -118,8 +119,8 @@ class ProcessNetworkItem extends StatelessWidget {
   }
 }
 
-class _TypePill extends StatelessWidget {
-  const _TypePill({required this.type});
+class _NetworkTypeBadge extends StatelessWidget {
+  const _NetworkTypeBadge({required this.type});
 
   final String type;
 
@@ -132,12 +133,12 @@ class _TypePill extends StatelessWidget {
       'udp6' => context.appColors.chart3,
       _ => context.appColors.neutral,
     };
-    return _Pill(label: type, color: color);
+    return StatusPill(label: type, tone: color, dense: true);
   }
 }
 
-class _StatusPill extends StatelessWidget {
-  const _StatusPill({required this.status});
+class _NetworkStatusBadge extends StatelessWidget {
+  const _NetworkStatusBadge({required this.status});
 
   final String status;
 
@@ -150,34 +151,6 @@ class _StatusPill extends StatelessWidget {
       'CLOSE_WAIT' || 'NONE' => context.appColors.danger,
       _ => context.appColors.neutral,
     };
-    return _Pill(label: status, color: color);
-  }
-}
-
-class _Pill extends StatelessWidget {
-  const _Pill({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTokens.s8,
-        vertical: 3,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppTokens.rXs),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.caption.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
+    return StatusPill(label: status, tone: color, dense: true);
   }
 }
