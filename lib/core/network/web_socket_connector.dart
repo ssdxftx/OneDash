@@ -58,7 +58,10 @@ Future<void> checkAppWebSocketAuth(
     }
 
     if (statusCode == 401) {
-      throw AuthException('WebSocket 认证失败', statusCode: statusCode);
+      throw AuthException(
+        'WebSocket authentication failed',
+        statusCode: statusCode,
+      );
     }
     if (statusCode == 404 || statusCode == 405) {
       throw HttpException(
@@ -84,9 +87,7 @@ Future<void> checkAppWebSocketAuth(
       final code = decoded['code'];
       if (code is int && code != 200) {
         final message =
-            decoded['message']?.toString() ??
-            decoded['msg']?.toString() ??
-            'WebSocket 预检失败';
+            decoded['message']?.toString() ?? decoded['msg']?.toString() ?? '';
         throw ApiBusinessException(code, message);
       }
     }

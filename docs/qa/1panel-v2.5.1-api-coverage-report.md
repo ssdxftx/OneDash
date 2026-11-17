@@ -352,3 +352,7 @@ python3 scripts/check_1panel_api_coverage.py --panel-root /tmp/1panel-latest --j
 - `docs/qa/P2.md`
 - `docs/qa/D.md`
 - `docs/qa/ui-review-2026-11-16.md`
+
+## 附录 C：变更记录
+
+- 2026-11-17：新增应用内语言选择，将请求头 `Accept-Language` 与应用语言同步，并把证书名兜底与内部诊断文案移出中文硬编码；API 路径、方法与覆盖率结论不变。

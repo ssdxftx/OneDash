@@ -62,8 +62,8 @@ extension AppLocaleOptionX on AppLocaleOption {
 
   String labelOf(AppLocalizations l10n) => switch (this) {
     AppLocaleOption.system => l10n.common_systemDefault,
-    AppLocaleOption.zh => '简体中文',
-    AppLocaleOption.en => 'English',
+    AppLocaleOption.zh => l10n.settings_appLanguageZh,
+    AppLocaleOption.en => l10n.settings_appLanguageEn,
   };
 
   String widgetLocaleCode(Locale platformLocale) {

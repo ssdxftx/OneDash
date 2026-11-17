@@ -1,6 +1,6 @@
 # OneDash
 
-OneDash is a single-panel, zero-backend Android client for [1Panel](https://github.com/1Panel-dev/1Panel), built with Flutter and a Material 3 design language.
+OneDash is a single-panel, zero-backend Android client for [1Panel](https://github.com/1Panel-dev/1Panel), built with Flutter and a Material 3 design language. The interface is available in Simplified Chinese and English.
 
 > This project is based on the data layer of **Mono-Dash** (GPL-3.0). The whole project is released under **GPL-3.0**. The visual language references **Kazumi** (GPL-3.0); no Kazumi source code is copied.
 

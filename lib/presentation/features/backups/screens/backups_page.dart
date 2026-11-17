@@ -530,7 +530,7 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
         }
         await Future<void>.delayed(const Duration(seconds: 2));
       }
-      throw const TaskFailedException(subject: '备份任务', timedOut: true);
+      throw const TaskFailedException(subject: 'Backup task', timedOut: true);
     },
   );
   if (!success || !context.mounted) return;

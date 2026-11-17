@@ -24,7 +24,7 @@ class WebsiteSslDto {
   bool get isBound => id > 0;
 
   String get displayName {
-    final domain = primaryDomain.isEmpty ? '证书 #$id' : primaryDomain;
+    final domain = primaryDomain.isEmpty ? 'Certificate #$id' : primaryDomain;
     final suffix = provider.isEmpty ? type : provider;
     return suffix.isEmpty ? domain : '$domain · $suffix';
   }

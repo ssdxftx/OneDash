@@ -1,6 +1,8 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../localization/locale_controller.dart';
 import '../storage/storage_service.dart';
 import '../../presentation/features/settings/providers/app_settings_provider.dart';
 import 'dio_client.dart';
@@ -21,6 +23,10 @@ Future<DioClient> dioClient(Ref ref, int serverId) async {
   final apiKey = await storage.getApiKey(serverId) ?? '';
   final session = await storage.getPanelSession(serverId);
   final settings = ref.watch(networkSettingsProvider);
+  final localeOption = ref.watch(localeControllerProvider);
+  final languageCode = localeOption.widgetLocaleCode(
+    WidgetsBinding.instance.platformDispatcher.locale,
+  );
   final userAgent = await DioClient.defaultUserAgent();
 
   final client = DioClient(
@@ -30,6 +36,7 @@ Future<DioClient> dioClient(Ref ref, int serverId) async {
     customHeaders: settings.headers,
     userAgent: userAgent,
     allowInsecureConnections: server.allowInsecureConnections,
+    languageCode: languageCode,
     panelSession: session,
   );
   ref.onDispose(client.dispose);
@@ -48,6 +55,7 @@ Future<DioClient> createProbeClient({
       AppSettingsController.defaultRequestTimeoutSeconds,
   Map<String, String> customHeaders = const {},
   bool allowInsecureConnections = false,
+  String languageCode = 'zh',
 }) async {
   final scheme = isHttps ? 'https' : 'http';
   final userAgent = await DioClient.defaultUserAgent();
@@ -58,5 +66,6 @@ Future<DioClient> createProbeClient({
     customHeaders: customHeaders,
     userAgent: userAgent,
     allowInsecureConnections: allowInsecureConnections,
+    languageCode: languageCode,
   );
 }

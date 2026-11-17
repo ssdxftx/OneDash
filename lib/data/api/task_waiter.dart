@@ -17,7 +17,7 @@ class TaskWaiter {
 
   Future<void> waitFor(
     String taskID, {
-    String subject = '任务',
+    String subject = 'Task',
     void Function(TaskLogDto log)? onUpdate,
   }) async {
     if (taskID.isEmpty) return;

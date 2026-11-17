@@ -117,7 +117,9 @@ class AlertApi {
   Future<AlertConfigInfo> getAlertConfig() async {
     final configs = await getAlertConfigs();
     if (configs.isEmpty) {
-      throw const ApiFormatException('没有可编辑的告警配置');
+      throw const ApiFormatException(
+        'No editable alert configuration was found.',
+      );
     }
     return configs.first;
   }

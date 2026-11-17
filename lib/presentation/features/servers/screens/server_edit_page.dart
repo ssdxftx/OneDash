@@ -302,6 +302,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
         isHttps: _isHttps,
         allowInsecureConnections: _allowInsecure,
         requestTimeoutSeconds: 5,
+        languageCode: l10n.localeName == 'zh' ? 'zh' : 'en',
       );
       final response = await client.get<Map<String, dynamic>>(
         '/api/v2/dashboard/base/os',

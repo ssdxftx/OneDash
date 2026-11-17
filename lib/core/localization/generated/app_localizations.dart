@@ -2426,6 +2426,24 @@ abstract class AppLocalizations {
   /// **'List animations'**
   String get settings_list_animations;
 
+  /// Section title for the app language selector.
+  ///
+  /// In en, this message translates to:
+  /// **'App language'**
+  String get settings_appLanguage;
+
+  /// Simplified Chinese app language option.
+  ///
+  /// In en, this message translates to:
+  /// **'简体中文'**
+  String get settings_appLanguageZh;
+
+  /// English app language option.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get settings_appLanguageEn;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:
@@ -9091,6 +9109,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Apply, upload and delete certificates here. Bind one from the SSL tab.'**
   String get websites_sslManageHint;
+
+  /// Fallback name when a certificate has no primary domain.
+  ///
+  /// In en, this message translates to:
+  /// **'Certificate #{id}'**
+  String websites_sslFallbackName(int id);
 
   /// OneDash UI text.
   ///

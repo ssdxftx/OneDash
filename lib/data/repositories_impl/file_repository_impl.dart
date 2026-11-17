@@ -309,11 +309,12 @@ class FileRepositoryImpl implements FileRepository {
   );
 
   @override
-  Future<void> waitTask(String taskID, {String subject = '文件任务'}) => TaskWaiter(
-    _client,
-    interval: const Duration(seconds: 2),
-    maxAttempts: 300,
-  ).waitFor(taskID, subject: subject);
+  Future<void> waitTask(String taskID, {String subject = 'File task'}) =>
+      TaskWaiter(
+        _client,
+        interval: const Duration(seconds: 2),
+        maxAttempts: 300,
+      ).waitFor(taskID, subject: subject);
 
   static const _maxSingleFileSize = 10 * 1024 * 1024; // 10MB
   static const _chunkSize = 5 * 1024 * 1024; // 5MB

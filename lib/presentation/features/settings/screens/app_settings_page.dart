@@ -4,6 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
+import '../../../../core/localization/locale_controller.dart';
 import '../../../../core/theme/theme_controller.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../common/components/app_bar_large.dart';
@@ -38,6 +39,7 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = ref.watch(themeControllerProvider);
+    final localeOption = ref.watch(localeControllerProvider);
     final settings = ref.watch(appSettingsControllerProvider).valueOrNull;
     final darkActive = Theme.of(context).brightness == Brightness.dark;
     final scrollableThemeTabs =
@@ -176,6 +178,23 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
                     .setListAnimationsEnabled(value),
               ),
             ],
+          ),
+          const SizedBox(height: AppTokens.s24),
+          SectionHeader(title: l10n.settings_appLanguage),
+          TonalCard(
+            child: SegmentedTabs(
+              labels: [
+                l10n.common_systemDefault,
+                l10n.settings_appLanguageZh,
+                l10n.settings_appLanguageEn,
+              ],
+              selectedIndex: localeOption.index,
+              scrollable: scrollableThemeTabs,
+              padding: EdgeInsets.zero,
+              onChanged: (index) => ref
+                  .read(localeControllerProvider.notifier)
+                  .setOption(AppLocaleOption.values[index]),
+            ),
           ),
           const SizedBox(height: AppTokens.s24),
           SectionHeader(title: l10n.settings_security),

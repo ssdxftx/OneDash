@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../core/localization/generated/app_localizations.dart';
+import '../../../data/dto/website/website_ssl_dto.dart';
 
 /// 1Panel 备份账号类型常量，服务端按大写精确匹配。
 const backupAccountTypes = <String>[
@@ -93,6 +94,14 @@ String sslProviderLabel(String raw, AppLocalizations l10n) =>
       'frommaster' => l10n.websites_sslProviderFromMaster,
       _ => _unknown(raw, l10n),
     };
+
+String sslDisplayName(WebsiteSslDto ssl, AppLocalizations l10n) {
+  final domain = ssl.primaryDomain.isEmpty
+      ? l10n.websites_sslFallbackName(ssl.id)
+      : ssl.primaryDomain;
+  final suffix = ssl.provider.isEmpty ? ssl.type : ssl.provider;
+  return suffix.isEmpty ? domain : '$domain · $suffix';
+}
 
 String taskStatusLabel(String raw, AppLocalizations l10n) =>
     switch (raw.toLowerCase()) {

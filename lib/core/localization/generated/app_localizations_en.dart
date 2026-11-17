@@ -1257,6 +1257,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_list_animations => 'List animations';
 
   @override
+  String get settings_appLanguage => 'App language';
+
+  @override
+  String get settings_appLanguageZh => '简体中文';
+
+  @override
+  String get settings_appLanguageEn => 'English';
+
+  @override
   String get settings_about => 'About';
 
   @override
@@ -4756,6 +4765,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get websites_sslManageHint =>
       'Apply, upload and delete certificates here. Bind one from the SSL tab.';
+
+  @override
+  String websites_sslFallbackName(int id) {
+    return 'Certificate #$id';
+  }
 
   @override
   String get websites_uploadSsl => 'Upload certificate';

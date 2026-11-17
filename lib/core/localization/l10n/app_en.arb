@@ -1711,6 +1711,18 @@
   "@settings_list_animations": {
     "description": "OneDash UI string"
   },
+  "settings_appLanguage": "App language",
+  "@settings_appLanguage": {
+    "description": "Section title for the app language selector."
+  },
+  "settings_appLanguageZh": "简体中文",
+  "@settings_appLanguageZh": {
+    "description": "Simplified Chinese app language option."
+  },
+  "settings_appLanguageEn": "English",
+  "@settings_appLanguageEn": {
+    "description": "English app language option."
+  },
   "settings_about": "About",
   "@settings_about": {
     "description": "OneDash UI string"
@@ -6347,6 +6359,15 @@
   "websites_sslManageHint": "Apply, upload and delete certificates here. Bind one from the SSL tab.",
   "@websites_sslManageHint": {
     "description": "OneDash UI text."
+  },
+  "websites_sslFallbackName": "Certificate #{id}",
+  "@websites_sslFallbackName": {
+    "description": "Fallback name when a certificate has no primary domain.",
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
   },
   "websites_uploadSsl": "Upload certificate",
   "@websites_uploadSsl": {

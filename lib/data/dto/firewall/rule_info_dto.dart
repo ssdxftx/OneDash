@@ -99,7 +99,7 @@ class RuleInfoDto {
 
   String get displayAddress {
     if (address == null || address!.isEmpty || address == 'Anywhere') {
-      return '所有地址';
+      return 'Anywhere';
     }
     return address!;
   }

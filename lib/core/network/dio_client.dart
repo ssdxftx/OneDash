@@ -26,6 +26,7 @@ class DioClient {
     Map<String, String> customHeaders = const {},
     required String userAgent,
     this.allowInsecureConnections = false,
+    this.languageCode = 'zh',
     PanelSession? panelSession,
   }) : _dio = Dio(
          _baseOptions(
@@ -33,6 +34,7 @@ class DioClient {
            requestTimeout: requestTimeout,
            customHeaders: customHeaders,
            userAgent: userAgent,
+           languageCode: languageCode,
          ),
        ),
        _auth = AuthInterceptor(apiKey, panelSession) {
@@ -61,6 +63,7 @@ class DioClient {
   final Dio _dio;
   final AuthInterceptor _auth;
   final bool allowInsecureConnections;
+  final String languageCode;
 
   Dio get raw => _dio;
 
@@ -206,6 +209,7 @@ class DioClient {
     required Duration requestTimeout,
     required Map<String, String> customHeaders,
     required String userAgent,
+    required String languageCode,
   }) {
     // 规范做法一：底层仅保留到根目录，由 API 业务层拼版本号
     String normalizedUrl = baseUrl;
@@ -220,7 +224,7 @@ class DioClient {
           : _maxConnectTimeout,
       sendTimeout: requestTimeout,
       receiveTimeout: requestTimeout,
-      headers: _headers(customHeaders, userAgent),
+      headers: _headers(customHeaders, userAgent, languageCode),
       responseType: ResponseType.json,
       validateStatus: (status) =>
           status != null && status >= 200 && status < 300,
@@ -232,11 +236,12 @@ class DioClient {
   static Map<String, String> _headers(
     Map<String, String> customHeaders,
     String userAgent,
+    String languageCode,
   ) {
     final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Accept-Language': 'zh',
+      'Accept-Language': languageCode,
     };
 
     for (final entry in customHeaders.entries) {
@@ -272,28 +277,29 @@ class DioClient {
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.transformTimeout:
-        return NetworkConnectionException('网络连接失败: $msg');
+        return NetworkConnectionException('Network connection failed: $msg');
       case DioExceptionType.badCertificate:
         return NetworkConnectionException(
-          '证书不受信任，连接已阻止。'
-          '如果这是你信任的自签名证书，可在设置中启用“允许不安全连接”。\n$msg',
+          'The certificate is not trusted, so the connection was blocked. '
+          'Enable insecure connections in server settings if you trust this '
+          'self-signed certificate.\n$msg',
         );
       case DioExceptionType.cancel:
-        return const NetworkConnectionException('请求已取消');
+        return const NetworkConnectionException('Request cancelled');
       case DioExceptionType.badResponse:
       case DioExceptionType.unknown:
         break;
     }
 
     if (status == 401) {
-      return AuthException('认证失败', statusCode: status);
+      return AuthException('Authentication failed', statusCode: status);
     }
     if (status != null && status >= 500) {
-      return ServerException('服务器错误: $msg', statusCode: status);
+      return ServerException('Server error: $msg', statusCode: status);
     }
     if (status != null && status >= 400) {
-      return HttpException('HTTP 错误: $msg', statusCode: status);
+      return HttpException('HTTP error: $msg', statusCode: status);
     }
-    return HttpException('请求失败: $msg', statusCode: status);
+    return HttpException('Request failed: $msg', statusCode: status);
   }
 }

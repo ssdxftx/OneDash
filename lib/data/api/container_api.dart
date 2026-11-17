@@ -405,7 +405,7 @@ class ContainerApi {
       _client,
       interval: const Duration(seconds: 2),
       maxAttempts: 300,
-    ).waitFor(taskID, subject: '容器任务', onUpdate: onUpdate);
+    ).waitFor(taskID, subject: 'Container task', onUpdate: onUpdate);
   }
 
   /// 更新容器。

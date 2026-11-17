@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onedash/core/localization/generated/app_localizations_en.dart';
+import 'package:onedash/data/dto/website/website_ssl_dto.dart';
 import 'package:onedash/presentation/common/formatters/enum_labels.dart';
 
 void main() {
@@ -36,6 +37,20 @@ void main() {
       expect(sslProviderLabel('custom', l10n), 'Unknown');
     },
   );
+
+  test('SSL display names fall back to a localized certificate label', () {
+    const ssl = WebsiteSslDto(
+      id: 7,
+      primaryDomain: '',
+      provider: '',
+      type: '',
+      status: '',
+      expireDate: '',
+      acmeAccountId: 0,
+    );
+
+    expect(sslDisplayName(ssl, l10n), 'Certificate #7');
+  });
 
   test('backup account types are localized', () {
     expect(backupAccountTypeLabel('LOCAL', l10n), 'Local');

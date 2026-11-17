@@ -9,7 +9,7 @@ class WebsiteAcmeAccountDto {
 
   const WebsiteAcmeAccountDto.manual()
     : id = 0,
-      email = '手动创建',
+      email = 'Manual',
       type = 'manual',
       url = '',
       useProxy = false;

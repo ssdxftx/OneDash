@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../localization/generated/app_localizations.dart';
 import '../storage/storage_service.dart';
 
 enum AppThemeMode {
@@ -147,11 +148,11 @@ class ThemeController extends Notifier<ThemeSettings> {
 
 extension AppThemeModeX on AppThemeMode {
   String label(BuildContext context) {
-    final l10n = MaterialLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
     return switch (this) {
-      AppThemeMode.system => l10n.okButtonLabel == 'OK' ? 'System' : '跟随系统',
-      AppThemeMode.light => l10n.okButtonLabel == 'OK' ? 'Light' : '浅色',
-      AppThemeMode.dark => l10n.okButtonLabel == 'OK' ? 'Dark' : '深色',
+      AppThemeMode.system => l10n.common_systemDefault,
+      AppThemeMode.light => l10n.settings_appearance_modeLight,
+      AppThemeMode.dark => l10n.settings_appearance_modeDark,
     };
   }
 }

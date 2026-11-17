@@ -886,7 +886,9 @@ class WebsiteApi {
     final id = ApiResponseParser.map(resp)['id'];
     final parsed = id is num ? id.toInt() : int.tryParse('$id');
     if (parsed == null || parsed <= 0) {
-      throw const ApiFormatException('创建证书响应缺少 id');
+      throw const ApiFormatException(
+        'The certificate response is missing an id.',
+      );
     }
     return parsed;
   }

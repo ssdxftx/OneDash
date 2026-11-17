@@ -60,7 +60,7 @@ class VncClient {
 
   Future<void> _handshake() async {
     if (!await _iterator.moveNext()) {
-      throw VncException('VNC 连接已关闭');
+      throw VncException('VNC connection closed');
     }
     _buffer.addAll((_iterator.current as List).cast<int>());
     final version = String.fromCharCodes(await _read(12));
@@ -73,7 +73,9 @@ class VncClient {
     }
     final types = await _read(count);
     if (!types.contains(1)) {
-      throw VncException('VNC 服务端要求不支持的认证方式');
+      throw VncException(
+        'VNC server requested an unsupported authentication method',
+      );
     }
     _writeByte(1);
     final result = _uint32(await _read(4), 0);
@@ -128,7 +130,7 @@ class VncClient {
             final length = _uint32(header, 3);
             if (length > 0) await _read(length);
           default:
-            throw VncException('未知的 VNC 消息类型：$type');
+            throw VncException('Unknown VNC message type: $type');
         }
       }
     } catch (error) {
@@ -158,7 +160,7 @@ class VncClient {
       } else if (encoding == -224) {
         break;
       } else {
-        throw VncException('不支持的 VNC 编码：$encoding');
+        throw VncException('Unsupported VNC encoding: $encoding');
       }
     }
     await _emitFrame();
@@ -169,7 +171,7 @@ class VncClient {
 
   void _blitRaw(int x, int y, int w, int h, Uint8List bytes) {
     if (_bpp != 16 && _bpp != 32) {
-      throw VncException('不支持的像素位宽：$_bpp');
+      throw VncException('Unsupported pixel depth: $_bpp');
     }
     final data = ByteData.sublistView(bytes);
     final bytesPerPixel = _bpp ~/ 8;
@@ -278,7 +280,7 @@ class VncClient {
   Future<Uint8List> _read(int count) async {
     while (_buffer.length < count) {
       if (!await _iterator.moveNext()) {
-        throw VncException('VNC 连接已断开');
+        throw VncException('VNC connection dropped');
       }
       _buffer.addAll((_iterator.current as List).cast<int>());
     }
@@ -296,11 +298,11 @@ class VncClient {
 
   static String _negotiateVersion(String peer) {
     final match = RegExp(r'RFB (\d{3})\.(\d{3})').firstMatch(peer);
-    if (match == null) throw VncException('无效的 VNC 协议版本');
+    if (match == null) throw VncException('Invalid VNC protocol version');
     final major = int.tryParse(match.group(1) ?? '') ?? 0;
     final minor = int.tryParse(match.group(2) ?? '') ?? 0;
     if (major < 3 || (major == 3 && minor < 8)) {
-      throw VncException('VNC 服务端版本过低，需要 RFB 3.8');
+      throw VncException('VNC server is too old; RFB 3.8 is required');
     }
     return 'RFB 003.008\n';
   }

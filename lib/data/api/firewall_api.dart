@@ -364,7 +364,7 @@ class FirewallApi {
       _client,
       interval: const Duration(seconds: 2),
       maxAttempts: 300,
-    ).waitFor(task.taskID, subject: '防火墙任务');
+    ).waitFor(task.taskID, subject: 'Firewall task');
   }
 
   static Map<String, dynamic> _fileMap(Map<dynamic, dynamic> file) =>
@@ -409,7 +409,10 @@ class FirewallApi {
             },
         ];
       default:
-        throw ApiBusinessException(400, '不支持的防火墙后端 $provider');
+        throw ApiBusinessException(
+          400,
+          'Unsupported firewall backend: $provider',
+        );
     }
   }
 
@@ -439,6 +442,6 @@ class FirewallApi {
         'direction': 'input',
       };
     }
-    throw ApiBusinessException(400, '不支持的防火墙后端 $provider');
+    throw ApiBusinessException(400, 'Unsupported firewall backend: $provider');
   }
 }

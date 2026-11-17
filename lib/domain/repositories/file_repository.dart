@@ -143,7 +143,7 @@ abstract class FileRepository {
   Future<Uint8List> chunkDownload({required String path, required String name});
 
   /// 等待 1Panel 后台任务结束。
-  Future<void> waitTask(String taskID, {String subject = '文件任务'});
+  Future<void> waitTask(String taskID, {String subject = 'File task'});
 
   /// 压缩文件。
   Future<void> compressFiles({

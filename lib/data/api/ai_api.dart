@@ -1173,7 +1173,7 @@ class AiApi {
         _client,
         interval: const Duration(seconds: 2),
         maxAttempts: 300,
-      ).waitFor(taskID, subject: 'AI 任务');
+      ).waitFor(taskID, subject: 'AI task');
     }
   }
 }

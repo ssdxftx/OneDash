@@ -15,6 +15,13 @@ void main() {
     expect(text, isNot(contains('Exception')));
   });
 
+  test('empty business messages fall back to a localized error', () {
+    final text = describeError(const ApiBusinessException(400, ''), l10n);
+
+    expect(text, contains('Operation failed'));
+    expect(text, isNot(contains('请求处理失败')));
+  });
+
   test('unknown errors never leak object details', () {
     final text = describeError(StateError('internal stack trace marker'), l10n);
 

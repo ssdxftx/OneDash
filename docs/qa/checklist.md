@@ -15,7 +15,7 @@ Run after installing the release APK on a real device (spec 13.4).
 | 9 | Airplane mode: offline banner + snapshot data + writes disabled | pending |
 | 10 | TalkBack: add server -> overview is understandable | pending |
 | 11 | OLED black theme: cards, sheets, skeleton and terminal remain distinguishable | pending |
-| 12 | English locale: website detail, backups, server edit, files and terminal show no Chinese fallback | pending |
+| 12 | Settings -> App language -> English: all pages, including website detail, backups, server edit, files and terminal, switch immediately with no Chinese fallback | pending |
 | 13 | Offline or bad API key: every page shows the error state with a working retry button, never a blank screen | pending |
 | 14 | Settings: switch all 8 accents and confirm primary buttons, selected tabs and rings change | pending |
 | 15 | Panel settings: grouped labels, edit default address/theme/language/session timeout, no raw JSON keys | pending |

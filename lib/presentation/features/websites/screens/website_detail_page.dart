@@ -1072,7 +1072,7 @@ class _SslTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(ssl.displayName, style: AppTextStyles.titleM),
+              Text(sslDisplayName(ssl, l10n), style: AppTextStyles.titleM),
               const SizedBox(height: AppTokens.s8),
               Row(
                 children: [

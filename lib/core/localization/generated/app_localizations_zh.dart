@@ -1231,6 +1231,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_list_animations => '列表动画';
 
   @override
+  String get settings_appLanguage => '应用语言';
+
+  @override
+  String get settings_appLanguageZh => '简体中文';
+
+  @override
+  String get settings_appLanguageEn => 'English';
+
+  @override
   String get settings_about => '关于';
 
   @override
@@ -4644,6 +4653,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get websites_sslManageHint => '在这里申请、上传和删除证书，在 SSL 页签绑定。';
+
+  @override
+  String websites_sslFallbackName(int id) {
+    return '证书 #$id';
+  }
 
   @override
   String get websites_uploadSsl => '上传证书';

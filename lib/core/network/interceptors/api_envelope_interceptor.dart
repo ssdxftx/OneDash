@@ -48,7 +48,7 @@ class ApiEnvelopeInterceptor extends Interceptor {
   String _messageOf(Map<dynamic, dynamic> payload) {
     final message = payload['message'] ?? payload['msg'];
     final text = message?.toString().trim();
-    return text == null || text.isEmpty ? '请求处理失败' : text;
+    return text ?? '';
   }
 }
 

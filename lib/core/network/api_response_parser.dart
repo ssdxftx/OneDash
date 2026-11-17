@@ -16,7 +16,7 @@ class ApiResponseParser {
   ) {
     final data = _extractData(response);
     if (data is! Map<String, dynamic>) {
-      throw const ApiFormatException('data 字段不是对象');
+      throw const ApiFormatException('The data field is not an object.');
     }
     return fromJson(data);
   }
@@ -29,7 +29,7 @@ class ApiResponseParser {
     final data = _extractData(response);
     if (data == null) return const [];
     if (data is! List) {
-      throw const ApiFormatException('data 字段不是数组');
+      throw const ApiFormatException('The data field is not an array.');
     }
     return data
         .whereType<Map<String, dynamic>>()
@@ -41,7 +41,7 @@ class ApiResponseParser {
   static List<T> primitiveList<T>(Response<dynamic> response) {
     final data = _extractData(response);
     if (data is! List) {
-      throw const ApiFormatException('data 字段不是数组');
+      throw const ApiFormatException('The data field is not an array.');
     }
     return data.whereType<T>().toList(growable: false);
   }
@@ -50,7 +50,9 @@ class ApiResponseParser {
   static T primitive<T>(Response<dynamic> response) {
     final data = _extractData(response);
     if (data is! T) {
-      throw ApiFormatException('data 字段类型不匹配，期望 $T');
+      throw ApiFormatException(
+        'The data field type does not match the expected $T.',
+      );
     }
     return data;
   }
@@ -59,7 +61,7 @@ class ApiResponseParser {
   static Map<String, dynamic> map(Response<dynamic> response) {
     final data = _extractData(response);
     if (data is Map<String, dynamic>) return data;
-    throw const ApiFormatException('data 字段不是对象');
+    throw const ApiFormatException('The data field is not an object.');
   }
 
   /// 纯"成功/失败"语义，不关心 data 内容。
@@ -70,10 +72,10 @@ class ApiResponseParser {
   static dynamic _extractData(Response<dynamic> response) {
     final body = response.data;
     if (body is! Map) {
-      throw const ApiFormatException('响应体不是 JSON 对象');
+      throw const ApiFormatException('The response body is not a JSON object.');
     }
     if (!body.containsKey('data')) {
-      throw const ApiFormatException('响应缺少 data 字段');
+      throw const ApiFormatException('The response is missing the data field.');
     }
     return body['data'];
   }
