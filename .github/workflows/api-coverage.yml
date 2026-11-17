@@ -1,0 +1,26 @@
+name: api-coverage
+
+on:
+  pull_request:
+    paths:
+      - 'lib/data/api/**'
+      - 'lib/domain/repositories/**'
+      - 'scripts/check_1panel_api_coverage.py'
+      - '.github/workflows/api-coverage.yml'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone 1Panel v2.5.1
+        run: |
+          git clone --depth 1 --branch v2.5.1 \
+            https://github.com/1Panel-dev/1Panel.git /tmp/1panel-latest
+
+      - name: Check API coverage
+        run: |
+          python3 scripts/check_1panel_api_coverage.py \
+            --panel-root /tmp/1panel-latest

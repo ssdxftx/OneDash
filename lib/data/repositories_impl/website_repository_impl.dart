@@ -632,6 +632,10 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
   );
 
   @override
+  Future<void> importMasterSsl(Map<String, dynamic> data) =>
+      _websiteApi.importMasterSsl(data);
+
+  @override
   Future<Response<dynamic>> downloadSsl(int id) => _websiteApi.downloadSsl(id);
 
   // ===========================================================================

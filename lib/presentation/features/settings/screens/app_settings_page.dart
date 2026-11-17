@@ -39,6 +39,10 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
     final l10n = AppLocalizations.of(context);
     final theme = ref.watch(themeControllerProvider);
     final settings = ref.watch(appSettingsControllerProvider).valueOrNull;
+    final darkActive = Theme.of(context).brightness == Brightness.dark;
+    final scrollableThemeTabs =
+        MediaQuery.sizeOf(context).width < 360 ||
+        MediaQuery.textScalerOf(context).scale(1) > 1.2;
 
     return Scaffold(
       appBar: AppBarLarge(title: l10n.settings_title),
@@ -64,13 +68,30 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
                     l10n.settings_appearance_modeDark,
                   ],
                   selectedIndex: theme.mode.index,
-                  scrollable: false,
+                  scrollable: scrollableThemeTabs,
+                  padding: EdgeInsets.zero,
                   onChanged: (index) => ref
                       .read(themeControllerProvider.notifier)
                       .setMode(AppThemeMode.values[index]),
                 ),
                 const SizedBox(height: AppTokens.s20),
-                Text(l10n.settings_accent, style: AppTextStyles.bodyM),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.settings_accent,
+                        style: AppTextStyles.bodyM,
+                      ),
+                    ),
+                    Text(
+                      _accentLabel(l10n, theme.accent),
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: context.scheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: AppTokens.s8),
                 Wrap(
                   spacing: AppTokens.s12,
@@ -79,6 +100,7 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
                     for (final preset in AccentPreset.values)
                       _AccentSwatch(
                         color: preset.color,
+                        label: _accentLabel(l10n, preset),
                         selected: theme.accent == preset,
                         onTap: () => ref
                             .read(themeControllerProvider.notifier)
@@ -104,9 +126,18 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(l10n.settings_oled),
+                  subtitle: Text(
+                    l10n.settings_oled_hint,
+                    style: AppTextStyles.bodyS.copyWith(
+                      color: context.scheme.onSurfaceVariant,
+                    ),
+                  ),
                   value: theme.oled,
-                  onChanged: (value) =>
-                      ref.read(themeControllerProvider.notifier).setOled(value),
+                  onChanged: darkActive
+                      ? (value) => ref
+                            .read(themeControllerProvider.notifier)
+                            .setOled(value)
+                      : null,
                 ),
                 const SizedBox(height: AppTokens.s8),
                 Text(
@@ -191,14 +222,29 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
   }
 }
 
+String _accentLabel(AppLocalizations l10n, AccentPreset preset) {
+  return switch (preset) {
+    AccentPreset.forest => l10n.settings_accent_forest,
+    AccentPreset.ocean => l10n.settings_accent_ocean,
+    AccentPreset.indigo => l10n.settings_accent_indigo,
+    AccentPreset.violet => l10n.settings_accent_violet,
+    AccentPreset.rose => l10n.settings_accent_rose,
+    AccentPreset.amber => l10n.settings_accent_amber,
+    AccentPreset.teal => l10n.settings_accent_teal,
+    AccentPreset.graphite => l10n.settings_accent_graphite,
+  };
+}
+
 class _AccentSwatch extends StatelessWidget {
   const _AccentSwatch({
     required this.color,
+    required this.label,
     required this.selected,
     required this.onTap,
   });
 
   final Color color;
+  final String label;
   final bool selected;
   final VoidCallback onTap;
 
@@ -208,27 +254,37 @@ class _AccentSwatch extends StatelessWidget {
         ThemeData.estimateBrightnessForColor(color) == Brightness.dark
         ? Colors.white
         : Colors.black;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppTokens.rFull),
-      child: SizedBox(
-        width: AppTokens.minTapTarget,
-        height: AppTokens.minTapTarget,
-        child: Center(
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: selected ? context.scheme.onSurface : Colors.transparent,
-                width: 2,
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppTokens.rFull),
+          child: SizedBox(
+            width: AppTokens.minTapTarget,
+            height: AppTokens.minTapTarget,
+            child: Center(
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected
+                        ? context.scheme.onSurface
+                        : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+                child: selected
+                    ? Icon(TablerIcons.check, size: 20, color: checkColor)
+                    : null,
               ),
             ),
-            child: selected
-                ? Icon(TablerIcons.check, size: 20, color: checkColor)
-                : null,
           ),
         ),
       ),

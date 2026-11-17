@@ -16,6 +16,7 @@ import '../dto/setting/api_key_dto.dart';
 import '../dto/setting/script_library_dto.dart';
 import '../dto/setting/command_library_dto.dart';
 import '../dto/setting/group_dto.dart';
+import '../dto/setting/passkey_dto.dart';
 
 part 'setting_repository_impl.g.dart';
 
@@ -232,6 +233,10 @@ class SettingRepositoryImpl implements SettingRepository {
   Future<void> resetMenuSetting() => _settingApi.resetMenuSetting();
 
   @override
+  Future<void> updateMenuSetting(String value) =>
+      _settingApi.updateMenuSetting(value);
+
+  @override
   Future<Map<String, dynamic>> getUpgradeInfo() => _settingApi.getUpgradeInfo();
 
   @override
@@ -327,6 +332,12 @@ class SettingRepositoryImpl implements SettingRepository {
       _settingApi.searchCommandTree(type: type);
 
   @override
+  Future<List<Map<String, dynamic>>> uploadCommandCsv({
+    required Uint8List bytes,
+    required String filename,
+  }) => _settingApi.uploadCommandCsv(bytes: bytes, filename: filename);
+
+  @override
   Future<void> importCommands(List<Map<String, dynamic>> items) =>
       _settingApi.importCommands(items);
 
@@ -411,6 +422,34 @@ class SettingRepositoryImpl implements SettingRepository {
     required String code,
     required int interval,
   }) => _settingApi.bindMFA(secret: secret, code: code, interval: interval);
+
+  @override
+  Future<PasskeyChallenge> passkeyBeginLogin({String entrance = ''}) =>
+      _settingApi.passkeyBeginLogin(entrance: entrance);
+
+  @override
+  Future<PanelLoginResult> passkeyFinishLogin({
+    required Map<String, dynamic> payload,
+    required String sessionId,
+    String entrance = '',
+  }) => _settingApi.passkeyFinishLogin(
+    payload: payload,
+    sessionId: sessionId,
+    entrance: entrance,
+  );
+
+  @override
+  Future<PasskeyChallenge> passkeyBeginRegister(String name) =>
+      _settingApi.passkeyBeginRegister(name);
+
+  @override
+  Future<void> passkeyFinishRegister({
+    required Map<String, dynamic> payload,
+    required String sessionId,
+  }) => _settingApi.passkeyFinishRegister(
+    payload: payload,
+    sessionId: sessionId,
+  );
 
   @override
   Future<List<Map<String, dynamic>>> listPasskeys() =>

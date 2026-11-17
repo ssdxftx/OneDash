@@ -90,7 +90,7 @@ class _ServerSwitcherBody extends ConsumerWidget {
                         if (server.id != currentServerId) {
                           ref.read(activeServerIdStateProvider.notifier).state =
                               server.id;
-                          router.go('/s/${server.id}/overview');
+                          router.pushReplacement('/s/${server.id}/overview');
                         }
                       },
                     ),

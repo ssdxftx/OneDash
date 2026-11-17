@@ -203,6 +203,10 @@ class BackupAccountsPage extends ConsumerWidget {
         localDir = null;
       }
     }
+    if (type == 'OneDrive' && vars.text.trim().isEmpty) {
+      final defaults = await _oneDriveVars(ref);
+      if (defaults != null) vars.text = defaults;
+    }
     if (!context.mounted) return;
     final saved = await pushFormPage<bool>(
       context,
@@ -236,7 +240,14 @@ class BackupAccountsPage extends ConsumerWidget {
                     ),
                 ],
                 onChanged: (value) {
-                  if (value != null) setState(() => type = value);
+                  if (value == null) return;
+                  setState(() => type = value);
+                  if (value == 'OneDrive' && vars.text.trim().isEmpty) {
+                    _oneDriveVars(ref).then((text) {
+                      if (text == null || !pageContext.mounted) return;
+                      setState(() => vars.text = text);
+                    });
+                  }
                 },
               ),
             if (isLocalAccount && localDir != null) ...[
@@ -375,6 +386,21 @@ class BackupAccountsPage extends ConsumerWidget {
   };
 
   static String _encode(String value) => base64Encode(utf8.encode(value));
+
+  Future<String?> _oneDriveVars(WidgetRef ref) async {
+    try {
+      final repository = await ref.read(backupAccountRepositoryProvider.future);
+      final info = await repository.getClientInfo('Onedrive');
+      return const JsonEncoder.withIndent('  ').convert({
+        'isCN': false,
+        'client_id': info['client_id'] ?? '',
+        'client_secret': info['client_secret'] ?? '',
+        'redirect_uri': info['redirect_uri'] ?? '',
+      });
+    } catch (_) {
+      return null;
+    }
+  }
 
   Future<void> _buckets(
     BuildContext context,

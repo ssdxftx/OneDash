@@ -294,11 +294,30 @@ class _VmResourcesSheetState extends ConsumerState<_VmResourcesSheet> {
 
   Future<void> _addNetwork() async {
     final l10n = AppLocalizations.of(context);
+    List<Map<String, dynamic>> bridges = const [];
+    try {
+      final repository = await ref.read(vmRepositoryProvider.future);
+      bridges = await repository.listNetworkBridges();
+    } catch (_) {
+      bridges = const [];
+    }
+    if (!mounted) return;
+    final bridgeNames = bridges
+        .map((item) => '${item['name'] ?? ''}')
+        .where((name) => name.isNotEmpty)
+        .toList(growable: false);
+    final recommendedBridge = bridges
+        .where((item) => item['recommended'] == true)
+        .map((item) => '${item['name'] ?? ''}')
+        .where((name) => name.isNotEmpty)
+        .firstOrNull;
     final name = TextEditingController();
     final cidr = TextEditingController();
     final gateway = TextEditingController();
     final source = TextEditingController();
     var type = 'nat';
+    var bridgeName =
+        recommendedBridge ?? (bridgeNames.isEmpty ? '' : bridgeNames.first);
     var autoStart = true;
     final saved = await _showForm(
       title: l10n.vm_networks,
@@ -321,6 +340,28 @@ class _VmResourcesSheetState extends ConsumerState<_VmResourcesSheet> {
         AppTextField(controller: cidr, label: l10n.vm_cidr),
         const SizedBox(height: AppTokens.s12),
         AppTextField(controller: gateway, label: l10n.vm_gateway),
+        if (type == 'bridge') ...[
+          const SizedBox(height: AppTokens.s12),
+          if (bridgeNames.isEmpty)
+            Text(
+              l10n.vm_noBridges,
+              style: AppTextStyles.bodyS.copyWith(color: context.scheme.error),
+            )
+          else
+            DropdownButtonFormField<String>(
+              initialValue: bridgeNames.contains(bridgeName)
+                  ? bridgeName
+                  : null,
+              decoration: InputDecoration(labelText: l10n.vm_bridgeName),
+              items: [
+                for (final item in bridgeNames)
+                  DropdownMenuItem(value: item, child: Text(item)),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => bridgeName = value);
+              },
+            ),
+        ],
         if (type == 'macvtap') ...[
           const SizedBox(height: AppTokens.s12),
           AppTextField(controller: source, label: l10n.vm_sourceInterface),
@@ -338,6 +379,7 @@ class _VmResourcesSheetState extends ConsumerState<_VmResourcesSheet> {
       'type': type,
       'cidr': cidr.text.trim(),
       'gateway': gateway.text.trim(),
+      if (type == 'bridge') 'bridgeName': bridgeName,
       'sourceInterface': source.text.trim(),
       'autoStart': autoStart,
     };

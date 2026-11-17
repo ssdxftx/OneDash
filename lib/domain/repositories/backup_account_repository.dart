@@ -21,5 +21,6 @@ abstract interface class BackupAccountRepository {
     required String name,
     required bool isPublic,
   });
+  Future<Map<String, dynamic>> getClientInfo(String clientType);
   Future<String> getLocalDir();
 }

@@ -32,6 +32,7 @@ class _RecordingAdapter implements HttpClientAdapter {
   final List<String> paths = [];
   final List<String> methods = [];
   final List<Map<String, dynamic>> bodies = [];
+  final List<RequestOptions> requests = [];
   Object? responseData;
 
   @override
@@ -42,6 +43,7 @@ class _RecordingAdapter implements HttpClientAdapter {
   ) async {
     paths.add(options.path);
     methods.add(options.method);
+    requests.add(options);
     final data = options.data;
     bodies.add(data is Map ? Map<String, dynamic>.from(data) : {});
     return ResponseBody.fromString(
@@ -2033,5 +2035,142 @@ void main() {
     ]);
     expect(adapter.bodies[3]['passwd'], base64Encode(utf8.encode('secret')));
     expect(adapter.bodies[6]['removeInfected'], isTrue);
+  });
+
+  test('container volume create sends driver options and labels', () async {
+    final api = ContainerApi(client);
+    adapter.responseData = null;
+    await api.createVolume(
+      name: 'app_data',
+      driver: 'local',
+      options: const ['type=tmpfs'],
+      labels: const ['env=test'],
+    );
+    expect(adapter.paths.single, '/api/v2/containers/volume');
+    expect(adapter.methods.single, 'POST');
+    expect(adapter.bodies.single, {
+      'name': 'app_data',
+      'driver': 'local',
+      'options': ['type=tmpfs'],
+      'labels': ['env=test'],
+    });
+  });
+
+  test('panel menu update sends HideMenu payload', () async {
+    final api = SettingApi(client);
+    adapter.responseData = null;
+    await api.updateMenuSetting('[{"id":"Home-Menu","isShow":true}]');
+    expect(adapter.paths.single, '/api/v2/core/settings/menu/update');
+    expect(adapter.bodies.single['key'], 'HideMenu');
+    expect(
+      adapter.bodies.single['value'],
+      '[{"id":"Home-Menu","isShow":true}]',
+    );
+  });
+
+  test('command csv upload posts the file field', () async {
+    final api = SettingApi(client);
+    adapter.responseData = <Map<String, dynamic>>[
+      {'name': 'uptime', 'command': 'uptime'},
+    ];
+    final items = await api.uploadCommandCsv(
+      bytes: Uint8List.fromList([117, 112]),
+      filename: 'commands.csv',
+    );
+    expect(items.single['name'], 'uptime');
+    expect(adapter.paths.single, '/api/v2/core/commands/upload');
+    expect(adapter.methods.single, 'POST');
+  });
+
+  test('master SSL import uses the websites SSL import route', () async {
+    final api = WebsiteApi(client);
+    adapter.responseData = null;
+    await api.importMasterSsl({
+      'primaryDomain': 'example.com',
+      'pem': 'cert',
+      'privateKey': 'key',
+      'type': 'upload',
+      'keyType': 'EC256',
+    });
+    expect(adapter.paths.single, '/api/v2/websites/ssl/import');
+    expect(adapter.bodies.single['primaryDomain'], 'example.com');
+    expect(adapter.bodies.single['pem'], 'cert');
+  });
+
+  test('backup client info uses the client type path', () async {
+    final api = BackupApi(client);
+    adapter.responseData = <String, dynamic>{
+      'client_id': 'client',
+      'client_secret': 'secret',
+      'redirect_uri': 'https://example.com/callback',
+    };
+    final info = await api.getClientInfo('Onedrive');
+    expect(adapter.paths.single, '/api/v2/core/backups/client/Onedrive');
+    expect(info['client_id'], 'client');
+  });
+
+  test('passkey login begin and finish use session header', () async {
+    final api = SettingApi(client);
+    adapter.responseData = <String, dynamic>{
+      'sessionId': 'passkey-session',
+      'publicKey': {'challenge': 'abc', 'rpId': 'panel.example.com'},
+    };
+    final challenge = await api.passkeyBeginLogin();
+    expect(adapter.paths.single, '/api/v2/core/auth/passkey/begin');
+    expect(adapter.methods.single, 'POST');
+    expect(challenge.sessionId, 'passkey-session');
+    expect(challenge.publicKey['challenge'], 'abc');
+
+    adapter.responseData = <String, dynamic>{};
+    await api.passkeyFinishLogin(
+      payload: {'id': 'credential', 'type': 'public-key'},
+      sessionId: 'passkey-session',
+    );
+    expect(adapter.paths.last, '/api/v2/core/auth/passkey/finish');
+    expect(
+      adapter.requests.last.headers['Passkey-Session'],
+      'passkey-session',
+    );
+    expect(adapter.bodies.last['id'], 'credential');
+
+    await api.passkeyBeginLogin(entrance: 'secret');
+    expect(
+      adapter.requests.last.headers['EntranceCode'],
+      base64Encode(utf8.encode('secret')),
+    );
+  });
+
+  test('passkey register begin and finish use the session header', () async {
+    final api = SettingApi(client);
+    adapter.responseData = <String, dynamic>{
+      'sessionId': 'register-session',
+      'publicKey': {'challenge': 'def'},
+    };
+    final challenge = await api.passkeyBeginRegister('Pixel');
+    expect(adapter.paths.single, '/api/v2/core/auth/passkey/register/begin');
+    expect(adapter.bodies.single, {'name': 'Pixel'});
+    expect(challenge.sessionId, 'register-session');
+
+    adapter.responseData = null;
+    await api.passkeyFinishRegister(
+      payload: {'id': 'credential', 'type': 'public-key'},
+      sessionId: 'register-session',
+    );
+    expect(adapter.paths.last, '/api/v2/core/auth/passkey/register/finish');
+    expect(
+      adapter.requests.last.headers['Passkey-Session'],
+      'register-session',
+    );
+    expect(adapter.bodies.last['id'], 'credential');
+  });
+
+  test('VM bridge list uses the host bridge endpoint', () async {
+    adapter.responseData = <Map<String, dynamic>>[
+      {'name': 'br0', 'recommended': true},
+    ];
+    final bridges = await VmApi(client).listNetworkBridges();
+    expect(adapter.paths.single, '/api/v2/vms/networks/bridges');
+    expect(adapter.methods.single, 'GET');
+    expect(bridges.single['name'], 'br0');
   });
 }

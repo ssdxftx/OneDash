@@ -57,6 +57,10 @@ class BackupAccountRepositoryImpl implements BackupAccountRepository {
   }) => _api.refreshToken(id: id, name: name, isPublic: isPublic);
 
   @override
+  Future<Map<String, dynamic>> getClientInfo(String clientType) =>
+      _api.getClientInfo(clientType);
+
+  @override
   Future<String> getLocalDir() => _api.getLocalDir();
 }
 

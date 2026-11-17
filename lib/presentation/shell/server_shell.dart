@@ -325,8 +325,8 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
                       label: l10n.nav_containers,
                     ),
                     NavigationDestination(
-                      icon: const Icon(TablerIcons.dots),
-                      selectedIcon: const Icon(TablerIcons.dots),
+                      icon: const Icon(TablerIcons.layout_grid),
+                      selectedIcon: const Icon(TablerIcons.layout_grid),
                       label: l10n.nav_more,
                     ),
                   ],

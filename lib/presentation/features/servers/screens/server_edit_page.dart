@@ -184,7 +184,11 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
       ref.read(activeServerIdStateProvider.notifier).state = server.id;
       if (!mounted) return;
       AppToast.success(context, l10n.server_edit_savedConnecting);
-      context.go('/s/${server.id}/overview');
+      if (widget.embedded) {
+        context.go('/s/${server.id}/overview');
+      } else {
+        context.pushReplacement('/s/${server.id}/overview');
+      }
     } catch (error) {
       if (!mounted) return;
       setState(() => _saving = false);

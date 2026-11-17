@@ -67,6 +67,10 @@ String websiteTypeLabel(String raw, AppLocalizations l10n) =>
       'static' => l10n.websites_static,
       'proxy' || 'reverse_proxy' => l10n.websites_proxy,
       'php' => l10n.websites_php,
+      'runtime' => l10n.websites_runtime,
+      'deployment' => l10n.websites_deployment,
+      'subsite' => l10n.websites_subsite,
+      'stream' => l10n.websites_tunnel,
       _ => _unknown(raw, l10n),
     };
 
@@ -132,6 +136,53 @@ String backupAccountTypeLabel(String raw, AppLocalizations l10n) =>
       'googledrive' => l10n.backups_typeGoogleDrive,
       _ => _unknown(raw, l10n),
     };
+
+/// 面板菜单标题映射。1Panel 的 HideMenu 存的是 i18n key，App 无法直接翻译，
+/// 已知项使用本地文案，未知项回退到可读的 label。
+String panelMenuLabel(String title, String label, AppLocalizations l10n) {
+  final value = switch (title) {
+    'menu.home' => l10n.nav_overview,
+    'menu.apps' => l10n.more_group_apps,
+    'menu.aiTools' => l10n.ai_title,
+    'aiTools.gpu.gpu' => l10n.ai_gpu,
+    'aiTools.model.services' => l10n.ai_models,
+    'aiTools.agents.agent' => l10n.ai_agents,
+    'menu.mcp' => l10n.ai_mcp,
+    'menu.website' => l10n.websites_title,
+    'menu.ssl' => l10n.websites_sslCertificate,
+    'menu.template' => l10n.websites_templates,
+    'menu.runtime' => l10n.websites_runtime,
+    'menu.database' => l10n.databases_title,
+    'menu.container' => l10n.nav_containers,
+    'xpack.vm.vm' => l10n.vm_title,
+    'menu.system' => l10n.host_title,
+    'menu.files' => l10n.nav_files,
+    'menu.monitor' => l10n.host_monitor,
+    'menu.firewall' => l10n.more_firewall,
+    'menu.processManage' => l10n.more_process,
+    'menu.ssh' => l10n.host_ssh,
+    'menu.disk' => l10n.host_disks,
+    'menu.terminal' => l10n.more_terminal,
+    'menu.cronjob' => l10n.more_cronjobs,
+    'menu.toolbox' => l10n.toolbox_title,
+    'menu.logs' => l10n.logs_title,
+    'menu.settings' => l10n.more_panel_settings,
+    _ => null,
+  };
+  if (value != null) return value;
+  return _humanizeMenuLabel(label.isNotEmpty ? label : title);
+}
+
+String _humanizeMenuLabel(String value) {
+  var text = value.trim();
+  if (text.isEmpty) return '';
+  if (text.contains('.')) text = text.split('.').last;
+  text = text.replaceAll(RegExp(r'[-_]+'), ' ');
+  text = text.replaceAll(RegExp(r'\s*Menu$'), '');
+  text = text.replaceAllMapped(RegExp(r'(?<=[a-z0-9])(?=[A-Z])'), (_) => ' ');
+  text = text.replaceAllMapped(RegExp(r'(?<=[A-Z])(?=[A-Z][a-z])'), (_) => ' ');
+  return text.trim();
+}
 
 /// 未覆盖的枚举值：上屏「未知」，debug 下打印原值方便补映射。
 String _unknown(String raw, AppLocalizations l10n) {

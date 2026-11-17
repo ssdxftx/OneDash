@@ -343,6 +343,26 @@ class ContainerApi {
     return ApiResponseParser.list(resp, ContainerOptionDto.fromJson);
   }
 
+  /// 创建挂载卷。
+  /// POST /api/v2/containers/volume
+  Future<void> createVolume({
+    required String name,
+    String driver = 'local',
+    List<String> options = const [],
+    List<String> labels = const [],
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/containers/volume',
+      data: {
+        'name': name,
+        'driver': driver,
+        'options': options,
+        'labels': labels,
+      },
+    );
+    ApiResponseParser.ok(resp);
+  }
+
   /// 批量删除挂载卷。
   /// POST /api/v2/containers/volume/del
   Future<void> deleteVolumes(List<String> names) async {

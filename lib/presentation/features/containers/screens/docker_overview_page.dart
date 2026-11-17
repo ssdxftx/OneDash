@@ -10,6 +10,7 @@ import '../../../../data/dto/container/container_item_stats_dto.dart';
 import '../../../../data/dto/container/container_status_dto.dart';
 import '../../../../data/dto/container/docker_status_dto.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/back_to_servers_button.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/error_toast.dart';
@@ -39,6 +40,7 @@ class DockerOverviewPage extends ConsumerWidget {
         child: Column(
           children: [
             AppBarLarge(
+              leading: const BackToServersButton(),
               title: l10n.nav_containers,
               subtitle: server?.displayName,
               onTitleTap: () =>

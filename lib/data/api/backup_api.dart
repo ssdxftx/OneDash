@@ -379,6 +379,15 @@ class BackupApi {
     );
   }
 
+  /// 获取备份客户端应用信息。
+  /// GET /api/v2/core/backups/client/:clientType
+  Future<Map<String, dynamic>> getClientInfo(String clientType) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/core/backups/client/${Uri.encodeComponent(clientType)}',
+    );
+    return ApiResponseParser.map(resp);
+  }
+
   /// 获取本地备份目录。
   Future<String> getLocalDir() async {
     final resp = await _client.get<Map<String, dynamic>>(

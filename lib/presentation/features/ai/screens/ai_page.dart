@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -16,6 +14,7 @@ import '../../../../data/dto/ai/ollama_model_dto.dart';
 import '../../../../data/repositories_impl/ai_repository_impl.dart';
 import '../../../../domain/repositories/ai_repository.dart';
 import 'ai_chat_page.dart';
+import '../widgets/ai_channel_config_page.dart';
 import '../../../../data/dto/app/app_installed_search_req.dart';
 import '../../../../data/dto/website/website_search_req.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';

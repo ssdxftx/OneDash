@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../core/network/api_compatibility.dart';
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/one_panel_auth.dart';
@@ -226,23 +225,10 @@ class FileApi {
   }
 
   /// 查询 OpenResty 网站根目录。
+  /// GET /api/v2/settings/website/dir
   Future<String> getWebsiteRootDir() async {
-    final resp = await ApiCompatibility.tryVariants(
-      [
-        ApiEndpointVariant(
-          name: 'settings.website.dir',
-          call: () =>
-              _client.get<Map<String, dynamic>>('/api/v2/settings/website/dir'),
-        ),
-        ApiEndpointVariant(
-          name: 'files.path.websiteDir',
-          call: () => _client.get<Map<String, dynamic>>(
-            '/api/v2/files/path/websiteDir',
-          ),
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'files.websiteRootDir',
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/settings/website/dir',
     );
     final data = resp.data?['data'];
     return data is String ? data : '';
@@ -274,27 +260,10 @@ class FileApi {
       taskOperate: taskOperate,
       resourceID: resourceID,
     );
-    final resp = await ApiCompatibility.tryVariants(
-      [
-        ApiEndpointVariant(
-          name: 'files.read.pathType',
-          call: () => _client.post<Map<String, dynamic>>(
-            '/api/v2/files/read/${Uri.encodeComponent(type)}',
-            query: const {'operateNode': 'local'},
-            data: data,
-          ),
-        ),
-        ApiEndpointVariant(
-          name: 'files.read.bodyType',
-          call: () => _client.post<Map<String, dynamic>>(
-            '/api/v2/files/read',
-            query: const {'operateNode': 'local'},
-            data: data,
-          ),
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'files.read',
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/read/${Uri.encodeComponent(type)}',
+      query: const {'operateNode': 'local'},
+      data: data,
     );
     return ApiResponseParser.object(resp, fromJson);
   }
@@ -316,25 +285,9 @@ class FileApi {
       pageSize: pageSize,
       latest: latest,
     );
-    final resp = await ApiCompatibility.tryVariants(
-      [
-        ApiEndpointVariant(
-          name: 'files.readRuntime.pathType',
-          call: () => _client.post<Map<String, dynamic>>(
-            '/api/v2/files/read/${Uri.encodeComponent(type)}',
-            data: data,
-          ),
-        ),
-        ApiEndpointVariant(
-          name: 'files.readRuntime.bodyType',
-          call: () => _client.post<Map<String, dynamic>>(
-            '/api/v2/files/read',
-            data: data,
-          ),
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'files.readRuntimeLog',
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/files/read/${Uri.encodeComponent(type)}',
+      data: data,
     );
     return FileLogDto.fromJson(ApiResponseParser.map(resp));
   }

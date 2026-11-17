@@ -877,47 +877,10 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
       final repository = await ref.read(aiRepositoryProvider.future);
       final data = await repository.getChannelConfig(channel, agent.id);
       if (!mounted) return;
-      final controller = TextEditingController(
-        text: const JsonEncoder.withIndent('  ').convert(data),
-      );
-      String? error;
       final result = await pushFormPage<Map<String, dynamic>>(
         context,
-        StatefulBuilder(
-          builder: (pageContext, setState) => SimpleFormPage(
-            title: '${l10n.ai_agent_channel_config} · $channel',
-            onSave: () async {
-              try {
-                final decoded = jsonDecode(controller.text);
-                if (decoded is! Map) {
-                  throw const FormatException();
-                }
-                Navigator.of(
-                  pageContext,
-                ).pop(Map<String, dynamic>.from(decoded));
-              } catch (_) {
-                setState(() => error = l10n.ai_agent_channel_json_invalid);
-              }
-            },
-            children: [
-              AppTextField(
-                controller: controller,
-                label: l10n.ai_agent_channel_json,
-                helper: l10n.ai_agent_channel_json_hint,
-                maxLines: 14,
-              ),
-              if (error != null)
-                Text(
-                  error!,
-                  style: AppTextStyles.bodyS.copyWith(
-                    color: pageContext.scheme.error,
-                  ),
-                ),
-            ],
-          ),
-        ),
+        AiChannelConfigPage(channel: channel, initial: data),
       );
-      controller.dispose();
       if (result == null || !mounted) return;
       await repository.updateChannelConfig(channel, {
         ...result,

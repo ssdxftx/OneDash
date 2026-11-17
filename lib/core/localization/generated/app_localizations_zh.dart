@@ -90,7 +90,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nav_files => '文件';
 
   @override
-  String get nav_containers => '容器';
+  String get nav_containers => 'Docker';
 
   @override
   String get nav_more => '更多';
@@ -697,7 +697,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get containers_stopped => '已停止';
 
   @override
-  String get containers_compose => 'Compose';
+  String get containers_compose => '编排';
 
   @override
   String get containers_logs => '日志';
@@ -819,6 +819,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get error_unknown_message => '请重试；若持续出现，请查看面板日志。';
 
   @override
+  String get servers_backToList => '返回面板列表';
+
+  @override
+  String get servers_websites => '网站';
+
+  @override
+  String get servers_databases => '数据库';
+
+  @override
+  String get servers_apps => '应用';
+
+  @override
+  String get servers_tasks => '任务';
+
+  @override
   String get servers_title => '面板';
 
   @override
@@ -835,6 +850,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get servers_offline => '离线';
+
+  @override
+  String get servers_neverConnected => '从未连接';
+
+  @override
+  String get servers_sessionActive => '本次会话';
 
   @override
   String servers_last_seen(String time) {
@@ -1061,6 +1082,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String websites_expired_days(int days) {
+    return '已过期 $days 天';
+  }
+
+  @override
+  String get websites_expire_today => '今天到期';
+
+  @override
   String get containers_title => '容器';
 
   @override
@@ -1124,6 +1153,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get more_backups => '备份';
 
   @override
+  String get more_logsSubtitle => '操作、登录与任务日志';
+
+  @override
+  String get more_processSubtitle => '查看资源占用并结束进程';
+
+  @override
+  String get more_backupsSubtitle => '备份计划、备份账号与恢复';
+
+  @override
+  String get more_firewallSubtitle => '端口放行与 IP 规则';
+
+  @override
+  String get more_supervisorSubtitle => '进程守护与自启管理';
+
+  @override
+  String get more_toolboxSubtitle => '常用运维工具集合';
+
+  @override
   String get more_runtimes => '运行环境';
 
   @override
@@ -1143,6 +1190,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_oled => 'OLED 纯黑';
+
+  @override
+  String get settings_oled_hint => '仅在深色主题生效';
+
+  @override
+  String get settings_accent_forest => '森林绿';
+
+  @override
+  String get settings_accent_ocean => '海洋蓝';
+
+  @override
+  String get settings_accent_indigo => '靛蓝';
+
+  @override
+  String get settings_accent_violet => '紫罗兰';
+
+  @override
+  String get settings_accent_rose => '玫瑰红';
+
+  @override
+  String get settings_accent_amber => '琥珀';
+
+  @override
+  String get settings_accent_teal => '青碧';
+
+  @override
+  String get settings_accent_graphite => '石墨';
 
   @override
   String get settings_text_scale => '字号缩放';
@@ -2022,7 +2096,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get app_detail_container => '容器';
 
   @override
-  String get app_detail_compose => 'Compose 文件';
+  String get app_detail_compose => '编排文件';
 
   @override
   String get app_detail_message => '说明';
@@ -5087,10 +5161,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get containers_fileEmpty => '目录为空';
 
   @override
-  String get containers_composeEnv => 'Compose 环境变量';
+  String get containers_composeEnv => '编排环境变量';
 
   @override
-  String get containers_pinCompose => '置顶 Compose';
+  String get containers_pinCompose => '置顶编排';
 
   @override
   String get containers_unpinCompose => '取消置顶';
@@ -5716,6 +5790,112 @@ class AppLocalizationsZh extends AppLocalizations {
   String get panelSettings_notificationMethodsEmptyTitle => '尚未配置通知方式';
 
   @override
+  String get process_title => '进程管理';
+
+  @override
+  String get process_stopRequested => '已发送停止请求';
+
+  @override
+  String get process_stopFailed => '停止失败';
+
+  @override
+  String get process_searchNamePlaceholder => '搜索进程名';
+
+  @override
+  String get process_searchNameOrPortPlaceholder => '搜索进程名或端口';
+
+  @override
+  String get process_connectionFailed => '连接失败';
+
+  @override
+  String get process_noResults => '无匹配结果';
+
+  @override
+  String get process_noData => '暂无数据';
+
+  @override
+  String get process_noResultsSubtitle => '尝试修改搜索关键词';
+
+  @override
+  String get process_waitingData => '等待数据加载';
+
+  @override
+  String get process_connecting => '正在连接进程服务';
+
+  @override
+  String get process_readingDetail => '正在读取进程详情';
+
+  @override
+  String get process_readFailed => '读取失败';
+
+  @override
+  String get process_basicInfo => '基本信息';
+
+  @override
+  String get process_user => '用户';
+
+  @override
+  String get process_status => '状态';
+
+  @override
+  String get process_startTime => '启动时间';
+
+  @override
+  String process_threads(int count) {
+    return '$count 线程';
+  }
+
+  @override
+  String get process_threadCount => '线程数';
+
+  @override
+  String process_connections(int count) {
+    return '$count 连接';
+  }
+
+  @override
+  String get process_connectionCount => '连接数';
+
+  @override
+  String get process_commandLine => '命令行';
+
+  @override
+  String get process_cpuDisk => 'CPU / 磁盘';
+
+  @override
+  String get process_memory => '内存';
+
+  @override
+  String get process_diskRead => '磁盘读取';
+
+  @override
+  String get process_diskWrite => '磁盘写入';
+
+  @override
+  String get process_memoryDetails => '内存详情';
+
+  @override
+  String get process_openFiles => '打开文件';
+
+  @override
+  String get process_networkConnections => '网络连接';
+
+  @override
+  String get process_environmentVariables => '环境变量';
+
+  @override
+  String get process_sort => '排序';
+
+  @override
+  String get process_sortCpu => 'CPU 使用率';
+
+  @override
+  String get process_sortMemory => '内存';
+
+  @override
+  String get process_sortConnections => '连接数';
+
+  @override
   String get process_emptyTitle => '暂无进程';
 
   @override
@@ -5970,6 +6150,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dashboard_realtimeSpeed => '实时速率';
+
+  @override
+  String get dashboard_chartNow => '现在';
+
+  @override
+  String dashboard_chartSecondsAgo(int seconds) {
+    return '$seconds 秒前';
+  }
 
   @override
   String get dashboard_diskIo => '磁盘 I/O';
@@ -8668,7 +8856,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get panelSettings_registerPasskey => '在浏览器中注册';
 
   @override
-  String get panelSettings_registerPasskeyHint => '通行密钥绑定当前域名，请在面板网页中完成注册';
+  String get panelSettings_registerPasskeyHint => '在浏览器中注册同样需要 HTTPS 访问绑定域名';
 
   @override
   String get host_sshTerminal => 'SSH 终端';
@@ -8678,4 +8866,167 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get cronjobs_pickScript => '从脚本库选择';
+
+  @override
+  String get containers_createVolume => '创建存储卷';
+
+  @override
+  String get containers_volumeName => '存储卷名称';
+
+  @override
+  String get containers_volumeDriver => '驱动';
+
+  @override
+  String get containers_volumeOptions => '驱动参数';
+
+  @override
+  String get containers_volumeLabels => '标签';
+
+  @override
+  String get containers_volumeKeyValueHint => '每行一个 key=value';
+
+  @override
+  String get panelSettings_menuSettings => '菜单设置';
+
+  @override
+  String get panelSettings_menuSettingsHint => '选择面板菜单中显示的功能入口';
+
+  @override
+  String get panelSettings_menuSaveConfirm => '保存当前的菜单显示设置？';
+
+  @override
+  String get panelSettings_menuUpdated => '菜单已更新';
+
+  @override
+  String get panelSettings_menuEmpty => '暂无菜单项';
+
+  @override
+  String get websites_importMasterSsl => '导入主节点证书';
+
+  @override
+  String get websites_sslStart => '生效时间';
+
+  @override
+  String get websites_masterSslId => '主证书 ID';
+
+  @override
+  String get websites_domainsHint => '逗号分隔的域名，留空则使用主域名';
+
+  @override
+  String get ai_agent_dm_policy => '私聊策略';
+
+  @override
+  String get ai_agent_policy_pairing => '配对';
+
+  @override
+  String get ai_agent_policy_open => '开放';
+
+  @override
+  String get ai_agent_policy_allowlist => '白名单';
+
+  @override
+  String get ai_agent_policy_disabled => '禁用';
+
+  @override
+  String get ai_agent_allow_from => '允许的发送者';
+
+  @override
+  String get ai_agent_allow_from_hint => '多个 ID 用逗号分隔';
+
+  @override
+  String get ai_agent_group_allow_from => '允许的群成员';
+
+  @override
+  String get ai_agent_proxy => '代理';
+
+  @override
+  String get ai_agent_default_account => '默认账号';
+
+  @override
+  String get ai_agent_streaming_off => '关闭';
+
+  @override
+  String get ai_agent_streaming_partial => '部分';
+
+  @override
+  String get ai_agent_streaming_block => '分段';
+
+  @override
+  String get ai_agent_streaming_progress => '进度';
+
+  @override
+  String get ai_agent_group_session_scope => '群会话范围';
+
+  @override
+  String get ai_agent_group_scope_group => '按群';
+
+  @override
+  String get ai_agent_group_scope_sender => '按群和发送者';
+
+  @override
+  String get ai_agent_separate_session => '按会话独立会话';
+
+  @override
+  String get ai_agent_shared_memory => '跨会话共享记忆';
+
+  @override
+  String get ai_agent_async_mode => '异步模式';
+
+  @override
+  String get ai_agent_ack_text => '确认回复文本';
+
+  @override
+  String get ai_agent_bot_id => '机器人 ID';
+
+  @override
+  String get ai_agent_bot_secret => '机器人密钥';
+
+  @override
+  String get ai_agent_bot_token => '机器人 Token';
+
+  @override
+  String get ai_agent_bot_app_id => 'App ID';
+
+  @override
+  String get ai_agent_bot_client_id => 'Client ID';
+
+  @override
+  String get ai_agent_bot_client_secret => 'Client Secret';
+
+  @override
+  String get ai_agent_bot_system_prompt => '系统提示词';
+
+  @override
+  String get ai_agent_bot_name => '机器人名称';
+
+  @override
+  String get ai_agent_bot_default => '默认机器人';
+
+  @override
+  String get ai_agent_add_bot => '添加机器人';
+
+  @override
+  String get ai_agent_remove_bot => '移除机器人';
+
+  @override
+  String get vm_bridgeName => '网桥名称';
+
+  @override
+  String get vm_noBridges => '未发现主机网桥';
+
+  @override
+  String get panelSettings_usePasskey => '使用通行密钥登录';
+
+  @override
+  String get panelSettings_passkeyLoginHint => '使用绑定面板域名保存的通行密钥';
+
+  @override
+  String get panelSettings_registerPasskeyDevice => '在此设备注册';
+
+  @override
+  String get panelSettings_passkeyName => '通行密钥名称';
+
+  @override
+  String get panelSettings_passkeyPrereq =>
+      '需通过 HTTPS 访问绑定域名，并在该域名提供 Android assetlinks.json';
 }

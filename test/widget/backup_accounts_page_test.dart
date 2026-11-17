@@ -59,6 +59,9 @@ class _FakeBackupAccountRepository implements BackupAccountRepository {
   }) async {}
 
   @override
+  Future<Map<String, dynamic>> getClientInfo(String clientType) async => {};
+
+  @override
   Future<String> getLocalDir() async => '/backup';
 }
 

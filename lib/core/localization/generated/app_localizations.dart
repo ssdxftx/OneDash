@@ -239,7 +239,7 @@ abstract class AppLocalizations {
   /// OneDash UI string
   ///
   /// In en, this message translates to:
-  /// **'Containers'**
+  /// **'Docker'**
   String get nav_containers;
 
   /// OneDash UI string
@@ -1622,6 +1622,36 @@ abstract class AppLocalizations {
   /// **'Please retry. If it persists, check the panel logs.'**
   String get error_unknown_message;
 
+  /// Tooltip for returning from a panel to the panel list.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to panels'**
+  String get servers_backToList;
+
+  /// Website count label on panel cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Websites'**
+  String get servers_websites;
+
+  /// Database count label on panel cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Databases'**
+  String get servers_databases;
+
+  /// Installed app count label on panel cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps'**
+  String get servers_apps;
+
+  /// Cronjob count label on panel cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get servers_tasks;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:
@@ -1657,6 +1687,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Offline'**
   String get servers_offline;
+
+  /// Server subtitle when the panel has never been connected.
+  ///
+  /// In en, this message translates to:
+  /// **'Never connected'**
+  String get servers_neverConnected;
+
+  /// Server subtitle when the panel is online but has no last-used time.
+  ///
+  /// In en, this message translates to:
+  /// **'This session'**
+  String get servers_sessionActive;
 
   /// OneDash UI string
   ///
@@ -2090,6 +2132,18 @@ abstract class AppLocalizations {
   /// **'{days} days left'**
   String websites_expire_days(int days);
 
+  /// SSL certificate expiry shown when the certificate already expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired {days} days ago'**
+  String websites_expired_days(int days);
+
+  /// SSL certificate expiry shown when the certificate expires today.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires today'**
+  String get websites_expire_today;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:
@@ -2216,6 +2270,42 @@ abstract class AppLocalizations {
   /// **'Backups'**
   String get more_backups;
 
+  /// More page logs entry subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation, login, and task logs'**
+  String get more_logsSubtitle;
+
+  /// More page process entry subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspect resource usage and end processes'**
+  String get more_processSubtitle;
+
+  /// More page backups entry subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup plans, accounts, and restore'**
+  String get more_backupsSubtitle;
+
+  /// More page firewall entry subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Port rules and IP allowlists'**
+  String get more_firewallSubtitle;
+
+  /// More page supervisor entry subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Process supervision and restart policy'**
+  String get more_supervisorSubtitle;
+
+  /// More page toolbox entry subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyday maintenance tools'**
+  String get more_toolboxSubtitle;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:
@@ -2257,6 +2347,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OLED black'**
   String get settings_oled;
+
+  /// Helper text for the OLED switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Only applies to dark theme'**
+  String get settings_oled_hint;
+
+  /// Accent color name.
+  ///
+  /// In en, this message translates to:
+  /// **'Forest'**
+  String get settings_accent_forest;
+
+  /// Accent color name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean'**
+  String get settings_accent_ocean;
+
+  /// Accent color name.
+  ///
+  /// In en, this message translates to:
+  /// **'Indigo'**
+  String get settings_accent_indigo;
+
+  /// Accent color name.
+  ///
+  /// In en, this message translates to:
+  /// **'Violet'**
+  String get settings_accent_violet;
+
+  /// Accent color name.
+  ///
+  /// In en, this message translates to:
+  /// **'Rose'**
+  String get settings_accent_rose;
+
+  /// Accent color name.
+  ///
+  /// In en, this message translates to:
+  /// **'Amber'**
+  String get settings_accent_amber;
+
+  /// Accent color name.
+  ///
+  /// In en, this message translates to:
+  /// **'Teal'**
+  String get settings_accent_teal;
+
+  /// Accent color name.
+  ///
+  /// In en, this message translates to:
+  /// **'Graphite'**
+  String get settings_accent_graphite;
 
   /// OneDash UI string
   ///
@@ -11186,6 +11330,210 @@ abstract class AppLocalizations {
   /// **'No notification methods configured'**
   String get panelSettings_notificationMethodsEmptyTitle;
 
+  /// Process management page title.
+  ///
+  /// In en, this message translates to:
+  /// **'Processes'**
+  String get process_title;
+
+  /// Toast shown after sending a process stop request.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop request sent'**
+  String get process_stopRequested;
+
+  /// Toast shown when stopping a process fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to stop process'**
+  String get process_stopFailed;
+
+  /// Process search field placeholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Search process name'**
+  String get process_searchNamePlaceholder;
+
+  /// Network connection search field placeholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Search process name or port'**
+  String get process_searchNameOrPortPlaceholder;
+
+  /// Process page connection failure title.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection failed'**
+  String get process_connectionFailed;
+
+  /// Process page search empty state title.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching results'**
+  String get process_noResults;
+
+  /// Process page empty state title.
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get process_noData;
+
+  /// Process page search empty state subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different search keyword'**
+  String get process_noResultsSubtitle;
+
+  /// Process page empty state subtitle when waiting for data.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for data'**
+  String get process_waitingData;
+
+  /// Process page loading state.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to process service'**
+  String get process_connecting;
+
+  /// Process detail loading state.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading process details'**
+  String get process_readingDetail;
+
+  /// Process detail read failure label.
+  ///
+  /// In en, this message translates to:
+  /// **'Read failed'**
+  String get process_readFailed;
+
+  /// Process detail basic information section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Info'**
+  String get process_basicInfo;
+
+  /// Process user label.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get process_user;
+
+  /// Process status label.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get process_status;
+
+  /// Process start time label.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Time'**
+  String get process_startTime;
+
+  /// Process list thread count label.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} threads'**
+  String process_threads(int count);
+
+  /// Process detail thread count label.
+  ///
+  /// In en, this message translates to:
+  /// **'Threads'**
+  String get process_threadCount;
+
+  /// Process list connection count label.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} connections'**
+  String process_connections(int count);
+
+  /// Process detail connection count label.
+  ///
+  /// In en, this message translates to:
+  /// **'Connections'**
+  String get process_connectionCount;
+
+  /// Process detail command line label.
+  ///
+  /// In en, this message translates to:
+  /// **'Command Line'**
+  String get process_commandLine;
+
+  /// Process detail CPU and disk section title.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU / Disk'**
+  String get process_cpuDisk;
+
+  /// Process memory label.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get process_memory;
+
+  /// Process detail disk read label.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk Read'**
+  String get process_diskRead;
+
+  /// Process detail disk write label.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk Write'**
+  String get process_diskWrite;
+
+  /// Process detail memory section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory Details'**
+  String get process_memoryDetails;
+
+  /// Process detail open files section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Files'**
+  String get process_openFiles;
+
+  /// Process detail network connections section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Network Connections'**
+  String get process_networkConnections;
+
+  /// Process detail environment variables section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Environment Variables'**
+  String get process_environmentVariables;
+
+  /// Process menu sort action.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get process_sort;
+
+  /// Process sort by CPU option.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU Usage'**
+  String get process_sortCpu;
+
+  /// Process sort by memory option.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get process_sortMemory;
+
+  /// Process sort by connections option.
+  ///
+  /// In en, this message translates to:
+  /// **'Connections'**
+  String get process_sortConnections;
+
   /// Empty state title for processes.
   ///
   /// In en, this message translates to:
@@ -11653,6 +12001,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Live speed'**
   String get dashboard_realtimeSpeed;
+
+  /// Right edge of the realtime chart time axis.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get dashboard_chartNow;
+
+  /// Elapsed time label on the realtime chart.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s ago'**
+  String dashboard_chartSecondsAgo(int seconds);
 
   /// OneDash UI text.
   ///
@@ -16883,7 +17243,7 @@ abstract class AppLocalizations {
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
-  /// **'Passkeys bind to the current domain, so finish registration in the panel web page'**
+  /// **'Browser registration also requires the bound panel domain over HTTPS'**
   String get panelSettings_registerPasskeyHint;
 
   /// Open an SSH terminal to a remote host.
@@ -16903,6 +17263,330 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose from library'**
   String get cronjobs_pickScript;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Create volume'**
+  String get containers_createVolume;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume name'**
+  String get containers_volumeName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get containers_volumeDriver;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver options'**
+  String get containers_volumeOptions;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Labels'**
+  String get containers_volumeLabels;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'One key=value pair per line'**
+  String get containers_volumeKeyValueHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu settings'**
+  String get panelSettings_menuSettings;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which panel menu entries are visible'**
+  String get panelSettings_menuSettingsHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Save the current menu visibility?'**
+  String get panelSettings_menuSaveConfirm;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu updated'**
+  String get panelSettings_menuUpdated;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No menu entries'**
+  String get panelSettings_menuEmpty;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Import master certificate'**
+  String get websites_importMasterSsl;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid from'**
+  String get websites_sslStart;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Master certificate ID'**
+  String get websites_masterSslId;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Comma-separated domains; leave empty to use the primary domain'**
+  String get websites_domainsHint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Direct message policy'**
+  String get ai_agent_dm_policy;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing'**
+  String get ai_agent_policy_pairing;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get ai_agent_policy_open;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowlist'**
+  String get ai_agent_policy_allowlist;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get ai_agent_policy_disabled;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed senders'**
+  String get ai_agent_allow_from;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate IDs with commas'**
+  String get ai_agent_allow_from_hint;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed group senders'**
+  String get ai_agent_group_allow_from;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy'**
+  String get ai_agent_proxy;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Default account'**
+  String get ai_agent_default_account;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get ai_agent_streaming_off;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial'**
+  String get ai_agent_streaming_partial;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get ai_agent_streaming_block;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get ai_agent_streaming_progress;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Group session scope'**
+  String get ai_agent_group_session_scope;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get ai_agent_group_scope_group;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Group and sender'**
+  String get ai_agent_group_scope_sender;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate session per conversation'**
+  String get ai_agent_separate_session;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Share memory across conversations'**
+  String get ai_agent_shared_memory;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Async mode'**
+  String get ai_agent_async_mode;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledgement text'**
+  String get ai_agent_ack_text;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot ID'**
+  String get ai_agent_bot_id;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot secret'**
+  String get ai_agent_bot_secret;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot token'**
+  String get ai_agent_bot_token;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'App ID'**
+  String get ai_agent_bot_app_id;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Client ID'**
+  String get ai_agent_bot_client_id;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Client secret'**
+  String get ai_agent_bot_client_secret;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'System prompt'**
+  String get ai_agent_bot_system_prompt;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot name'**
+  String get ai_agent_bot_name;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Default bot'**
+  String get ai_agent_bot_default;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Add bot'**
+  String get ai_agent_add_bot;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove bot'**
+  String get ai_agent_remove_bot;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'Bridge name'**
+  String get vm_bridgeName;
+
+  /// OneDash UI text.
+  ///
+  /// In en, this message translates to:
+  /// **'No host bridges found'**
+  String get vm_noBridges;
+
+  /// panelSettings_usePasskey
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with passkey'**
+  String get panelSettings_usePasskey;
+
+  /// panelSettings_passkeyLoginHint
+  ///
+  /// In en, this message translates to:
+  /// **'Use a passkey saved for the bound panel domain'**
+  String get panelSettings_passkeyLoginHint;
+
+  /// panelSettings_registerPasskeyDevice
+  ///
+  /// In en, this message translates to:
+  /// **'Register on this device'**
+  String get panelSettings_registerPasskeyDevice;
+
+  /// panelSettings_passkeyName
+  ///
+  /// In en, this message translates to:
+  /// **'Passkey name'**
+  String get panelSettings_passkeyName;
+
+  /// panelSettings_passkeyPrereq
+  ///
+  /// In en, this message translates to:
+  /// **'Requires the bound panel domain over HTTPS and Android assetlinks.json on that domain'**
+  String get panelSettings_passkeyPrereq;
 }
 
 class _AppLocalizationsDelegate

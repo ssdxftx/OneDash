@@ -12,6 +12,7 @@ class AppBarLarge extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.leading,
     this.onTitleTap,
+    this.bottom,
   });
 
   final String title;
@@ -19,18 +20,23 @@ class AppBarLarge extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final Widget? leading;
   final VoidCallback? onTitleTap;
+  final PreferredSizeWidget? bottom;
 
   @override
   Size get preferredSize => Size.fromHeight(
-    subtitle == null ? AppTokens.appBarHeight : AppTokens.appBarLargeHeight,
+    (subtitle == null ? AppTokens.appBarHeight : AppTokens.appBarLargeHeight) +
+        (bottom?.preferredSize.height ?? 0),
   );
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: preferredSize.height,
+      toolbarHeight: subtitle == null
+          ? AppTokens.appBarHeight
+          : AppTokens.appBarLargeHeight,
       leading: leading,
       actions: actions,
+      bottom: bottom,
       title: _TitleBlock(title: title, subtitle: subtitle, onTap: onTitleTap),
     );
   }

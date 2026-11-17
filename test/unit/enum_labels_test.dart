@@ -74,6 +74,23 @@ void main() {
     expect(cronjobTypeLabel('custom', l10n), 'Unknown');
   });
 
+  test('website types cover runtime, deployment, subsite and stream', () {
+    expect(websiteTypeLabel('static', l10n), 'Static');
+    expect(websiteTypeLabel('proxy', l10n), 'Reverse proxy');
+    expect(websiteTypeLabel('runtime', l10n), 'Runtime');
+    expect(websiteTypeLabel('deployment', l10n), 'Application');
+    expect(websiteTypeLabel('subsite', l10n), 'Subsite');
+    expect(websiteTypeLabel('stream', l10n), 'TCP/UDP proxy');
+  });
+
+  test('panel menu titles map known keys and humanize labels', () {
+    expect(panelMenuLabel('menu.home', 'Home-Menu', l10n), 'Overview');
+    expect(panelMenuLabel('menu.website', 'Website-Menu', l10n), 'Websites');
+    expect(panelMenuLabel('menu.ssl', 'SSL', l10n), 'SSL Certificate');
+    expect(panelMenuLabel('', 'OllamaModels', l10n), 'Ollama Models');
+    expect(panelMenuLabel('custom.title', 'MCPServer', l10n), 'MCP Server');
+  });
+
   test('unmapped enum values are not shown raw', () {
     expect(alertTypeLabel('weird_status', l10n), 'Unknown');
     expect(websiteTypeLabel('weird_type', l10n), 'Unknown');

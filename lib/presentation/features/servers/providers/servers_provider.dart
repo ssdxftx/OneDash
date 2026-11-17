@@ -62,6 +62,12 @@ class ServerHealth {
     this.memoryPercent,
     this.diskPercent,
     this.hostname,
+    this.distro = '',
+    this.ipAddress = '',
+    this.websiteCount = 0,
+    this.databaseCount = 0,
+    this.appCount = 0,
+    this.cronjobCount = 0,
   });
 
   final bool online;
@@ -70,6 +76,12 @@ class ServerHealth {
   final double? memoryPercent;
   final double? diskPercent;
   final String? hostname;
+  final String distro;
+  final String ipAddress;
+  final int websiteCount;
+  final int databaseCount;
+  final int appCount;
+  final int cronjobCount;
 
   static const offline = ServerHealth(online: false, latencyMs: 0);
 }
@@ -102,6 +114,12 @@ final serverHealthProvider = FutureProvider.autoDispose
           memoryPercent: current.memoryUsedPercent,
           diskPercent: disk,
           hostname: dashboard.base.hostname,
+          distro: dashboard.base.prettyDistro,
+          ipAddress: dashboard.base.ipV4Addr,
+          websiteCount: dashboard.base.websiteNumber,
+          databaseCount: dashboard.base.databaseNumber,
+          appCount: dashboard.base.appInstalledNumber,
+          cronjobCount: dashboard.base.cronjobNumber,
         );
       } catch (_) {
         stopwatch.stop();

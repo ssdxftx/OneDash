@@ -301,6 +301,19 @@ class ContainerRepositoryImpl implements ContainerRepository {
   );
 
   @override
+  Future<void> createVolume({
+    required String name,
+    String driver = 'local',
+    List<String> options = const [],
+    List<String> labels = const [],
+  }) => _containerApi.createVolume(
+    name: name,
+    driver: driver,
+    options: options,
+    labels: labels,
+  );
+
+  @override
   Future<void> deleteVolumes(List<String> names) =>
       _containerApi.deleteVolumes(names);
 

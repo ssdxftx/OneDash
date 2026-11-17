@@ -10,6 +10,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/repository_providers.dart';
 import '../../../../domain/entities/dashboard.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/back_to_servers_button.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/section_header.dart';
@@ -47,6 +48,7 @@ class MorePage extends ConsumerWidget {
         child: CustomScrollView(
           slivers: [
             SliverAppBarLarge(
+              leading: const BackToServersButton(),
               title: l10n.more_title,
               subtitle: server?.displayName,
               onTitleTap: () =>
@@ -79,7 +81,7 @@ class MorePage extends ConsumerWidget {
                           icon: TablerIcons.package,
                           title: l10n.more_installed_apps,
                           subtitle: counts == null
-                              ? null
+                              ? l10n.action_loading
                               : l10n.more_appsCount(counts.appInstalledNumber),
                           onTap: () => context.push(
                             '/s/$serverId/more/apps?tab=installed',
@@ -90,7 +92,7 @@ class MorePage extends ConsumerWidget {
                           icon: TablerIcons.database,
                           title: l10n.more_databases,
                           subtitle: counts == null
-                              ? null
+                              ? l10n.action_loading
                               : l10n.more_databasesCount(counts.databaseNumber),
                           onTap: () =>
                               context.push('/s/$serverId/more/databases'),
@@ -128,7 +130,7 @@ class MorePage extends ConsumerWidget {
                           icon: TablerIcons.clock,
                           title: l10n.more_cronjobs,
                           subtitle: counts == null
-                              ? null
+                              ? l10n.action_loading
                               : l10n.more_cronjobsCount(counts.cronjobNumber),
                           onTap: () =>
                               context.push('/s/$serverId/more/cronjobs'),
@@ -137,6 +139,7 @@ class MorePage extends ConsumerWidget {
                           context,
                           icon: TablerIcons.file_text,
                           title: l10n.more_logs,
+                          subtitle: l10n.more_logsSubtitle,
                           onTap: () => context.push('/s/$serverId/more/logs'),
                         ),
                         _tile(
@@ -150,6 +153,7 @@ class MorePage extends ConsumerWidget {
                           context,
                           icon: TablerIcons.list_details,
                           title: l10n.more_process,
+                          subtitle: l10n.more_processSubtitle,
                           onTap: () =>
                               context.push('/s/$serverId/more/process'),
                         ),
@@ -164,6 +168,7 @@ class MorePage extends ConsumerWidget {
                           context,
                           icon: TablerIcons.cloud_upload,
                           title: l10n.more_backups,
+                          subtitle: l10n.more_backupsSubtitle,
                           onTap: () =>
                               context.push('/s/$serverId/more/backups'),
                         ),
@@ -178,6 +183,7 @@ class MorePage extends ConsumerWidget {
                           context,
                           icon: TablerIcons.shield,
                           title: l10n.more_firewall,
+                          subtitle: l10n.more_firewallSubtitle,
                           onTap: () =>
                               context.push('/s/$serverId/more/firewall'),
                         ),
@@ -185,6 +191,7 @@ class MorePage extends ConsumerWidget {
                           context,
                           icon: TablerIcons.settings_cog,
                           title: l10n.supervisor_titleLong,
+                          subtitle: l10n.more_supervisorSubtitle,
                           onTap: () =>
                               context.push('/s/$serverId/more/host-tools'),
                         ),
@@ -192,6 +199,7 @@ class MorePage extends ConsumerWidget {
                           context,
                           icon: TablerIcons.tool,
                           title: l10n.toolbox_title,
+                          subtitle: l10n.more_toolboxSubtitle,
                           onTap: () =>
                               context.push('/s/$serverId/more/toolbox'),
                         ),

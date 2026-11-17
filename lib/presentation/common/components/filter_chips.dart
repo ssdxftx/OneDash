@@ -13,6 +13,7 @@ class AppFilterChips<T> extends StatefulWidget {
     required this.selected,
     required this.onChanged,
     this.multiSelect = false,
+    this.wrap = false,
     this.padding = const EdgeInsets.only(
       left: AppTokens.s16,
       right: AppTokens.s32,
@@ -24,6 +25,7 @@ class AppFilterChips<T> extends StatefulWidget {
   final Set<T> selected;
   final ValueChanged<Set<T>> onChanged;
   final bool multiSelect;
+  final bool wrap;
   final EdgeInsetsGeometry padding;
 
   @override
@@ -76,6 +78,43 @@ class _AppFilterChipsState<T> extends State<AppFilterChips<T>> {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final resolvedPadding = widget.padding.resolve(Directionality.of(context));
+
+    Widget chipFor(T option) {
+      final isSelected = widget.selected.contains(option);
+      return FilterChip(
+        selected: isSelected,
+        showCheckmark: false,
+        label: Text(widget.labelOf(option)),
+        onSelected: (_) => _toggle(option),
+        backgroundColor: scheme.surfaceContainerLow,
+        selectedColor: scheme.primaryContainer,
+        side: BorderSide(
+          color: isSelected ? Colors.transparent : scheme.outline,
+        ),
+        labelStyle: AppTextStyles.label.copyWith(
+          color: isSelected
+              ? scheme.onPrimaryContainer
+              : scheme.onSurfaceVariant,
+        ),
+      );
+    }
+
+    if (widget.wrap) {
+      return Padding(
+        padding: EdgeInsets.only(
+          left: resolvedPadding.left,
+          right: resolvedPadding.right,
+          top: AppTokens.s4,
+          bottom: AppTokens.s4,
+        ),
+        child: Wrap(
+          spacing: AppTokens.s8,
+          runSpacing: AppTokens.s8,
+          children: [for (final option in widget.options) chipFor(option)],
+        ),
+      );
+    }
+
     final labelHeight =
         MediaQuery.textScalerOf(context).scale(AppTextStyles.label.fontSize!) *
         (AppTextStyles.label.height ?? 1.3);
@@ -107,28 +146,8 @@ class _AppFilterChipsState<T> extends State<AppFilterChips<T>> {
           ),
           itemCount: widget.options.length,
           separatorBuilder: (_, _) => const SizedBox(width: AppTokens.s8),
-          itemBuilder: (context, index) {
-            final option = widget.options[index];
-            final isSelected = widget.selected.contains(option);
-            return Center(
-              child: FilterChip(
-                selected: isSelected,
-                showCheckmark: false,
-                label: Text(widget.labelOf(option)),
-                onSelected: (_) => _toggle(option),
-                backgroundColor: scheme.surfaceContainerLow,
-                selectedColor: scheme.primaryContainer,
-                side: BorderSide(
-                  color: isSelected ? Colors.transparent : scheme.outline,
-                ),
-                labelStyle: AppTextStyles.label.copyWith(
-                  color: isSelected
-                      ? scheme.onPrimaryContainer
-                      : scheme.onSurfaceVariant,
-                ),
-              ),
-            );
-          },
+          itemBuilder: (context, index) =>
+              Center(child: chipFor(widget.options[index])),
         ),
       ),
     );

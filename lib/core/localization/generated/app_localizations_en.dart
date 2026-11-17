@@ -90,7 +90,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nav_files => 'Files';
 
   @override
-  String get nav_containers => 'Containers';
+  String get nav_containers => 'Docker';
 
   @override
   String get nav_more => 'More';
@@ -836,6 +836,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please retry. If it persists, check the panel logs.';
 
   @override
+  String get servers_backToList => 'Back to panels';
+
+  @override
+  String get servers_websites => 'Websites';
+
+  @override
+  String get servers_databases => 'Databases';
+
+  @override
+  String get servers_apps => 'Apps';
+
+  @override
+  String get servers_tasks => 'Tasks';
+
+  @override
   String get servers_title => 'Panels';
 
   @override
@@ -853,6 +868,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get servers_offline => 'Offline';
+
+  @override
+  String get servers_neverConnected => 'Never connected';
+
+  @override
+  String get servers_sessionActive => 'This session';
 
   @override
   String servers_last_seen(String time) {
@@ -1084,6 +1105,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String websites_expired_days(int days) {
+    return 'Expired $days days ago';
+  }
+
+  @override
+  String get websites_expire_today => 'Expires today';
+
+  @override
   String get containers_title => 'Containers';
 
   @override
@@ -1148,6 +1177,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get more_backups => 'Backups';
 
   @override
+  String get more_logsSubtitle => 'Operation, login, and task logs';
+
+  @override
+  String get more_processSubtitle => 'Inspect resource usage and end processes';
+
+  @override
+  String get more_backupsSubtitle => 'Backup plans, accounts, and restore';
+
+  @override
+  String get more_firewallSubtitle => 'Port rules and IP allowlists';
+
+  @override
+  String get more_supervisorSubtitle =>
+      'Process supervision and restart policy';
+
+  @override
+  String get more_toolboxSubtitle => 'Everyday maintenance tools';
+
+  @override
   String get more_runtimes => 'Runtimes';
 
   @override
@@ -1168,6 +1216,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_oled => 'OLED black';
+
+  @override
+  String get settings_oled_hint => 'Only applies to dark theme';
+
+  @override
+  String get settings_accent_forest => 'Forest';
+
+  @override
+  String get settings_accent_ocean => 'Ocean';
+
+  @override
+  String get settings_accent_indigo => 'Indigo';
+
+  @override
+  String get settings_accent_violet => 'Violet';
+
+  @override
+  String get settings_accent_rose => 'Rose';
+
+  @override
+  String get settings_accent_amber => 'Amber';
+
+  @override
+  String get settings_accent_teal => 'Teal';
+
+  @override
+  String get settings_accent_graphite => 'Graphite';
 
   @override
   String get settings_text_scale => 'Text size';
@@ -5852,6 +5927,113 @@ class AppLocalizationsEn extends AppLocalizations {
       'No notification methods configured';
 
   @override
+  String get process_title => 'Processes';
+
+  @override
+  String get process_stopRequested => 'Stop request sent';
+
+  @override
+  String get process_stopFailed => 'Failed to stop process';
+
+  @override
+  String get process_searchNamePlaceholder => 'Search process name';
+
+  @override
+  String get process_searchNameOrPortPlaceholder =>
+      'Search process name or port';
+
+  @override
+  String get process_connectionFailed => 'Connection failed';
+
+  @override
+  String get process_noResults => 'No matching results';
+
+  @override
+  String get process_noData => 'No data';
+
+  @override
+  String get process_noResultsSubtitle => 'Try a different search keyword';
+
+  @override
+  String get process_waitingData => 'Waiting for data';
+
+  @override
+  String get process_connecting => 'Connecting to process service';
+
+  @override
+  String get process_readingDetail => 'Reading process details';
+
+  @override
+  String get process_readFailed => 'Read failed';
+
+  @override
+  String get process_basicInfo => 'Basic Info';
+
+  @override
+  String get process_user => 'User';
+
+  @override
+  String get process_status => 'Status';
+
+  @override
+  String get process_startTime => 'Start Time';
+
+  @override
+  String process_threads(int count) {
+    return '$count threads';
+  }
+
+  @override
+  String get process_threadCount => 'Threads';
+
+  @override
+  String process_connections(int count) {
+    return '$count connections';
+  }
+
+  @override
+  String get process_connectionCount => 'Connections';
+
+  @override
+  String get process_commandLine => 'Command Line';
+
+  @override
+  String get process_cpuDisk => 'CPU / Disk';
+
+  @override
+  String get process_memory => 'Memory';
+
+  @override
+  String get process_diskRead => 'Disk Read';
+
+  @override
+  String get process_diskWrite => 'Disk Write';
+
+  @override
+  String get process_memoryDetails => 'Memory Details';
+
+  @override
+  String get process_openFiles => 'Open Files';
+
+  @override
+  String get process_networkConnections => 'Network Connections';
+
+  @override
+  String get process_environmentVariables => 'Environment Variables';
+
+  @override
+  String get process_sort => 'Sort';
+
+  @override
+  String get process_sortCpu => 'CPU Usage';
+
+  @override
+  String get process_sortMemory => 'Memory';
+
+  @override
+  String get process_sortConnections => 'Connections';
+
+  @override
   String get process_emptyTitle => 'No processes';
 
   @override
@@ -6111,6 +6293,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboard_realtimeSpeed => 'Live speed';
+
+  @override
+  String get dashboard_chartNow => 'Now';
+
+  @override
+  String dashboard_chartSecondsAgo(int seconds) {
+    return '${seconds}s ago';
+  }
 
   @override
   String get dashboard_diskIo => 'Disk I/O';
@@ -8855,7 +9045,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get panelSettings_registerPasskeyHint =>
-      'Passkeys bind to the current domain, so finish registration in the panel web page';
+      'Browser registration also requires the bound panel domain over HTTPS';
 
   @override
   String get host_sshTerminal => 'SSH terminal';
@@ -8865,4 +9055,171 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cronjobs_pickScript => 'Choose from library';
+
+  @override
+  String get containers_createVolume => 'Create volume';
+
+  @override
+  String get containers_volumeName => 'Volume name';
+
+  @override
+  String get containers_volumeDriver => 'Driver';
+
+  @override
+  String get containers_volumeOptions => 'Driver options';
+
+  @override
+  String get containers_volumeLabels => 'Labels';
+
+  @override
+  String get containers_volumeKeyValueHint => 'One key=value pair per line';
+
+  @override
+  String get panelSettings_menuSettings => 'Menu settings';
+
+  @override
+  String get panelSettings_menuSettingsHint =>
+      'Choose which panel menu entries are visible';
+
+  @override
+  String get panelSettings_menuSaveConfirm =>
+      'Save the current menu visibility?';
+
+  @override
+  String get panelSettings_menuUpdated => 'Menu updated';
+
+  @override
+  String get panelSettings_menuEmpty => 'No menu entries';
+
+  @override
+  String get websites_importMasterSsl => 'Import master certificate';
+
+  @override
+  String get websites_sslStart => 'Valid from';
+
+  @override
+  String get websites_masterSslId => 'Master certificate ID';
+
+  @override
+  String get websites_domainsHint =>
+      'Comma-separated domains; leave empty to use the primary domain';
+
+  @override
+  String get ai_agent_dm_policy => 'Direct message policy';
+
+  @override
+  String get ai_agent_policy_pairing => 'Pairing';
+
+  @override
+  String get ai_agent_policy_open => 'Open';
+
+  @override
+  String get ai_agent_policy_allowlist => 'Allowlist';
+
+  @override
+  String get ai_agent_policy_disabled => 'Disabled';
+
+  @override
+  String get ai_agent_allow_from => 'Allowed senders';
+
+  @override
+  String get ai_agent_allow_from_hint => 'Separate IDs with commas';
+
+  @override
+  String get ai_agent_group_allow_from => 'Allowed group senders';
+
+  @override
+  String get ai_agent_proxy => 'Proxy';
+
+  @override
+  String get ai_agent_default_account => 'Default account';
+
+  @override
+  String get ai_agent_streaming_off => 'Off';
+
+  @override
+  String get ai_agent_streaming_partial => 'Partial';
+
+  @override
+  String get ai_agent_streaming_block => 'Block';
+
+  @override
+  String get ai_agent_streaming_progress => 'Progress';
+
+  @override
+  String get ai_agent_group_session_scope => 'Group session scope';
+
+  @override
+  String get ai_agent_group_scope_group => 'Group';
+
+  @override
+  String get ai_agent_group_scope_sender => 'Group and sender';
+
+  @override
+  String get ai_agent_separate_session => 'Separate session per conversation';
+
+  @override
+  String get ai_agent_shared_memory => 'Share memory across conversations';
+
+  @override
+  String get ai_agent_async_mode => 'Async mode';
+
+  @override
+  String get ai_agent_ack_text => 'Acknowledgement text';
+
+  @override
+  String get ai_agent_bot_id => 'Bot ID';
+
+  @override
+  String get ai_agent_bot_secret => 'Bot secret';
+
+  @override
+  String get ai_agent_bot_token => 'Bot token';
+
+  @override
+  String get ai_agent_bot_app_id => 'App ID';
+
+  @override
+  String get ai_agent_bot_client_id => 'Client ID';
+
+  @override
+  String get ai_agent_bot_client_secret => 'Client secret';
+
+  @override
+  String get ai_agent_bot_system_prompt => 'System prompt';
+
+  @override
+  String get ai_agent_bot_name => 'Bot name';
+
+  @override
+  String get ai_agent_bot_default => 'Default bot';
+
+  @override
+  String get ai_agent_add_bot => 'Add bot';
+
+  @override
+  String get ai_agent_remove_bot => 'Remove bot';
+
+  @override
+  String get vm_bridgeName => 'Bridge name';
+
+  @override
+  String get vm_noBridges => 'No host bridges found';
+
+  @override
+  String get panelSettings_usePasskey => 'Sign in with passkey';
+
+  @override
+  String get panelSettings_passkeyLoginHint =>
+      'Use a passkey saved for the bound panel domain';
+
+  @override
+  String get panelSettings_registerPasskeyDevice => 'Register on this device';
+
+  @override
+  String get panelSettings_passkeyName => 'Passkey name';
+
+  @override
+  String get panelSettings_passkeyPrereq =>
+      'Requires the bound panel domain over HTTPS and Android assetlinks.json on that domain';
 }

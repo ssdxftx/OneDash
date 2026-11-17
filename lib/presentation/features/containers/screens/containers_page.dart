@@ -199,26 +199,23 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
                 SelectionAppBar(
                   selectedCount: _selected.length,
                   onCancel: _clearSelection,
+                  height: AppTokens.appBarLargeHeight,
                 )
               else
                 AppBarLarge(
                   title: l10n.containers_title,
-                  subtitle: [
-                    if (server != null) server.displayName,
-                    if (total != null) l10n.containers_count(total),
-                  ].join(' · '),
+                  subtitle: MediaQuery.sizeOf(context).width < 360
+                      ? server?.displayName
+                      : [
+                          if (server != null) server.displayName,
+                          if (total != null) l10n.containers_count(total),
+                        ].join(' · '),
                   onTitleTap: () => showServerSwitcher(
                     context,
                     ref,
                     currentServerId: widget.serverId,
                   ),
                   actions: [
-                    AppIconButton(
-                      icon: TablerIcons.refresh,
-                      tooltip: l10n.action_refresh,
-                      onPressed: () =>
-                          ref.read(containersProvider.notifier).refresh(),
-                    ),
                     AppIconButton(
                       icon: _searching ? TablerIcons.x : TablerIcons.search,
                       tooltip: l10n.action_search,
@@ -264,6 +261,11 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
                               value: 'prune',
                               icon: TablerIcons.eraser,
                             ),
+                            SelectionOption(
+                              label: l10n.action_refresh,
+                              value: 'refresh',
+                              icon: TablerIcons.refresh,
+                            ),
                           ],
                         );
                         if (!context.mounted || value == null) return;
@@ -294,6 +296,8 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
                           );
                         } else if (value == 'prune') {
                           await _prune();
+                        } else if (value == 'refresh') {
+                          await ref.read(containersProvider.notifier).refresh();
                         }
                       },
                     ),
@@ -633,29 +637,31 @@ class _ContainerCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+            ],
+          ),
+          const SizedBox(height: AppTokens.s4),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  item.imageName,
+                  style: AppTextStyles.bodyS.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: AppTokens.s8),
               Text(
                 containerStateLabel(item.state, l10n),
                 style: AppTextStyles.caption.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
               ),
-              if (!selectionMode) ...[
-                const SizedBox(width: AppTokens.s4),
-                IconButton(
-                  tooltip: item.state.toLowerCase() == 'running'
-                      ? l10n.containers_stop
-                      : l10n.containers_start,
-                  visualDensity: VisualDensity.compact,
-                  icon: Icon(
-                    item.state.toLowerCase() == 'running'
-                        ? TablerIcons.player_pause
-                        : TablerIcons.player_play,
-                    size: AppTokens.iconList,
-                  ),
-                  onPressed: onToggle,
-                ),
-              ],
-              if (item.isFromCompose)
+              if (item.isFromCompose) ...[
+                const SizedBox(width: AppTokens.s8),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppTokens.s8,
@@ -672,17 +678,8 @@ class _ContainerCard extends StatelessWidget {
                     ),
                   ),
                 ),
+              ],
             ],
-          ),
-          const SizedBox(height: AppTokens.s4),
-          Text(
-            item.imageName,
-            style: AppTextStyles.bodyS.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppTokens.s8),
           Row(
@@ -701,19 +698,33 @@ class _ContainerCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              if (item.ports != null && item.ports!.isNotEmpty)
-                Flexible(
-                  child: Text(
-                    item.ports!.join(', '),
-                    style: AppTextStyles.caption.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+              if (!selectionMode)
+                IconButton(
+                  tooltip: item.state.toLowerCase() == 'running'
+                      ? l10n.containers_stop
+                      : l10n.containers_start,
+                  icon: Icon(
+                    item.state.toLowerCase() == 'running'
+                        ? TablerIcons.player_pause
+                        : TablerIcons.player_play,
+                    size: AppTokens.iconList,
                   ),
+                  onPressed: onToggle,
                 ),
             ],
           ),
+          if (item.ports != null && item.ports!.isNotEmpty) ...[
+            const SizedBox(height: AppTokens.s4),
+            Text(
+              item.ports!.join(', '),
+              style: AppTextStyles.caption.copyWith(
+                color: scheme.onSurfaceVariant,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ],
       ),
     );

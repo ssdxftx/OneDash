@@ -5,9 +5,11 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/search_field.dart';
+import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
@@ -27,6 +29,81 @@ class ContainerVolumesPage extends ConsumerStatefulWidget {
 
 class _ContainerVolumesPageState extends ConsumerState<ContainerVolumesPage> {
   String _query = '';
+
+  Future<void> _create() async {
+    final l10n = AppLocalizations.of(context);
+    final name = TextEditingController();
+    final driver = TextEditingController(text: 'local');
+    final options = TextEditingController();
+    final labels = TextEditingController();
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.containers_createVolume,
+          saveLabel: l10n.action_create,
+          onSave: () async {
+            if (name.text.trim().isEmpty) return;
+            Navigator.of(pageContext).pop(true);
+          },
+          children: [
+            AppTextField(controller: name, label: l10n.containers_volumeName),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: driver,
+              label: l10n.containers_volumeDriver,
+              hint: 'local',
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: options,
+              label: l10n.containers_volumeOptions,
+              hint: l10n.containers_volumeKeyValueHint,
+              maxLines: 3,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: labels,
+              label: l10n.containers_volumeLabels,
+              hint: l10n.containers_volumeKeyValueHint,
+              maxLines: 3,
+            ),
+          ],
+        ),
+      ),
+    );
+    final volumeName = name.text.trim();
+    final volumeDriver = driver.text.trim();
+    final volumeOptions = _keyValueLines(options.text);
+    final volumeLabels = _keyValueLines(labels.text);
+    name.dispose();
+    driver.dispose();
+    options.dispose();
+    labels.dispose();
+    if (saved != true || !mounted || volumeName.isEmpty) return;
+    try {
+      final repository = await ref.read(containerRepositoryProvider.future);
+      await repository.createVolume(
+        name: volumeName,
+        driver: volumeDriver.isEmpty ? 'local' : volumeDriver,
+        options: volumeOptions,
+        labels: volumeLabels,
+      );
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(containerVolumesProvider);
+      ref.invalidate(containerVolumeSearchProvider(_query));
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  List<String> _keyValueLines(String raw) => raw
+      .split('\n')
+      .map((line) => line.trim())
+      .where((line) => line.isNotEmpty)
+      .toList(growable: false);
 
   Future<void> _remove(String name) async {
     final l10n = AppLocalizations.of(context);
@@ -75,6 +152,11 @@ class _ContainerVolumesPageState extends ConsumerState<ContainerVolumesPage> {
               ref.invalidate(containerVolumesProvider);
               ref.invalidate(containerVolumeSearchProvider(_query));
             },
+          ),
+          AppIconButton(
+            icon: TablerIcons.plus,
+            tooltip: l10n.containers_createVolume,
+            onPressed: _create,
           ),
         ],
       ),

@@ -123,7 +123,7 @@
   "@nav_files": {
     "description": "OneDash UI string"
   },
-  "nav_containers": "Containers",
+  "nav_containers": "Docker",
   "@nav_containers": {
     "description": "OneDash UI string"
   },
@@ -1147,6 +1147,26 @@
   "@error_unknown_message": {
     "description": "OneDash UI string"
   },
+  "servers_backToList": "Back to panels",
+  "@servers_backToList": {
+    "description": "Tooltip for returning from a panel to the panel list."
+  },
+  "servers_websites": "Websites",
+  "@servers_websites": {
+    "description": "Website count label on panel cards."
+  },
+  "servers_databases": "Databases",
+  "@servers_databases": {
+    "description": "Database count label on panel cards."
+  },
+  "servers_apps": "Apps",
+  "@servers_apps": {
+    "description": "Installed app count label on panel cards."
+  },
+  "servers_tasks": "Tasks",
+  "@servers_tasks": {
+    "description": "Cronjob count label on panel cards."
+  },
   "servers_title": "Panels",
   "@servers_title": {
     "description": "OneDash UI string"
@@ -1168,6 +1188,14 @@
     "description": "OneDash UI string"
   },
   "servers_offline": "Offline",
+  "servers_neverConnected": "Never connected",
+  "@servers_neverConnected": {
+    "description": "Server subtitle when the panel has never been connected."
+  },
+  "servers_sessionActive": "This session",
+  "@servers_sessionActive": {
+    "description": "Server subtitle when the panel is online but has no last-used time."
+  },
   "@servers_offline": {
     "description": "OneDash UI string"
   },
@@ -1474,6 +1502,19 @@
     "description": "OneDash UI string"
   },
   "websites_expire_days": "{days} days left",
+  "websites_expired_days": "Expired {days} days ago",
+  "@websites_expired_days": {
+    "description": "SSL certificate expiry shown when the certificate already expired.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "websites_expire_today": "Expires today",
+  "@websites_expire_today": {
+    "description": "SSL certificate expiry shown when the certificate expires today."
+  },
   "@websites_expire_days": {
     "description": "OneDash UI string",
     "placeholders": {
@@ -1566,6 +1607,30 @@
   "@more_backups": {
     "description": "OneDash UI string"
   },
+  "more_logsSubtitle": "Operation, login, and task logs",
+  "@more_logsSubtitle": {
+    "description": "More page logs entry subtitle."
+  },
+  "more_processSubtitle": "Inspect resource usage and end processes",
+  "@more_processSubtitle": {
+    "description": "More page process entry subtitle."
+  },
+  "more_backupsSubtitle": "Backup plans, accounts, and restore",
+  "@more_backupsSubtitle": {
+    "description": "More page backups entry subtitle."
+  },
+  "more_firewallSubtitle": "Port rules and IP allowlists",
+  "@more_firewallSubtitle": {
+    "description": "More page firewall entry subtitle."
+  },
+  "more_supervisorSubtitle": "Process supervision and restart policy",
+  "@more_supervisorSubtitle": {
+    "description": "More page supervisor entry subtitle."
+  },
+  "more_toolboxSubtitle": "Everyday maintenance tools",
+  "@more_toolboxSubtitle": {
+    "description": "More page toolbox entry subtitle."
+  },
   "more_runtimes": "Runtimes",
   "@more_runtimes": {
     "description": "OneDash UI string"
@@ -1591,6 +1656,42 @@
     "description": "OneDash UI string"
   },
   "settings_oled": "OLED black",
+  "settings_oled_hint": "Only applies to dark theme",
+  "@settings_oled_hint": {
+    "description": "Helper text for the OLED switch."
+  },
+  "settings_accent_forest": "Forest",
+  "@settings_accent_forest": {
+    "description": "Accent color name."
+  },
+  "settings_accent_ocean": "Ocean",
+  "@settings_accent_ocean": {
+    "description": "Accent color name."
+  },
+  "settings_accent_indigo": "Indigo",
+  "@settings_accent_indigo": {
+    "description": "Accent color name."
+  },
+  "settings_accent_violet": "Violet",
+  "@settings_accent_violet": {
+    "description": "Accent color name."
+  },
+  "settings_accent_rose": "Rose",
+  "@settings_accent_rose": {
+    "description": "Accent color name."
+  },
+  "settings_accent_amber": "Amber",
+  "@settings_accent_amber": {
+    "description": "Accent color name."
+  },
+  "settings_accent_teal": "Teal",
+  "@settings_accent_teal": {
+    "description": "Accent color name."
+  },
+  "settings_accent_graphite": "Graphite",
+  "@settings_accent_graphite": {
+    "description": "Accent color name."
+  },
   "@settings_oled": {
     "description": "OneDash UI string"
   },
@@ -7802,6 +7903,152 @@
   "@panelSettings_notificationMethodsEmptyTitle": {
     "description": "Empty state title for notification methods."
   },
+  "process_title": "Processes",
+  "@process_title": {
+    "description": "Process management page title."
+  },
+  "process_stopRequested": "Stop request sent",
+  "@process_stopRequested": {
+    "description": "Toast shown after sending a process stop request."
+  },
+  "process_stopFailed": "Failed to stop process",
+  "@process_stopFailed": {
+    "description": "Toast shown when stopping a process fails."
+  },
+  "process_searchNamePlaceholder": "Search process name",
+  "@process_searchNamePlaceholder": {
+    "description": "Process search field placeholder."
+  },
+  "process_searchNameOrPortPlaceholder": "Search process name or port",
+  "@process_searchNameOrPortPlaceholder": {
+    "description": "Network connection search field placeholder."
+  },
+  "process_connectionFailed": "Connection failed",
+  "@process_connectionFailed": {
+    "description": "Process page connection failure title."
+  },
+  "process_noResults": "No matching results",
+  "@process_noResults": {
+    "description": "Process page search empty state title."
+  },
+  "process_noData": "No data",
+  "@process_noData": {
+    "description": "Process page empty state title."
+  },
+  "process_noResultsSubtitle": "Try a different search keyword",
+  "@process_noResultsSubtitle": {
+    "description": "Process page search empty state subtitle."
+  },
+  "process_waitingData": "Waiting for data",
+  "@process_waitingData": {
+    "description": "Process page empty state subtitle when waiting for data."
+  },
+  "process_connecting": "Connecting to process service",
+  "@process_connecting": {
+    "description": "Process page loading state."
+  },
+  "process_readingDetail": "Reading process details",
+  "@process_readingDetail": {
+    "description": "Process detail loading state."
+  },
+  "process_readFailed": "Read failed",
+  "@process_readFailed": {
+    "description": "Process detail read failure label."
+  },
+  "process_basicInfo": "Basic Info",
+  "@process_basicInfo": {
+    "description": "Process detail basic information section title."
+  },
+  "process_user": "User",
+  "@process_user": {
+    "description": "Process user label."
+  },
+  "process_status": "Status",
+  "@process_status": {
+    "description": "Process status label."
+  },
+  "process_startTime": "Start Time",
+  "@process_startTime": {
+    "description": "Process start time label."
+  },
+  "process_threads": "{count} threads",
+  "@process_threads": {
+    "description": "Process list thread count label.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "process_threadCount": "Threads",
+  "@process_threadCount": {
+    "description": "Process detail thread count label."
+  },
+  "process_connections": "{count} connections",
+  "@process_connections": {
+    "description": "Process list connection count label.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "process_connectionCount": "Connections",
+  "@process_connectionCount": {
+    "description": "Process detail connection count label."
+  },
+  "process_commandLine": "Command Line",
+  "@process_commandLine": {
+    "description": "Process detail command line label."
+  },
+  "process_cpuDisk": "CPU / Disk",
+  "@process_cpuDisk": {
+    "description": "Process detail CPU and disk section title."
+  },
+  "process_memory": "Memory",
+  "@process_memory": {
+    "description": "Process memory label."
+  },
+  "process_diskRead": "Disk Read",
+  "@process_diskRead": {
+    "description": "Process detail disk read label."
+  },
+  "process_diskWrite": "Disk Write",
+  "@process_diskWrite": {
+    "description": "Process detail disk write label."
+  },
+  "process_memoryDetails": "Memory Details",
+  "@process_memoryDetails": {
+    "description": "Process detail memory section title."
+  },
+  "process_openFiles": "Open Files",
+  "@process_openFiles": {
+    "description": "Process detail open files section title."
+  },
+  "process_networkConnections": "Network Connections",
+  "@process_networkConnections": {
+    "description": "Process detail network connections section title."
+  },
+  "process_environmentVariables": "Environment Variables",
+  "@process_environmentVariables": {
+    "description": "Process detail environment variables section title."
+  },
+  "process_sort": "Sort",
+  "@process_sort": {
+    "description": "Process menu sort action."
+  },
+  "process_sortCpu": "CPU Usage",
+  "@process_sortCpu": {
+    "description": "Process sort by CPU option."
+  },
+  "process_sortMemory": "Memory",
+  "@process_sortMemory": {
+    "description": "Process sort by memory option."
+  },
+  "process_sortConnections": "Connections",
+  "@process_sortConnections": {
+    "description": "Process sort by connections option."
+  },
   "process_emptyTitle": "No processes",
   "@process_emptyTitle": {
     "description": "Empty state title for processes."
@@ -8139,6 +8386,19 @@
     "description": "OneDash UI text."
   },
   "dashboard_realtimeSpeed": "Live speed",
+  "dashboard_chartNow": "Now",
+  "@dashboard_chartNow": {
+    "description": "Right edge of the realtime chart time axis."
+  },
+  "dashboard_chartSecondsAgo": "{seconds}s ago",
+  "@dashboard_chartSecondsAgo": {
+    "description": "Elapsed time label on the realtime chart.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "@dashboard_realtimeSpeed": {
     "description": "OneDash UI text."
   },
@@ -11778,7 +12038,7 @@
   "@panelSettings_registerPasskey": {
     "description": "OneDash UI text."
   },
-  "panelSettings_registerPasskeyHint": "Passkeys bind to the current domain, so finish registration in the panel web page",
+  "panelSettings_registerPasskeyHint": "Browser registration also requires the bound panel domain over HTTPS",
   "@panelSettings_registerPasskeyHint": {
     "description": "OneDash UI text."
   },
@@ -11793,5 +12053,221 @@
   "cronjobs_pickScript": "Choose from library",
   "@cronjobs_pickScript": {
     "description": "Pick a shell script from the script library."
+  },
+  "containers_createVolume": "Create volume",
+  "@containers_createVolume": {
+    "description": "OneDash UI text."
+  },
+  "containers_volumeName": "Volume name",
+  "@containers_volumeName": {
+    "description": "OneDash UI text."
+  },
+  "containers_volumeDriver": "Driver",
+  "@containers_volumeDriver": {
+    "description": "OneDash UI text."
+  },
+  "containers_volumeOptions": "Driver options",
+  "@containers_volumeOptions": {
+    "description": "OneDash UI text."
+  },
+  "containers_volumeLabels": "Labels",
+  "@containers_volumeLabels": {
+    "description": "OneDash UI text."
+  },
+  "containers_volumeKeyValueHint": "One key=value pair per line",
+  "@containers_volumeKeyValueHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_menuSettings": "Menu settings",
+  "@panelSettings_menuSettings": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_menuSettingsHint": "Choose which panel menu entries are visible",
+  "@panelSettings_menuSettingsHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_menuSaveConfirm": "Save the current menu visibility?",
+  "@panelSettings_menuSaveConfirm": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_menuUpdated": "Menu updated",
+  "@panelSettings_menuUpdated": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_menuEmpty": "No menu entries",
+  "@panelSettings_menuEmpty": {
+    "description": "OneDash UI text."
+  },
+  "websites_importMasterSsl": "Import master certificate",
+  "@websites_importMasterSsl": {
+    "description": "OneDash UI text."
+  },
+  "websites_sslStart": "Valid from",
+  "@websites_sslStart": {
+    "description": "OneDash UI text."
+  },
+  "websites_masterSslId": "Master certificate ID",
+  "@websites_masterSslId": {
+    "description": "OneDash UI text."
+  },
+  "websites_domainsHint": "Comma-separated domains; leave empty to use the primary domain",
+  "@websites_domainsHint": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_dm_policy": "Direct message policy",
+  "@ai_agent_dm_policy": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_policy_pairing": "Pairing",
+  "@ai_agent_policy_pairing": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_policy_open": "Open",
+  "@ai_agent_policy_open": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_policy_allowlist": "Allowlist",
+  "@ai_agent_policy_allowlist": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_policy_disabled": "Disabled",
+  "@ai_agent_policy_disabled": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_allow_from": "Allowed senders",
+  "@ai_agent_allow_from": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_allow_from_hint": "Separate IDs with commas",
+  "@ai_agent_allow_from_hint": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_group_allow_from": "Allowed group senders",
+  "@ai_agent_group_allow_from": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_proxy": "Proxy",
+  "@ai_agent_proxy": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_default_account": "Default account",
+  "@ai_agent_default_account": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_streaming_off": "Off",
+  "@ai_agent_streaming_off": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_streaming_partial": "Partial",
+  "@ai_agent_streaming_partial": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_streaming_block": "Block",
+  "@ai_agent_streaming_block": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_streaming_progress": "Progress",
+  "@ai_agent_streaming_progress": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_group_session_scope": "Group session scope",
+  "@ai_agent_group_session_scope": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_group_scope_group": "Group",
+  "@ai_agent_group_scope_group": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_group_scope_sender": "Group and sender",
+  "@ai_agent_group_scope_sender": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_separate_session": "Separate session per conversation",
+  "@ai_agent_separate_session": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_shared_memory": "Share memory across conversations",
+  "@ai_agent_shared_memory": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_async_mode": "Async mode",
+  "@ai_agent_async_mode": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_ack_text": "Acknowledgement text",
+  "@ai_agent_ack_text": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_id": "Bot ID",
+  "@ai_agent_bot_id": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_secret": "Bot secret",
+  "@ai_agent_bot_secret": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_token": "Bot token",
+  "@ai_agent_bot_token": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_app_id": "App ID",
+  "@ai_agent_bot_app_id": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_client_id": "Client ID",
+  "@ai_agent_bot_client_id": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_client_secret": "Client secret",
+  "@ai_agent_bot_client_secret": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_system_prompt": "System prompt",
+  "@ai_agent_bot_system_prompt": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_name": "Bot name",
+  "@ai_agent_bot_name": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_default": "Default bot",
+  "@ai_agent_bot_default": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_add_bot": "Add bot",
+  "@ai_agent_add_bot": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_remove_bot": "Remove bot",
+  "@ai_agent_remove_bot": {
+    "description": "OneDash UI text."
+  },
+  "vm_bridgeName": "Bridge name",
+  "@vm_bridgeName": {
+    "description": "OneDash UI text."
+  },
+  "vm_noBridges": "No host bridges found",
+  "@vm_noBridges": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_usePasskey": "Sign in with passkey",
+  "panelSettings_passkeyLoginHint": "Use a passkey saved for the bound panel domain",
+  "panelSettings_registerPasskeyDevice": "Register on this device",
+  "panelSettings_passkeyName": "Passkey name",
+  "panelSettings_passkeyPrereq": "Requires the bound panel domain over HTTPS and Android assetlinks.json on that domain",
+  "@panelSettings_usePasskey": {
+    "description": "panelSettings_usePasskey"
+  },
+  "@panelSettings_passkeyLoginHint": {
+    "description": "panelSettings_passkeyLoginHint"
+  },
+  "@panelSettings_registerPasskeyDevice": {
+    "description": "panelSettings_registerPasskeyDevice"
+  },
+  "@panelSettings_passkeyName": {
+    "description": "panelSettings_passkeyName"
+  },
+  "@panelSettings_passkeyPrereq": {
+    "description": "panelSettings_passkeyPrereq"
   }
 }

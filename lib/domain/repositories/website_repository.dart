@@ -453,6 +453,9 @@ abstract interface class WebsiteRepository {
     int? websiteSSLId,
   });
 
+  /// 导入主节点 SSL 证书
+  Future<void> importMasterSsl(Map<String, dynamic> data);
+
   /// 下载 SSL 证书
   Future<Response<dynamic>> downloadSsl(int id);
 

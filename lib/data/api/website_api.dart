@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../core/network/api_compatibility.dart';
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/network_exceptions.dart';
@@ -706,29 +705,9 @@ class WebsiteApi {
       'operate': operate,
       'logType': type.fileName,
     };
-    await ApiCompatibility.tryVariants<void>(
-      [
-        ApiEndpointVariant(
-          name: 'websites.log.operate',
-          call: () async {
-            await _client.post<Map<String, dynamic>>(
-              '/api/v2/websites/log/operate',
-              data: data,
-            );
-          },
-        ),
-        ApiEndpointVariant(
-          name: 'websites.log.legacy',
-          call: () async {
-            await _client.post<Map<String, dynamic>>(
-              '/api/v2/websites/log',
-              data: data,
-            );
-          },
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'websites.log.operate',
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/log/operate',
+      data: data,
     );
   }
 
@@ -994,6 +973,15 @@ class WebsiteApi {
     await _client.postMultipart<Map<String, dynamic>>(
       '/api/v2/websites/ssl/upload/file',
       formData: formData,
+    );
+  }
+
+  /// 导入主节点 SSL 证书。
+  /// POST /api/v2/websites/ssl/import
+  Future<void> importMasterSsl(Map<String, dynamic> data) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/websites/ssl/import',
+      data: data,
     );
   }
 

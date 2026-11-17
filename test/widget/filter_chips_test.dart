@@ -38,4 +38,32 @@ void main() {
     final padding = list.padding!.resolve(TextDirection.ltr);
     expect(padding.right, AppTokens.s32);
   });
+
+  testWidgets('wrap mode keeps every chip visible on narrow screens', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 260);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(Brightness.light),
+        home: Scaffold(
+          body: AppFilterChips<String>(
+            options: const ['全部', '应用', '静态', '反向代理', '运行环境', '子站', '隧道'],
+            labelOf: (option) => option,
+            selected: const {'全部'},
+            wrap: true,
+            padding: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
+            onChanged: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(ShaderMask), findsNothing);
+    expect(find.byType(FilterChip), findsNWidgets(7));
+  });
 }

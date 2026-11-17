@@ -25,7 +25,6 @@ import '../../../common/components/search_field.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/segmented_tabs.dart';
 import '../../../common/components/simple_form_page.dart';
-import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
@@ -35,6 +34,7 @@ import '../../../common/states/error_toast.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../containers/widgets/container_log_page.dart';
 import '../widgets/installed_app_actions.dart';
+import '../widgets/installed_app_card.dart';
 import '../widgets/installed_skeleton.dart';
 import 'installed_app_page.dart';
 import '../providers/app_store_provider.dart';
@@ -810,67 +810,20 @@ class _InstalledTab extends ConsumerWidget {
                 final app = visible[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: AppTokens.s12),
-                  child: TonalCard(
+                  child: InstalledAppCard(
+                    name: app.displayName,
+                    icon: app.icon,
+                    cacheKey: '$serverId:${app.appKey}',
+                    iconLoader: () => ref
+                        .read(appRepositoryProvider.future)
+                        .then(
+                          (repository) => repository.getAppIcon(app.appKey),
+                        ),
+                    status: app.status.toLowerCase(),
+                    subtitle: '${app.version} · ${app.httpPort}',
+                    canUpdate: app.canUpdate,
+                    updateLabel: l10n.apps_update_available,
                     onTap: () => _showActions(context, ref, app),
-                    child: Row(
-                      children: [
-                        AppIcon(
-                          name: app.displayName,
-                          icon: app.icon,
-                          size: 36,
-                          cacheKey: '$serverId:${app.appKey}',
-                          iconLoader: () => ref
-                              .read(appRepositoryProvider.future)
-                              .then(
-                                (repository) =>
-                                    repository.getAppIcon(app.appKey),
-                              ),
-                        ),
-                        const SizedBox(width: AppTokens.s12),
-                        StatusDot(status: app.status.toLowerCase()),
-                        const SizedBox(width: AppTokens.s8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                app.displayName,
-                                style: AppTextStyles.titleM,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                '${app.version} · ${app.httpPort}',
-                                style: AppTextStyles.bodyS.copyWith(
-                                  color: context.scheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (app.canUpdate)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppTokens.s8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: context.appColors.warning.withValues(
-                                alpha: 0.15,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                AppTokens.rXs,
-                              ),
-                            ),
-                            child: Text(
-                              l10n.apps_update_available,
-                              style: AppTextStyles.caption.copyWith(
-                                color: context.appColors.warning,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
                   ),
                 );
               },

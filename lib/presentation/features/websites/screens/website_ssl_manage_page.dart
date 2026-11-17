@@ -483,6 +483,14 @@ class WebsiteSslManagePage extends ConsumerWidget {
                 },
               ),
               SplitListTile(
+                leading: const Icon(TablerIcons.shield_lock),
+                title: l10n.websites_importMasterSsl,
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _importMaster(context, ref);
+                },
+              ),
+              SplitListTile(
                 leading: const Icon(TablerIcons.world_check),
                 title: l10n.websites_checkDns,
                 onTap: () {
@@ -520,6 +528,131 @@ class WebsiteSslManagePage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _importMaster(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final domain = TextEditingController();
+    final certificate = TextEditingController();
+    final privateKey = TextEditingController();
+    final domains = TextEditingController();
+    final organization = TextEditingController();
+    final startDate = TextEditingController();
+    final expireDate = TextEditingController();
+    final masterId = TextEditingController();
+    final description = TextEditingController();
+    final saved = await pushFormPage<bool>(
+      context,
+      Builder(
+        builder: (pageContext) => SimpleFormPage(
+          title: l10n.websites_importMasterSsl,
+          saveLabel: l10n.websites_importMasterSsl,
+          onSave: () async {
+            if (domain.text.trim().isEmpty ||
+                certificate.text.trim().isEmpty ||
+                privateKey.text.trim().isEmpty) {
+              return;
+            }
+            Navigator.of(pageContext).pop(true);
+          },
+          children: [
+            AppTextField(controller: domain, label: l10n.websites_domain),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: certificate,
+              label: l10n.websites_certificatePem,
+              maxLines: 8,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: privateKey,
+              label: l10n.websites_privateKeyPem,
+              maxLines: 8,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: domains,
+              label: l10n.websites_domains,
+              hint: l10n.websites_domainsHint,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: organization,
+              label: l10n.websites_organization,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: startDate,
+              label: l10n.websites_sslStart,
+              hint: '2026-11-16',
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: expireDate,
+              label: l10n.websites_sslExpire,
+              hint: '2027-11-16',
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: masterId,
+              label: l10n.websites_masterSslId,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(controller: description, label: l10n.websites_remark),
+          ],
+        ),
+      ),
+    );
+    final parsedStart = _parseDate(startDate.text);
+    final parsedExpire = _parseDate(expireDate.text);
+    final parsedMasterId = int.tryParse(masterId.text.trim()) ?? 0;
+    final payload = <String, dynamic>{
+      'primaryDomain': domain.text.trim(),
+      'privateKey': privateKey.text.trim(),
+      'pem': certificate.text.trim(),
+      'domains': domains.text.trim(),
+      'organization': organization.text.trim(),
+      'type': 'upload',
+      'keyType': 'EC256',
+      'description': description.text.trim(),
+      if (parsedStart != null) 'startDate': parsedStart,
+      if (parsedExpire != null) 'expireDate': parsedExpire,
+      if (parsedMasterId > 0) 'id': parsedMasterId,
+    };
+    for (final controller in [
+      domain,
+      certificate,
+      privateKey,
+      domains,
+      organization,
+      startDate,
+      expireDate,
+      masterId,
+      description,
+    ]) {
+      controller.dispose();
+    }
+    if (saved != true || !context.mounted) return;
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      await repository.importMasterSsl(payload);
+      ref.invalidate(_sslListProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  String? _parseDate(String raw) {
+    final value = raw.trim();
+    if (value.isEmpty) return null;
+    final parsed = DateTime.tryParse(
+      value.length == 10 ? '${value}T00:00:00Z' : value,
+    );
+    return parsed?.toUtc().toIso8601String();
   }
 
   Future<void> _push(

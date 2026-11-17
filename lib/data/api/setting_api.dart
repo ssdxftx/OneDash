@@ -1,10 +1,8 @@
-import 'dart:typed_data';
-
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 
-import '../../core/network/api_compatibility.dart';
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/panel_password_encrypter.dart';
@@ -12,6 +10,7 @@ import '../../core/network/panel_session.dart';
 import '../dto/common/page_result.dart';
 import '../dto/setting/api_key_dto.dart';
 import '../dto/setting/group_dto.dart';
+import '../dto/setting/passkey_dto.dart';
 import '../dto/setting/command_library_dto.dart';
 import '../dto/setting/script_library_dto.dart';
 
@@ -51,10 +50,7 @@ class SettingApi {
     String entrance = '',
   }) async {
     await _loadPanelPublicKey();
-    final headers = <String, dynamic>{
-      if (entrance.isNotEmpty)
-        'EntranceCode': base64Encode(utf8.encode(entrance)),
-    };
+    final headers = _entranceHeaders(entrance);
     final publicKey = _panelPublicKey;
     final passwordValue = publicKey == null
         ? password
@@ -113,6 +109,11 @@ class SettingApi {
     );
     _client.updateSession(null);
   }
+
+  Map<String, dynamic> _entranceHeaders(String entrance) => {
+    if (entrance.isNotEmpty)
+      'EntranceCode': base64Encode(utf8.encode(entrance)),
+  };
 
   Future<void> _loadPanelPublicKey() async {
     if (_panelPublicKey != null) return;
@@ -380,6 +381,14 @@ class SettingApi {
     await _client.post('/api/v2/core/settings/menu/default', data: {});
   }
 
+  /// POST /api/v2/core/settings/menu/update
+  Future<void> updateMenuSetting(String value) async {
+    await _client.post(
+      '/api/v2/core/settings/menu/update',
+      data: {'key': 'HideMenu', 'value': value},
+    );
+  }
+
   /// 保存描述与置顶状态。
   /// POST /api/v2/settings/description/save
   Future<void> saveDescription({
@@ -516,40 +525,20 @@ class SettingApi {
   }
 
   /// 更新面板登录密码。
-  /// POST /api/v2/core/settings/password/update
+  /// POST /api/v2/core/auth/current/update
   Future<void> updatePassword({
     required String oldPassword,
     required String newPassword,
   }) async {
-    await ApiCompatibility.tryVariants<void>(
-      [
-        ApiEndpointVariant(
-          name: 'core.auth.current.updatePassword',
-          call: () async {
-            final user = await loadCurrentUser();
-            final name = user['name']?.toString() ?? '';
-            await _client.post(
-              '/api/v2/core/auth/current/update',
-              data: {
-                'name': name,
-                'oldPassword': base64Encode(utf8.encode(oldPassword)),
-                'password': base64Encode(utf8.encode(newPassword)),
-              },
-            );
-          },
-        ),
-        ApiEndpointVariant(
-          name: 'core.settings.password.update',
-          call: () async {
-            await _client.post(
-              '/api/v2/core/settings/password/update',
-              data: {'oldPassword': oldPassword, 'newPassword': newPassword},
-            );
-          },
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'core.password.update',
+    final user = await loadCurrentUser();
+    final name = user['name']?.toString() ?? '';
+    await _client.post(
+      '/api/v2/core/auth/current/update',
+      data: {
+        'name': name,
+        'oldPassword': base64Encode(utf8.encode(oldPassword)),
+        'password': base64Encode(utf8.encode(newPassword)),
+      },
     );
   }
 
@@ -610,60 +599,28 @@ class SettingApi {
   }
 
   /// 加载 MFA 信息。
-  /// POST /api/v2/core/settings/mfa
+  /// POST /api/v2/core/auth/mfa
   Future<Map<String, dynamic>> loadMFA({
     required String title,
     required int interval,
   }) async {
-    final data = {'title': title, 'interval': interval};
-    final resp = await ApiCompatibility.tryVariants(
-      [
-        ApiEndpointVariant(
-          name: 'core.auth.mfa',
-          call: () => _client.post<Map<String, dynamic>>(
-            '/api/v2/core/auth/mfa',
-            data: data,
-          ),
-        ),
-        ApiEndpointVariant(
-          name: 'core.settings.mfa',
-          call: () => _client.post<Map<String, dynamic>>(
-            '/api/v2/core/settings/mfa',
-            data: data,
-          ),
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'core.mfa.load',
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/mfa',
+      data: {'title': title, 'interval': interval},
     );
     return ApiResponseParser.map(resp);
   }
 
   /// 绑定 MFA。
-  /// POST /api/v2/core/settings/mfa/bind
+  /// POST /api/v2/core/auth/mfa/bind
   Future<void> bindMFA({
     required String secret,
     required String code,
     required int interval,
   }) async {
-    final data = {'secret': secret, 'code': code, 'interval': interval};
-    await ApiCompatibility.tryVariants<void>(
-      [
-        ApiEndpointVariant(
-          name: 'core.auth.mfa.bind',
-          call: () async {
-            await _client.post('/api/v2/core/auth/mfa/bind', data: data);
-          },
-        ),
-        ApiEndpointVariant(
-          name: 'core.settings.mfa.bind',
-          call: () async {
-            await _client.post('/api/v2/core/settings/mfa/bind', data: data);
-          },
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'core.mfa.bind',
+    await _client.post(
+      '/api/v2/core/auth/mfa/bind',
+      data: {'secret': secret, 'code': code, 'interval': interval},
     );
   }
 
@@ -779,6 +736,21 @@ class SettingApi {
     return ApiResponseParser.list(resp, CommandTreeDto.fromJson);
   }
 
+  /// 上传命令 CSV 并由面板解析。
+  /// POST /api/v2/core/commands/upload
+  Future<List<Map<String, dynamic>>> uploadCommandCsv({
+    required Uint8List bytes,
+    required String filename,
+  }) async {
+    final resp = await _client.postMultipart<Map<String, dynamic>>(
+      '/api/v2/core/commands/upload',
+      formData: FormData.fromMap({
+        'file': MultipartFile.fromBytes(bytes, filename: filename),
+      }),
+    );
+    return ApiResponseParser.list(resp, (json) => json);
+  }
+
   /// POST /api/v2/core/commands/import
   Future<void> importCommands(List<Map<String, dynamic>> items) async {
     await _client.post('/api/v2/core/commands/import', data: {'items': items});
@@ -835,25 +807,72 @@ class SettingApi {
     await _client.post('/api/v2/core/script/sync', data: {'taskID': taskID});
   }
 
-  /// GET /api/v2/core/settings/passkey/list
+  /// POST /api/v2/core/auth/passkey/begin
+  Future<PasskeyChallenge> passkeyBeginLogin({String entrance = ''}) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/passkey/begin',
+      data: const {},
+      options: Options(
+        headers: _entranceHeaders(entrance),
+        extra: const {'skipAuth': true, 'skipSession': true},
+      ),
+    );
+    return PasskeyChallenge.fromJson(ApiResponseParser.map(resp));
+  }
+
+  /// POST /api/v2/core/auth/passkey/finish
+  Future<PanelLoginResult> passkeyFinishLogin({
+    required Map<String, dynamic> payload,
+    required String sessionId,
+    String entrance = '',
+  }) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/passkey/finish',
+      data: payload,
+      options: Options(
+        headers: {
+          'Passkey-Session': sessionId,
+          ..._entranceHeaders(entrance),
+        },
+        extra: const {'skipAuth': true, 'skipSession': true},
+      ),
+    );
+    final data = ApiResponseParser.map(resp);
+    final session = _sessionFromResponse(resp);
+    final result = PanelLoginResult(
+      session: session,
+      mfaStatus: data['mfaStatus']?.toString() ?? '',
+      mfaSession: data['mfaSession']?.toString() ?? '',
+    );
+    _client.updateSession(result.needsMfa ? null : session);
+    return result;
+  }
+
+  /// POST /api/v2/core/auth/passkey/register/begin
+  Future<PasskeyChallenge> passkeyBeginRegister(String name) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/passkey/register/begin',
+      data: {'name': name},
+    );
+    return PasskeyChallenge.fromJson(ApiResponseParser.map(resp));
+  }
+
+  /// POST /api/v2/core/auth/passkey/register/finish
+  Future<void> passkeyFinishRegister({
+    required Map<String, dynamic> payload,
+    required String sessionId,
+  }) async {
+    await _client.post(
+      '/api/v2/core/auth/passkey/register/finish',
+      data: payload,
+      options: Options(headers: {'Passkey-Session': sessionId}),
+    );
+  }
+
+  /// GET /api/v2/core/auth/passkey/list
   Future<List<Map<String, dynamic>>> listPasskeys() async {
-    final resp = await ApiCompatibility.tryVariants(
-      [
-        ApiEndpointVariant(
-          name: 'core.auth.passkey.list',
-          call: () => _client.get<Map<String, dynamic>>(
-            '/api/v2/core/auth/passkey/list',
-          ),
-        ),
-        ApiEndpointVariant(
-          name: 'core.settings.passkey.list',
-          call: () => _client.get<Map<String, dynamic>>(
-            '/api/v2/core/settings/passkey/list',
-          ),
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'core.passkey.list',
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/core/auth/passkey/list',
     );
     final data = resp.data?['data'];
     if (data is List) return data.whereType<Map<String, dynamic>>().toList();
@@ -861,83 +880,27 @@ class SettingApi {
   }
 
   /// 删除 Passkey。
-  /// DELETE /api/v2/core/settings/passkey/:id
+  /// POST /api/v2/core/auth/passkey/del
   Future<void> deletePasskey(String id) async {
-    await ApiCompatibility.tryVariants<void>(
-      [
-        ApiEndpointVariant(
-          name: 'core.auth.passkey.del',
-          call: () async {
-            await _client.post(
-              '/api/v2/core/auth/passkey/del',
-              data: {'id': id},
-            );
-          },
-        ),
-        ApiEndpointVariant(
-          name: 'core.settings.passkey.delete',
-          call: () async {
-            await _client.delete('/api/v2/core/settings/passkey/$id');
-          },
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'core.passkey.delete',
-    );
+    await _client.post('/api/v2/core/auth/passkey/del', data: {'id': id});
   }
 
   // ── API 接口配置 ──
 
   /// 生成 API 密钥。
-  /// POST /api/v2/core/settings/api/config/generate/key
+  /// POST /api/v2/core/auth/api/generate
   Future<String> generateApiKey() async {
-    final resp = await ApiCompatibility.tryVariants(
-      [
-        ApiEndpointVariant(
-          name: 'core.auth.api.generate',
-          call: () => _client.post<Map<String, dynamic>>(
-            '/api/v2/core/auth/api/generate',
-            data: {},
-          ),
-        ),
-        ApiEndpointVariant(
-          name: 'core.settings.api.config.generate.key',
-          call: () => _client.post<Map<String, dynamic>>(
-            '/api/v2/core/settings/api/config/generate/key',
-            data: {},
-          ),
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'core.api.generate',
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/core/auth/api/generate',
+      data: {},
     );
     return ApiResponseParser.primitive<String>(resp);
   }
 
   /// 更新 API 接口配置。
-  /// POST /api/v2/core/settings/api/config/update
+  /// POST /api/v2/core/auth/api/update
   Future<void> updateApiConfig(Map<String, dynamic> config) async {
-    await ApiCompatibility.tryVariants<void>(
-      [
-        ApiEndpointVariant(
-          name: 'core.auth.api.update',
-          call: () async {
-            await _client.post('/api/v2/core/auth/api/update', data: config);
-          },
-        ),
-        ApiEndpointVariant(
-          name: 'core.settings.api.config.update',
-          call: () async {
-            await _client.post(
-              '/api/v2/core/settings/api/config/update',
-              data: config,
-            );
-          },
-        ),
-      ],
-      cacheScope: _client,
-      cacheKey: 'core.api.update',
-    );
+    await _client.post('/api/v2/core/auth/api/update', data: config);
   }
 
   // ── 独立 API Key ──

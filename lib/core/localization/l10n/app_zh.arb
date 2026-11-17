@@ -23,7 +23,7 @@
   "nav_overview": "概览",
   "nav_websites": "网站",
   "nav_files": "文件",
-  "nav_containers": "容器",
+  "nav_containers": "Docker",
   "nav_more": "更多",
   "nav_network": "网络",
   "dashboard_system": "系统",
@@ -235,7 +235,7 @@
   "containers_restart": "重启",
   "containers_running": "运行中",
   "containers_stopped": "已停止",
-  "containers_compose": "Compose",
+  "containers_compose": "编排",
   "containers_logs": "日志",
   "containers_all": "全部",
   "containers_terminal": "终端",
@@ -263,12 +263,25 @@
   "error_format_message": "面板响应格式与应用版本不兼容。",
   "error_unknown_title": "出现了一点问题",
   "error_unknown_message": "请重试；若持续出现，请查看面板日志。",
+  "servers_backToList": "返回面板列表",
+  "servers_websites": "网站",
+  "servers_databases": "数据库",
+  "servers_apps": "应用",
+  "servers_tasks": "任务",
   "servers_title": "面板",
   "servers_empty_title": "还没有连接任何面板",
   "servers_empty_message": "在 1Panel 的「面板设置 → API 接口」中生成密钥。",
   "servers_add": "添加面板",
   "servers_current": "当前",
   "servers_offline": "离线",
+  "servers_neverConnected": "从未连接",
+  "@servers_neverConnected": {
+    "description": "Server subtitle when the panel has never been connected."
+  },
+  "servers_sessionActive": "本次会话",
+  "@servers_sessionActive": {
+    "description": "Server subtitle when the panel is online but has no last-used time."
+  },
   "servers_last_seen": "最后连接 {time}",
   "servers_delete": "删除面板",
   "servers_delete_message": "仅从本机移除该面板，不会影响面板本身。",
@@ -368,6 +381,19 @@
   },
   "websites_php": "PHP",
   "websites_expire_days": "剩余 {days} 天",
+  "websites_expired_days": "已过期 {days} 天",
+  "@websites_expired_days": {
+    "description": "SSL certificate expiry shown when the certificate already expired.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "websites_expire_today": "今天到期",
+  "@websites_expire_today": {
+    "description": "SSL certificate expiry shown when the certificate expires today."
+  },
   "containers_title": "容器",
   "containers_empty_title": "还没有容器",
   "containers_empty_message": "面板上创建的容器会显示在这里。",
@@ -390,12 +416,54 @@
   "more_process": "进程",
   "more_backups": "备份",
   "more_runtimes": "运行环境",
+  "more_logsSubtitle": "操作、登录与任务日志",
+  "more_processSubtitle": "查看资源占用并结束进程",
+  "more_backupsSubtitle": "备份计划、备份账号与恢复",
+  "more_firewallSubtitle": "端口放行与 IP 规则",
+  "more_supervisorSubtitle": "进程守护与自启管理",
+  "more_toolboxSubtitle": "常用运维工具集合",
   "settings_appearance": "外观",
   "settings_theme_mode": "主题模式",
   "settings_accent": "强调色",
   "settings_dynamic_color": "动态取色",
   "settings_dynamic_color_hint": "使用 Android 12+ 壁纸取色",
   "settings_oled": "OLED 纯黑",
+  "settings_oled_hint": "仅在深色主题生效",
+  "@settings_oled_hint": {
+    "description": "Helper text for the OLED switch."
+  },
+  "settings_accent_forest": "森林绿",
+  "@settings_accent_forest": {
+    "description": "Accent color name."
+  },
+  "settings_accent_ocean": "海洋蓝",
+  "@settings_accent_ocean": {
+    "description": "Accent color name."
+  },
+  "settings_accent_indigo": "靛蓝",
+  "@settings_accent_indigo": {
+    "description": "Accent color name."
+  },
+  "settings_accent_violet": "紫罗兰",
+  "@settings_accent_violet": {
+    "description": "Accent color name."
+  },
+  "settings_accent_rose": "玫瑰红",
+  "@settings_accent_rose": {
+    "description": "Accent color name."
+  },
+  "settings_accent_amber": "琥珀",
+  "@settings_accent_amber": {
+    "description": "Accent color name."
+  },
+  "settings_accent_teal": "青碧",
+  "@settings_accent_teal": {
+    "description": "Accent color name."
+  },
+  "settings_accent_graphite": "石墨",
+  "@settings_accent_graphite": {
+    "description": "Accent color name."
+  },
   "settings_text_scale": "字号缩放",
   "settings_interaction": "交互",
   "settings_haptics": "触觉反馈",
@@ -682,7 +750,7 @@
   "toolbox_readOnlyHint": "以下信息来自面板，修改请到 1Panel 网页",
   "app_detail_key": "应用标识",
   "app_detail_container": "容器",
-  "app_detail_compose": "Compose 文件",
+  "app_detail_compose": "编排文件",
   "app_detail_message": "说明",
   "server_edit_savedConnecting": "已保存，正在连接…",
   "action_add": "添加",
@@ -1845,11 +1913,11 @@
   "@containers_fileEmpty": {
     "description": "OneDash UI text."
   },
-  "containers_composeEnv": "Compose 环境变量",
+  "containers_composeEnv": "编排环境变量",
   "@containers_composeEnv": {
     "description": "OneDash UI text."
   },
-  "containers_pinCompose": "置顶 Compose",
+  "containers_pinCompose": "置顶编排",
   "@containers_pinCompose": {
     "description": "OneDash UI text."
   },
@@ -2162,6 +2230,40 @@
   "toolbox_sshBanEmptyTitle": "暂无被封禁 IP",
   "toolbox_clamScanEmptyTitle": "暂无扫描记录",
   "panelSettings_notificationMethodsEmptyTitle": "尚未配置通知方式",
+  "process_title": "进程管理",
+  "process_stopRequested": "已发送停止请求",
+  "process_stopFailed": "停止失败",
+  "process_searchNamePlaceholder": "搜索进程名",
+  "process_searchNameOrPortPlaceholder": "搜索进程名或端口",
+  "process_connectionFailed": "连接失败",
+  "process_noResults": "无匹配结果",
+  "process_noData": "暂无数据",
+  "process_noResultsSubtitle": "尝试修改搜索关键词",
+  "process_waitingData": "等待数据加载",
+  "process_connecting": "正在连接进程服务",
+  "process_readingDetail": "正在读取进程详情",
+  "process_readFailed": "读取失败",
+  "process_basicInfo": "基本信息",
+  "process_user": "用户",
+  "process_status": "状态",
+  "process_startTime": "启动时间",
+  "process_threads": "{count} 线程",
+  "process_threadCount": "线程数",
+  "process_connections": "{count} 连接",
+  "process_connectionCount": "连接数",
+  "process_commandLine": "命令行",
+  "process_cpuDisk": "CPU / 磁盘",
+  "process_memory": "内存",
+  "process_diskRead": "磁盘读取",
+  "process_diskWrite": "磁盘写入",
+  "process_memoryDetails": "内存详情",
+  "process_openFiles": "打开文件",
+  "process_networkConnections": "网络连接",
+  "process_environmentVariables": "环境变量",
+  "process_sort": "排序",
+  "process_sortCpu": "CPU 使用率",
+  "process_sortMemory": "内存",
+  "process_sortConnections": "连接数",
   "process_emptyTitle": "暂无进程",
   "terminal_emptySessionsTitle": "暂无终端会话",
   "files_historyEmptyTitle": "暂无文件历史",
@@ -2300,6 +2402,19 @@
   "dashboard_resourceUsage": "资源占用",
   "dashboard_swap": "Swap",
   "dashboard_realtimeSpeed": "实时速率",
+  "dashboard_chartNow": "现在",
+  "@dashboard_chartNow": {
+    "description": "Right edge of the realtime chart time axis."
+  },
+  "dashboard_chartSecondsAgo": "{seconds} 秒前",
+  "@dashboard_chartSecondsAgo": {
+    "description": "Elapsed time label on the realtime chart.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "dashboard_diskIo": "磁盘 I/O",
   "dashboard_read": "读取",
   "dashboard_write": "写入",
@@ -4483,7 +4598,7 @@
   "@panelSettings_registerPasskey": {
     "description": "OneDash UI text."
   },
-  "panelSettings_registerPasskeyHint": "通行密钥绑定当前域名，请在面板网页中完成注册",
+  "panelSettings_registerPasskeyHint": "在浏览器中注册同样需要 HTTPS 访问绑定域名",
   "@panelSettings_registerPasskeyHint": {
     "description": "OneDash UI text."
   },
@@ -4498,5 +4613,221 @@
   "cronjobs_pickScript": "从脚本库选择",
   "@cronjobs_pickScript": {
     "description": "Pick a shell script from the script library."
+  },
+  "containers_createVolume": "创建存储卷",
+  "@containers_createVolume": {
+    "description": "OneDash UI text."
+  },
+  "containers_volumeName": "存储卷名称",
+  "@containers_volumeName": {
+    "description": "OneDash UI text."
+  },
+  "containers_volumeDriver": "驱动",
+  "@containers_volumeDriver": {
+    "description": "OneDash UI text."
+  },
+  "containers_volumeOptions": "驱动参数",
+  "@containers_volumeOptions": {
+    "description": "OneDash UI text."
+  },
+  "containers_volumeLabels": "标签",
+  "@containers_volumeLabels": {
+    "description": "OneDash UI text."
+  },
+  "containers_volumeKeyValueHint": "每行一个 key=value",
+  "@containers_volumeKeyValueHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_menuSettings": "菜单设置",
+  "@panelSettings_menuSettings": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_menuSettingsHint": "选择面板菜单中显示的功能入口",
+  "@panelSettings_menuSettingsHint": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_menuSaveConfirm": "保存当前的菜单显示设置？",
+  "@panelSettings_menuSaveConfirm": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_menuUpdated": "菜单已更新",
+  "@panelSettings_menuUpdated": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_menuEmpty": "暂无菜单项",
+  "@panelSettings_menuEmpty": {
+    "description": "OneDash UI text."
+  },
+  "websites_importMasterSsl": "导入主节点证书",
+  "@websites_importMasterSsl": {
+    "description": "OneDash UI text."
+  },
+  "websites_sslStart": "生效时间",
+  "@websites_sslStart": {
+    "description": "OneDash UI text."
+  },
+  "websites_masterSslId": "主证书 ID",
+  "@websites_masterSslId": {
+    "description": "OneDash UI text."
+  },
+  "websites_domainsHint": "逗号分隔的域名，留空则使用主域名",
+  "@websites_domainsHint": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_dm_policy": "私聊策略",
+  "@ai_agent_dm_policy": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_policy_pairing": "配对",
+  "@ai_agent_policy_pairing": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_policy_open": "开放",
+  "@ai_agent_policy_open": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_policy_allowlist": "白名单",
+  "@ai_agent_policy_allowlist": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_policy_disabled": "禁用",
+  "@ai_agent_policy_disabled": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_allow_from": "允许的发送者",
+  "@ai_agent_allow_from": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_allow_from_hint": "多个 ID 用逗号分隔",
+  "@ai_agent_allow_from_hint": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_group_allow_from": "允许的群成员",
+  "@ai_agent_group_allow_from": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_proxy": "代理",
+  "@ai_agent_proxy": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_default_account": "默认账号",
+  "@ai_agent_default_account": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_streaming_off": "关闭",
+  "@ai_agent_streaming_off": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_streaming_partial": "部分",
+  "@ai_agent_streaming_partial": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_streaming_block": "分段",
+  "@ai_agent_streaming_block": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_streaming_progress": "进度",
+  "@ai_agent_streaming_progress": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_group_session_scope": "群会话范围",
+  "@ai_agent_group_session_scope": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_group_scope_group": "按群",
+  "@ai_agent_group_scope_group": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_group_scope_sender": "按群和发送者",
+  "@ai_agent_group_scope_sender": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_separate_session": "按会话独立会话",
+  "@ai_agent_separate_session": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_shared_memory": "跨会话共享记忆",
+  "@ai_agent_shared_memory": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_async_mode": "异步模式",
+  "@ai_agent_async_mode": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_ack_text": "确认回复文本",
+  "@ai_agent_ack_text": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_id": "机器人 ID",
+  "@ai_agent_bot_id": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_secret": "机器人密钥",
+  "@ai_agent_bot_secret": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_token": "机器人 Token",
+  "@ai_agent_bot_token": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_app_id": "App ID",
+  "@ai_agent_bot_app_id": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_client_id": "Client ID",
+  "@ai_agent_bot_client_id": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_client_secret": "Client Secret",
+  "@ai_agent_bot_client_secret": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_system_prompt": "系统提示词",
+  "@ai_agent_bot_system_prompt": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_name": "机器人名称",
+  "@ai_agent_bot_name": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_bot_default": "默认机器人",
+  "@ai_agent_bot_default": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_add_bot": "添加机器人",
+  "@ai_agent_add_bot": {
+    "description": "OneDash UI text."
+  },
+  "ai_agent_remove_bot": "移除机器人",
+  "@ai_agent_remove_bot": {
+    "description": "OneDash UI text."
+  },
+  "vm_bridgeName": "网桥名称",
+  "@vm_bridgeName": {
+    "description": "OneDash UI text."
+  },
+  "vm_noBridges": "未发现主机网桥",
+  "@vm_noBridges": {
+    "description": "OneDash UI text."
+  },
+  "panelSettings_usePasskey": "使用通行密钥登录",
+  "panelSettings_passkeyLoginHint": "使用绑定面板域名保存的通行密钥",
+  "panelSettings_registerPasskeyDevice": "在此设备注册",
+  "panelSettings_passkeyName": "通行密钥名称",
+  "panelSettings_passkeyPrereq": "需通过 HTTPS 访问绑定域名，并在该域名提供 Android assetlinks.json",
+  "@panelSettings_usePasskey": {
+    "description": "panelSettings_usePasskey"
+  },
+  "@panelSettings_passkeyLoginHint": {
+    "description": "panelSettings_passkeyLoginHint"
+  },
+  "@panelSettings_registerPasskeyDevice": {
+    "description": "panelSettings_registerPasskeyDevice"
+  },
+  "@panelSettings_passkeyName": {
+    "description": "panelSettings_passkeyName"
+  },
+  "@panelSettings_passkeyPrereq": {
+    "description": "panelSettings_passkeyPrereq"
   }
 }

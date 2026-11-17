@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -176,30 +174,15 @@ class CommandLibraryPage extends ConsumerWidget {
       if (file == null) return;
       final bytes = file.bytes;
       if (bytes == null) return;
-      final rows = _parseCsv(utf8.decode(bytes, allowMalformed: true));
-      if (rows.length <= 1) {
-        AppToast.warning(context, l10n.commandLibrary_importEmpty);
-        return;
-      }
-      final items = <Map<String, dynamic>>[];
-      for (final row in rows.skip(1)) {
-        if (row.length < 2) continue;
-        final name = row[0].trim();
-        final command = row[1].trim();
-        if (name.isEmpty || command.isEmpty) continue;
-        items.add({
-          'type': 'command',
-          'groupID': 0,
-          'groupBelong': '',
-          'name': name,
-          'command': command,
-        });
-      }
+      final repository = await ref.read(settingRepositoryProvider.future);
+      final items = await repository.uploadCommandCsv(
+        bytes: bytes,
+        filename: file.name,
+      );
       if (items.isEmpty) {
         AppToast.warning(context, l10n.commandLibrary_importEmpty);
         return;
       }
-      final repository = await ref.read(settingRepositoryProvider.future);
       await repository.importCommands(items);
       if (!context.mounted) return;
       AppToast.success(context, l10n.commandLibrary_imported);
@@ -313,45 +296,4 @@ class CommandLibraryPage extends ConsumerWidget {
       showErrorToast(context, error);
     }
   }
-}
-
-List<List<String>> _parseCsv(String text) {
-  final rows = <List<String>>[];
-  var row = <String>[];
-  final field = StringBuffer();
-  var quoted = false;
-  for (var i = 0; i < text.length; i++) {
-    final char = text[i];
-    if (quoted) {
-      if (char == '"') {
-        if (i + 1 < text.length && text[i + 1] == '"') {
-          field.write('"');
-          i++;
-        } else {
-          quoted = false;
-        }
-      } else {
-        field.write(char);
-      }
-      continue;
-    }
-    if (char == '"') {
-      quoted = true;
-    } else if (char == ',') {
-      row.add(field.toString());
-      field.clear();
-    } else if (char == '\n') {
-      row.add(field.toString());
-      field.clear();
-      rows.add(row);
-      row = <String>[];
-    } else if (char != '\r') {
-      field.write(char);
-    }
-  }
-  if (field.isNotEmpty || row.isNotEmpty) {
-    row.add(field.toString());
-    rows.add(row);
-  }
-  return rows;
 }

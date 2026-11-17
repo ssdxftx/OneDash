@@ -10,20 +10,22 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.selectedCount,
     required this.onCancel,
     this.actions,
+    this.height = AppTokens.appBarHeight,
   });
 
   final int selectedCount;
   final VoidCallback onCancel;
   final List<Widget>? actions;
+  final double height;
 
   @override
-  Size get preferredSize => const Size.fromHeight(AppTokens.appBarHeight);
+  Size get preferredSize => Size.fromHeight(height);
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return AppBar(
-      toolbarHeight: AppTokens.appBarHeight,
+      toolbarHeight: height,
       leading: IconButton(
         tooltip: l10n.files_cancelSelection,
         icon: const Icon(TablerIcons.x),

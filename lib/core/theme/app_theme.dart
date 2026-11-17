@@ -34,14 +34,7 @@ abstract final class AppTheme {
       );
     }
 
-    return base.copyWith(
-      surface: const Color(0xFF101512),
-      surfaceContainerLowest: const Color(0xFF0B0F0C),
-      surfaceContainerLow: const Color(0xFF1A211C),
-      surfaceContainer: const Color(0xFF1D2520),
-      surfaceContainerHigh: const Color(0xFF222C27),
-      surfaceContainerHighest: const Color(0xFF29342E),
-    );
+    return base;
   }
 
   static ThemeData build(

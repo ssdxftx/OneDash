@@ -55,6 +55,15 @@ DiskUsage? _primaryDisk(List<DiskUsage> disks) {
   return disks.reduce((a, b) => a.usedPercent >= b.usedPercent ? a : b);
 }
 
+String _systemSummary(DashboardBase base) {
+  final distro = base.prettyDistro.trim();
+  final version = base.platformVersion.trim();
+  if (distro.isEmpty) return version;
+  if (version.isEmpty || distro.contains(version)) return distro;
+  if (version.contains(distro)) return version;
+  return '$distro · $version';
+}
+
 Color _usageColor(BuildContext context, double percent) {
   final colors = context.appColors;
   if (percent >= 85) return colors.danger;
@@ -135,10 +144,7 @@ class _ServerHeaderCard extends StatelessWidget {
                     ),
                     const SizedBox(height: AppTokens.s4),
                     Text(
-                      [
-                        base.prettyDistro,
-                        base.platformVersion,
-                      ].where((item) => item.isNotEmpty).join(' · '),
+                      _systemSummary(base),
                       style: AppTextStyles.caption.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
@@ -155,41 +161,28 @@ class _ServerHeaderCard extends StatelessWidget {
           const SizedBox(height: AppTokens.s16),
           Divider(height: 1, color: scheme.outlineVariant),
           const SizedBox(height: AppTokens.s16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _HeaderMetric(
-                  icon: TablerIcons.clock,
-                  label: l10n.dashboard_uptime,
-                  value: formatUptime(current.uptimeSeconds, l10n),
-                  alignment: CrossAxisAlignment.start,
-                ),
+          _HeaderMetrics(
+            metrics: [
+              (
+                icon: TablerIcons.clock,
+                label: l10n.dashboard_uptime,
+                value: formatUptime(current.uptimeSeconds, l10n),
               ),
-              Expanded(
-                child: _HeaderMetric(
-                  icon: TablerIcons.activity,
-                  label: l10n.dashboard_load,
-                  value:
-                      '${current.load1.toStringAsFixed(2)}/${current.load5.toStringAsFixed(2)}/${current.load15.toStringAsFixed(2)}',
-                  alignment: CrossAxisAlignment.center,
-                ),
+              (
+                icon: TablerIcons.activity,
+                label: l10n.dashboard_load,
+                value:
+                    '${current.load1.toStringAsFixed(2)}/${current.load5.toStringAsFixed(2)}/${current.load15.toStringAsFixed(2)}',
               ),
-              Expanded(
-                child: _HeaderMetric(
-                  icon: TablerIcons.cpu,
-                  label: l10n.dashboard_processes,
-                  value: '${current.procs}',
-                  alignment: CrossAxisAlignment.center,
-                ),
+              (
+                icon: TablerIcons.cpu,
+                label: l10n.dashboard_processes,
+                value: '${current.procs}',
               ),
-              Expanded(
-                child: _HeaderMetric(
-                  icon: TablerIcons.topology_star,
-                  label: l10n.dashboard_arch,
-                  value: base.kernelArch.isEmpty ? '-' : base.kernelArch,
-                  alignment: CrossAxisAlignment.end,
-                ),
+              (
+                icon: TablerIcons.topology_star,
+                label: l10n.dashboard_arch,
+                value: base.kernelArch.isEmpty ? '-' : base.kernelArch,
               ),
             ],
           ),
@@ -207,12 +200,10 @@ class _StatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final color = online
-        ? context.appColors.success
-        : context.appColors.warning;
+    final color = online ? context.appColors.success : context.appColors.danger;
     return Container(
-      width: 68,
-      height: 24,
+      width: 76,
+      height: 26,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(6),
@@ -220,13 +211,13 @@ class _StatusPill extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(TablerIcons.activity_heartbeat, size: 11, color: color),
+          Icon(TablerIcons.activity_heartbeat, size: 12, color: color),
           const SizedBox(width: 4),
           Flexible(
             child: Text(
               online ? l10n.servers_online : l10n.servers_offline,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 12,
                 height: 1,
                 fontWeight: FontWeight.w700,
                 color: color,
@@ -263,35 +254,124 @@ class _HeaderMetric extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 10, color: scheme.onSurfaceVariant),
+            Icon(icon, size: 12, color: scheme.onSurfaceVariant),
             const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                height: 1.1,
-                fontWeight: FontWeight.w500,
-                color: scheme.onSurfaceVariant,
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  height: 1.1,
+                  fontWeight: FontWeight.w500,
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 6),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 13,
-            height: 1.2,
-            fontWeight: FontWeight.w600,
-            color: scheme.onSurface,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: switch (alignment) {
-            CrossAxisAlignment.end => TextAlign.end,
-            CrossAxisAlignment.center => TextAlign.center,
-            _ => TextAlign.start,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: switch (alignment) {
+            CrossAxisAlignment.end => Alignment.centerRight,
+            CrossAxisAlignment.center => Alignment.center,
+            _ => Alignment.centerLeft,
           },
+          child: Text(
+            value,
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.2,
+              fontWeight: FontWeight.w600,
+              color: scheme.onSurface,
+            ),
+            textAlign: switch (alignment) {
+              CrossAxisAlignment.end => TextAlign.end,
+              CrossAxisAlignment.center => TextAlign.center,
+              _ => TextAlign.start,
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HeaderMetrics extends StatelessWidget {
+  const _HeaderMetrics({required this.metrics});
+
+  final List<({IconData icon, String label, String value})> metrics;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stacked =
+            constraints.maxWidth < 480 ||
+            MediaQuery.textScalerOf(context).scale(1) > 1.15;
+        if (!stacked) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var index = 0; index < metrics.length; index++)
+                Expanded(
+                  child: _HeaderMetric(
+                    icon: metrics[index].icon,
+                    label: metrics[index].label,
+                    value: metrics[index].value,
+                    alignment: switch (index) {
+                      0 => CrossAxisAlignment.start,
+                      _ when index == metrics.length - 1 =>
+                        CrossAxisAlignment.end,
+                      _ => CrossAxisAlignment.center,
+                    },
+                  ),
+                ),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            _HeaderMetricRow(left: metrics[0], right: metrics[1]),
+            const SizedBox(height: AppTokens.s16),
+            _HeaderMetricRow(left: metrics[2], right: metrics[3]),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _HeaderMetricRow extends StatelessWidget {
+  const _HeaderMetricRow({required this.left, required this.right});
+
+  final ({IconData icon, String label, String value}) left;
+  final ({IconData icon, String label, String value}) right;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: _HeaderMetric(
+            icon: left.icon,
+            label: left.label,
+            value: left.value,
+            alignment: CrossAxisAlignment.start,
+          ),
+        ),
+        const SizedBox(width: AppTokens.s16),
+        Expanded(
+          child: _HeaderMetric(
+            icon: right.icon,
+            label: right.label,
+            value: right.value,
+            alignment: CrossAxisAlignment.end,
+          ),
         ),
       ],
     );
@@ -314,15 +394,15 @@ class _ResourceCard extends StatelessWidget {
       _ResourceRow(
         icon: TablerIcons.cpu,
         label: l10n.dashboard_cpu,
-        color: context.appColors.success,
+        color: _usageColor(context, current.cpuUsedPercent),
         value:
-            '${current.cpuUsed.toStringAsFixed(2)} / $cores ${cores == 1 ? 'Core' : 'Cores'}',
+            '${current.cpuUsed.toStringAsFixed(2)} / ${l10n.dashboard_cores(cores)}',
         percent: current.cpuUsedPercent,
       ),
       _ResourceRow(
         icon: TablerIcons.device_sd_card,
         label: l10n.dashboard_memory,
-        color: context.appColors.chart4,
+        color: _usageColor(context, current.memoryUsedPercent),
         value:
             '${formatBytes(current.memoryUsed)} / ${formatBytes(current.memoryTotal)}',
         percent: current.memoryUsedPercent,
@@ -331,7 +411,7 @@ class _ResourceCard extends StatelessWidget {
         _ResourceRow(
           icon: TablerIcons.arrows_diagonal,
           label: l10n.dashboard_swap,
-          color: context.appColors.warning,
+          color: _usageColor(context, current.swapMemoryUsedPercent),
           value:
               '${formatBytes(current.swapMemoryUsed)} / ${formatBytes(current.swapMemoryTotal)}',
           percent: current.swapMemoryUsedPercent,
@@ -385,14 +465,14 @@ class _ResourceRow extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.color,
-    required this.value,
+    this.value,
     required this.percent,
   });
 
   final IconData icon;
   final String label;
   final Color color;
-  final String value;
+  final String? value;
   final double percent;
 
   @override
@@ -405,6 +485,7 @@ class _ResourceRow extends StatelessWidget {
         vertical: AppTokens.s8,
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 32,
@@ -418,12 +499,11 @@ class _ResourceRow extends StatelessWidget {
           const SizedBox(width: AppTokens.s12),
           Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Expanded(
-                      flex: 3,
                       child: Text(
                         label,
                         style: const TextStyle(
@@ -436,21 +516,30 @@ class _ResourceRow extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppTokens.s8),
-                    Flexible(
-                      flex: 2,
-                      child: Text(
-                        value,
-                        textAlign: TextAlign.end,
-                        style: AppTextStyles.caption.copyWith(
-                          color: scheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      '${clamped.toStringAsFixed(0)}%',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        height: 1.2,
+                        fontWeight: FontWeight.w600,
+                        fontFeatures: [FontFeature.tabularFigures()],
                       ),
                     ),
                   ],
                 ),
+                if (value != null && value!.trim().isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    value!,
+                    style: AppTextStyles.caption.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
                 const SizedBox(height: 6),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(3),
@@ -470,17 +559,149 @@ class _ResourceRow extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: AppTokens.s12),
-          SizedBox(
-            width: 38,
-            child: Text(
-              '${clamped.toStringAsFixed(0)}%',
-              textAlign: TextAlign.end,
-              style: const TextStyle(
-                fontSize: 13,
-                height: 1.2,
-                fontWeight: FontWeight.w600,
+        ],
+      ),
+    );
+  }
+}
+
+class NodeInfoCard extends StatelessWidget {
+  const NodeInfoCard({super.key, required this.node});
+
+  final Map<String, dynamic> node;
+
+  double _num(String key) {
+    final value = node[key];
+    return value is num ? value.toDouble() : 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cpu = _num('cpuUsedPercent').clamp(0, 100).toDouble();
+    final memory = _num('memoryUsedPercent').clamp(0, 100).toDouble();
+    return SizedBox(
+      width: double.infinity,
+      child: TonalCard(
+        padding: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppTokens.s16,
+                AppTokens.s12,
+                AppTokens.s16,
+                AppTokens.s4,
               ),
+              child: _panelTitle(
+                context,
+                l10n.dashboard_nodeInfo,
+                TablerIcons.topology_star,
+                context.appColors.chart4,
+              ),
+            ),
+            _ResourceRow(
+              icon: TablerIcons.cpu,
+              label: l10n.dashboard_cpu,
+              color: _usageColor(context, cpu),
+              percent: cpu,
+            ),
+            Divider(
+              height: 1,
+              indent: 44,
+              color: context.scheme.outlineVariant,
+            ),
+            _ResourceRow(
+              icon: TablerIcons.device_sd_card,
+              label: l10n.dashboard_memory,
+              color: _usageColor(context, memory),
+              percent: memory,
+            ),
+            Divider(
+              height: 1,
+              indent: 44,
+              color: context.scheme.outlineVariant,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppTokens.s16,
+                AppTokens.s12,
+                AppTokens.s16,
+                AppTokens.s16,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.dashboard_load,
+                    style: AppTextStyles.caption.copyWith(
+                      color: context.scheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: AppTokens.s8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _LoadTile(
+                          label: '1m',
+                          value: _num('load1').toStringAsFixed(2),
+                        ),
+                      ),
+                      const SizedBox(width: AppTokens.s8),
+                      Expanded(
+                        child: _LoadTile(
+                          label: '5m',
+                          value: _num('load5').toStringAsFixed(2),
+                        ),
+                      ),
+                      const SizedBox(width: AppTokens.s8),
+                      Expanded(
+                        child: _LoadTile(
+                          label: '15m',
+                          value: _num('load15').toStringAsFixed(2),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadTile extends StatelessWidget {
+  const _LoadTile({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.scheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: AppTokens.s8),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(AppTokens.rSm),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: AppTextStyles.caption.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: AppTextStyles.titleS.copyWith(
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
         ],
@@ -518,14 +739,18 @@ class _NetworkTrafficCard extends StatelessWidget {
           _TrafficRow(
             icon: TablerIcons.arrow_up_right,
             label: l10n.dashboard_upload,
-            value: formatBytes(current.netBytesSent),
+            value: l10n.dashboard_trafficTotal(
+              formatBytes(current.netBytesSent),
+            ),
             color: context.appColors.success,
           ),
           Divider(height: 1, indent: 44, color: context.scheme.outlineVariant),
           _TrafficRow(
             icon: TablerIcons.arrow_down_left,
             label: l10n.dashboard_download,
-            value: formatBytes(current.netBytesRecv),
+            value: l10n.dashboard_trafficTotal(
+              formatBytes(current.netBytesRecv),
+            ),
             color: context.appColors.chart2,
           ),
         ],
@@ -576,13 +801,19 @@ class _TrafficRow extends StatelessWidget {
               ),
             ),
           ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              height: 1.1,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.2,
+          const SizedBox(width: AppTokens.s8),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 14,
+                height: 1.1,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.2,
+              ),
             ),
           ),
         ],
@@ -625,6 +856,7 @@ class _SpeedChartCardState extends State<_SpeedChartCard>
     final latest = state.speedHistory.isEmpty
         ? SpeedSample(time: _epoch, up: 0, down: 0)
         : state.speedHistory.last;
+    final chartScale = _speedScale(state.speedHistory);
     return TonalCard(
       padding: EdgeInsets.zero,
       child: Column(
@@ -637,46 +869,97 @@ class _SpeedChartCardState extends State<_SpeedChartCard>
               AppTokens.s16,
               AppTokens.s4,
             ),
-            child: _panelTitle(
-              context,
-              l10n.dashboard_realtimeSpeed,
-              TablerIcons.chart_area_line,
-              context.appColors.chart1,
-              trailing: Wrap(
-                spacing: AppTokens.s12,
-                runSpacing: 6,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _panelTitle(
+                  context,
+                  l10n.dashboard_realtimeSpeed,
+                  TablerIcons.chart_area_line,
+                  context.appColors.chart1,
+                ),
+                const SizedBox(height: AppTokens.s8),
+                Wrap(
+                  spacing: AppTokens.s16,
+                  runSpacing: 6,
+                  children: [
+                    _LegendItem(
+                      icon: TablerIcons.arrow_up_right,
+                      label: formatByteRate(latest.up),
+                      color: context.appColors.success,
+                    ),
+                    _LegendItem(
+                      icon: TablerIcons.arrow_down_left,
+                      label: formatByteRate(latest.down),
+                      color: context.appColors.chart2,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 160,
+            child: Padding(
+              padding: const EdgeInsets.only(left: AppTokens.s16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _LegendItem(
-                    icon: TablerIcons.arrow_up_right,
-                    label: formatByteRate(latest.up),
-                    color: context.appColors.success,
+                  _SpeedChartYAxis(
+                    scale: chartScale,
+                    color: context.scheme.onSurfaceVariant.withValues(
+                      alpha: 0.6,
+                    ),
                   ),
-                  _LegendItem(
-                    icon: TablerIcons.arrow_down_left,
-                    label: formatByteRate(latest.down),
-                    color: context.appColors.chart2,
+                  const SizedBox(width: AppTokens.s8),
+                  Expanded(
+                    child: ValueListenableBuilder<DateTime>(
+                      valueListenable: _now,
+                      builder: (context, now, _) => CustomPaint(
+                        painter: _SpeedChartPainter(
+                          samples: state.speedHistory,
+                          now: now,
+                          upColor: context.appColors.success,
+                          downColor: context.appColors.chart2,
+                          gridColor: context.scheme.outlineVariant,
+                        ),
+                        child: const SizedBox.expand(),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(
-            height: 160,
-            child: ValueListenableBuilder<DateTime>(
-              valueListenable: _now,
-              builder: (context, now, _) => CustomPaint(
-                painter: _SpeedChartPainter(
-                  samples: state.speedHistory,
-                  now: now,
-                  upColor: context.appColors.success,
-                  downColor: context.appColors.chart2,
-                  gridColor: context.scheme.outlineVariant,
-                  labelColor: context.scheme.onSurfaceVariant.withValues(
-                    alpha: 0.6,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppTokens.s16,
+              AppTokens.s4,
+              AppTokens.s16,
+              AppTokens.s12,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.dashboard_chartSecondsAgo(60),
+                  style: AppTextStyles.caption.copyWith(
+                    color: context.scheme.onSurfaceVariant,
                   ),
                 ),
-                child: const SizedBox.expand(),
-              ),
+                Text(
+                  l10n.dashboard_chartSecondsAgo(30),
+                  style: AppTextStyles.caption.copyWith(
+                    color: context.scheme.onSurfaceVariant,
+                  ),
+                ),
+                Text(
+                  l10n.dashboard_chartNow,
+                  style: AppTextStyles.caption.copyWith(
+                    color: context.scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -705,15 +988,15 @@ class _LegendItem extends StatelessWidget {
       children: [
         Icon(icon, size: 13, color: color),
         const SizedBox(width: 4),
-        SizedBox(
-          width: 78,
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 132),
           child: Transform.translate(
             offset: const Offset(0, -1),
             child: Text(
               label,
               textAlign: TextAlign.end,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 12,
                 height: 1.1,
                 fontWeight: FontWeight.w600,
                 color: context.scheme.onSurfaceVariant,
@@ -728,6 +1011,56 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
+double _speedScale(List<SpeedSample> samples) {
+  var currentMax = 0.0;
+  for (final sample in samples) {
+    currentMax = math.max(currentMax, math.max(sample.up, sample.down));
+  }
+  if (currentMax < 2048) return 2048;
+  final magnitude = math
+      .pow(10, (math.log(currentMax) / math.ln10).floor())
+      .toDouble();
+  final scale = switch (currentMax / magnitude) {
+    <= 1 => 1,
+    <= 2 => 2,
+    <= 5 => 5,
+    _ => 10,
+  };
+  return magnitude * scale * 1.2;
+}
+
+class _SpeedChartYAxis extends StatelessWidget {
+  const _SpeedChartYAxis({required this.scale, required this.color});
+
+  final double scale;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    const height = 160.0;
+    const steps = 4;
+    return SizedBox(
+      width: 52,
+      height: height,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          for (var index = 0; index < steps; index++)
+            Positioned(
+              top: height * index / steps - 6,
+              right: 0,
+              child: Text(
+                formatByteRate(scale * (1 - index / steps)),
+                textAlign: TextAlign.end,
+                style: TextStyle(fontSize: 11, height: 1, color: color),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SpeedChartPainter extends CustomPainter {
   _SpeedChartPainter({
     required this.samples,
@@ -735,7 +1068,6 @@ class _SpeedChartPainter extends CustomPainter {
     required this.upColor,
     required this.downColor,
     required this.gridColor,
-    required this.labelColor,
   });
 
   final List<SpeedSample> samples;
@@ -743,30 +1075,11 @@ class _SpeedChartPainter extends CustomPainter {
   final Color upColor;
   final Color downColor;
   final Color gridColor;
-  final Color labelColor;
-
-  double _maxScale() {
-    var currentMax = 0.0;
-    for (final sample in samples) {
-      currentMax = math.max(currentMax, math.max(sample.up, sample.down));
-    }
-    if (currentMax < 2048) return 2048;
-    final magnitude = math
-        .pow(10, (math.log(currentMax) / math.ln10).floor())
-        .toDouble();
-    final scale = switch (currentMax / magnitude) {
-      <= 1 => 1,
-      <= 2 => 2,
-      <= 5 => 5,
-      _ => 10,
-    };
-    return magnitude * scale * 1.2;
-  }
 
   @override
   void paint(Canvas canvas, Size size) {
     if (samples.isEmpty || size.width <= 0 || size.height <= 0) return;
-    final scale = _maxScale();
+    final scale = _speedScale(samples);
     const stepCount = 4;
     final gridPaint = Paint()
       ..color = gridColor.withValues(alpha: 0.5)
@@ -774,15 +1087,6 @@ class _SpeedChartPainter extends CustomPainter {
     for (var index = 0; index <= stepCount; index++) {
       final y = size.height * index / stepCount;
       canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-      final value = scale * (1 - index / stepCount);
-      final text = TextPainter(
-        text: TextSpan(
-          text: formatByteRate(value),
-          style: TextStyle(fontSize: 10, height: 1, color: labelColor),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      text.paint(canvas, Offset(16, y + 6));
     }
     _drawSeries(canvas, size, scale, (sample) => sample.up, upColor);
     _drawSeries(canvas, size, scale, (sample) => sample.down, downColor);

@@ -42,5 +42,6 @@ void main() {
     expect(find.text('app_data'), findsOneWidget);
     expect(find.text('mysql_data'), findsOneWidget);
     expect(find.byIcon(TablerIcons.trash), findsNWidgets(2));
+    expect(find.byIcon(TablerIcons.plus), findsOneWidget);
   });
 }

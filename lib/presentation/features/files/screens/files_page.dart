@@ -23,18 +23,21 @@ import '../../../../data/dto/file/file_tree_dto.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../../data/repositories_impl/log_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/back_to_servers_button.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/search_field.dart';
+import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/task_log_sheet.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/refreshable_empty_state.dart';
+import '../../servers/providers/servers_provider.dart';
 import '../providers/files_provider.dart';
 import '../widgets/file_permission_sheet.dart';
 import '../../../common/states/error_toast.dart';
@@ -1171,18 +1174,24 @@ class _FilesPageState extends ConsumerState<FilesPage> {
     final l10n = AppLocalizations.of(context);
     final scheme = context.scheme;
     final files = ref.watch(filesProvider(_path));
+    final server = ref.watch(serverByIdProvider(widget.serverId)).valueOrNull;
     final folderName = _path == '/'
         ? l10n.files_rootDirectory
         : _path.split('/').where((e) => e.isNotEmpty).last;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _selectionMode
-              ? l10n.files_selectCount(_selected.length)
-              : folderName,
-          style: AppTextStyles.titleM,
-        ),
+      appBar: AppBarLarge(
+        title: _selectionMode
+            ? l10n.files_selectCount(_selected.length)
+            : folderName,
+        subtitle: _selectionMode ? null : server?.displayName,
+        onTitleTap: _selectionMode
+            ? null
+            : () => showServerSwitcher(
+                context,
+                ref,
+                currentServerId: widget.serverId,
+              ),
         leading: _selectionMode
             ? IconButton(
                 tooltip: l10n.files_cancelSelection,
@@ -1190,7 +1199,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                 onPressed: _clearSelection,
               )
             : _path == '/'
-            ? null
+            ? const BackToServersButton()
             : IconButton(
                 tooltip: l10n.files_parent,
                 icon: const Icon(TablerIcons.arrow_up),
@@ -1241,30 +1250,22 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                   onPressed: _uploading ? null : _upload,
                 ),
                 PopupMenuButton<String>(
-                  tooltip: l10n.files_sort,
-                  icon: const Icon(TablerIcons.arrows_sort),
-                  onSelected: (value) =>
-                      ref.read(filesProvider(_path).notifier).setSort(value),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'name',
-                      child: Text(l10n.files_sortName),
-                    ),
-                    PopupMenuItem(
-                      value: 'size',
-                      child: Text(l10n.files_sortSize),
-                    ),
-                    PopupMenuItem(
-                      value: 'modTime',
-                      child: Text(l10n.files_sortModifiedTime),
-                    ),
-                  ],
-                ),
-                PopupMenuButton<String>(
                   tooltip: l10n.action_more,
                   icon: const Icon(TablerIcons.dots),
                   onSelected: (value) async {
-                    if (value == 'root') {
+                    if (value == 'sortName') {
+                      await ref
+                          .read(filesProvider(_path).notifier)
+                          .setSort('name');
+                    } else if (value == 'sortSize') {
+                      await ref
+                          .read(filesProvider(_path).notifier)
+                          .setSort('size');
+                    } else if (value == 'sortModified') {
+                      await ref
+                          .read(filesProvider(_path).notifier)
+                          .setSort('modTime');
+                    } else if (value == 'root') {
                       try {
                         final repository = await ref.read(
                           fileRepositoryProvider.future,
@@ -1292,6 +1293,18 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                   },
                   itemBuilder: (context) => [
                     PopupMenuItem(
+                      value: 'sortName',
+                      child: Text(l10n.files_sortName),
+                    ),
+                    PopupMenuItem(
+                      value: 'sortSize',
+                      child: Text(l10n.files_sortSize),
+                    ),
+                    PopupMenuItem(
+                      value: 'sortModified',
+                      child: Text(l10n.files_sortModifiedTime),
+                    ),
+                    PopupMenuItem(
                       value: 'root',
                       child: Text(l10n.files_websiteRoot),
                     ),
@@ -1310,91 +1323,99 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                   ],
                 ),
               ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(_searching ? 64 : 48),
-          child: Column(
-            children: [
-              if (_searching)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppTokens.s16,
-                    0,
-                    AppTokens.s16,
-                    AppTokens.s8,
-                  ),
-                  child: SearchField(
-                    controller: _searchController,
-                    autofocus: true,
-                    onChanged: (value) {
-                      _clearSelection();
-                      _searchDebouncer(() {
-                        ref.read(filesProvider(_path).notifier).search(value);
-                      }, delay: const Duration(milliseconds: 300));
+        bottom: _path == '/'
+            ? null
+            : PreferredSize(
+                preferredSize: const Size.fromHeight(AppTokens.minTapTarget),
+                child: _Breadcrumb(path: _path, onTap: _openPath),
+              ),
+      ),
+      body: Column(
+        children: [
+          if (_searching)
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                context.pagePadding,
+                AppTokens.s8,
+                context.pagePadding,
+                AppTokens.s8,
+              ),
+              child: SearchField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: (value) {
+                  _clearSelection();
+                  _searchDebouncer(() {
+                    ref.read(filesProvider(_path).notifier).search(value);
+                  }, delay: const Duration(milliseconds: 300));
+                },
+              ),
+            ),
+          Expanded(
+            child: AsyncStateView(
+              value: files,
+              onRetry: () => ref.read(filesProvider(_path).notifier).refresh(),
+              loading: const SkeletonList(itemCount: 10, itemHeight: 56),
+              isEmpty: (state) => state.items.isEmpty,
+              empty: RefreshableEmptyState(
+                onRefresh: () =>
+                    ref.read(filesProvider(_path).notifier).refresh(),
+                child: EmptyState(
+                  icon: TablerIcons.folder_open,
+                  title: l10n.files_empty_title,
+                  message: l10n.files_empty_message,
+                  actionLabel: l10n.files_upload,
+                  onAction: _upload,
+                ),
+              ),
+              builder: (state) => RefreshIndicator(
+                onRefresh: () =>
+                    ref.read(filesProvider(_path).notifier).refresh(),
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification.metrics.extentAfter < 400) {
+                      ref.read(filesProvider(_path).notifier).loadMore();
+                    }
+                    return false;
+                  },
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.only(
+                      bottom:
+                          AppTokens.bottomNavClearance +
+                          MediaQuery.paddingOf(context).bottom,
+                    ),
+                    itemExtent:
+                        72 *
+                        MediaQuery.textScalerOf(
+                          context,
+                        ).scale(1).clamp(1.0, 1.8),
+                    itemCount: state.items.length,
+                    itemBuilder: (context, index) {
+                      final item = state.items[index];
+                      return _FileTile(
+                        item: item,
+                        remark: state.remarks[item.path] ?? '',
+                        selected: _selected.contains(item.path),
+                        dirSize: _dirSizes[item.path],
+                        calculating: _calculating.contains(item.path),
+                        onTap: _selectionMode
+                            ? () => _toggleSelection(item)
+                            : item.isDir
+                            ? () => _openPath(item.path)
+                            : () => _showActions(item),
+                        onLongPress: () => _toggleSelection(item),
+                        onCalculateSize: item.isDir
+                            ? () => _calculateDirSize(item)
+                            : null,
+                      );
                     },
                   ),
                 ),
-              _Breadcrumb(path: _path, onTap: _openPath),
-            ],
-          ),
-        ),
-      ),
-      body: AsyncStateView(
-        value: files,
-        onRetry: () => ref.read(filesProvider(_path).notifier).refresh(),
-        loading: const SkeletonList(itemCount: 10, itemHeight: 56),
-        isEmpty: (state) => state.items.isEmpty,
-        empty: RefreshableEmptyState(
-          onRefresh: () => ref.read(filesProvider(_path).notifier).refresh(),
-          child: EmptyState(
-            icon: TablerIcons.folder_open,
-            title: l10n.files_empty_title,
-            message: l10n.files_empty_message,
-            actionLabel: l10n.files_upload,
-            onAction: _upload,
-          ),
-        ),
-        builder: (state) => RefreshIndicator(
-          onRefresh: () => ref.read(filesProvider(_path).notifier).refresh(),
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (notification) {
-              if (notification.metrics.extentAfter < 400) {
-                ref.read(filesProvider(_path).notifier).loadMore();
-              }
-              return false;
-            },
-            child: ListView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.only(
-                bottom:
-                    AppTokens.bottomNavClearance +
-                    MediaQuery.paddingOf(context).bottom,
               ),
-              itemExtent:
-                  72 *
-                  MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.8),
-              itemCount: state.items.length,
-              itemBuilder: (context, index) {
-                final item = state.items[index];
-                return _FileTile(
-                  item: item,
-                  remark: state.remarks[item.path] ?? '',
-                  selected: _selected.contains(item.path),
-                  dirSize: _dirSizes[item.path],
-                  calculating: _calculating.contains(item.path),
-                  onTap: _selectionMode
-                      ? () => _toggleSelection(item)
-                      : item.isDir
-                      ? () => _openPath(item.path)
-                      : () => _showActions(item),
-                  onLongPress: () => _toggleSelection(item),
-                  onCalculateSize: item.isDir
-                      ? () => _calculateDirSize(item)
-                      : null,
-                );
-              },
             ),
           ),
-        ),
+        ],
       ),
       bottomNavigationBar: _selectionMode
           ? SafeArea(
@@ -1757,7 +1778,13 @@ class _Breadcrumb extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final segments = path.split('/').where((e) => e.isNotEmpty).toList();
+    if (segments.isEmpty) return const SizedBox.shrink();
     final scheme = context.scheme;
+    final separator = Icon(
+      TablerIcons.chevron_right,
+      size: 16,
+      color: scheme.onSurfaceVariant.withValues(alpha: 0.6),
+    );
     return SizedBox(
       height: AppTokens.minTapTarget,
       child: ListView(
@@ -1770,7 +1797,7 @@ class _Breadcrumb extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: AppTokens.s8),
               child: Center(
                 child: Text(
-                  l10n.files_homeDirectory,
+                  l10n.files_rootDirectory,
                   style: AppTextStyles.bodyS.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
@@ -1778,7 +1805,8 @@ class _Breadcrumb extends StatelessWidget {
               ),
             ),
           ),
-          for (var i = 0; i < segments.length; i++)
+          for (var i = 0; i < segments.length; i++) ...[
+            separator,
             InkWell(
               onTap: () => onTap('/${segments.take(i + 1).join('/')}'),
               child: Padding(
@@ -1798,6 +1826,7 @@ class _Breadcrumb extends StatelessWidget {
                 ),
               ),
             ),
+          ],
         ],
       ),
     );
@@ -1874,11 +1903,15 @@ class _FileTile extends StatelessWidget {
                   ),
                   Text(
                     [
-                      item.isDir
-                          ? (item.itemTotal > 0
-                                ? l10n.files_itemCount(item.itemTotal)
-                                : l10n.files_folder)
-                          : '${formatBytes(item.size)} · ${formatListTime(DateTime.tryParse(item.modTime), l10n, fallback: item.modTime)}',
+                      if (item.isDir && item.itemTotal > 0)
+                        l10n.files_itemCount(item.itemTotal)
+                      else
+                        formatListTime(
+                          DateTime.tryParse(item.modTime),
+                          l10n,
+                          fallback: item.modTime,
+                        ),
+                      if (!item.isDir) formatBytes(item.size),
                       if (remark.isNotEmpty) remark,
                     ].join(' · '),
                     style: AppTextStyles.caption.copyWith(
@@ -1891,7 +1924,7 @@ class _FileTile extends StatelessWidget {
               ),
             ),
             Icon(
-              TablerIcons.chevron_right,
+              item.isDir ? TablerIcons.chevron_right : TablerIcons.dots,
               size: AppTokens.iconList,
               color: scheme.onSurfaceVariant,
             ),

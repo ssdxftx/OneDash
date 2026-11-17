@@ -6,6 +6,7 @@ import '../../data/dto/setting/api_key_dto.dart';
 import '../../data/dto/setting/script_library_dto.dart';
 import '../../data/dto/setting/command_library_dto.dart';
 import '../../data/dto/setting/group_dto.dart';
+import '../../data/dto/setting/passkey_dto.dart';
 
 /// 设置相关数据仓库接口。
 abstract interface class SettingRepository {
@@ -101,6 +102,7 @@ abstract interface class SettingRepository {
   Future<bool> checkLocalSshConn(Map<String, dynamic> data);
   Future<void> setSshDefaultConn({required String defaultConn, bool withReset});
   Future<void> resetMenuSetting();
+  Future<void> updateMenuSetting(String value);
 
   Future<Map<String, dynamic>> getUpgradeInfo();
   Future<List<Map<String, dynamic>>> getUpgradeReleases();
@@ -159,6 +161,10 @@ abstract interface class SettingRepository {
 
   /// 搜索命令库。
   Future<List<CommandTreeDto>> searchCommandTree({String type});
+  Future<List<Map<String, dynamic>>> uploadCommandCsv({
+    required Uint8List bytes,
+    required String filename,
+  });
   Future<void> importCommands(List<Map<String, dynamic>> items);
   Future<String> exportCommands();
 
@@ -217,6 +223,17 @@ abstract interface class SettingRepository {
     required String secret,
     required String code,
     required int interval,
+  });
+  Future<PasskeyChallenge> passkeyBeginLogin({String entrance = ''});
+  Future<PanelLoginResult> passkeyFinishLogin({
+    required Map<String, dynamic> payload,
+    required String sessionId,
+    String entrance = '',
+  });
+  Future<PasskeyChallenge> passkeyBeginRegister(String name);
+  Future<void> passkeyFinishRegister({
+    required Map<String, dynamic> payload,
+    required String sessionId,
   });
   Future<List<Map<String, dynamic>>> listPasskeys();
   Future<void> deletePasskey(String id);

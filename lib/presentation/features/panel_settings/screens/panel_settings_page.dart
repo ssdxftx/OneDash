@@ -11,6 +11,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/network/dio_client_provider.dart';
+import '../../../../core/passkey/passkey_service.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/server_repository_impl.dart';
 import '../../../../data/dto/setting/api_key_dto.dart';
@@ -28,12 +29,15 @@ import 'advanced_settings_pages.dart';
 import 'panel_upgrade_page.dart';
 import 'script_library_page.dart';
 import 'command_library_page.dart';
+import 'panel_menu_page.dart';
 import 'group_management_page.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../../../common/states/error_toast.dart';
 import '../../../common/formatters/value_labels.dart';
+
+const _passkeyLoginMarker = '__onedash_passkey_login__';
 
 class _PanelSettingsData {
   const _PanelSettingsData(
@@ -593,26 +597,11 @@ class _PanelSettingsBody extends ConsumerWidget {
                   ),
                   SplitListTile(
                     leading: const Icon(TablerIcons.menu_2),
-                    title: l10n.panelSettings_resetMenu,
-                    subtitle: l10n.panelSettings_resetMenuHint,
-                    trailing: const Icon(TablerIcons.refresh),
-                    onTap: () async {
-                      final confirmed = await showConfirmSheet(
-                        context,
-                        title: l10n.panelSettings_resetMenu,
-                        message: l10n.panelSettings_resetMenuConfirm,
-                        confirmLabel: l10n.action_confirm,
-                      );
-                      if (!confirmed || !context.mounted) return;
-                      await _update(
-                        context,
-                        ref,
-                        () => ref
-                            .read(settingRepositoryProvider.future)
-                            .then((repo) => repo.resetMenuSetting()),
-                        l10n,
-                      );
-                    },
+                    title: l10n.panelSettings_menuSettings,
+                    subtitle: l10n.panelSettings_menuSettingsHint,
+                    trailing: const Icon(TablerIcons.chevron_right),
+                    onTap: () =>
+                        pushFormPage<void>(context, const PanelMenuPage()),
                   ),
                   SplitListTile(
                     leading: const Icon(TablerIcons.login),
@@ -632,6 +621,7 @@ class _PanelSettingsBody extends ConsumerWidget {
                         ref,
                         l10n,
                         entrance: data.value('securityEntrance'),
+                        passkeyAvailable: _canOfferPasskey(data, serverUrl),
                       );
                       if (loggedIn && context.mounted) {
                         ref.invalidate(_panelSettingsProvider);
@@ -952,11 +942,62 @@ class _PanelSettingsBody extends ConsumerWidget {
     }
   }
 
+  bool _canOfferPasskey(_PanelSettingsData data, Uri? serverUrl) {
+    final bindDomain = data.value('bindDomain');
+    if (bindDomain.isEmpty || serverUrl == null || serverUrl.scheme != 'https') {
+      return false;
+    }
+    final bindHost =
+        Uri.tryParse(
+          bindDomain.contains('://') ? bindDomain : 'https://$bindDomain',
+        )?.host.toLowerCase() ??
+        bindDomain.toLowerCase();
+    return serverUrl.host.toLowerCase() == bindHost;
+  }
+
+  Future<bool> _completePasskeyLogin(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n, {
+    String entrance = '',
+  }) async {
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      final challenge = await repository.passkeyBeginLogin(entrance: entrance);
+      final payload = await ref
+          .read(passkeyServiceProvider)
+          .get(challenge.publicKey);
+      final result = await repository.passkeyFinishLogin(
+        payload: payload,
+        sessionId: challenge.sessionId,
+        entrance: entrance,
+      );
+      if (result.session == null) {
+        if (!context.mounted) return false;
+        AppToast.error(context, l10n.panelSettings_loginRequired);
+        return false;
+      }
+      if (!context.mounted) return false;
+      AppToast.success(context, l10n.action_done);
+      return true;
+    } on PasskeyException catch (error) {
+      if (error.code == 'passkey_cancelled') return false;
+      if (!context.mounted) return false;
+      showErrorToast(context, error);
+      return false;
+    } catch (error) {
+      if (!context.mounted) return false;
+      showErrorToast(context, error);
+      return false;
+    }
+  }
+
   Future<bool> _loginPanel(
     BuildContext context,
     WidgetRef ref,
     AppLocalizations l10n, {
     String entrance = '',
+    bool passkeyAvailable = false,
   }) async {
     final name = TextEditingController();
     final password = TextEditingController();
@@ -980,6 +1021,23 @@ class _PanelSettingsBody extends ConsumerWidget {
               label: l10n.panelSettings_password,
               obscure: true,
             ),
+            if (passkeyAvailable) ...[
+              const SizedBox(height: AppTokens.s12),
+              Text(
+                l10n.panelSettings_passkeyLoginHint,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: pageContext.scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppTokens.s8),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.of(
+                  pageContext,
+                ).pop(const [_passkeyLoginMarker]),
+                icon: const Icon(TablerIcons.fingerprint),
+                label: Text(l10n.panelSettings_usePasskey),
+              ),
+            ],
           ],
         ),
       ),
@@ -989,6 +1047,9 @@ class _PanelSettingsBody extends ConsumerWidget {
     name.dispose();
     password.dispose();
     if (saved == null || !context.mounted) return false;
+    if (saved.length == 1 && saved.first == _passkeyLoginMarker) {
+      return _completePasskeyLogin(context, ref, l10n, entrance: entrance);
+    }
     return _completeLogin(
       context,
       ref,
@@ -1013,6 +1074,7 @@ class _PanelSettingsBody extends ConsumerWidget {
       ref,
       l10n,
       entrance: data.value('securityEntrance'),
+      passkeyAvailable: _canOfferPasskey(data, serverUrl),
     );
     if (loggedIn) ref.invalidate(_panelSettingsProvider);
     return loggedIn;
@@ -1780,6 +1842,27 @@ class _PanelSettingsBody extends ConsumerWidget {
                 color: context.scheme.onSurfaceVariant,
               ),
             ),
+            if (_canOfferPasskey(data, serverUrl)) ...[
+              const SizedBox(height: AppTokens.s12),
+              FilledButton.tonalIcon(
+                onPressed: () => _registerPasskeyOnDevice(
+                  context,
+                  ref,
+                  l10n,
+                  serverUrl,
+                  sheetContext,
+                ),
+                icon: const Icon(TablerIcons.fingerprint),
+                label: Text(l10n.panelSettings_registerPasskeyDevice),
+              ),
+              const SizedBox(height: AppTokens.s8),
+              Text(
+                l10n.panelSettings_passkeyPrereq,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: context.scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
             const SizedBox(height: AppTokens.s16),
             if (items.isEmpty)
               Text(l10n.panelSettings_noPasskeys)
@@ -1809,6 +1892,44 @@ class _PanelSettingsBody extends ConsumerWidget {
           ],
         ),
       );
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _registerPasskeyOnDevice(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    Uri? serverUrl,
+    BuildContext sheetContext,
+  ) async {
+    final name = await _editValue(
+      context,
+      title: l10n.panelSettings_passkeyName,
+      initial: '',
+      hint: l10n.panelSettings_passkeyName,
+    );
+    final value = name?.trim() ?? '';
+    if (value.isEmpty || !context.mounted) return;
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      final challenge = await repository.passkeyBeginRegister(value);
+      final payload = await ref
+          .read(passkeyServiceProvider)
+          .create(challenge.publicKey);
+      await repository.passkeyFinishRegister(
+        payload: payload,
+        sessionId: challenge.sessionId,
+      );
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+      if (sheetContext.mounted) Navigator.of(sheetContext).pop();
+    } on PasskeyException catch (error) {
+      if (error.code == 'passkey_cancelled') return;
+      if (!context.mounted) return;
+      showErrorToast(context, error);
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);

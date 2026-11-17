@@ -14,6 +14,7 @@ import '../../../../data/dto/website/website_dto.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/action_sheet.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../../../common/components/back_to_servers_button.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/components/app_toast.dart';
@@ -270,9 +271,11 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                 SelectionAppBar(
                   selectedCount: _selected.length,
                   onCancel: _clearSelection,
+                  height: AppTokens.appBarLargeHeight,
                 )
               else
                 AppBarLarge(
+                  leading: const BackToServersButton(),
                   title: l10n.websites_title,
                   subtitle: [
                     if (server != null) server.displayName,
@@ -283,7 +286,28 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                     ref,
                     currentServerId: widget.serverId,
                   ),
-                  actions: [_moduleMenu(context, l10n)],
+                  actions: [
+                    AppIconButton(
+                      icon: _searching ? TablerIcons.x : TablerIcons.search,
+                      tooltip: l10n.action_search,
+                      onPressed: () {
+                        setState(() {
+                          _searching = !_searching;
+                          if (!_searching) {
+                            _clearSelection();
+                            _searchController.clear();
+                            ref.read(websitesProvider.notifier).search('');
+                          }
+                        });
+                      },
+                    ),
+                    AppIconButton(
+                      icon: TablerIcons.plus,
+                      tooltip: l10n.websites_create,
+                      onPressed: _showCreateMenu,
+                    ),
+                    _moduleMenu(context, l10n),
+                  ],
                 ),
               AnimatedSize(
                 duration: context.motion(AppTokens.dBase),
@@ -313,6 +337,8 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                 options: _filters,
                 labelOf: (value) => _filterLabel(value, l10n),
                 selected: {_selectedFilter},
+                wrap: true,
+                padding: const EdgeInsets.symmetric(horizontal: AppTokens.s16),
                 onChanged: (selection) {
                   if (selection.isEmpty) return;
                   setState(() {
@@ -516,6 +542,53 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
       if (!mounted) return;
       showErrorToast(context, error);
     }
+  }
+
+  Future<void> _showCreateMenu() async {
+    final l10n = AppLocalizations.of(context);
+    final type = await showSelectionMenu<String>(
+      context,
+      options: [
+        SelectionOption(
+          label: l10n.websites_proxy,
+          value: 'proxy',
+          icon: TablerIcons.arrows_exchange,
+          subtitle: l10n.websites_proxyHint,
+        ),
+        SelectionOption(
+          label: l10n.websites_static,
+          value: 'static',
+          icon: TablerIcons.file_text,
+          subtitle: l10n.websites_staticHint,
+        ),
+        SelectionOption(
+          label: l10n.websites_runtime,
+          value: 'runtime',
+          icon: TablerIcons.brand_php,
+          subtitle: l10n.websites_runtimeHint,
+        ),
+        SelectionOption(
+          label: l10n.websites_tunnel,
+          value: 'stream',
+          icon: TablerIcons.arrows_split,
+          subtitle: l10n.websites_createStreamTitle,
+        ),
+        SelectionOption(
+          label: l10n.websites_deployment,
+          value: 'deployment',
+          icon: TablerIcons.rocket,
+          subtitle: l10n.websites_deploymentApp,
+        ),
+        SelectionOption(
+          label: l10n.websites_subsite,
+          value: 'subsite',
+          icon: TablerIcons.folder_symlink,
+          subtitle: l10n.websites_subsitePath,
+        ),
+      ],
+    );
+    if (!mounted || type == null) return;
+    await context.push('/s/${widget.serverId}/websites/create?type=$type');
   }
 
   Widget _moduleMenu(BuildContext context, AppLocalizations l10n) {
@@ -1304,6 +1377,12 @@ class _WebsiteCard extends StatelessWidget {
         ? context.appColors.warning
         : scheme.onSurfaceVariant;
 
+    final expiryLabel = daysLeft < 0
+        ? l10n.websites_expired_days(-daysLeft)
+        : daysLeft == 0
+        ? l10n.websites_expire_today
+        : l10n.websites_expire_days(daysLeft);
+
     return TonalCard(
       onTap: onTap,
       onLongPress: onLongPress,
@@ -1312,24 +1391,65 @@ class _WebsiteCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (selectionMode)
-                Checkbox(value: selected, onChanged: (_) => onTap()),
-              StatusDot(status: site.status.toLowerCase()),
+                Padding(
+                  padding: const EdgeInsets.only(top: AppTokens.s4),
+                  child: Checkbox(value: selected, onChanged: (_) => onTap()),
+                ),
+              Padding(
+                padding: const EdgeInsets.only(top: AppTokens.s8),
+                child: StatusDot(status: site.status.toLowerCase()),
+              ),
               const SizedBox(width: AppTokens.s8),
               Expanded(
                 child: Text(
                   site.primaryDomain,
                   style: AppTextStyles.titleM,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: AppTokens.s8),
+              if (!selectionMode) ...[
+                const SizedBox(width: AppTokens.s4),
+                Padding(
+                  padding: const EdgeInsets.only(top: AppTokens.s4),
+                  child: Icon(
+                    TablerIcons.chevron_right,
+                    size: AppTokens.iconList,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: AppTokens.s8),
+          Wrap(
+            spacing: AppTokens.s8,
+            runSpacing: AppTokens.s8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
               Text(
                 _statusLabel(site.status, l10n),
                 style: AppTextStyles.caption.copyWith(
                   color: scheme.onSurfaceVariant,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTokens.s8,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerHigh,
+                  borderRadius: BorderRadius.circular(AppTokens.rXs),
+                ),
+                child: Text(
+                  typeLabel,
+                  style: AppTextStyles.caption.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ),
               ),
               if (site.protocol.toUpperCase() == 'HTTPS')
@@ -1350,46 +1470,6 @@ class _WebsiteCard extends StatelessWidget {
                     ),
                   ),
                 ),
-              if (!selectionMode) ...[
-                const SizedBox(width: AppTokens.s4),
-                Icon(
-                  TablerIcons.chevron_right,
-                  size: AppTokens.iconList,
-                  color: scheme.onSurfaceVariant,
-                ),
-              ],
-            ],
-          ),
-          const SizedBox(height: AppTokens.s8),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppTokens.s8,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: scheme.surfaceContainerHigh,
-                  borderRadius: BorderRadius.circular(AppTokens.rXs),
-                ),
-                child: Text(
-                  typeLabel,
-                  style: AppTextStyles.caption.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppTokens.s8),
-              Expanded(
-                child: Text(
-                  site.siteDir.isEmpty ? site.sitePath : site.siteDir,
-                  style: AppTextStyles.bodyS.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
             ],
           ),
           if (expiry.isAfter(DateTime(2000))) ...[
@@ -1398,11 +1478,15 @@ class _WebsiteCard extends StatelessWidget {
               children: [
                 Icon(TablerIcons.calendar_event, size: 14, color: expiryColor),
                 const SizedBox(width: 4),
-                Text(
-                  l10n.websites_expire_days(daysLeft),
-                  style: AppTextStyles.caption.copyWith(
-                    color: expiryColor,
-                    fontFeatures: const [FontFeature.tabularFigures()],
+                Flexible(
+                  child: Text(
+                    expiryLabel,
+                    style: AppTextStyles.caption.copyWith(
+                      color: expiryColor,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
