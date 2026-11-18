@@ -267,20 +267,24 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
                       onChanged: (_) => setState(() {}),
                     ),
                   ),
-                AppFilterChips<String>(
-                  options: const ['all', 'ipv4', 'ipv6', 'allow', 'deny'],
-                  labelOf: (value) => switch (value) {
-                    'ipv4' => l10n.firewall_filterIpv4,
-                    'ipv6' => l10n.firewall_filterIpv6,
-                    'allow' => l10n.firewall_filterAllow,
-                    'deny' => l10n.firewall_filterDeny,
-                    _ => l10n.firewall_filterAll,
-                  },
-                  selected: {_filter},
-                  onChanged: (selection) {
-                    if (selection.isEmpty) return;
-                    setState(() => _filter = selection.first);
-                  },
+                Container(
+                  color: context.scheme.surfaceContainerLow,
+                  padding: const EdgeInsets.symmetric(vertical: AppTokens.s4),
+                  child: AppFilterChips<String>(
+                    options: const ['all', 'ipv4', 'ipv6', 'allow', 'deny'],
+                    labelOf: (value) => switch (value) {
+                      'ipv4' => l10n.firewall_filterIpv4,
+                      'ipv6' => l10n.firewall_filterIpv6,
+                      'allow' => l10n.firewall_filterAllow,
+                      'deny' => l10n.firewall_filterDeny,
+                      _ => l10n.firewall_filterAll,
+                    },
+                    selected: {_filter},
+                    onChanged: (selection) {
+                      if (selection.isEmpty) return;
+                      setState(() => _filter = selection.first);
+                    },
+                  ),
                 ),
               ],
               Expanded(

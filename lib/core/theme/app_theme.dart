@@ -157,23 +157,23 @@ abstract final class AppTheme {
           color: scheme.onSurfaceVariant,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTokens.rSm),
+          borderRadius: BorderRadius.circular(AppTokens.rMd),
           borderSide: BorderSide(color: scheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTokens.rSm),
+          borderRadius: BorderRadius.circular(AppTokens.rMd),
           borderSide: BorderSide(color: scheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTokens.rSm),
+          borderRadius: BorderRadius.circular(AppTokens.rMd),
           borderSide: BorderSide(color: scheme.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTokens.rSm),
+          borderRadius: BorderRadius.circular(AppTokens.rMd),
           borderSide: BorderSide(color: scheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTokens.rSm),
+          borderRadius: BorderRadius.circular(AppTokens.rMd),
           borderSide: BorderSide(color: scheme.error, width: 1.5),
         ),
       ),

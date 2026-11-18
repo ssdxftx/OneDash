@@ -565,7 +565,9 @@ class _TemplateEditorSheetState extends ConsumerState<_TemplateEditorSheet> {
             decoration: InputDecoration(
               labelText: l10n.websites_templateContent,
               hintText: '<html><body><h1>{{title}}</h1></body></html>',
-              border: const OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppTokens.rMd),
+              ),
             ),
           ),
           const SizedBox(height: AppTokens.s8),

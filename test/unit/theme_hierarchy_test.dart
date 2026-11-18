@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onedash/core/theme/app_theme.dart';
+import 'package:onedash/core/theme/tokens.dart';
 
 void main() {
   test('text theme sizes step down without inversion', () {
@@ -18,6 +19,28 @@ void main() {
     ];
     for (var i = 1; i < sizes.length; i++) {
       expect(sizes[i], lessThan(sizes[i - 1]));
+    }
+  });
+
+  test('input corners use the 14dp step below cards', () {
+    for (final brightness in Brightness.values) {
+      final input = AppTheme.build(brightness).inputDecorationTheme;
+      final borders = [
+        input.border,
+        input.enabledBorder,
+        input.focusedBorder,
+        input.errorBorder,
+        input.focusedErrorBorder,
+      ];
+      for (final border in borders) {
+        final radius = (border! as OutlineInputBorder).borderRadius.resolve(
+          TextDirection.ltr,
+        );
+        expect(radius.topLeft.x, AppTokens.rMd);
+      }
+      expect(AppTokens.rSm, lessThan(AppTokens.rMd));
+      expect(AppTokens.rMd, lessThan(AppTokens.rLg));
+      expect(AppTokens.rLg, lessThan(AppTokens.rSheet));
     }
   });
 }

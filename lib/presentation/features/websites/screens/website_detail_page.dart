@@ -815,7 +815,11 @@ class _ConfigTab extends ConsumerWidget {
                 controller: controller,
                 maxLines: 14,
                 style: AppTextStyles.mono,
-                decoration: const InputDecoration(border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppTokens.rMd),
+                  ),
+                ),
               ),
             ],
           ),
