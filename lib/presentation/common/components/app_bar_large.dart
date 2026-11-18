@@ -124,13 +124,23 @@ class _TitleBlock extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Flexible(
-                child: Text(
-                  title,
-                  style:
-                      (compact ? AppTextStyles.titleM : AppTextStyles.headline)
-                          .copyWith(color: scheme.onSurface),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      title,
+                      style:
+                          (compact
+                                  ? AppTextStyles.titleM
+                                  : AppTextStyles.headline)
+                              .copyWith(color: scheme.onSurface),
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
                 ),
               ),
               if (interactive) ...[

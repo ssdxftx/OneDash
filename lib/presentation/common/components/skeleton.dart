@@ -71,14 +71,15 @@ class SkeletonBox extends StatelessWidget {
     final highlight = Color.lerp(base, scheme.onSurface, 0.13)!;
     final scope = context.dependOnInheritedWidgetOfExactType<_SkeletonScope>();
     Widget box(double t) {
+      final center = -1.5 + 3.0 * t;
       return Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(borderRadius),
           gradient: LinearGradient(
-            begin: Alignment(-2.5 + 5 * t - 1, 0),
-            end: Alignment(-2.5 + 5 * t + 1, 0),
+            begin: Alignment(center - 0.5, 0),
+            end: Alignment(center + 0.5, 0),
             colors: [base, highlight, base],
             stops: const [0.0, 0.5, 1.0],
           ),

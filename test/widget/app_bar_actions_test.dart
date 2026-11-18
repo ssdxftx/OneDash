@@ -47,6 +47,44 @@ void main() {
     expect(find.byIcon(TablerIcons.dots), findsNothing);
   });
 
+  testWidgets('three actions collapse to refresh and more', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        AppBarActions(
+          maxInline: 1,
+          actions: [
+            AppBarAction(
+              icon: TablerIcons.refresh,
+              tooltip: 'Refresh',
+              onPressed: () {},
+            ),
+            AppBarAction(
+              icon: TablerIcons.adjustments,
+              tooltip: 'Options',
+              onPressed: () {},
+            ),
+            AppBarAction(
+              icon: TablerIcons.terminal_2,
+              tooltip: 'Terminal',
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final icons = tester
+        .widgetList<Icon>(
+          find.descendant(
+            of: find.byType(AppBarActions),
+            matching: find.byType(Icon),
+          ),
+        )
+        .map((icon) => icon.icon)
+        .toList();
+    expect(icons, [TablerIcons.refresh, TablerIcons.dots]);
+  });
+
   testWidgets('overflow keeps refresh first and create last', (tester) async {
     await tester.pumpWidget(
       _wrap(

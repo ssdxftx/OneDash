@@ -7,6 +7,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
+import '../../../common/components/app_bar_actions.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/back_to_servers_button.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -97,43 +98,48 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                   currentServerId: widget.serverId,
                 ),
                 actions: [
-                  AppIconButton(
-                    icon: TablerIcons.refresh,
-                    tooltip: l10n.action_refresh,
-                    onPressed: () => ref
-                        .read(overviewProvider(widget.serverId).notifier)
-                        .refresh(),
-                  ),
-                  AppIconButton(
-                    icon: TablerIcons.adjustments,
-                    tooltip: l10n.dashboard_monitorOptions,
-                    onPressed: () async {
-                      final current = ref.read(
-                        overviewSelectionProvider(widget.serverId),
-                      );
-                      final next = await showAppSheet<MonitorSelection>(
-                        context: context,
-                        builder: (_) => _MonitorOptionsSheet(
-                          serverId: widget.serverId,
-                          initial: current,
-                        ),
-                      );
-                      if (next == null || !mounted) return;
-                      ref
-                              .read(
-                                overviewSelectionProvider(
-                                  widget.serverId,
-                                ).notifier,
-                              )
-                              .state =
-                          next;
-                    },
-                  ),
-                  AppIconButton(
-                    icon: TablerIcons.terminal_2,
-                    tooltip: l10n.dashboard_terminal,
-                    onPressed: () =>
-                        context.push('/s/${widget.serverId}/terminal'),
+                  AppBarActions(
+                    maxInline: 1,
+                    actions: [
+                      AppBarAction(
+                        icon: TablerIcons.refresh,
+                        tooltip: l10n.action_refresh,
+                        onPressed: () => ref
+                            .read(overviewProvider(widget.serverId).notifier)
+                            .refresh(),
+                      ),
+                      AppBarAction(
+                        icon: TablerIcons.adjustments,
+                        tooltip: l10n.dashboard_monitorOptions,
+                        onPressed: () async {
+                          final current = ref.read(
+                            overviewSelectionProvider(widget.serverId),
+                          );
+                          final next = await showAppSheet<MonitorSelection>(
+                            context: context,
+                            builder: (_) => _MonitorOptionsSheet(
+                              serverId: widget.serverId,
+                              initial: current,
+                            ),
+                          );
+                          if (next == null || !mounted) return;
+                          ref
+                                  .read(
+                                    overviewSelectionProvider(
+                                      widget.serverId,
+                                    ).notifier,
+                                  )
+                                  .state =
+                              next;
+                        },
+                      ),
+                      AppBarAction(
+                        icon: TablerIcons.terminal_2,
+                        tooltip: l10n.dashboard_terminal,
+                        onPressed: () =>
+                            context.push('/s/${widget.serverId}/terminal'),
+                      ),
+                    ],
                   ),
                 ],
               ),

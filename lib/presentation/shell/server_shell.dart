@@ -240,7 +240,7 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
                     child: AnimatedOpacity(
                       opacity: shown ? 1 : 0,
                       duration: modalOpen
-                          ? const Duration(milliseconds: 120)
+                          ? AppTokens.dEmphasis
                           : shown
                           ? showDuration
                           : hideDuration,

@@ -24,6 +24,7 @@ import '../../../common/components/selection_app_bar.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/skeleton.dart';
 import '../../../common/components/status_dot.dart';
+import '../../../common/components/status_pill.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/formatters/status_labels.dart';
@@ -654,29 +655,18 @@ class _ContainerCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppTokens.s8),
-              Text(
-                containerStateLabel(item.state, l10n),
-                style: AppTextStyles.caption.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
+              StatusPill(
+                label: containerStateLabel(item.state, l10n),
+                tone: context.appColors.status(item.state),
+                dense: true,
+                showDot: true,
               ),
               if (item.isFromCompose) ...[
                 const SizedBox(width: AppTokens.s8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppTokens.s8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: scheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(AppTokens.rXs),
-                  ),
-                  child: Text(
-                    l10n.containers_compose,
-                    style: AppTextStyles.caption.copyWith(
-                      color: scheme.onPrimaryContainer,
-                    ),
-                  ),
+                StatusPill(
+                  label: l10n.containers_compose,
+                  tone: scheme.onSurfaceVariant,
+                  dense: true,
                 ),
               ],
             ],
