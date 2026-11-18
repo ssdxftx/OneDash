@@ -23,7 +23,10 @@ class StatusPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final onTone = Theme.of(context).brightness == Brightness.dark
         ? tone
-        : Color.alphaBlend(Colors.black.withValues(alpha: 0.16), tone);
+        : Color.alphaBlend(
+            Colors.black.withValues(alpha: AppTokens.toneTextInk),
+            tone,
+          );
     final text = Text(
       label,
       maxLines: 1,
@@ -40,7 +43,7 @@ class StatusPill extends StatelessWidget {
         vertical: dense ? 2 : 4,
       ),
       decoration: BoxDecoration(
-        color: tone.withValues(alpha: 0.16),
+        color: tone.withValues(alpha: AppTokens.toneSurfaceStrong),
         borderRadius: BorderRadius.circular(AppTokens.rXs),
       ),
       child: showDot

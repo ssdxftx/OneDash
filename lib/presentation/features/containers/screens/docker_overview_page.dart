@@ -151,7 +151,7 @@ class _DockerBody extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: colors.info.withValues(alpha: 0.12),
+              color: colors.info.withValues(alpha: AppTokens.toneSurface),
               borderRadius: BorderRadius.circular(AppTokens.rMd),
             ),
             child: Icon(
@@ -546,7 +546,9 @@ Widget _bar(
     width: width,
     height: height,
     decoration: BoxDecoration(
-      color: context.scheme.onSurfaceVariant.withValues(alpha: 0.12),
+      color: context.scheme.onSurfaceVariant.withValues(
+        alpha: AppTokens.toneSurface,
+      ),
       borderRadius: BorderRadius.circular(radius),
     ),
   );

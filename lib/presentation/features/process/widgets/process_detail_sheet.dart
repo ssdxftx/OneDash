@@ -116,7 +116,9 @@ class _ProcessDetailSheetState extends ConsumerState<_ProcessDetailSheet> {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: context.appColors.success.withValues(alpha: 0.12),
+            color: context.appColors.success.withValues(
+              alpha: AppTokens.toneSurface,
+            ),
             borderRadius: BorderRadius.circular(AppTokens.rMd),
           ),
           child: Icon(

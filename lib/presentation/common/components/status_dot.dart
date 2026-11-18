@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/tokens.dart';
 import 'status_pulse.dart';
 
+/// 状态色点。必须与文字标签成对出现，禁止单独作为状态指示。
 class StatusDot extends StatefulWidget {
   const StatusDot({
     super.key,
     required this.status,
-    this.size = 8,
+    this.size = AppTokens.rXs,
     this.semanticLabel,
   });
 

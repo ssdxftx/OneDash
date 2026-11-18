@@ -102,7 +102,7 @@ class _AppDetailBody extends ConsumerWidget {
               AppIcon(
                 name: app.name,
                 icon: app.icon,
-                size: 56,
+                size: AppTokens.iconAppCard,
                 cacheKey: '$serverId:${app.key}',
                 iconLoader: () => ref
                     .read(appRepositoryProvider.future)

@@ -20,6 +20,7 @@ import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/host_repository_impl.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
+import '../../../common/components/console_app_bar.dart';
 import '../../../common/components/split_list_group.dart';
 import '../../../common/states/empty_state.dart';
 
@@ -317,24 +318,15 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
       },
       child: Scaffold(
         backgroundColor: AppTokens.consoleBackground,
-        // The console owns its own dark chrome, so this header stays a bare
-        // AppBar instead of AppBarLarge.
-        appBar: AppBar(
-          backgroundColor: AppTokens.consoleBackground,
-          foregroundColor: AppTokens.consoleForeground,
-          title: Row(
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: statusColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: AppTokens.s8),
-              Text(statusLabel, style: AppTextStyles.bodyS),
-            ],
+        appBar: ConsoleAppBar(
+          title: statusLabel,
+          titleLeading: Container(
+            width: AppTokens.s8,
+            height: AppTokens.s8,
+            decoration: BoxDecoration(
+              color: statusColor,
+              shape: BoxShape.circle,
+            ),
           ),
           actions: [
             IconButton(
@@ -382,7 +374,9 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
                 ),
                 padding: const EdgeInsets.all(AppTokens.s12),
                 decoration: BoxDecoration(
-                  color: context.appColors.danger.withValues(alpha: 0.12),
+                  color: context.appColors.danger.withValues(
+                    alpha: AppTokens.toneSurface,
+                  ),
                   borderRadius: BorderRadius.circular(AppTokens.rSm),
                   border: Border.all(
                     color: context.appColors.danger.withValues(alpha: 0.35),
@@ -408,14 +402,17 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
                 ),
               ),
             Expanded(
-              child: TerminalView(
-                _terminal,
-                focusNode: _focusNode,
-                autofocus: true,
-                deleteDetection: true,
-                // Terminal font size is a user setting, not a design token.
-                textStyle: TerminalStyle(fontSize: _fontSize),
-                theme: TerminalThemes.defaultTheme,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppTokens.s8),
+                child: TerminalView(
+                  _terminal,
+                  focusNode: _focusNode,
+                  autofocus: true,
+                  deleteDetection: true,
+                  // Terminal font size is a user setting, not a design token.
+                  textStyle: TerminalStyle(fontSize: _fontSize),
+                  theme: TerminalThemes.defaultTheme,
+                ),
               ),
             ),
             _TerminalToolbar(
@@ -507,17 +504,7 @@ class _KeyButton extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 2),
-        child: TextButton(
-          onPressed: onTap,
-          style: TextButton.styleFrom(
-            foregroundColor: AppTokens.consoleForeground,
-            minimumSize: const Size(
-              AppTokens.minTapTarget,
-              AppTokens.minTapTarget,
-            ),
-          ),
-          child: Text(label, style: AppTextStyles.caption),
-        ),
+        child: ConsoleToolbarButton(label: label, onPressed: onTap),
       ),
     );
   }

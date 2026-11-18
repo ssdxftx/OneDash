@@ -204,8 +204,8 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
         !_modalHidden &&
         !_navRevealPending &&
         !ref.watch(bottomNavSuppressedProvider);
-    final hideDuration = context.motion(const Duration(milliseconds: 240));
-    final showDuration = context.motion(const Duration(milliseconds: 200));
+    final hideDuration = context.motion(AppTokens.dEmphasis);
+    final showDuration = context.motion(AppTokens.dBase);
     return Scaffold(
       backgroundColor: scheme.surface,
       body: Stack(

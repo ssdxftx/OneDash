@@ -220,7 +220,9 @@ class ActionSheetRow extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: effectiveColor.withValues(alpha: 0.1),
+                    color: effectiveColor.withValues(
+                      alpha: AppTokens.toneSurface,
+                    ),
                     borderRadius: BorderRadius.circular(AppTokens.rSm),
                   ),
                   child: Icon(

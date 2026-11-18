@@ -40,7 +40,7 @@ class _ErrorStateState extends State<ErrorState> {
               width: widget.compact ? 56 : 72,
               height: widget.compact ? 56 : 72,
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
+                color: color.withValues(alpha: AppTokens.toneSurface),
                 shape: BoxShape.circle,
               ),
               child: Icon(

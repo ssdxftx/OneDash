@@ -141,7 +141,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
     Scrollable.ensureVisible(
       target,
       alignment: 0.5,
-      duration: target.motion(const Duration(milliseconds: 220)),
+      duration: target.motion(AppTokens.dBase),
       curve: AppTokens.curveFast,
     );
   }
@@ -277,7 +277,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
                 child: AnimatedOpacity(
                   key: const Key('segmentedTabsMoreHintFade'),
                   opacity: _canScrollRight ? 1 : 0,
-                  duration: context.motion(const Duration(milliseconds: 160)),
+                  duration: context.motion(AppTokens.dBase),
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
@@ -288,9 +288,7 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
                       );
                       _controller.animateTo(
                         target,
-                        duration: context.motion(
-                          const Duration(milliseconds: 200),
-                        ),
+                        duration: context.motion(AppTokens.dBase),
                         curve: AppTokens.curveFast,
                       );
                     },

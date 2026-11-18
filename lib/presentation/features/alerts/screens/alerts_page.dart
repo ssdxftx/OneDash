@@ -166,7 +166,7 @@ class _AlertListTab extends ConsumerWidget {
           leading: Container(
             decoration: BoxDecoration(
               color: (enabled ? colors.success : colors.info).withValues(
-                alpha: 0.1,
+                alpha: AppTokens.toneSurface,
               ),
               borderRadius: BorderRadius.circular(AppTokens.rMd),
             ),
@@ -373,7 +373,7 @@ class _AlertCard extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   color: (enabled ? scheme.primary : scheme.onSurfaceVariant)
-                      .withValues(alpha: 0.12),
+                      .withValues(alpha: AppTokens.toneSurface),
                   borderRadius: BorderRadius.circular(AppTokens.rSm),
                 ),
                 child: Icon(

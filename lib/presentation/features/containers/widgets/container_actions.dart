@@ -616,7 +616,7 @@ class _ContainerGlyph extends StatelessWidget {
     final color = context.appColors.status(state);
     return Container(
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withValues(alpha: AppTokens.toneSurface),
         borderRadius: BorderRadius.circular(AppTokens.rMd),
       ),
       child: Icon(TablerIcons.box, color: color, size: AppTokens.iconNav),

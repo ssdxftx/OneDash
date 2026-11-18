@@ -366,7 +366,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
         infoCard: ActionSheetInfoCard(
           leading: Container(
             decoration: BoxDecoration(
-              color: colors.info.withValues(alpha: 0.1),
+              color: colors.info.withValues(alpha: AppTokens.toneSurface),
               borderRadius: BorderRadius.circular(AppTokens.rMd),
             ),
             child: Icon(

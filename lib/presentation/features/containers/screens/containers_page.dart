@@ -329,7 +329,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
                               ref
                                   .read(containersProvider.notifier)
                                   .search(value);
-                            }, delay: const Duration(milliseconds: 300));
+                            });
                           },
                         ),
                       )
@@ -341,7 +341,9 @@ class _ContainersPageState extends ConsumerState<ContainersPage>
                   margin: EdgeInsets.symmetric(horizontal: context.pagePadding),
                   padding: const EdgeInsets.all(AppTokens.s12),
                   decoration: BoxDecoration(
-                    color: context.appColors.warning.withValues(alpha: 0.12),
+                    color: context.appColors.warning.withValues(
+                      alpha: AppTokens.toneSurface,
+                    ),
                     borderRadius: BorderRadius.circular(AppTokens.rMd),
                   ),
                   child: Row(

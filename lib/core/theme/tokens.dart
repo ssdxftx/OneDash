@@ -20,6 +20,8 @@ abstract final class AppTokens {
   static const double s48 = 48;
 
   static const double rXs = 6;
+  static const double rTile = 8;
+  static const double rTrack = 3;
   static const double rSm = 10;
   static const double rMd = 14;
   static const double rLg = 18;
@@ -34,6 +36,9 @@ abstract final class AppTokens {
   static const double iconLeading = 22;
   static const double iconNav = 24;
   static const double iconEmpty = 28;
+  static const double iconAppSmall = 36;
+  static const double iconAvatar = 44;
+  static const double iconAppCard = 56;
 
   static const double appBarHeight = 64;
   static const double appBarCompactHeight = 56;
@@ -54,6 +59,15 @@ abstract final class AppTokens {
   static const double pagePaddingWide = 24;
   static const double contentMaxWidth = 640;
 
+  /// 语义色淡底：图标块、进度轨道、提示横幅。
+  static const double toneSurface = 0.12;
+
+  /// 语义色淡底：承载文字的状态胶囊。
+  static const double toneSurfaceStrong = 0.16;
+
+  /// 浅色主题下压深语义色文字所用的叠黑浓度。
+  static const double toneTextInk = 0.18;
+
   static const Duration dInstant = Duration.zero;
   static const Duration dFast = Duration(milliseconds: 120);
   static const Duration dBase = Duration(milliseconds: 200);
@@ -70,6 +84,7 @@ abstract final class AppTokens {
   static const Duration containerStatsPoll = Duration(seconds: 2);
   static const Duration logFollowPoll = Duration(seconds: 3);
   static const Duration appStatusPoll = Duration(seconds: 5);
+  static const Duration searchDebounce = Duration(milliseconds: 300);
 
   static const Curve curveFast = Curves.easeOutCubic;
   static const Curve curveBase = Curves.easeOutCubic;
@@ -88,6 +103,8 @@ abstract final class AppTokens {
   static const double metricValueMedium = 26;
   static const double metricValueCompact = 23;
   static const double iconBadge = 32;
+  static const double rowDividerIndent = s16 + iconBadge + s12;
+  static const double rowDividerIndentCompact = s16 + iconEmpty + s12;
   static const double miniRing = 38;
   static const double spinner = 20;
   static const double spinnerStroke = 2;
@@ -158,6 +175,12 @@ class OneDashColors extends ThemeExtension<OneDashColors> {
     chart5: Color(0xFF8FD4CF),
     chart6: Color(0xFFD79A9A),
   );
+
+  Color usageTone(double percent) {
+    if (percent >= 85) return danger;
+    if (percent >= 60) return warning;
+    return success;
+  }
 
   Color status(String status) {
     return switch (status.toLowerCase()) {

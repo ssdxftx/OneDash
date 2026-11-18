@@ -65,3 +65,18 @@
 - P3-1：页头测试补回 compact 长路径降档到 14sp，以及长标题下 chevron 间距与无溢出的断言。
 - P3-2：`_fitsOneLine` 加回 `maxWidth` 非有限或非正数时直接判定可容纳的防御。
 - 新增 `test/widget/status_pill_test.dart`，读取组件实际文字色与底色计算对比度，覆盖浅色与深色下的 success、warning、danger。
+
+## v33 验收报告复修
+
+- P1-1：抽出 `ConsoleAppBar`，固定 `consoleBackground` 与 `consoleForeground`，标题显式使用 console 前景色并钉住 `titleTextStyle`；终端页状态文字在浅色主题下恢复可读。
+- P1-2：新增 `ConsoleToolbarButton`，禁用态前景改用 `consoleMuted`，终端快捷键条在浅色主题下保持可见。
+- P2-1：仪表盘图标块统一为 `iconBadge`，分隔线缩进统一为 `s16 + iconBadge + s12`，5 处从 44 改为 60，与文字左缘对齐。
+- P2-2：终端页与虚拟机控制台页统一使用 `ConsoleAppBar`，控制台页头在浅色主题下保持深色。
+- O-1：新增 `toneSurface`、`toneSurfaceStrong` 与 `toneTextInk`，清理语义淡底的字面量 alpha。
+- O-2：应用卡片状态改为色点加本地化文字；`StatusDot` 默认尺寸与胶囊圆点统一为 `rXs`，并补充成对使用约定。
+- O-3：动效时长收敛到 `dBase` 与 `dEmphasis`；新增 `searchDebounce`，四处搜索删掉显式 300ms。
+- O-4：新增 `rTile`、`rTrack`、`iconAppSmall`、`iconAvatar`、`iconAppCard`，替换对应圆角与尺寸字面量。
+- O-5：胶囊叠黑从 0.16 提到 0.18，浅色最差值从 4.83 提到 5.00。
+- O-6：终端内容区补 8dp 横向内边距，光标不再贴边。
+- O-7：用量配色收敛到 `OneDashColors.usageTone`，总览与服务器列表共用阈值。
+- 测试：新增控制台页头与快捷键条对比度测试、仪表盘分隔线缩进测试，胶囊测试锁定叠黑后的 4.95 下限与淡底 token，用量阈值补单元测试。

@@ -381,7 +381,7 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
               onChanged: (value) {
                 _searchDebouncer(() {
                   setState(() => _query = value.trim());
-                }, delay: const Duration(milliseconds: 300));
+                });
               },
             ),
           ),
@@ -554,7 +554,7 @@ class _InstalledTab extends ConsumerWidget {
           leading: AppIcon(
             name: app.displayName,
             icon: app.icon,
-            size: 56,
+            size: AppTokens.iconAppCard,
             cacheKey: '$serverId:${app.appKey}',
             iconLoader: () => ref
                 .read(appRepositoryProvider.future)
@@ -856,7 +856,7 @@ class _AppRow extends ConsumerWidget {
           AppIcon(
             name: app.name,
             icon: app.icon,
-            size: 44,
+            size: AppTokens.iconAvatar,
             cacheKey: cacheKey,
             iconLoader: () => ref
                 .read(appRepositoryProvider.future)

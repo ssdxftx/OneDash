@@ -198,7 +198,11 @@ class _TaskLogSheetState extends State<_TaskLogSheet>
       children: [
         Row(
           children: [
-            Icon(TablerIcons.logs, size: 22, color: context.scheme.primary),
+            Icon(
+              TablerIcons.logs,
+              size: AppTokens.iconLeading,
+              color: context.scheme.primary,
+            ),
             const SizedBox(width: AppTokens.s8),
             Expanded(
               child: Text(

@@ -65,13 +65,6 @@ String _systemSummary(DashboardBase base) {
   return '$distro · $version';
 }
 
-Color _usageColor(BuildContext context, double percent) {
-  final colors = context.appColors;
-  if (percent >= 85) return colors.danger;
-  if (percent >= 60) return colors.warning;
-  return colors.success;
-}
-
 Widget _panelTitle(
   BuildContext context,
   String title,
@@ -113,15 +106,17 @@ class _ServerHeaderCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: AppTokens.iconAvatar,
+                height: AppTokens.iconAvatar,
                 decoration: BoxDecoration(
-                  color: context.appColors.info.withValues(alpha: 0.12),
+                  color: context.appColors.info.withValues(
+                    alpha: AppTokens.toneSurface,
+                  ),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   TablerIcons.server_2,
-                  size: 22,
+                  size: AppTokens.iconLeading,
                   color: context.appColors.info,
                 ),
               ),
@@ -360,7 +355,7 @@ class _ResourceCard extends StatelessWidget {
       _ResourceRow(
         icon: TablerIcons.cpu,
         label: l10n.dashboard_cpu,
-        color: _usageColor(context, current.cpuUsedPercent),
+        color: context.appColors.usageTone(current.cpuUsedPercent),
         value:
             '${current.cpuUsed.toStringAsFixed(2)} / ${l10n.dashboard_cores(cores)}',
         percent: current.cpuUsedPercent,
@@ -368,7 +363,7 @@ class _ResourceCard extends StatelessWidget {
       _ResourceRow(
         icon: TablerIcons.device_sd_card,
         label: l10n.dashboard_memory,
-        color: _usageColor(context, current.memoryUsedPercent),
+        color: context.appColors.usageTone(current.memoryUsedPercent),
         value:
             '${formatBytes(current.memoryUsed)} / ${formatBytes(current.memoryTotal)}',
         percent: current.memoryUsedPercent,
@@ -377,7 +372,7 @@ class _ResourceCard extends StatelessWidget {
         _ResourceRow(
           icon: TablerIcons.arrows_diagonal,
           label: l10n.dashboard_swap,
-          color: _usageColor(context, current.swapMemoryUsedPercent),
+          color: context.appColors.usageTone(current.swapMemoryUsedPercent),
           value:
               '${formatBytes(current.swapMemoryUsed)} / ${formatBytes(current.swapMemoryTotal)}',
           percent: current.swapMemoryUsedPercent,
@@ -385,7 +380,7 @@ class _ResourceCard extends StatelessWidget {
       _ResourceRow(
         icon: TablerIcons.database,
         label: l10n.dashboard_disk,
-        color: _usageColor(context, disk?.usedPercent ?? 0),
+        color: context.appColors.usageTone(disk?.usedPercent ?? 0),
         value: disk == null
             ? ''
             : '${formatBytes(disk!.used)} / ${formatBytes(disk!.total)}',
@@ -416,7 +411,7 @@ class _ResourceCard extends StatelessWidget {
             if (index < rows.length - 1)
               Divider(
                 height: 1,
-                indent: 44,
+                indent: AppTokens.rowDividerIndent,
                 color: context.scheme.outlineVariant,
               ),
           ],
@@ -454,11 +449,11 @@ class _ResourceRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: AppTokens.iconBadge,
+            height: AppTokens.iconBadge,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: color.withValues(alpha: AppTokens.toneSurface),
+              borderRadius: BorderRadius.circular(AppTokens.rTile),
             ),
             child: Icon(icon, size: AppTokens.iconInline, color: color),
           ),
@@ -503,12 +498,12 @@ class _ResourceRow extends StatelessWidget {
                 ],
                 const SizedBox(height: 6),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: BorderRadius.circular(AppTokens.rTrack),
                   child: Stack(
                     children: [
                       Container(
                         height: 6,
-                        color: color.withValues(alpha: 0.12),
+                        color: color.withValues(alpha: AppTokens.toneSurface),
                       ),
                       FractionallySizedBox(
                         widthFactor: clamped / 100,
@@ -565,23 +560,23 @@ class NodeInfoCard extends StatelessWidget {
             _ResourceRow(
               icon: TablerIcons.cpu,
               label: l10n.dashboard_cpu,
-              color: _usageColor(context, cpu),
+              color: context.appColors.usageTone(cpu),
               percent: cpu,
             ),
             Divider(
               height: 1,
-              indent: 44,
+              indent: AppTokens.rowDividerIndent,
               color: context.scheme.outlineVariant,
             ),
             _ResourceRow(
               icon: TablerIcons.device_sd_card,
               label: l10n.dashboard_memory,
-              color: _usageColor(context, memory),
+              color: context.appColors.usageTone(memory),
               percent: memory,
             ),
             Divider(
               height: 1,
-              indent: 44,
+              indent: AppTokens.rowDividerIndent,
               color: context.scheme.outlineVariant,
             ),
             Padding(
@@ -705,7 +700,11 @@ class _NetworkTrafficCard extends StatelessWidget {
             ),
             color: context.appColors.success,
           ),
-          Divider(height: 1, indent: 44, color: context.scheme.outlineVariant),
+          Divider(
+            height: 1,
+            indent: AppTokens.rowDividerIndent,
+            color: context.scheme.outlineVariant,
+          ),
           _TrafficRow(
             icon: TablerIcons.arrow_down_left,
             label: l10n.dashboard_download,
@@ -743,11 +742,11 @@ class _TrafficRow extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: AppTokens.iconBadge,
+            height: AppTokens.iconBadge,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: color.withValues(alpha: AppTokens.toneSurface),
+              borderRadius: BorderRadius.circular(AppTokens.rTile),
             ),
             child: Icon(icon, size: AppTokens.iconInline, color: color),
           ),
@@ -1183,7 +1182,7 @@ class _DiskUsageCard extends StatelessWidget {
             if (index < selected.length - 1)
               Divider(
                 height: 1,
-                indent: 44,
+                indent: AppTokens.rowDividerIndent,
                 color: context.scheme.outlineVariant,
               ),
           ],
@@ -1219,7 +1218,7 @@ class _DiskUsageRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final percent = disk.usedPercent.clamp(0, 100).toDouble();
-    final color = _usageColor(context, percent);
+    final color = context.appColors.usageTone(percent);
     final path = disk.path.isEmpty ? disk.device : disk.path;
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -1229,11 +1228,11 @@ class _DiskUsageRow extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: AppTokens.iconBadge,
+            height: AppTokens.iconBadge,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: color.withValues(alpha: AppTokens.toneSurface),
+              borderRadius: BorderRadius.circular(AppTokens.rTile),
             ),
             child: Icon(
               TablerIcons.database,
@@ -1271,12 +1270,12 @@ class _DiskUsageRow extends StatelessWidget {
                 ),
                 const SizedBox(height: AppTokens.s8),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: BorderRadius.circular(AppTokens.rTrack),
                   child: Stack(
                     children: [
                       Container(
                         height: 6,
-                        color: color.withValues(alpha: 0.12),
+                        color: color.withValues(alpha: AppTokens.toneSurface),
                       ),
                       FractionallySizedBox(
                         widthFactor: percent / 100,

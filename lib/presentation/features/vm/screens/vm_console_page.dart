@@ -15,6 +15,7 @@ import '../../../../core/storage/storage_service.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/buttons.dart';
+import '../../../common/components/console_app_bar.dart';
 import '../../../common/states/error_toast.dart';
 
 class VmConsolePage extends ConsumerStatefulWidget {
@@ -149,7 +150,7 @@ class _VmConsolePageState extends ConsumerState<VmConsolePage> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppTokens.consoleBackground,
-      appBar: AppBarLarge(
+      appBar: ConsoleAppBar(
         title: l10n.vm_console,
         subtitle: widget.name,
         leading: IconButton(

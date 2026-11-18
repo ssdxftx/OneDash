@@ -25,7 +25,7 @@ class StatusIconBlock extends StatelessWidget {
       height: 34,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: tone.withValues(alpha: 0.1),
+        color: tone.withValues(alpha: AppTokens.toneSurface),
         borderRadius: BorderRadius.circular(AppTokens.rXs),
       ),
       child: Icon(icon, size: AppTokens.iconInline, color: tone),
@@ -163,7 +163,7 @@ class LogDetailHeader extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 22, color: tone),
+            Icon(icon, size: AppTokens.iconLeading, color: tone),
             const SizedBox(width: AppTokens.s8),
             Expanded(child: Text(title, style: AppTextStyles.titleL)),
           ],
@@ -177,7 +177,7 @@ class LogDetailHeader extends StatelessWidget {
                 vertical: 2,
               ),
               decoration: BoxDecoration(
-                color: tone.withValues(alpha: 0.12),
+                color: tone.withValues(alpha: AppTokens.toneSurface),
                 borderRadius: BorderRadius.circular(AppTokens.rXs),
               ),
               child: Text(

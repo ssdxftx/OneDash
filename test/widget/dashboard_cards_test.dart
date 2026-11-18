@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onedash/core/localization/generated/app_localizations.dart';
 import 'package:onedash/core/theme/app_theme.dart';
+import 'package:onedash/core/theme/tokens.dart';
 import 'package:onedash/data/dto/dashboard/dashboard_dto.dart';
 import 'package:onedash/domain/entities/dashboard.dart';
 import 'package:onedash/presentation/features/dashboard/providers/overview_provider.dart';
@@ -137,6 +138,28 @@ void main() {
     expect(find.text('主机详情'), findsOneWidget);
     expect(find.text('进程数'), findsWidgets);
     expect(find.text('x86_64'), findsOneWidget);
+  });
+
+  testWidgets('dashboard row dividers align with the row text', (tester) async {
+    tester.view.physicalSize = const Size(390, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(_app(width: 390, height: 1800));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    final indents = tester
+        .widgetList<Divider>(find.byType(Divider))
+        .map((divider) => divider.indent)
+        .whereType<double>()
+        .toList();
+    expect(indents, isNotEmpty);
+    expect(indents, isNot(contains(44)));
+    expect(
+      indents.where((indent) => indent == AppTokens.rowDividerIndent).length,
+      greaterThanOrEqualTo(4),
+    );
   });
 
   testWidgets('dashboard fits 320dp at 1.5x text', (tester) async {

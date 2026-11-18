@@ -1345,7 +1345,7 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                   _clearSelection();
                   _searchDebouncer(() {
                     ref.read(filesProvider(_path).notifier).search(value);
-                  }, delay: const Duration(milliseconds: 300));
+                  });
                 },
               ),
             ),

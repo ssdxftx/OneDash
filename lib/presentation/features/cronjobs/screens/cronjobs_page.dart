@@ -216,7 +216,7 @@ class _CronjobsPageState extends ConsumerState<CronjobsPage>
           leading: Container(
             decoration: BoxDecoration(
               color: (enabled ? colors.success : colors.info).withValues(
-                alpha: 0.1,
+                alpha: AppTokens.toneSurface,
               ),
               borderRadius: BorderRadius.circular(AppTokens.rMd),
             ),

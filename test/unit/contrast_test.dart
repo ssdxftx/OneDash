@@ -83,6 +83,14 @@ void main() {
     }
   });
 
+  test('usage tone follows the shared thresholds', () {
+    const colors = OneDashColors.light;
+    expect(colors.usageTone(59.9), colors.success);
+    expect(colors.usageTone(60), colors.warning);
+    expect(colors.usageTone(84.9), colors.warning);
+    expect(colors.usageTone(85), colors.danger);
+  });
+
   test('input hint keeps 4.5:1 against its fill', () {
     for (final brightness in Brightness.values) {
       final input = AppTheme.build(brightness).inputDecorationTheme;

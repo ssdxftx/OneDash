@@ -245,7 +245,9 @@ class _OfflineBanner extends StatelessWidget {
         vertical: AppTokens.s8,
       ),
       decoration: BoxDecoration(
-        color: context.appColors.warning.withValues(alpha: 0.12),
+        color: context.appColors.warning.withValues(
+          alpha: AppTokens.toneSurface,
+        ),
         borderRadius: BorderRadius.circular(AppTokens.rMd),
       ),
       child: Row(
@@ -563,11 +565,11 @@ class _TopProcessCard extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    width: 32,
-                    height: 32,
+                    width: AppTokens.iconBadge,
+                    height: AppTokens.iconBadge,
                     decoration: BoxDecoration(
-                      color: accent.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      color: accent.withValues(alpha: AppTokens.toneSurface),
+                      borderRadius: BorderRadius.circular(AppTokens.rTile),
                     ),
                     child: Icon(
                       icon,
@@ -618,7 +620,11 @@ class _TopProcessCard extends StatelessWidget {
                   showMemory: showMemory,
                 ),
                 if (index < items.length - 1)
-                  Divider(height: 1, indent: 56, color: scheme.outlineVariant),
+                  Divider(
+                    height: 1,
+                    indent: AppTokens.rowDividerIndentCompact,
+                    color: scheme.outlineVariant,
+                  ),
               ],
             if (items.isNotEmpty) const SizedBox(height: AppTokens.s8),
           ],
@@ -666,12 +672,12 @@ class _ProcessRankRow extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 28,
-            height: 28,
+            width: AppTokens.iconEmpty,
+            height: AppTokens.iconEmpty,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: accent.withValues(alpha: AppTokens.toneSurface),
+              borderRadius: BorderRadius.circular(AppTokens.rTile),
             ),
             child: Text(
               '${index + 1}',
@@ -732,12 +738,12 @@ class _ProcessRankRow extends StatelessWidget {
                   ),
                 const SizedBox(height: 4),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppTokens.rTrack),
                   child: Stack(
                     children: [
                       Container(
                         height: 4,
-                        color: accent.withValues(alpha: 0.12),
+                        color: accent.withValues(alpha: AppTokens.toneSurface),
                       ),
                       FractionallySizedBox(
                         widthFactor: ratio,

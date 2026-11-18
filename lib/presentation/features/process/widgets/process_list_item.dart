@@ -85,7 +85,7 @@ class ProcessListItem extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
+                  color: statusColor.withValues(alpha: AppTokens.toneSurface),
                   borderRadius: BorderRadius.circular(AppTokens.rSm),
                 ),
                 child: Icon(
@@ -175,7 +175,7 @@ class _ProcessStatusPill extends StatelessWidget {
         vertical: 3,
       ),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withValues(alpha: AppTokens.toneSurface),
         borderRadius: BorderRadius.circular(AppTokens.rXs),
       ),
       child: Text(
@@ -259,10 +259,13 @@ class _ProcessMetricBar extends StatelessWidget {
         const SizedBox(width: AppTokens.s8),
         Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: BorderRadius.circular(AppTokens.rTrack),
             child: Stack(
               children: [
-                Container(height: 5, color: color.withValues(alpha: 0.12)),
+                Container(
+                  height: 5,
+                  color: color.withValues(alpha: AppTokens.toneSurface),
+                ),
                 FractionallySizedBox(
                   widthFactor: progress.clamp(0, 1).toDouble(),
                   child: Container(height: 5, color: color),

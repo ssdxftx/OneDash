@@ -328,7 +328,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
                             _clearSelection();
                             _debouncer(() {
                               ref.read(websitesProvider.notifier).search(value);
-                            }, delay: const Duration(milliseconds: 300));
+                            });
                           },
                         ),
                       )
@@ -984,7 +984,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
         infoCard: ActionSheetInfoCard(
           leading: Container(
             decoration: BoxDecoration(
-              color: colors.info.withValues(alpha: 0.1),
+              color: colors.info.withValues(alpha: AppTokens.toneSurface),
               borderRadius: BorderRadius.circular(AppTokens.rMd),
             ),
             child: Icon(

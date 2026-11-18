@@ -53,8 +53,13 @@ void main() {
         final fill = Color.alphaBlend(deco.color!, scheme.surfaceContainerLow);
 
         expect(
+          deco.color!.a,
+          closeTo(AppTokens.toneSurfaceStrong, 0.001),
+          reason: '$brightness ${entry.key} pill fill',
+        );
+        expect(
           _contrastRatio(text, fill),
-          greaterThanOrEqualTo(4.5),
+          greaterThanOrEqualTo(4.95),
           reason: '$brightness ${entry.key} pill text',
         );
       }

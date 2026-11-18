@@ -628,8 +628,8 @@ class _ServerAvatar extends StatelessWidget {
         ? context.appColors.success
         : context.appColors.neutral;
     return Container(
-      width: 44,
-      height: 44,
+      width: AppTokens.iconAvatar,
+      height: AppTokens.iconAvatar,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -642,7 +642,11 @@ class _ServerAvatar extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTokens.rMd),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
-      child: Icon(TablerIcons.server_2, size: 22, color: color),
+      child: Icon(
+        TablerIcons.server_2,
+        size: AppTokens.iconLeading,
+        color: color,
+      ),
     );
   }
 }
@@ -697,7 +701,7 @@ class _ServerStatusPill extends StatelessWidget {
         vertical: 4,
       ),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withValues(alpha: AppTokens.toneSurface),
         borderRadius: BorderRadius.circular(AppTokens.rFull),
       ),
       child: Row(
@@ -770,7 +774,7 @@ class _ServerMetric extends StatelessWidget {
     final clamped = value?.clamp(0, 100).toDouble();
     final color = clamped == null
         ? context.appColors.neutral
-        : usageColor(context, clamped);
+        : context.appColors.usageTone(clamped);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -798,10 +802,13 @@ class _ServerMetric extends StatelessWidget {
         ),
         const SizedBox(height: AppTokens.s8),
         ClipRRect(
-          borderRadius: BorderRadius.circular(3),
+          borderRadius: BorderRadius.circular(AppTokens.rTrack),
           child: Stack(
             children: [
-              Container(height: 5, color: color.withValues(alpha: 0.12)),
+              Container(
+                height: 5,
+                color: color.withValues(alpha: AppTokens.toneSurface),
+              ),
               FractionallySizedBox(
                 widthFactor: (clamped ?? 0) / 100,
                 child: Container(height: 5, color: color),
@@ -850,11 +857,4 @@ class _ServerCount extends StatelessWidget {
       ),
     );
   }
-}
-
-Color usageColor(BuildContext context, double percent) {
-  final colors = context.appColors;
-  if (percent >= 85) return colors.danger;
-  if (percent >= 60) return colors.warning;
-  return colors.success;
 }

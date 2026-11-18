@@ -904,7 +904,7 @@ class _AccessLogCard extends StatelessWidget {
             ],
           ),
           AnimatedSize(
-            duration: context.motion(const Duration(milliseconds: 160)),
+            duration: context.motion(AppTokens.dBase),
             curve: AppTokens.curveBase,
             alignment: Alignment.topCenter,
             child: expanded
@@ -1202,7 +1202,7 @@ class _StructuredLineState extends State<_StructuredLine> {
     final statusBadge = Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       decoration: BoxDecoration(
-        color: statusColor.withValues(alpha: 0.16),
+        color: statusColor.withValues(alpha: AppTokens.toneSurfaceStrong),
         borderRadius: BorderRadius.circular(AppTokens.rXs),
       ),
       child: Text(statusText, style: statusStyle),
@@ -1349,7 +1349,7 @@ class _StructuredLineState extends State<_StructuredLine> {
           margin: const EdgeInsets.only(top: 2),
           padding: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.16),
+            color: color.withValues(alpha: AppTokens.toneSurfaceStrong),
             borderRadius: BorderRadius.circular(AppTokens.rXs),
           ),
           child: Text(

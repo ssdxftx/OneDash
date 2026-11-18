@@ -247,7 +247,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
           leading: Container(
             decoration: BoxDecoration(
               color: (running ? colors.success : colors.info).withValues(
-                alpha: 0.1,
+                alpha: AppTokens.toneSurface,
               ),
               borderRadius: BorderRadius.circular(AppTokens.rMd),
             ),
