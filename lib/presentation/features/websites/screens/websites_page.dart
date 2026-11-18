@@ -29,7 +29,6 @@ import '../../../common/components/selection_app_bar.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/sheet_title.dart';
 import '../../../common/components/skeleton.dart';
-import '../../../common/components/status_dot.dart';
 import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/formatters/enum_labels.dart';
@@ -1392,11 +1391,6 @@ class _WebsiteCard extends StatelessWidget {
                   padding: const EdgeInsets.only(top: AppTokens.s4),
                   child: Checkbox(value: selected, onChanged: (_) => onTap()),
                 ),
-              Padding(
-                padding: const EdgeInsets.only(top: AppTokens.s8),
-                child: StatusDot(status: site.status.toLowerCase()),
-              ),
-              const SizedBox(width: AppTokens.s8),
               Expanded(
                 child: Text(
                   site.primaryDomain,

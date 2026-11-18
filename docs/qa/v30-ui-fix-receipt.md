@@ -51,3 +51,10 @@
 - C-2 骨架高光：扫描带宽从整块宽度收窄到半个容器宽，中心仍走完整周期。
 - C-3 导航栏淡出：弹窗分支时长从 120ms 改为 `dEmphasis`(280ms)，与摘除时机一致。
 - CI：`analysis_options.yaml` 暂时忽略 SDK 级 `deprecated_member_use`，等待全仓迁移到 `material_ui` 后移除。
+
+## v31 验收报告复修
+
+- V31-1/V31-2：页头标题撤销 `FittedBox` 缩放，改为 `headline`(24) → `titleL`(20) 单档降级加省略号，chevron 重新紧贴标题。
+- V31-3：保留 `deprecated_member_use: ignore` 并补迁移 TODO 与追踪说明；CI 以 `--fatal-infos` 运行，切成 warning 会直接阻断流水线。
+- V31-4：容器与网站卡片删除标题行的 `StatusDot`，状态只由第二行 `StatusPill` 表达。
+- V31-5：状态胶囊底色 alpha 从 0.12 提到 0.16，浅色主题下与卡片底可区分。

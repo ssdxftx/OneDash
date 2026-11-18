@@ -3,6 +3,23 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tokens.dart';
 
+bool _fitsOneLine(
+  BuildContext context,
+  String text,
+  TextStyle style,
+  double maxWidth,
+) {
+  final painter = TextPainter(
+    text: TextSpan(text: text, style: style),
+    maxLines: 1,
+    textDirection: Directionality.of(context),
+    textScaler: MediaQuery.textScalerOf(context),
+  )..layout();
+  final fits = painter.width <= maxWidth;
+  painter.dispose();
+  return fits;
+}
+
 /// 标准大标题栏。滚动内容请使用 [SliverAppBarLarge]。
 class AppBarLarge extends StatelessWidget implements PreferredSizeWidget {
   const AppBarLarge({
@@ -124,23 +141,25 @@ class _TitleBlock extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Flexible(
-                child: Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: AlignmentDirectional.centerStart,
-                    child: Text(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final base = compact
+                        ? AppTextStyles.titleM
+                        : AppTextStyles.headline;
+                    final fallback = compact
+                        ? AppTextStyles.titleS
+                        : AppTextStyles.titleL;
+                    final style =
+                        _fitsOneLine(context, title, base, constraints.maxWidth)
+                        ? base
+                        : fallback;
+                    return Text(
                       title,
-                      style:
-                          (compact
-                                  ? AppTextStyles.titleM
-                                  : AppTextStyles.headline)
-                              .copyWith(color: scheme.onSurface),
+                      style: style.copyWith(color: scheme.onSurface),
                       maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.clip,
-                    ),
-                  ),
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  },
                 ),
               ),
               if (interactive) ...[

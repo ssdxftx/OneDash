@@ -23,7 +23,6 @@ import '../../../common/components/search_field.dart';
 import '../../../common/components/selection_app_bar.dart';
 import '../../../common/components/server_switcher_sheet.dart';
 import '../../../common/components/skeleton.dart';
-import '../../../common/components/status_dot.dart';
 import '../../../common/components/status_pill.dart';
 import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/components/tonal_card.dart';
@@ -628,8 +627,6 @@ class _ContainerCard extends StatelessWidget {
             children: [
               if (selectable && selectionMode)
                 Checkbox(value: selected, onChanged: (_) => onTap()),
-              StatusDot(status: item.state.toLowerCase()),
-              const SizedBox(width: AppTokens.s8),
               Expanded(
                 child: Text(
                   item.name,
