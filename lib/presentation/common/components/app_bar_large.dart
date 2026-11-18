@@ -9,6 +9,7 @@ bool _fitsOneLine(
   TextStyle style,
   double maxWidth,
 ) {
+  if (!maxWidth.isFinite || maxWidth <= 0) return true;
   final painter = TextPainter(
     text: TextSpan(text: text, style: style),
     maxLines: 1,

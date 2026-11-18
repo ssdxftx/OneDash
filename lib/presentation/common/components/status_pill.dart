@@ -21,12 +21,15 @@ class StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onTone = Theme.of(context).brightness == Brightness.dark
+        ? tone
+        : Color.alphaBlend(Colors.black.withValues(alpha: 0.16), tone);
     final text = Text(
       label,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: AppTextStyles.caption.copyWith(
-        color: tone,
+        color: onTone,
         fontWeight: FontWeight.w600,
       ),
     );

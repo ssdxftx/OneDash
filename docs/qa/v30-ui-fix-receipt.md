@@ -58,3 +58,10 @@
 - V31-3：保留 `deprecated_member_use: ignore` 并补迁移 TODO 与追踪说明；CI 以 `--fatal-infos` 运行，切成 warning 会直接阻断流水线。
 - V31-4：容器与网站卡片删除标题行的 `StatusDot`，状态只由第二行 `StatusPill` 表达。
 - V31-5：状态胶囊底色 alpha 从 0.12 提到 0.16，浅色主题下与卡片底可区分。
+
+## v32 验收报告复修
+
+- P2-1：`StatusPill` 浅色模式下胶囊文字在 tone 上叠加 16% 黑色，深色模式保持 tone 原色；底色 16% 不变，圆点保持 tone。实测 success 4.88、warning 4.83、danger 5.81，均达到 4.5:1，深色模式保持 6.6 以上。
+- P3-1：页头测试补回 compact 长路径降档到 14sp，以及长标题下 chevron 间距与无溢出的断言。
+- P3-2：`_fitsOneLine` 加回 `maxWidth` 非有限或非正数时直接判定可容纳的防御。
+- 新增 `test/widget/status_pill_test.dart`，读取组件实际文字色与底色计算对比度，覆盖浅色与深色下的 success、warning、danger。

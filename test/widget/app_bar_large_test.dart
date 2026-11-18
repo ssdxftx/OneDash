@@ -85,4 +85,39 @@ void main() {
     final chevronRect = tester.getRect(find.byIcon(TablerIcons.chevron_down));
     expect(chevronRect.left - titleRect.right, lessThan(12));
   });
+
+  testWidgets('compact variant drops to 14sp for a long path', (tester) async {
+    tester.view.physicalSize = const Size(320, 200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    const name = 'a-very-long-file-name-with-many-segments.js';
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(appBar: AppBarLarge(title: name, compact: true)),
+      ),
+    );
+
+    expect(tester.widget<Text>(find.text(name)).style!.fontSize, 14);
+  });
+
+  testWidgets('chevron stays next to a long title', (tester) async {
+    tester.view.physicalSize = const Size(320, 200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    const title = 'Singapore Production Cluster Node 02';
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          appBar: AppBarLarge(title: title, onTitleTap: () {}),
+        ),
+      ),
+    );
+
+    final titleRect = tester.getRect(find.text(title));
+    final chevronRect = tester.getRect(find.byIcon(TablerIcons.chevron_down));
+    expect(chevronRect.left - titleRect.right, lessThan(12));
+    expect(tester.takeException(), isNull);
+  });
 }
