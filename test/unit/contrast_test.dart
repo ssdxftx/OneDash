@@ -66,6 +66,23 @@ void main() {
     }
   });
 
+  test('card borders meet 3:1 against their fill', () {
+    final schemes = [
+      ('light', AppTheme.schemeFor(Brightness.light)),
+      ('dark', AppTheme.schemeFor(Brightness.dark)),
+      ('oled', AppTheme.schemeFor(Brightness.dark, oled: true)),
+    ];
+    for (final (name, scheme) in schemes) {
+      final fill = scheme.surfaceContainerLow;
+      final ratio = contrastRatio(scheme.outline, fill);
+      expect(
+        ratio,
+        greaterThanOrEqualTo(3),
+        reason: '$name card border ratio $ratio',
+      );
+    }
+  });
+
   test('input hint keeps 4.5:1 against its fill', () {
     for (final brightness in Brightness.values) {
       final input = AppTheme.build(brightness).inputDecorationTheme;

@@ -60,6 +60,16 @@ def main() -> int:
         relative = path.relative_to(ROOT)
         if "FloatingActionButton" in source:
             failures.append(f"{relative}: new entries must live in the app bar")
+        for match in re.finditer(r"fontSize:\s*\d", source):
+            line = source[: match.start()].count("\n") + 1
+            failures.append(
+                f"{relative}:{line}: use an AppTextStyles token instead of a numeric fontSize"
+            )
+        for match in re.finditer(r"fontFamily:\s*'monospace'", source):
+            line = source[: match.start()].count("\n") + 1
+            failures.append(
+                f"{relative}:{line}: use AppTextStyles.mono instead of a monospace literal"
+            )
         for match in re.finditer(r"actions:\s*\[", source):
             block = source[match.end() :]
             depth = 1

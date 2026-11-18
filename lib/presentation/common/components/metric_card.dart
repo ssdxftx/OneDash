@@ -107,9 +107,9 @@ class MetricCard extends StatelessWidget {
     final style = AppTextStyles.numericLarge.copyWith(
       color: valueColor,
       fontSize: switch (value.length) {
-        <= 4 => 28,
-        <= 6 => 26,
-        _ => 23,
+        <= 4 => AppTokens.metricValueWide,
+        <= 6 => AppTokens.metricValueMedium,
+        _ => AppTokens.metricValueCompact,
       },
       fontFeatures: const [FontFeature.tabularFigures()],
     );

@@ -22,6 +22,15 @@ void main() {
     }
   });
 
+  test('sheet emphasis curve never moves backwards', () {
+    var previous = 0.0;
+    for (var step = 1; step <= 100; step++) {
+      final value = AppTokens.curveEmphasis.transform(step / 100);
+      expect(value, greaterThanOrEqualTo(previous));
+      previous = value;
+    }
+  });
+
   test('input corners use the 14dp step below cards', () {
     for (final brightness in Brightness.values) {
       final input = AppTheme.build(brightness).inputDecorationTheme;

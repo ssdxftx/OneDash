@@ -40,8 +40,6 @@ abstract final class AppTokens {
   static const double menuRowHeight = 40;
   static const double appBarLargeHeight = 84;
 
-  static const double cardBorderAlpha = 0.16;
-
   static const double bottomNavHeight = 72;
   static const double bottomNavMaxWidth = 480;
   static const double bottomNavClearance = 96;
@@ -86,6 +84,9 @@ abstract final class AppTokens {
   static const int chartHistoryPoints = 120;
   static const double chartHeight = 160;
   static const double chartCompactHeight = 28;
+  static const double metricValueWide = 28;
+  static const double metricValueMedium = 26;
+  static const double metricValueCompact = 23;
   static const double iconBadge = 32;
   static const double miniRing = 38;
   static const double spinner = 20;

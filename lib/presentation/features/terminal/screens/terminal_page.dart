@@ -317,6 +317,8 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
       },
       child: Scaffold(
         backgroundColor: AppTokens.consoleBackground,
+        // The console owns its own dark chrome, so this header stays a bare
+        // AppBar instead of AppBarLarge.
         appBar: AppBar(
           backgroundColor: AppTokens.consoleBackground,
           foregroundColor: AppTokens.consoleForeground,
@@ -411,6 +413,7 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
                 focusNode: _focusNode,
                 autofocus: true,
                 deleteDetection: true,
+                // Terminal font size is a user setting, not a design token.
                 textStyle: TerminalStyle(fontSize: _fontSize),
                 theme: TerminalThemes.defaultTheme,
               ),
