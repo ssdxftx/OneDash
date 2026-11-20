@@ -255,6 +255,10 @@ class FirewallApi {
       '/api/v2/hosts/firewall/docker/operate',
       data: {'operation': operation},
     );
+    if (operation != 'initialize') {
+      ApiResponseParser.ok(response);
+      return;
+    }
     await _awaitTask(
       ApiResponseParser.object(response, FirewallTaskResult.fromJson),
     );
@@ -350,12 +354,24 @@ class FirewallApi {
     return ApiResponseParser.primitive<String>(response);
   }
 
-  Future<void> resetRules({String? backupFile}) async {
+  Future<void> resetRules() async {
     final response = await _client.post<Map<String, dynamic>>(
       '/api/v2/hosts/firewall/rules/reset',
-      data: {if (backupFile != null) 'backupFile': backupFile},
+      data: const {},
     );
     ApiResponseParser.ok(response);
+  }
+
+  /// Restore rules from a server-side backup.
+  /// POST /api/v2/hosts/firewall/rules
+  Future<void> restoreRules(String backupFile) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/firewall/rules',
+      data: {'backupFile': backupFile, 'initialize': false, 'items': const []},
+    );
+    await _awaitTask(
+      ApiResponseParser.object(response, FirewallTaskResult.fromJson),
+    );
   }
 
   Future<void> _awaitTask(FirewallTaskResult task) async {

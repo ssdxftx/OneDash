@@ -703,9 +703,18 @@ class _PanelSettingsBody extends ConsumerWidget {
                           );
                           return;
                         }
+                        final validity =
+                            int.tryParse(
+                              '${settings['apiKeyValidityTime'] ?? 0}',
+                            ) ??
+                            0;
                         await repository.updateApiConfig({
                           'apiInterfaceStatus': value ? 'Enable' : 'Disable',
                           'apiKey': apiKey,
+                          'ipWhiteList': '${settings['ipWhiteList'] ?? ''}',
+                          'apiTrustedProxies':
+                              '${settings['apiTrustedProxies'] ?? ''}',
+                          'apiKeyValidityTime': validity,
                         });
                         ref.invalidate(_panelSettingsProvider);
                         if (!context.mounted) return;
@@ -887,6 +896,7 @@ class _PanelSettingsBody extends ConsumerWidget {
         result = await repository.loginPanelMfa(
           sessionId: result.mfaSession,
           code: code,
+          entrance: entrance,
         );
       }
       if (result.session == null) {
@@ -924,6 +934,7 @@ class _PanelSettingsBody extends ConsumerWidget {
           result = await repository.loginPanelMfa(
             sessionId: result.mfaSession,
             code: code,
+            entrance: entrance,
           );
         }
         if (result.session == null) {
@@ -1338,7 +1349,7 @@ class _PanelSettingsBody extends ConsumerWidget {
   ) async {
     final name = TextEditingController();
     final description = TextEditingController();
-    final ipWhiteList = TextEditingController();
+    final ipWhiteList = TextEditingController(text: '0.0.0.0/0\n::/0');
     final trustedProxies = TextEditingController();
     final validity = TextEditingController(text: '120');
     final saved = await pushFormPage<List<String>>(
@@ -1371,6 +1382,7 @@ class _PanelSettingsBody extends ConsumerWidget {
             AppTextField(
               controller: ipWhiteList,
               label: l10n.panelSettings_apiKeyIpWhiteList,
+              maxLines: 2,
             ),
             const SizedBox(height: AppTokens.s12),
             AppTextField(
@@ -1462,6 +1474,7 @@ class _PanelSettingsBody extends ConsumerWidget {
             AppTextField(
               controller: ipWhiteList,
               label: l10n.panelSettings_apiKeyIpWhiteList,
+              maxLines: 2,
             ),
             const SizedBox(height: AppTokens.s12),
             AppTextField(
@@ -1495,6 +1508,7 @@ class _PanelSettingsBody extends ConsumerWidget {
         apiTrustedProxies: values[3],
         apiKeyValidityTime: int.tryParse(values[4]) ?? 120,
         expiresAt: item.expiresAt,
+        allowAppBinding: item.allowAppBinding,
       );
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_saved);

@@ -187,14 +187,16 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
               const SizedBox(height: AppTokens.s16),
               Row(
                 children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _showStatus(state),
-                      icon: const Icon(TablerIcons.activity),
-                      label: Text(l10n.databases_status),
+                  if (widget.type == 'mysql' || widget.type == 'mariadb') ...[
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _showStatus(state),
+                        icon: const Icon(TablerIcons.activity),
+                        label: Text(l10n.databases_status),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppTokens.s12),
+                    const SizedBox(width: AppTokens.s12),
+                  ],
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _changePassword(state.item.id),

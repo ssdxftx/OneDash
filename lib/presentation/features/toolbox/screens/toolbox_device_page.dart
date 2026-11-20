@@ -313,6 +313,22 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
       final scan = await repository.scanClean();
       if (!mounted) return;
       final items = <Map<String, dynamic>>[];
+      void collect(Object? node) {
+        if (node is! Map) return;
+        final children = node['children'];
+        if (children is List && children.isNotEmpty) {
+          for (final child in children) {
+            collect(child);
+          }
+          return;
+        }
+        if (node['canDelete'] != true) return;
+        final type = '${node['type'] ?? ''}';
+        final name = '${node['name'] ?? ''}';
+        if (type.isEmpty || name.isEmpty) return;
+        items.add({'treeType': type, 'name': name, 'size': node['size'] ?? 0});
+      }
+
       for (final group in const [
         'systemClean',
         'backupClean',
@@ -323,12 +339,8 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
       ]) {
         final children = scan[group];
         if (children is! List) continue;
-        for (final item in children.whereType<Map>()) {
-          items.add({
-            'treeType': '${item['type'] ?? ''}',
-            'name': '${item['name'] ?? ''}',
-            'size': item['size'] ?? 0,
-          });
+        for (final item in children) {
+          collect(item);
         }
       }
       if (items.isEmpty) {

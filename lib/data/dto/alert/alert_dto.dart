@@ -186,6 +186,9 @@ class AlertConfigUpdateReq {
 @JsonSerializable()
 class AlertConfigTestReq {
   const AlertConfigTestReq({
+    this.id = 0,
+    this.type = '',
+    this.config = '',
     this.host = '',
     this.port = 0,
     this.sender = '',
@@ -196,6 +199,9 @@ class AlertConfigTestReq {
     this.recipient = '',
   });
 
+  final int id;
+  final String type;
+  final String config;
   final String host;
   final int port;
   final String sender;

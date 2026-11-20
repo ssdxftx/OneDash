@@ -644,8 +644,12 @@ class _VmCard extends ConsumerWidget {
       detail = const {};
     }
     if (!context.mounted) return;
+    final disks = detail['disks'];
+    final firstDisk = disks is List && disks.isNotEmpty && disks.first is Map
+        ? disks.first as Map
+        : null;
     final target = TextEditingController(
-      text: '${detail['diskTarget'] ?? 'vda'}',
+      text: '${firstDisk?['target'] ?? 'vda'}',
     );
     final size = TextEditingController(text: '${detail['diskSize'] ?? ''}');
     final confirmed = await pushFormPage<bool>(

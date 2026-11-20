@@ -311,6 +311,12 @@ class _OperationLogTab extends ConsumerWidget {
           LogDetailField(label: l10n.logs_method, value: item.method),
           LogDetailField(label: l10n.logs_path, value: item.path),
           LogDetailField(label: l10n.logs_source, value: item.source),
+          if (item.user.trim().isNotEmpty)
+            LogDetailField(label: l10n.logs_user, value: item.user),
+          if (item.apiKeyName.trim().isNotEmpty)
+            LogDetailField(label: l10n.logs_apiKey, value: item.apiKeyName),
+          if (item.authMethod.trim().isNotEmpty)
+            LogDetailField(label: l10n.logs_authMode, value: item.authMethod),
           LogDetailField(
             label: l10n.logs_result,
             value: item.isSuccess ? l10n.common_success : l10n.common_failed,
@@ -375,6 +381,8 @@ class _LoginLogTab extends ConsumerWidget {
             time: formatLogTime(item.createdAt),
             icon: TablerIcons.login,
           ),
+          if (item.user.trim().isNotEmpty)
+            LogDetailField(label: l10n.logs_user, value: item.user),
           if (item.hasLocation)
             LogDetailField(label: l10n.logs_address, value: item.address),
           if (item.hasDevice)

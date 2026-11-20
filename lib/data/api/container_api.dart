@@ -410,12 +410,13 @@ class ContainerApi {
 
   /// 更新容器。
   /// POST /api/v2/containers/update
-  Future<void> updateContainer(Map<String, dynamic> data) async {
+  Future<String> updateContainer(Map<String, dynamic> data) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/containers/update',
       data: data,
     );
     ApiResponseParser.ok(resp);
+    return '${data['taskID'] ?? ''}';
   }
 
   /// 容器操作。
@@ -557,13 +558,11 @@ class ContainerApi {
     return data['taskID'] as String;
   }
 
-  /// 获取镜像仓库列表。
-  /// GET /api/v2/containers/repo
+  /// 获取镜像仓库完整列表。
+  /// POST /api/v2/containers/repo/search
   Future<List<ImageRepoDto>> listImageRepos() async {
-    final resp = await _client.get<Map<String, dynamic>>(
-      '/api/v2/containers/repo',
-    );
-    return ApiResponseParser.list(resp, ImageRepoDto.fromJson);
+    final page = await searchImageRepos(pageSize: 200);
+    return page.items;
   }
 
   /// 分页搜索镜像仓库。
@@ -913,12 +912,12 @@ class ContainerApi {
 
   /// 读取 Compose 环境变量。
   /// POST /api/v2/containers/compose/env
-  Future<List<String>> loadComposeEnv(String path) async {
+  Future<String> loadComposeEnv(String path) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/containers/compose/env',
       data: {'path': path},
     );
-    return ApiResponseParser.primitiveList<String>(resp);
+    return ApiResponseParser.primitive<String>(resp);
   }
 
   /// 设置 Compose 置顶状态。

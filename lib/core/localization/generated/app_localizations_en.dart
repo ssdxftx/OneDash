@@ -3896,6 +3896,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cronjobs_url => 'Request URL';
 
   @override
+  String get cronjobs_urlHeader => 'User-Agent';
+
+  @override
   String get cronjobs_website => 'Website';
 
   @override
@@ -4252,6 +4255,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter the compose file content';
 
   @override
+  String get containers_dockerfileRequired => 'Enter the Dockerfile content';
+
+  @override
   String get containers_dockerSettings => 'Docker settings';
 
   @override
@@ -4361,6 +4367,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get files_name => 'Name';
+
+  @override
+  String get files_nameRequired => 'Enter a file name';
 
   @override
   String get files_path => 'Path';
@@ -7079,6 +7088,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logs_authMode => 'Auth method';
 
   @override
+  String get logs_user => 'User';
+
+  @override
+  String get logs_apiKey => 'API key';
+
+  @override
   String get logs_message => 'Error message';
 
   @override
@@ -9169,6 +9184,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ai_agent_group_scope_sender => 'Group and sender';
+
+  @override
+  String get ai_agent_group_scope_topic => 'Group and topic';
+
+  @override
+  String get ai_agent_group_scope_topic_sender => 'Group, topic and sender';
 
   @override
   String get ai_agent_separate_session => 'Separate session per conversation';

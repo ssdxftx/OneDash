@@ -989,6 +989,9 @@ class _HostPageState extends ConsumerState<HostPage> {
           id: cert.id,
           name: keyName,
           encryptionMode: cert.encryptionMode,
+          passPhrase: cert.passPhrase,
+          publicKey: _decodeCertField(cert.publicKey),
+          privateKey: _decodeCertField(cert.privateKey),
           description: note,
         ),
       );
@@ -998,6 +1001,15 @@ class _HostPageState extends ConsumerState<HostPage> {
     } catch (error) {
       if (!mounted) return;
       showErrorToast(context, error);
+    }
+  }
+
+  String _decodeCertField(String value) {
+    if (value.isEmpty) return '';
+    try {
+      return utf8.decode(base64Decode(value));
+    } on FormatException {
+      return value;
     }
   }
 

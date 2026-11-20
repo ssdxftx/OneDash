@@ -4,6 +4,7 @@ class LoginLogDto {
     required this.ip,
     this.address = '',
     this.agent = '',
+    this.user = '',
     required this.status,
     this.message = '',
     required this.createdAt,
@@ -13,6 +14,7 @@ class LoginLogDto {
   final String ip;
   final String address;
   final String agent;
+  final String user;
   final String status;
   final String message;
   final DateTime createdAt;
@@ -23,6 +25,7 @@ class LoginLogDto {
       ip: json['ip'] as String? ?? '',
       address: json['address'] as String? ?? '',
       agent: json['agent'] as String? ?? '',
+      user: json['user'] as String? ?? '',
       status: json['status'] as String? ?? '',
       message: json['message'] as String? ?? '',
       createdAt:

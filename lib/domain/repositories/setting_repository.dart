@@ -52,6 +52,7 @@ abstract interface class SettingRepository {
   Future<PanelLoginResult> loginPanelMfa({
     required String sessionId,
     required String code,
+    String entrance = '',
   });
 
   Future<void> logoutPanel();

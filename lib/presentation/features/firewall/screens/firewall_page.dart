@@ -335,7 +335,7 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
                     onFamilyOperation: _showFamilyOperation,
                     onFilterChain: _showFilterChain,
                     onResetRules: _resetRules,
-                    onRestoreBackup: (file) => _resetRules(backupFile: file),
+                    onRestoreBackup: _restoreBackup,
                     onNativeDetail: _showNativeDetail,
                   ),
                 },
@@ -741,23 +741,41 @@ class _FirewallPageState extends ConsumerState<FirewallPage> {
     }
   }
 
-  Future<void> _resetRules({String? backupFile}) async {
+  Future<void> _resetRules() async {
     final l10n = AppLocalizations.of(context);
     final confirmed = await showConfirmSheet(
       context,
       title: l10n.firewall_resetRules,
-      message: backupFile == null
-          ? l10n.firewall_resetRulesMessage
-          : l10n.firewall_restoreBackupMessage(backupFile),
-      confirmLabel: backupFile == null
-          ? l10n.firewall_resetRules
-          : l10n.firewall_restoreBackup,
+      message: l10n.firewall_resetRulesMessage,
+      confirmLabel: l10n.firewall_resetRules,
       danger: true,
     );
     if (!confirmed || !mounted) return;
     try {
       final repository = await ref.read(firewallRepositoryProvider.future);
-      await repository.resetRules(backupFile: backupFile);
+      await repository.resetRules();
+      if (!mounted) return;
+      AppToast.success(context, l10n.action_done);
+      ref.invalidate(_firewallProvider);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _restoreBackup(String backupFile) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.firewall_resetRules,
+      message: l10n.firewall_restoreBackupMessage(backupFile),
+      confirmLabel: l10n.firewall_restoreBackup,
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final repository = await ref.read(firewallRepositoryProvider.future);
+      await repository.restoreRules(backupFile);
       if (!mounted) return;
       AppToast.success(context, l10n.action_done);
       ref.invalidate(_firewallProvider);

@@ -587,8 +587,9 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
     final l10n = AppLocalizations.of(context);
     final name = image.tags.isEmpty ? image.id : image.tags.first;
     final target = TextEditingController(text: name);
-    final source = TextEditingController(text: 'scratch');
-    final archive = TextEditingController(text: '/tmp/image.tar');
+    final archive = TextEditingController(
+      text: operation == 'save' ? _archiveFileName(name) : '',
+    );
     final repo = TextEditingController(text: '0');
     final saved = await pushFormPage<bool>(
       context,
@@ -598,13 +599,6 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
           saveLabel: _operationLabel(operation, l10n),
           onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
-            if (operation == 'build') ...[
-              AppTextField(
-                controller: source,
-                label: l10n.containers_baseImage,
-              ),
-              const SizedBox(height: AppTokens.s12),
-            ],
             AppTextField(
               controller: target,
               label: operation == 'load'
@@ -615,7 +609,15 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
             ),
             if (operation == 'build') ...[
               const SizedBox(height: AppTokens.s12),
-              AppTextField(controller: archive, label: 'Dockerfile'),
+              AppTextField(
+                controller: archive,
+                label: 'Dockerfile',
+                maxLines: 8,
+              ),
+            ],
+            if (operation == 'save') ...[
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(controller: archive, label: l10n.files_name),
             ],
             if (operation == 'push') ...[
               const SizedBox(height: AppTokens.s12),
@@ -630,14 +632,20 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
       ),
     );
     final value = target.text.trim();
-    final sourceValue = source.text.trim();
     final archiveValue = archive.text.trim();
     final repoId = int.tryParse(repo.text.trim()) ?? 0;
     target.dispose();
-    source.dispose();
     archive.dispose();
     repo.dispose();
     if (saved != true || !context.mounted || value.isEmpty) return;
+    if (operation == 'build' && archiveValue.isEmpty) {
+      AppToast.warning(context, l10n.containers_dockerfileRequired);
+      return;
+    }
+    if (operation == 'save' && archiveValue.isEmpty) {
+      AppToast.warning(context, l10n.files_nameRequired);
+      return;
+    }
     final repository = await ref.read(containerRepositoryProvider.future);
     if (!context.mounted) return;
     final taskID = const Uuid().v4();
@@ -650,7 +658,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
             await repository.buildImage(
               ImageBuildReq(
                 taskID: taskID,
-                from: sourceValue.isEmpty ? 'scratch' : sourceValue,
+                from: 'edit',
                 name: value,
                 dockerfile: archiveValue,
               ),
@@ -661,7 +669,9 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
                 taskID: taskID,
                 tagName: name,
                 path: value,
-                name: name,
+                name: archiveValue.toLowerCase().endsWith('.tar')
+                    ? archiveValue.substring(0, archiveValue.length - 4)
+                    : archiveValue,
               ),
             );
           case 'load':
@@ -1425,6 +1435,11 @@ class _PullImageSheetState extends State<_PullImageSheet> {
       ],
     );
   }
+}
+
+String _archiveFileName(String image) {
+  final base = image.contains('/') ? image.split('/').last : image;
+  return base.replaceAll(':', '_');
 }
 
 class _TagImageSheet extends StatefulWidget {

@@ -143,7 +143,10 @@ class AlertApi {
       '/api/v2/alert/config/test',
       data: req.toJson(),
     );
-    return ApiResponseParser.primitive<bool>(resp);
+    final data = resp.data?['data'];
+    if (data is bool) return data;
+    if (data is Map) return data['success'] == true;
+    return false;
   }
 
   /// 删除告警配置。

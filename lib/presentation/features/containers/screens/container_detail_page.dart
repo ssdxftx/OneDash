@@ -475,7 +475,7 @@ class _ConfigTab extends ConsumerWidget {
                 title: l10n.containers_memory,
                 subtitle: data.memory == 0
                     ? l10n.containers_unlimited
-                    : formatBytes(data.memory),
+                    : formatBytes((data.memory * 1024 * 1024).round()),
               ),
               SplitListTile(
                 title: l10n.containers_privilegedMode,

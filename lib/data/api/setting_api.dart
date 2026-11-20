@@ -84,11 +84,15 @@ class SettingApi {
   Future<PanelLoginResult> loginPanelMfa({
     required String sessionId,
     required String code,
+    String entrance = '',
   }) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/core/auth/mfalogin',
       data: {'sessionId': sessionId, 'code': code},
-      options: Options(extra: const {'skipAuth': true, 'skipSession': true}),
+      options: Options(
+        headers: _entranceHeaders(entrance),
+        extra: const {'skipAuth': true, 'skipSession': true},
+      ),
     );
     final data = ApiResponseParser.map(resp);
     final session = _sessionFromResponse(resp);
@@ -109,6 +113,9 @@ class SettingApi {
     );
     _client.updateSession(null);
   }
+
+  /// Clear the in-memory panel session after the server invalidates it.
+  void clearPanelSession() => _client.updateSession(null);
 
   Map<String, dynamic> _entranceHeaders(String entrance) => {
     if (entrance.isNotEmpty)
@@ -447,6 +454,7 @@ class SettingApi {
         'apiInterfaceStatus',
         'apiKey',
         'ipWhiteList',
+        'apiTrustedProxies',
         'apiKeyValidityTime',
       ]) {
         if (current.containsKey(key)) settings[key] = current[key];
@@ -498,7 +506,7 @@ class SettingApi {
         'proxyPasswd': proxyPasswd.isEmpty
             ? ''
             : base64Encode(utf8.encode(proxyPasswd)),
-        'proxyPasswdKeep': proxyPasswdKeep ? 'true' : 'false',
+        'proxyPasswdKeep': proxyPasswdKeep ? 'Enable' : 'Disable',
         'proxyDocker': proxyDocker,
         'withDockerRestart': withDockerRestart,
       },
@@ -830,10 +838,7 @@ class SettingApi {
       '/api/v2/core/auth/passkey/finish',
       data: payload,
       options: Options(
-        headers: {
-          'Passkey-Session': sessionId,
-          ..._entranceHeaders(entrance),
-        },
+        headers: {'Passkey-Session': sessionId, ..._entranceHeaders(entrance)},
         extra: const {'skipAuth': true, 'skipSession': true},
       ),
     );

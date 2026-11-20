@@ -45,8 +45,8 @@ class ContainerInfoDto {
   final List<String>? cmd;
   final List<String>? entrypoint;
   final int cpuShares;
-  final int nanoCPUs;
-  final int memory;
+  final double nanoCPUs;
+  final double memory;
   final bool privileged;
   final bool autoRemove;
   final List<ContainerVolumeDto> volumes;
@@ -114,9 +114,9 @@ class ContainerInfoDto {
       entrypoint: (json['entrypoint'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      cpuShares: json['cpuShares'] as int? ?? 0,
-      nanoCPUs: json['nanoCPUs'] as int? ?? 0,
-      memory: json['memory'] as int? ?? 0,
+      cpuShares: (json['cpuShares'] as num?)?.toInt() ?? 0,
+      nanoCPUs: (json['nanoCPUs'] as num?)?.toDouble() ?? 0,
+      memory: (json['memory'] as num?)?.toDouble() ?? 0,
       privileged: json['privileged'] as bool? ?? false,
       autoRemove: json['autoRemove'] as bool? ?? false,
       volumes:

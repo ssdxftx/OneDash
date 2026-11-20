@@ -175,6 +175,14 @@ class ExposedPort {
     );
   }
 
+  ExposedPort copyWith({int? hostPort, int? containerPort, String? hostIP}) {
+    return ExposedPort(
+      hostPort: hostPort ?? this.hostPort,
+      containerPort: containerPort ?? this.containerPort,
+      hostIP: hostIP ?? this.hostIP,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'hostPort': hostPort,
     'containerPort': containerPort,

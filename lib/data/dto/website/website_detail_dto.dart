@@ -63,6 +63,22 @@ class WebsiteDetailDto {
 
   bool get isSslBound => webSiteSSLId > 0;
 
+  WebsiteDetailDto copyWith({WebsiteSslDto? ssl}) => WebsiteDetailDto(
+    website: website,
+    alias: alias,
+    errorLogPath: errorLogPath,
+    accessLogPath: accessLogPath,
+    webSiteGroupId: webSiteGroupId,
+    webSiteSSLId: webSiteSSLId,
+    ipv6: ipv6,
+    accessLog: accessLog,
+    errorLog: errorLog,
+    defaultServer: defaultServer,
+    favorite: favorite,
+    domains: domains,
+    ssl: ssl ?? this.ssl,
+  );
+
   factory WebsiteDetailDto.fromJson(Map<String, dynamic> json) {
     final domainsJson = json['domains'] as List?;
     final sslJson = json['webSiteSSL'];

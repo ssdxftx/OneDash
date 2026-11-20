@@ -63,7 +63,7 @@ class _ComposeFormPageState extends ConsumerState<ComposeFormPage> {
       final content = await repository.inspect(
         id: compose.name,
         type: 'compose',
-        detail: compose.configFile,
+        detail: compose.primaryConfigFile,
       );
       if (!mounted) return;
       setState(() {
@@ -92,7 +92,7 @@ class _ComposeFormPageState extends ConsumerState<ComposeFormPage> {
         'taskID': taskID,
         'name': compose.name,
         'path': compose.path,
-        'detailPath': compose.configFile,
+        'detailPath': compose.primaryConfigFile,
         'content': _content.text,
         'env': _env.text,
         'forcePull': _forcePull,
@@ -109,13 +109,28 @@ class _ComposeFormPageState extends ConsumerState<ComposeFormPage> {
     };
   }
 
+  Map<String, dynamic> _testPayload() {
+    if (widget.isEditing) {
+      final compose = widget.compose!;
+      return {
+        'taskID': const Uuid().v4(),
+        'name': compose.name,
+        'from': 'path',
+        'path': compose.path,
+        'env': _env.text,
+        'forcePull': _forcePull,
+      };
+    }
+    return _payload(const Uuid().v4());
+  }
+
   Future<void> _test() async {
     final l10n = AppLocalizations.of(context);
     if (_content.text.trim().isEmpty) return;
     setState(() => _submitting = true);
     try {
       final repository = await ref.read(containerRepositoryProvider.future);
-      final valid = await repository.testCompose(_payload(const Uuid().v4()));
+      final valid = await repository.testCompose(_testPayload());
       if (!mounted) return;
       if (valid) {
         AppToast.success(context, l10n.containers_composeValid);

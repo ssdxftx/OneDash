@@ -3803,6 +3803,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cronjobs_url => '请求地址';
 
   @override
+  String get cronjobs_urlHeader => 'User-Agent';
+
+  @override
   String get cronjobs_website => '网站';
 
   @override
@@ -4150,6 +4153,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get containers_composeContentRequired => '请输入编排文件内容';
 
   @override
+  String get containers_dockerfileRequired => '请输入 Dockerfile 内容';
+
+  @override
   String get containers_dockerSettings => 'Docker 设置';
 
   @override
@@ -4257,6 +4263,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get files_name => '名称';
+
+  @override
+  String get files_nameRequired => '请输入文件名';
 
   @override
   String get files_path => '路径';
@@ -6927,6 +6936,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get logs_authMode => '认证方式';
 
   @override
+  String get logs_user => '用户';
+
+  @override
+  String get logs_apiKey => 'API Key';
+
+  @override
   String get logs_message => '错误信息';
 
   @override
@@ -8976,6 +8991,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get ai_agent_group_scope_sender => '按群和发送者';
+
+  @override
+  String get ai_agent_group_scope_topic => '群和话题';
+
+  @override
+  String get ai_agent_group_scope_topic_sender => '群、话题和发送者';
 
   @override
   String get ai_agent_separate_session => '按会话独立会话';

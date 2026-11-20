@@ -37,6 +37,7 @@ class CronjobDto {
     this.dbType,
     this.dbName,
     this.url,
+    this.urlItems,
     this.isDir,
     this.sourceDir,
     this.sourceAccountIDs,
@@ -83,6 +84,7 @@ class CronjobDto {
   final String? dbType;
   final String? dbName;
   final String? url;
+  final List<CronjobUrlItemDto>? urlItems;
   final bool? isDir;
   final String? sourceDir;
   final String? sourceAccountIDs;
@@ -130,6 +132,10 @@ class CronjobDto {
       dbType: json['dbType'] as String?,
       dbName: json['dbName'] as String?,
       url: json['url'] as String?,
+      urlItems: (json['urlItems'] as List?)
+          ?.whereType<Map<String, dynamic>>()
+          .map(CronjobUrlItemDto.fromJson)
+          .toList(),
       isDir: json['isDir'] as bool?,
       sourceDir: json['sourceDir'] as String?,
       sourceAccountIDs: json['sourceAccountIDs'] as String?,
@@ -170,6 +176,7 @@ class CronjobCreateReq {
     this.dbType,
     this.dbName,
     this.url,
+    this.urlItems,
     this.isDir,
     this.sourceDir,
     this.sourceAccountIDs,
@@ -207,6 +214,7 @@ class CronjobCreateReq {
   final String? dbType;
   final String? dbName;
   final String? url;
+  final List<CronjobUrlItemDto>? urlItems;
   final bool? isDir;
   final String? sourceDir;
   final String? sourceAccountIDs;
@@ -244,6 +252,8 @@ class CronjobCreateReq {
     if (dbType != null) 'dbType': dbType,
     if (dbName != null) 'dbName': dbName,
     if (url != null) 'url': url,
+    if (urlItems != null)
+      'urlItems': urlItems!.map((item) => item.toJson()).toList(),
     if (isDir != null) 'isDir': isDir,
     if (sourceDir != null) 'sourceDir': sourceDir,
     if (sourceAccountIDs != null) 'sourceAccountIDs': sourceAccountIDs,
@@ -261,6 +271,22 @@ class CronjobCreateReq {
     if (alertMethod != null) 'alertMethod': alertMethod,
     if (alertTriggerMode != null) 'alertTriggerMode': alertTriggerMode,
   };
+}
+
+class CronjobUrlItemDto {
+  const CronjobUrlItemDto({required this.url, this.header = ''});
+
+  final String url;
+  final String header;
+
+  factory CronjobUrlItemDto.fromJson(Map<String, dynamic> json) {
+    return CronjobUrlItemDto(
+      url: json['url'] as String? ?? '',
+      header: json['header'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'url': url, 'header': header};
 }
 
 class CronjobRecordDto {

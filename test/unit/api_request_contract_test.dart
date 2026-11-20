@@ -23,6 +23,8 @@ import 'package:onedash/data/api/toolbox_api.dart';
 import 'package:onedash/data/api/vm_api.dart';
 import 'package:onedash/data/api/website_api.dart';
 import 'package:onedash/data/dto/alert/alert_dto.dart';
+import 'package:onedash/data/dto/container/container_info_dto.dart';
+import 'package:onedash/data/dto/cronjob/cronjob_dto.dart';
 import 'package:onedash/data/dto/host/ssh_cert_dto.dart';
 import 'package:onedash/data/dto/host/ssh_log_dto.dart';
 import 'package:onedash/data/dto/website/website_create_req.dart';
@@ -263,7 +265,7 @@ void main() {
 
   test('compose env and pin use backend fields', () async {
     final api = ContainerApi(client);
-    adapter.responseData = <String>[];
+    adapter.responseData = 'FOO=bar';
     await api.loadComposeEnv('/opt/1panel/docker/compose/app');
     adapter.responseData = <String, dynamic>{};
     await api.setComposePin(name: 'app', isPinned: true);
@@ -753,7 +755,7 @@ void main() {
     expect(adapter.bodies[1]['quicks'][0]['id'], 1);
     expect(adapter.bodies[3]['alias'], 'root');
     expect(adapter.bodies[7]['filter'], 'web');
-    expect(adapter.bodies[8]['value'], 'True');
+    expect(adapter.bodies[8]['value'], 'Enable');
   });
 
   test('public file share info and check use code and password', () async {
@@ -2127,10 +2129,7 @@ void main() {
       sessionId: 'passkey-session',
     );
     expect(adapter.paths.last, '/api/v2/core/auth/passkey/finish');
-    expect(
-      adapter.requests.last.headers['Passkey-Session'],
-      'passkey-session',
-    );
+    expect(adapter.requests.last.headers['Passkey-Session'], 'passkey-session');
     expect(adapter.bodies.last['id'], 'credential');
 
     await api.passkeyBeginLogin(entrance: 'secret');
@@ -2172,5 +2171,139 @@ void main() {
     expect(adapter.paths.single, '/api/v2/vms/networks/bridges');
     expect(adapter.methods.single, 'GET');
     expect(bridges.single['name'], 'br0');
+  });
+  test('compose env accepts a plain text response', () async {
+    adapter.responseData = 'FOO=bar\nBAZ=qux';
+    final env = await ContainerApi(client).loadComposeEnv('/tmp/demo');
+    expect(env, 'FOO=bar\nBAZ=qux');
+    expect(adapter.paths.single, '/api/v2/containers/compose/env');
+  });
+
+  test('firewall restore uses the rule create endpoint', () async {
+    adapter.responseData = <String, dynamic>{'taskID': '', 'queued': false};
+    await FirewallApi(client).restoreRules('rules-20260101.json');
+    expect(adapter.paths.single, '/api/v2/hosts/firewall/rules');
+    expect(adapter.bodies.single['backupFile'], 'rules-20260101.json');
+    expect(adapter.bodies.single['initialize'], false);
+  });
+
+  test('MFA login forwards the security entrance header', () async {
+    adapter.responseData = <String, dynamic>{};
+    await SettingApi(
+      client,
+    ).loginPanelMfa(sessionId: 'mfa', code: '123456', entrance: 'secret');
+    expect(adapter.paths.single, '/api/v2/core/auth/mfalogin');
+    expect(
+      adapter.requests.single.headers['EntranceCode'],
+      base64Encode(utf8.encode('secret')),
+    );
+  });
+
+  test('proxy password keep uses the Enable/Disable enum', () async {
+    await SettingApi(client).updatePanelProxy(
+      proxyUrl: 'proxy.example.com',
+      proxyType: 'http',
+      proxyPort: '8080',
+      proxyPasswdKeep: true,
+    );
+    expect(adapter.bodies.single['proxyPasswdKeep'], 'Enable');
+  });
+
+  test('VM console initialization uses the console endpoint', () async {
+    adapter.responseData = <String, dynamic>{'type': 'vnc', 'port': '5900'};
+    await VmApi(client).getVmConsole('demo');
+    expect(adapter.paths.single, '/api/v2/vms/console');
+    expect(adapter.bodies.single['name'], 'demo');
+  });
+
+  test('disabling default documents uses the delete operation', () async {
+    await WebsiteApi(client).updateWebsiteIndexConfig(3, const []);
+    expect(adapter.paths.single, '/api/v2/websites/config/update');
+    expect(adapter.bodies.single['operate'], 'delete');
+    expect(adapter.bodies.single['params'], isEmpty);
+  });
+
+  test('container limits keep CPU cores and memory MB', () {
+    final info = ContainerInfoDto.fromJson({
+      'taskID': 'task',
+      'name': 'demo',
+      'image': 'nginx',
+      'nanoCPUs': 0.5,
+      'memory': 512,
+    });
+    expect(info.nanoCPUs, 0.5);
+    expect(info.memory, 512);
+    expect(info.toJson()['nanoCPUs'], 0.5);
+    expect(info.toJson()['memory'], 512);
+  });
+
+  test('alert config updates keep revision and display name', () {
+    const request = AlertConfigUpdateReq(
+      id: 7,
+      type: 'custom',
+      displayName: 'Hook',
+      revision: '2026-01-01T00:00:00Z',
+    );
+    final json = request.toJson();
+    expect(json['displayName'], 'Hook');
+    expect(json['revision'], '2026-01-01T00:00:00Z');
+    final parsed = AlertConfigInfo.fromJson({
+      'id': 7,
+      'type': 'custom',
+      'displayName': 'Hook',
+      'revision': '2026-01-01T00:00:00Z',
+    });
+    expect(parsed.displayName, 'Hook');
+    expect(parsed.revision, '2026-01-01T00:00:00Z');
+  });
+
+  test('cronjob URL items preserve per-URL headers', () {
+    const request = CronjobCreateReq(
+      name: 'curl',
+      type: 'curl',
+      spec: '30 1 * * *',
+      url: 'https://a.example,https://b.example',
+      urlItems: [
+        CronjobUrlItemDto(url: 'https://a.example', header: 'agent-a'),
+        CronjobUrlItemDto(url: 'https://b.example', header: 'agent-b'),
+      ],
+    );
+    final json = request.toJson();
+    expect(json['urlItems'], [
+      {'url': 'https://a.example', 'header': 'agent-a'},
+      {'url': 'https://b.example', 'header': 'agent-b'},
+    ]);
+  });
+  test('container update returns the task id for polling', () async {
+    final taskID = await ContainerApi(
+      client,
+    ).updateContainer({'taskID': 'update-task', 'name': 'demo'});
+    expect(taskID, 'update-task');
+    expect(adapter.paths.single, '/api/v2/containers/update');
+  });
+
+  test('dashboard launcher status uses Enable/Disable', () async {
+    await DashboardApi(client).updateAppLauncherShow(key: 'app', show: true);
+    expect(adapter.bodies.single['value'], 'Enable');
+  });
+
+  test('docker guard bind accepts a null data payload', () async {
+    adapter.responseData = null;
+    await FirewallApi(client).operateDockerGuard('bind');
+    expect(adapter.paths.single, '/api/v2/hosts/firewall/docker/operate');
+  });
+
+  test('custom alert test accepts a result object', () async {
+    adapter.responseData = <String, dynamic>{'success': true};
+    final ok = await AlertApi(client).testAlertConfig(
+      const AlertConfigTestReq(
+        id: 7,
+        type: 'custom',
+        config: '{"url":"https://example.com"}',
+      ),
+    );
+    expect(ok, isTrue);
+    expect(adapter.bodies.single['id'], 7);
+    expect(adapter.bodies.single['type'], 'custom');
   });
 }

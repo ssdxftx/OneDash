@@ -105,10 +105,12 @@ class SettingRepositoryImpl implements SettingRepository {
   Future<PanelLoginResult> loginPanelMfa({
     required String sessionId,
     required String code,
+    String entrance = '',
   }) async {
     final result = await _settingApi.loginPanelMfa(
       sessionId: sessionId,
       code: code,
+      entrance: entrance,
     );
     if (result.session != null) {
       await _storage.savePanelSession(_server.id, result.session!);
@@ -273,10 +275,14 @@ class SettingRepositoryImpl implements SettingRepository {
   Future<void> updatePassword({
     required String oldPassword,
     required String newPassword,
-  }) => _settingApi.updatePassword(
-    oldPassword: oldPassword,
-    newPassword: newPassword,
-  );
+  }) async {
+    await _settingApi.updatePassword(
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    );
+    _settingApi.clearPanelSession();
+    await _storage.clearPanelSession(_server.id);
+  }
 
   @override
   Future<void> updatePort(int serverPort) => _settingApi.updatePort(serverPort);
@@ -432,11 +438,17 @@ class SettingRepositoryImpl implements SettingRepository {
     required Map<String, dynamic> payload,
     required String sessionId,
     String entrance = '',
-  }) => _settingApi.passkeyFinishLogin(
-    payload: payload,
-    sessionId: sessionId,
-    entrance: entrance,
-  );
+  }) async {
+    final result = await _settingApi.passkeyFinishLogin(
+      payload: payload,
+      sessionId: sessionId,
+      entrance: entrance,
+    );
+    if (result.session != null) {
+      await _storage.savePanelSession(_server.id, result.session!);
+    }
+    return result;
+  }
 
   @override
   Future<PasskeyChallenge> passkeyBeginRegister(String name) =>
@@ -446,10 +458,8 @@ class SettingRepositoryImpl implements SettingRepository {
   Future<void> passkeyFinishRegister({
     required Map<String, dynamic> payload,
     required String sessionId,
-  }) => _settingApi.passkeyFinishRegister(
-    payload: payload,
-    sessionId: sessionId,
-  );
+  }) =>
+      _settingApi.passkeyFinishRegister(payload: payload, sessionId: sessionId);
 
   @override
   Future<List<Map<String, dynamic>>> listPasskeys() =>

@@ -1,6 +1,4 @@
-import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,13 +46,9 @@ Future<void> _loadFont(String family, String path) async {
 }
 
 Future<void> _loadFonts() async {
-  final regular = await File(
-    'assets/fonts/MiSans-Regular.ttf',
-  ).readAsBytes();
+  final regular = await File('assets/fonts/MiSans-Regular.ttf').readAsBytes();
   final medium = await File('assets/fonts/MiSans-Medium.ttf').readAsBytes();
-  final semibold = await File(
-    'assets/fonts/MiSans-Semibold.ttf',
-  ).readAsBytes();
+  final semibold = await File('assets/fonts/MiSans-Semibold.ttf').readAsBytes();
   final loader = FontLoader('MiSans')
     ..addFont(Future.value(ByteData.view(regular.buffer)))
     ..addFont(Future.value(ByteData.view(medium.buffer)))
@@ -336,11 +330,7 @@ class _FakeWebsiteRepository implements WebsiteRepository {
       type: 'runtime',
       runtimeName: 'php82',
     ),
-    _website(
-      id: 4,
-      domain: 'static.acme.com',
-      protocol: 'http',
-    ),
+    _website(id: 4, domain: 'static.acme.com', protocol: 'http'),
     _website(
       id: 5,
       domain: 'shop.acme.com',
@@ -360,8 +350,7 @@ class _FakeWebsiteRepository implements WebsiteRepository {
   Future<PageResult<WebsiteDto>> searchWebsites(WebsiteSearchReq req) async {
     final filtered = sites.where((site) {
       if (req.type.isNotEmpty && site.type != req.type) return false;
-      if (req.name.isNotEmpty &&
-          !site.primaryDomain.contains(req.name)) {
+      if (req.name.isNotEmpty && !site.primaryDomain.contains(req.name)) {
         return false;
       }
       return true;
@@ -420,12 +409,7 @@ class _FakeFileRepository implements FileRepository {
     String sortBy = 'name',
     String? sortOrder,
   }) async {
-    final root = _file(
-      '/',
-      '/',
-      isDir: true,
-      modTime: '2026-11-16 09:20',
-    );
+    final root = _file('/', '/', isDir: true, modTime: '2026-11-16 09:20');
     final items = path != '/'
         ? <FileItemDto>[
             _file('$path/index.html', 'index.html', size: 2048),
@@ -482,7 +466,7 @@ class _FakeFileRepository implements FileRepository {
 }
 
 class _FakeContainerRepository implements ContainerRepository {
-  final items = [
+  final items = const <ContainerItemDto>[
     ContainerItemDto(
       containerID: 'c1',
       name: 'nginx-proxy',
@@ -491,7 +475,7 @@ class _FakeContainerRepository implements ContainerRepository {
       createTime: '2026-09-01',
       state: 'running',
       runTime: '76 days',
-      ports: const ['80:80', '443:443'],
+      ports: ['80:80', '443:443'],
       isFromApp: false,
       isFromCompose: false,
       isPinned: false,
@@ -505,7 +489,7 @@ class _FakeContainerRepository implements ContainerRepository {
       createTime: '2026-08-12',
       state: 'running',
       runTime: '96 days',
-      ports: const ['3306:3306'],
+      ports: ['3306:3306'],
       isFromApp: true,
       isFromCompose: false,
       isPinned: false,
@@ -519,7 +503,7 @@ class _FakeContainerRepository implements ContainerRepository {
       createTime: '2026-11-02',
       state: 'running',
       runTime: '14 days',
-      ports: const ['8080:8080'],
+      ports: ['8080:8080'],
       isFromApp: false,
       isFromCompose: true,
       isPinned: false,
@@ -533,7 +517,7 @@ class _FakeContainerRepository implements ContainerRepository {
       createTime: '2026-07-20',
       state: 'exited',
       runTime: '12 days',
-      ports: const ['6379:6379'],
+      ports: ['6379:6379'],
       isFromApp: false,
       isFromCompose: false,
       isPinned: false,
@@ -560,7 +544,7 @@ class _FakeContainerRepository implements ContainerRepository {
       createTime: '2026-10-19',
       state: 'running',
       runTime: '28 days',
-      ports: const ['3001:3001'],
+      ports: ['3001:3001'],
       isFromApp: true,
       isFromCompose: false,
       isPinned: false,
@@ -590,11 +574,8 @@ class _FakeContainerRepository implements ContainerRepository {
   }
 
   @override
-  Future<DockerStatusDto> getDockerStatus() async => const DockerStatusDto(
-    isActive: true,
-    isExist: true,
-    version: '27.3.1',
-  );
+  Future<DockerStatusDto> getDockerStatus() async =>
+      const DockerStatusDto(isActive: true, isExist: true, version: '27.3.1');
 
   @override
   Future<List<ContainerResourceStatsDto>> getContainerResourceStats({
@@ -696,6 +677,7 @@ class _FakeThemeController extends ThemeController {
 }
 
 Future<void> _pumpApp(WidgetTester tester, {required String themeMode}) async {
+  // ignore: invalid_use_of_visible_for_testing_member
   SharedPreferences.setMockInitialValues({});
   final documents = Directory.systemTemp.createTempSync('onedash-ui-audit-');
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger

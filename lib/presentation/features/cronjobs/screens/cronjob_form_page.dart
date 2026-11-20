@@ -59,7 +59,7 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
   final _spec = TextEditingController(text: '30 1 * * *');
   final _script = TextEditingController();
   final _sourceDir = TextEditingController();
-  final _url = TextEditingController();
+  final _urlItems = <_UrlFields>[_UrlFields()];
   final _website = TextEditingController();
   final _dbType = TextEditingController(text: 'mysql');
   final _dbName = TextEditingController();
@@ -115,7 +115,17 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
         _scriptMode = item.scriptMode ?? 'input';
         _scriptID = item.scriptID;
         _sourceDir.text = item.sourceDir ?? '';
-        _url.text = item.url ?? '';
+        for (final field in _urlItems) {
+          field.dispose();
+        }
+        _urlItems.clear();
+        final existing = item.urlItems;
+        if (existing != null && existing.isNotEmpty) {
+          _urlItems.addAll(existing.map((entry) => _UrlFields()..fill(entry)));
+        } else if ((item.url ?? '').trim().isNotEmpty) {
+          _urlItems.add(_UrlFields()..url.text = item.url!.trim());
+        }
+        if (_urlItems.isEmpty) _urlItems.add(_UrlFields());
         _website.text = item.website ?? '';
         _dbType.text = item.dbType ?? 'mysql';
         _dbName.text = item.dbName ?? '';
@@ -145,7 +155,9 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
     _spec.dispose();
     _script.dispose();
     _sourceDir.dispose();
-    _url.dispose();
+    for (final field in _urlItems) {
+      field.dispose();
+    }
     _website.dispose();
     _dbType.dispose();
     _dbName.dispose();
@@ -205,7 +217,16 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
       AppToast.warning(context, l10n.cronjobs_scriptRequired);
       return;
     }
-    if (_type == 'curl' && _url.text.trim().isEmpty) {
+    final urlItems = _urlItems
+        .map(
+          (field) => CronjobUrlItemDto(
+            url: field.url.text.trim(),
+            header: field.header.text.trim(),
+          ),
+        )
+        .where((item) => item.url.isNotEmpty)
+        .toList();
+    if (_type == 'curl' && urlItems.isEmpty) {
       AppToast.warning(context, l10n.cronjobs_urlRequired);
       return;
     }
@@ -228,7 +249,10 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
         sourceDir: _sourceDir.text.trim().isEmpty
             ? null
             : _sourceDir.text.trim(),
-        url: _url.text.trim().isEmpty ? null : _url.text.trim(),
+        url: _type == 'curl' && urlItems.isNotEmpty
+            ? urlItems.map((item) => item.url).join(',')
+            : null,
+        urlItems: _type == 'curl' ? urlItems : null,
         website: _website.text.trim().isEmpty ? null : _website.text.trim(),
         dbType: _type == 'database' ? _dbType.text.trim() : null,
         dbName: _dbName.text.trim().isEmpty ? null : _dbName.text.trim(),
@@ -346,12 +370,43 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
                 hint: '/var/log/nginx/access.log',
                 helper: l10n.cronjobs_logFilesHint,
               ),
-            if (_type == 'curl')
-              AppTextField(
-                controller: _url,
-                label: l10n.cronjobs_url,
-                hint: 'https://example.com/health',
+            if (_type == 'curl') ...[
+              for (var index = 0; index < _urlItems.length; index++) ...[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: AppTextField(
+                        controller: _urlItems[index].url,
+                        label: l10n.cronjobs_url,
+                        hint: 'https://example.com/health',
+                      ),
+                    ),
+                    const SizedBox(width: AppTokens.s8),
+                    Expanded(
+                      child: AppTextField(
+                        controller: _urlItems[index].header,
+                        label: l10n.cronjobs_urlHeader,
+                        hint: 'Mozilla/5.0',
+                      ),
+                    ),
+                    if (_urlItems.length > 1)
+                      IconButton(
+                        tooltip: l10n.action_delete,
+                        onPressed: () =>
+                            setState(() => _urlItems.removeAt(index).dispose()),
+                        icon: const Icon(TablerIcons.trash),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: AppTokens.s8),
+              ],
+              SecondaryButton(
+                label: l10n.action_add,
+                icon: TablerIcons.plus,
+                onPressed: () => setState(() => _urlItems.add(_UrlFields())),
               ),
+            ],
             if (_type == 'website')
               AppTextField(
                 controller: _website,
@@ -572,6 +627,21 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
       'ntp' => l10n.cronjobs_typeNtp,
       _ => type,
     };
+  }
+}
+
+class _UrlFields {
+  final url = TextEditingController();
+  final header = TextEditingController();
+
+  void fill(CronjobUrlItemDto item) {
+    url.text = item.url;
+    header.text = item.header;
+  }
+
+  void dispose() {
+    url.dispose();
+    header.dispose();
   }
 }
 

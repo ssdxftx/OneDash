@@ -164,7 +164,7 @@ class DashboardApi {
   }) async {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/dashboard/app/launcher/show',
-      data: {'key': key, 'value': show ? 'True' : 'False'},
+      data: {'key': key, 'value': show ? 'Enable' : 'Disable'},
     );
   }
 

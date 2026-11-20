@@ -7,6 +7,10 @@ class OperationLogDto {
     this.path = '',
     this.method = '',
     this.userAgent = '',
+    this.user = '',
+    this.apiKeyID = '',
+    this.apiKeyName = '',
+    this.authMethod = '',
     this.latency = 0,
     required this.status,
     this.message = '',
@@ -22,6 +26,10 @@ class OperationLogDto {
   final String path;
   final String method;
   final String userAgent;
+  final String user;
+  final String apiKeyID;
+  final String apiKeyName;
+  final String authMethod;
   final int latency;
   final String status;
   final String message;
@@ -38,6 +46,10 @@ class OperationLogDto {
       path: json['path'] as String? ?? '',
       method: json['method'] as String? ?? '',
       userAgent: json['userAgent'] as String? ?? '',
+      user: json['user'] as String? ?? '',
+      apiKeyID: json['apiKeyID']?.toString() ?? '',
+      apiKeyName: json['apiKeyName'] as String? ?? '',
+      authMethod: json['authMethod'] as String? ?? '',
       latency: (json['latency'] as num?)?.toInt() ?? 0,
       status: json['status'] as String? ?? '',
       message: json['message'] as String? ?? '',

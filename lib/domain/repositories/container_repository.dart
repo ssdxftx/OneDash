@@ -226,7 +226,7 @@ abstract interface class ContainerRepository {
   });
 
   /// 更新容器。
-  Future<void> updateContainer(Map<String, dynamic> data);
+  Future<String> updateContainer(Map<String, dynamic> data);
 
   /// 容器操作。
   Future<void> operateContainer({
@@ -252,7 +252,7 @@ abstract interface class ContainerRepository {
   });
 
   /// 读取 Compose 环境变量。
-  Future<List<String>> loadComposeEnv(String path);
+  Future<String> loadComposeEnv(String path);
 
   /// 设置 Compose 置顶状态。
   Future<void> setComposePin({required String name, required bool isPinned});

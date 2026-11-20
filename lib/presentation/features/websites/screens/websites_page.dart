@@ -1288,9 +1288,6 @@ class WebsiteDeleteSheetState extends State<WebsiteDeleteSheet> {
                       ? l10n.websites_deleteDatabaseCount(1)
                       : l10n.websites_deleteDatabaseCount(0),
                 ),
-                subtitle: hasDatabase
-                    ? Text('${widget.site.dbType} · ${widget.site.dbID}')
-                    : null,
               ),
               CheckboxListTile(
                 value: _deleteBackup,

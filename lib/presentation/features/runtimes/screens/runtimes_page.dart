@@ -447,6 +447,9 @@ class RuntimesPage extends ConsumerWidget {
       remark.dispose();
       port.dispose();
       if (saved != true || !context.mounted || nameValue.isEmpty) return;
+      final updatedPorts = detail.exposedPorts
+          .map((item) => item.copyWith(hostPort: portValue))
+          .toList(growable: false);
       await repository.updateRuntime(
         RuntimeCreateReq(
           id: detail.id,
@@ -461,7 +464,7 @@ class RuntimesPage extends ConsumerWidget {
           source: detail.source,
           codeDir: detail.codeDir,
           port: portValue,
-          exposedPorts: detail.exposedPorts,
+          exposedPorts: updatedPorts,
           environments: detail.environments,
           volumes: detail.volumes,
           extraHosts: detail.extraHosts,

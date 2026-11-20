@@ -819,6 +819,9 @@ class _AlertSettingsTab extends ConsumerWidget {
       final repository = await ref.read(alertRepositoryProvider.future);
       final ok = await repository.testAlertConfig(
         AlertConfigTestReq(
+          id: config.id,
+          type: config.type,
+          config: config.config,
           host: '${raw['host'] ?? ''}',
           port: int.tryParse('${raw['port'] ?? 0}') ?? 0,
           sender: '${raw['sender'] ?? ''}',

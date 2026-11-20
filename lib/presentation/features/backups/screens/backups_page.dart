@@ -598,7 +598,9 @@ class _BackupTab extends ConsumerWidget {
                             ),
                           ),
                           Text(
-                            formatBytes(record.size),
+                            record.size > 0
+                                ? formatBytes(record.size)
+                                : l10n.common_unknown,
                             style: AppTextStyles.caption,
                           ),
                           Icon(

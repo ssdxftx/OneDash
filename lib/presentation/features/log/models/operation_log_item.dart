@@ -12,6 +12,9 @@ class OperationLogItem {
     required this.detailZH,
     required this.detailEN,
     required this.createdAt,
+    this.user = '',
+    this.apiKeyName = '',
+    this.authMethod = '',
   });
 
   final int id;
@@ -23,6 +26,9 @@ class OperationLogItem {
   final String detailZH;
   final String detailEN;
   final DateTime createdAt;
+  final String user;
+  final String apiKeyName;
+  final String authMethod;
 
   factory OperationLogItem.fromDto(OperationLogDto dto) => OperationLogItem(
     id: dto.id,
@@ -34,6 +40,9 @@ class OperationLogItem {
     detailZH: dto.detailZH,
     detailEN: dto.detailEN,
     createdAt: dto.createdAt,
+    user: dto.user,
+    apiKeyName: dto.apiKeyName,
+    authMethod: dto.authMethod,
   );
 
   /// 标题三级回退：中文动作名 → 英文动作名 → HTTP 方法 + 路径。

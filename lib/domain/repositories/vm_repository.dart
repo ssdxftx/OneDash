@@ -6,6 +6,7 @@ abstract interface class VmRepository {
   Future<Map<String, dynamic>> searchVms({int page, int pageSize});
   Future<void> syncVms();
   Future<Map<String, dynamic>> getVm(String name);
+  Future<Map<String, dynamic>> getVmConsole(String name);
   Future<Map<String, dynamic>> getVmStats(String name);
   Future<void> createVm(Map<String, dynamic> body);
   Future<void> updateVm(Map<String, dynamic> body);

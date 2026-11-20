@@ -1333,6 +1333,7 @@
   "cronjobs_logFiles": "日志文件",
   "cronjobs_logFilesHint": "多个绝对路径用逗号分隔",
   "cronjobs_url": "请求地址",
+  "cronjobs_urlHeader": "User-Agent",
   "cronjobs_website": "网站",
   "cronjobs_databaseType": "数据库类型",
   "cronjobs_databaseName": "数据库名称",
@@ -1444,6 +1445,7 @@
   "containers_composeValid": "编排文件校验通过",
   "containers_composeInvalid": "编排文件校验未通过",
   "containers_composeContentRequired": "请输入编排文件内容",
+  "containers_dockerfileRequired": "请输入 Dockerfile 内容",
   "containers_dockerSettings": "Docker 设置",
   "containers_dockerService": "Docker 服务",
   "containers_dockerRunning": "Docker 正在运行",
@@ -1479,6 +1481,7 @@
   "files_cancelShareConfirm": "确定取消 {name} 的分享吗？",
   "files_shareDetail": "分享详情",
   "files_name": "名称",
+  "files_nameRequired": "请输入文件名",
   "files_path": "路径",
   "files_shareCodeLabel": "分享码",
   "files_sharePassword": "密码",
@@ -3188,6 +3191,8 @@
   "common_paused": "已暂停",
   "common_abnormal": "异常",
   "logs_authMode": "认证方式",
+  "logs_user": "用户",
+  "logs_apiKey": "API Key",
   "logs_message": "错误信息",
   "common_removing": "删除中",
   "logs_result": "结果",
@@ -4760,6 +4765,8 @@
     "description": "OneDash UI text."
   },
   "ai_agent_group_scope_sender": "按群和发送者",
+  "ai_agent_group_scope_topic": "群和话题",
+  "ai_agent_group_scope_topic_sender": "群、话题和发送者",
   "@ai_agent_group_scope_sender": {
     "description": "OneDash UI text."
   },

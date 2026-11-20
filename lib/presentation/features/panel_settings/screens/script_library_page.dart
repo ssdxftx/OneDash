@@ -209,7 +209,7 @@ class ScriptLibraryPage extends ConsumerWidget {
       'description': description.text.trim(),
       'script': content.text,
       'isInteractive': interactive,
-      'groups': '',
+      'groups': script?.groupList.join(',') ?? '',
     };
     name.dispose();
     description.dispose();

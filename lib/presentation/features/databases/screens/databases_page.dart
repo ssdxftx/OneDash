@@ -377,13 +377,22 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage>
                       final repository = await ref.read(
                         databaseRepositoryProvider.future,
                       );
-                      await repository.deleteDatabase(
-                        id: item.id,
-                        type: item.from,
-                        database: item.name,
-                        forceDelete: false,
-                        deleteBackup: false,
-                      );
+                      if (item.from == 'remote') {
+                        await repository.deleteRemoteDatabase(
+                          id: item.id,
+                          database: item.name,
+                          forceDelete: false,
+                          deleteBackup: false,
+                        );
+                      } else {
+                        await repository.deleteDatabase(
+                          id: item.id,
+                          type: item.dbType,
+                          database: item.name,
+                          forceDelete: false,
+                          deleteBackup: false,
+                        );
+                      }
                       if (!mounted) return;
                       setState(() => _removing.add(item.id));
                       await Future<void>.delayed(
@@ -527,7 +536,12 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
     final username = TextEditingController(text: current?.username ?? '');
     final password = TextEditingController(text: current?.password ?? '');
     final description = TextEditingController(text: current?.description ?? '');
-    final type = current?.type ?? 'mysql';
+    var type = current?.type ?? 'mysql';
+    final version = TextEditingController(
+      text: current?.version.isNotEmpty == true
+          ? current!.version
+          : _defaultDatabaseVersion(type),
+    );
     bool ssl = current?.ssl ?? false;
     final saved = await pushFormPage<bool>(
       context,
@@ -539,6 +553,43 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
           onSave: () async => Navigator.of(pageContext).pop(true),
           children: [
             AppTextField(controller: name, label: l10n.files_name),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              initialValue: type,
+              decoration: InputDecoration(
+                labelText: l10n.cronjobs_databaseType,
+              ),
+              items: const [
+                DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
+                DropdownMenuItem(value: 'mariadb', child: Text('MariaDB')),
+                DropdownMenuItem(
+                  value: 'postgresql',
+                  child: Text('PostgreSQL'),
+                ),
+                DropdownMenuItem(value: 'mongodb', child: Text('MongoDB')),
+                DropdownMenuItem(value: 'redis', child: Text('Redis')),
+              ],
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  type = value;
+                  version.text = _defaultDatabaseVersion(value);
+                });
+              },
+            ),
+            const SizedBox(height: AppTokens.s12),
+            DropdownButtonFormField<String>(
+              key: ValueKey(type),
+              initialValue: version.text,
+              decoration: InputDecoration(labelText: l10n.settings_version),
+              items: [
+                for (final item in _databaseVersions(type, version.text))
+                  DropdownMenuItem(value: item, child: Text(item)),
+              ],
+              onChanged: (value) {
+                if (value != null) version.text = value;
+              },
+            ),
             const SizedBox(height: AppTokens.s12),
             AppTextField(controller: address, label: l10n.databases_address),
             const SizedBox(height: AppTokens.s12),
@@ -575,8 +626,10 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
     final portValue = int.tryParse(port.text.trim()) ?? 0;
     final usernameValue = username.text.trim();
     final passwordValue = password.text;
+    final versionValue = version.text.trim();
     final note = description.text.trim();
     name.dispose();
+    version.dispose();
     address.dispose();
     port.dispose();
     username.dispose();
@@ -588,7 +641,7 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
       'name': nameValue,
       'type': type,
       'from': current?.from ?? 'remote',
-      'version': current?.version ?? '',
+      'version': versionValue,
       'database': current?.database ?? nameValue,
       'address': addressValue,
       'port': portValue,
@@ -601,7 +654,11 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
     try {
       final repository = await ref.read(databaseRepositoryProvider.future);
       if (await repository.checkRemoteConnection(body)) {
-        await repository.updateRemoteDatabase(body);
+        if (current == null) {
+          await repository.createRemoteDatabase(body);
+        } else {
+          await repository.updateRemoteDatabase(body);
+        }
         if (!mounted) return;
         AppToast.success(context, l10n.action_saved);
         await _load();
@@ -613,6 +670,30 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
       if (!mounted) return;
       showErrorToast(context, error);
     }
+  }
+
+  static String _defaultDatabaseVersion(String type) {
+    return switch (type) {
+      'mariadb' => '10.x',
+      'postgresql' => '16',
+      'mongodb' => '7.0',
+      'redis' => '7.0',
+      _ => '8.x',
+    };
+  }
+
+  static List<String> _databaseVersions(String type, String current) {
+    final defaults = switch (type) {
+      'mariadb' => const ['10.x', '11.x'],
+      'postgresql' => const ['17', '16', '15', '14'],
+      'mongodb' => const ['7.0', '6.0'],
+      'redis' => const ['7.0', '6.0'],
+      _ => const ['8.x', '5.7', '5.6'],
+    };
+    return [
+      if (current.isNotEmpty && !defaults.contains(current)) current,
+      ...defaults,
+    ];
   }
 
   Future<void> _test(DatabaseInstanceDto item) async {

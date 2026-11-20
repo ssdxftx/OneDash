@@ -11,6 +11,7 @@ import '../dto/website/website_acme_account_dto.dart';
 import '../dto/website/website_create_req.dart';
 import '../dto/website/website_config_file_dto.dart';
 import '../dto/website/website_detail_dto.dart';
+import '../dto/website/website_ssl_dto.dart';
 import '../dto/website/website_dir_dto.dart';
 import '../dto/website/website_index_config_dto.dart';
 import '../dto/website/website_limit_config_dto.dart';
@@ -107,6 +108,15 @@ class WebsiteApi {
       '/api/v2/websites/$id',
     );
     return ApiResponseParser.object(resp, WebsiteDetailDto.fromJson);
+  }
+
+  /// 查询网站绑定的 SSL 证书。
+  /// GET /api/v2/websites/ssl/website/:websiteId
+  Future<WebsiteSslDto> getWebsiteSsl(int websiteId) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/websites/ssl/website/$websiteId',
+    );
+    return ApiResponseParser.object(resp, WebsiteSslDto.fromJson);
   }
 
   /// 查询 ACME 账号。手动创建（id=0）由调用方插入。
@@ -206,15 +216,19 @@ class WebsiteApi {
     int websiteId,
     List<String> indexFiles,
   ) async {
-    final body = indexFiles.join('\n');
-    final indexParam = body.isEmpty ? '' : '$body\n';
+    final files = indexFiles
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .toList();
     await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/config/update',
       data: {
-        'operate': 'update',
+        'operate': files.isEmpty ? 'delete' : 'update',
         'scope': 'index',
         'websiteId': websiteId,
-        'params': {'index': indexParam},
+        'params': files.isEmpty
+            ? <String, dynamic>{}
+            : {'index': '${files.join('\n')}\n'},
       },
     );
   }

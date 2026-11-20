@@ -717,8 +717,21 @@ class _ConfigTab extends ConsumerWidget {
       final resources = results[0] as List<WebsiteResourceDto>;
       final databases = results[1] as List<WebsiteDatabaseDto>;
       if (!context.mounted) return;
-      int selected = resources.isEmpty ? 0 : resources.first.resourceID;
+      int selected = site.dbID;
       if (!databases.any((db) => db.id == selected)) selected = 0;
+      final currentDatabaseNames = databases
+          .where((db) => db.id == site.dbID)
+          .map((db) => db.name)
+          .where((name) => name.isNotEmpty)
+          .toList();
+      if (currentDatabaseNames.isEmpty) {
+        currentDatabaseNames.addAll(
+          resources
+              .where((item) => item.type == 'database')
+              .map((item) => item.name)
+              .where((name) => name.isNotEmpty),
+        );
+      }
       final saved = await showAppSheet<bool>(
         context: context,
         builder: (sheetContext) => StatefulBuilder(
@@ -728,13 +741,10 @@ class _ConfigTab extends ConsumerWidget {
             children: [
               Text(l10n.websites_changeDatabase, style: AppTextStyles.titleL),
               const SizedBox(height: AppTokens.s8),
-              if (resources.isNotEmpty)
+              if (currentDatabaseNames.isNotEmpty)
                 Text(
                   l10n.websites_currentDatabase(
-                    resources
-                        .map((item) => item.name)
-                        .where((name) => name.isNotEmpty)
-                        .join(', '),
+                    currentDatabaseNames.join(', '),
                   ),
                   style: AppTextStyles.bodyS.copyWith(
                     color: context.scheme.onSurfaceVariant,

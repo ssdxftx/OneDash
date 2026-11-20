@@ -331,7 +331,7 @@ class ContainerRepositoryImpl implements ContainerRepository {
   }) => _containerApi.waitForTask(taskID, onUpdate: onUpdate);
 
   @override
-  Future<void> updateContainer(Map<String, dynamic> data) =>
+  Future<String> updateContainer(Map<String, dynamic> data) =>
       _containerApi.updateContainer(data);
 
   @override
@@ -372,7 +372,7 @@ class ContainerRepositoryImpl implements ContainerRepository {
   );
 
   @override
-  Future<List<String>> loadComposeEnv(String path) =>
+  Future<String> loadComposeEnv(String path) =>
       _containerApi.loadComposeEnv(path);
 
   @override

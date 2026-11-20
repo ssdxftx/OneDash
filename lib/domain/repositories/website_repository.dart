@@ -9,6 +9,7 @@ import '../../data/dto/website/website_create_metadata.dart';
 import '../../data/dto/website/website_create_req.dart';
 import '../../data/dto/website/website_config_file_dto.dart';
 import '../../data/dto/website/website_detail_dto.dart';
+import '../../data/dto/website/website_ssl_dto.dart';
 import '../../data/dto/website/website_dir_dto.dart';
 import '../../data/dto/website/website_index_config_dto.dart';
 import '../../data/dto/website/website_limit_config_dto.dart';
@@ -40,6 +41,7 @@ abstract interface class WebsiteRepository {
 
   /// 查询网站详情
   Future<WebsiteDetailDto> getWebsite(int id);
+  Future<WebsiteSslDto> getWebsiteSsl(int websiteId);
   Future<List<WebsiteOptionDto>> getWebsiteOptions();
 
   /// 查询 OpenResty 模块列表。

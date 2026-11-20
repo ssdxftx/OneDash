@@ -7,6 +7,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/repositories_impl/backup_account_repository_impl.dart';
+import '../../../../data/repositories_impl/setting_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/simple_form_page.dart';
@@ -18,6 +19,18 @@ import '../../../common/formatters/enum_labels.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+
+final _publicAccountSupportedProvider = FutureProvider.autoDispose<bool>((
+  ref,
+) async {
+  try {
+    final repository = await ref.watch(settingRepositoryProvider.future);
+    final settings = await repository.getLoginSetting();
+    return settings['isMasterProductPro'] == true;
+  } catch (_) {
+    return false;
+  }
+}, name: 'backupPublicAccountSupportedProvider');
 
 final _accountsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
@@ -40,6 +53,8 @@ class BackupAccountsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final accounts = ref.watch(_accountsProvider);
+    final publicSupported =
+        ref.watch(_publicAccountSupportedProvider).valueOrNull ?? false;
     return Scaffold(
       appBar: AppBarLarge(
         title: l10n.backups_accounts,
@@ -52,7 +67,8 @@ class BackupAccountsPage extends ConsumerWidget {
           AppIconButton(
             icon: TablerIcons.plus,
             tooltip: l10n.backups_addAccount,
-            onPressed: () => _edit(context, ref),
+            onPressed: () =>
+                _edit(context, ref, publicSupported: publicSupported),
           ),
         ],
       ),
@@ -85,7 +101,12 @@ class BackupAccountsPage extends ConsumerWidget {
               if (path.isNotEmpty) path,
             ].join(' · ');
             return TonalCard(
-              onTap: () => _edit(context, ref, account),
+              onTap: () => _edit(
+                context,
+                ref,
+                current: account,
+                publicSupported: publicSupported,
+              ),
               child: Row(
                 children: [
                   Icon(
@@ -168,9 +189,10 @@ class BackupAccountsPage extends ConsumerWidget {
 
   Future<void> _edit(
     BuildContext context,
-    WidgetRef ref, [
+    WidgetRef ref, {
     Map<String, dynamic>? current,
-  ]) async {
+    bool publicSupported = false,
+  }) async {
     final l10n = AppLocalizations.of(context);
     final name = TextEditingController(text: '${current?['name'] ?? ''}');
     final accessKey = TextEditingController(
@@ -191,7 +213,7 @@ class BackupAccountsPage extends ConsumerWidget {
         ? rawType
         : backupAccountTypes.first;
     bool rememberAuth = current?['rememberAuth'] == true;
-    var isPublic = current?['isPublic'] == true;
+    var isPublic = publicSupported && current?['isPublic'] == true;
     String? localDir;
     if (isLocalAccount) {
       try {
@@ -257,7 +279,7 @@ class BackupAccountsPage extends ConsumerWidget {
                 child: Text(localDir),
               ),
             ],
-            if (!isLocalAccount)
+            if (!isLocalAccount && publicSupported)
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.backups_publicAccount),

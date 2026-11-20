@@ -246,7 +246,7 @@ class _PanelProxySettingsPageState
     setState(() => _loadFailed = false);
     try {
       final repository = await ref.read(settingRepositoryProvider.future);
-      final data = await repository.searchSettings();
+      final data = await repository.searchCoreSettings();
       if (!mounted) return;
       final type = '${data['proxyType'] ?? ''}';
       setState(() {

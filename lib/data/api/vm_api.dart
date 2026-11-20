@@ -43,6 +43,14 @@ class VmApi {
     return ApiResponseParser.map(resp);
   }
 
+  Future<Map<String, dynamic>> getVmConsole(String name) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/vms/console',
+      data: {'name': name},
+    );
+    return ApiResponseParser.map(resp);
+  }
+
   Future<Map<String, dynamic>> getVmStats(String name) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/vms/stats',

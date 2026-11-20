@@ -124,6 +124,8 @@ AlertConfigInfo _$AlertConfigInfoFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String? ?? '',
       config: json['config'] as String? ?? '',
       status: json['status'] as String? ?? '',
+      displayName: json['displayName'] as String? ?? '',
+      revision: json['revision'] as String?,
       createdAt: json['createdAt'] as String?,
     );
 
@@ -134,6 +136,8 @@ Map<String, dynamic> _$AlertConfigInfoToJson(AlertConfigInfo instance) =>
       'title': instance.title,
       'config': instance.config,
       'status': instance.status,
+      'displayName': instance.displayName,
+      'revision': instance.revision,
       'createdAt': instance.createdAt,
     };
 
@@ -145,6 +149,8 @@ AlertConfigUpdateReq _$AlertConfigUpdateReqFromJson(
   title: json['title'] as String? ?? '',
   config: json['config'] as String? ?? '',
   status: json['status'] as String? ?? '',
+  displayName: json['displayName'] as String? ?? '',
+  revision: json['revision'] as String?,
 );
 
 Map<String, dynamic> _$AlertConfigUpdateReqToJson(
@@ -155,10 +161,15 @@ Map<String, dynamic> _$AlertConfigUpdateReqToJson(
   'title': instance.title,
   'config': instance.config,
   'status': instance.status,
+  'displayName': instance.displayName,
+  'revision': instance.revision,
 };
 
 AlertConfigTestReq _$AlertConfigTestReqFromJson(Map<String, dynamic> json) =>
     AlertConfigTestReq(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      type: json['type'] as String? ?? '',
+      config: json['config'] as String? ?? '',
       host: json['host'] as String? ?? '',
       port: (json['port'] as num?)?.toInt() ?? 0,
       sender: json['sender'] as String? ?? '',
@@ -171,6 +182,9 @@ AlertConfigTestReq _$AlertConfigTestReqFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$AlertConfigTestReqToJson(AlertConfigTestReq instance) =>
     <String, dynamic>{
+      'id': instance.id,
+      'type': instance.type,
+      'config': instance.config,
       'host': instance.host,
       'port': instance.port,
       'sender': instance.sender,

@@ -28,6 +28,10 @@ class VmRepositoryImpl implements VmRepository {
   Future<Map<String, dynamic>> getVm(String name) => _api.getVm(name);
 
   @override
+  Future<Map<String, dynamic>> getVmConsole(String name) =>
+      _api.getVmConsole(name);
+
+  @override
   Future<Map<String, dynamic>> getVmStats(String name) => _api.getVmStats(name);
 
   @override

@@ -97,10 +97,18 @@ class WebsitesController
 }
 
 final websiteDetailProvider = FutureProvider.autoDispose
-    .family<WebsiteDetailDto, int>((ref, websiteId) {
-      return ref
-          .watch(websiteRepositoryProvider.future)
-          .then((repository) => repository.getWebsite(websiteId));
+    .family<WebsiteDetailDto, int>((ref, websiteId) async {
+      final repository = await ref.watch(websiteRepositoryProvider.future);
+      final detail = await repository.getWebsite(websiteId);
+      if (!detail.isSslBound || detail.ssl?.id == detail.webSiteSSLId) {
+        return detail;
+      }
+      try {
+        final ssl = await repository.getWebsiteSsl(websiteId);
+        return detail.copyWith(ssl: ssl);
+      } catch (_) {
+        return detail;
+      }
     }, name: 'websiteDetailProvider');
 
 final websiteCreateMetadataProvider =

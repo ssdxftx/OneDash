@@ -169,15 +169,29 @@ void main() {
       'streaming': false,
       'requireMention': 'true',
       'groupPolicy': 'allowlist',
+      'groupSessionScope': 'group_sender',
       'connectionMode': 'websocket',
       'groupAllowFrom': ['g1'],
       'bots': [
-        {'accountId': 'a1', 'name': 'bot', 'enabled': true, 'appId': 'cli_x'},
+        {
+          'accountId': 'a1',
+          'name': 'bot',
+          'enabled': true,
+          'appId': 'cli_x',
+          'appSecret': 'secret',
+          'dmPolicy': 'allowlist',
+          'allowFrom': ['u1'],
+        },
       ],
     });
     expect(config.enabled, isTrue);
     expect(config.groupPolicy, 'allowlist');
     expect(config.bots, hasLength(1));
     expect(config.bots.first.appId, 'cli_x');
+    expect(config.groupSessionScope, 'group_sender');
+    expect(config.bots.first.appSecret, 'secret');
+    expect(config.bots.first.dmPolicy, 'allowlist');
+    expect(config.bots.first.allowFrom, ['u1']);
+    expect(config.bots.first.toJson()['appSecret'], 'secret');
   });
 }

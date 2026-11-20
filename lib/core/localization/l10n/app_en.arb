@@ -5203,6 +5203,10 @@
   "@cronjobs_url": {
     "description": "OneDash UI text."
   },
+  "cronjobs_urlHeader": "User-Agent",
+  "@cronjobs_urlHeader": {
+    "description": "Optional User-Agent header for a curl job URL."
+  },
   "cronjobs_website": "Website",
   "@cronjobs_website": {
     "description": "OneDash UI text."
@@ -5682,6 +5686,10 @@
   "@containers_composeContentRequired": {
     "description": "OneDash UI text."
   },
+  "containers_dockerfileRequired": "Enter the Dockerfile content",
+  "@containers_dockerfileRequired": {
+    "description": "Validation message for an empty Dockerfile."
+  },
   "containers_dockerSettings": "Docker settings",
   "@containers_dockerSettings": {
     "description": "OneDash UI text."
@@ -5831,6 +5839,10 @@
   "files_name": "Name",
   "@files_name": {
     "description": "OneDash UI text."
+  },
+  "files_nameRequired": "Enter a file name",
+  "@files_nameRequired": {
+    "description": "Validation message for a required file name."
   },
   "files_path": "Path",
   "@files_path": {
@@ -9445,6 +9457,14 @@
   "@logs_authMode": {
     "description": "OneDash UI text."
   },
+  "logs_user": "User",
+  "@logs_user": {
+    "description": "User who performed an operation."
+  },
+  "logs_apiKey": "API key",
+  "@logs_apiKey": {
+    "description": "API key used for an operation."
+  },
   "logs_message": "Error message",
   "@logs_message": {
     "description": "OneDash UI text."
@@ -12202,6 +12222,14 @@
   "ai_agent_group_scope_sender": "Group and sender",
   "@ai_agent_group_scope_sender": {
     "description": "OneDash UI text."
+  },
+  "ai_agent_group_scope_topic": "Group and topic",
+  "@ai_agent_group_scope_topic": {
+    "description": "Feishu group session scope."
+  },
+  "ai_agent_group_scope_topic_sender": "Group, topic and sender",
+  "@ai_agent_group_scope_topic_sender": {
+    "description": "Feishu group session scope."
   },
   "ai_agent_separate_session": "Separate session per conversation",
   "@ai_agent_separate_session": {

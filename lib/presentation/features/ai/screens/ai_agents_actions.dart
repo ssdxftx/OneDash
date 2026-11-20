@@ -975,6 +975,7 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
       var streaming = config.streaming;
       var requireMention = config.requireMention;
       var groupPolicy = config.groupPolicy;
+      var groupSessionScope = config.groupSessionScope;
       var connectionMode = config.connectionMode;
       final saved = await pushFormPage<bool>(
         context,
@@ -1036,6 +1037,34 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
               ),
               const SizedBox(height: AppTokens.s12),
               DropdownButtonFormField<String>(
+                initialValue: groupSessionScope,
+                decoration: InputDecoration(
+                  labelText: l10n.ai_agent_group_session_scope,
+                ),
+                items: [
+                  DropdownMenuItem(
+                    value: 'group',
+                    child: Text(l10n.ai_agent_group_scope_group),
+                  ),
+                  DropdownMenuItem(
+                    value: 'group_sender',
+                    child: Text(l10n.ai_agent_group_scope_sender),
+                  ),
+                  DropdownMenuItem(
+                    value: 'group_topic',
+                    child: Text(l10n.ai_agent_group_scope_topic),
+                  ),
+                  DropdownMenuItem(
+                    value: 'group_topic_sender',
+                    child: Text(l10n.ai_agent_group_scope_topic_sender),
+                  ),
+                ],
+                onChanged: (value) {
+                  if (value != null) setState(() => groupSessionScope = value);
+                },
+              ),
+              const SizedBox(height: AppTokens.s12),
+              DropdownButtonFormField<String>(
                 initialValue: connectionMode,
                 decoration: InputDecoration(
                   labelText: l10n.ai_agent_connection_mode,
@@ -1078,6 +1107,7 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
         'streaming': streaming,
         'requireMention': requireMention,
         'groupPolicy': groupPolicy,
+        'groupSessionScope': groupSessionScope,
         'groupAllowFrom': config.groupAllowFrom,
         'domain': config.domain,
         'connectionMode': connectionMode,

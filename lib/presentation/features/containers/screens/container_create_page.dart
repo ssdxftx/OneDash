@@ -104,10 +104,8 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
     _entrypoint.text = initial.entrypoint?.join(' ') ?? '';
     _cpu.text = initial.nanoCPUs <= 0
         ? ''
-        : (initial.nanoCPUs / 1000000000).toStringAsFixed(2);
-    _memory.text = initial.memory <= 0
-        ? ''
-        : '${(initial.memory / 1024 / 1024).round()}';
+        : initial.nanoCPUs.toStringAsFixed(2);
+    _memory.text = initial.memory <= 0 ? '' : '${initial.memory.round()}';
     _restartPolicy = initial.restartPolicy.isEmpty
         ? 'unless-stopped'
         : initial.restartPolicy;
@@ -191,7 +189,8 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
       final repository = await ref.read(containerRepositoryProvider.future);
       final payload = _payload(name, image);
       if (widget.isEditing) {
-        await repository.updateContainer(payload);
+        final taskID = await repository.updateContainer(payload);
+        await repository.waitForTask(taskID);
       } else {
         final taskID = await repository.createContainer(payload);
         await repository.waitForTask(taskID);
@@ -280,8 +279,9 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
       networks.first['network'] = _network;
     }
 
+    final initialTaskID = initial?.taskID.trim() ?? '';
     return {
-      'taskID': initial?.taskID ?? const Uuid().v4(),
+      'taskID': initialTaskID.isEmpty ? const Uuid().v4() : initialTaskID,
       'forcePull': initial?.forcePull ?? false,
       'name': name,
       'image': image,
@@ -298,8 +298,8 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
       'cmd': _split(_command.text),
       'entrypoint': _split(_entrypoint.text),
       'cpuShares': initial?.cpuShares ?? 0,
-      'nanoCPUs': cpu <= 0 ? 0 : cpu * 1000000000,
-      'memory': memory <= 0 ? 0 : memory * 1024 * 1024,
+      'nanoCPUs': cpu <= 0 ? 0.0 : cpu,
+      'memory': memory <= 0 ? 0.0 : memory.toDouble(),
       'volumes': volumes,
       'extraHosts':
           initial?.extraHosts?.map((item) => item.toJson()).toList() ??
@@ -528,7 +528,7 @@ class _ContainerCreatePageState extends ConsumerState<ContainerCreatePage> {
             if (limit != null) ...[
               const SizedBox(height: AppTokens.s8),
               Text(
-                l10n.containers_limitAvailable(limit.cpu, limit.memory),
+                l10n.containers_limitAvailable(limit.cpu, limit.memoryMb),
                 style: AppTextStyles.caption.copyWith(
                   color: context.scheme.onSurfaceVariant,
                 ),

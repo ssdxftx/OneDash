@@ -429,7 +429,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     final l10n = AppLocalizations.of(context);
     try {
       final repository = await ref.read(containerRepositoryProvider.future);
-      final lines = await repository.loadComposeEnv(item.path);
+      final env = await repository.loadComposeEnv(item.path);
       if (!context.mounted) return;
       await showAppSheet<void>(
         context: context,
@@ -440,13 +440,13 @@ class _ComposePageState extends ConsumerState<ComposePage> {
           children: [
             Text(l10n.containers_composeEnv, style: AppTextStyles.titleL),
             const SizedBox(height: AppTokens.s12),
-            if (lines.isEmpty)
+            if (env.isEmpty)
               Text(l10n.state_empty, style: AppTextStyles.bodyM)
             else
               Flexible(
                 child: SingleChildScrollView(
                   child: SelectableText(
-                    lines.join('\n'),
+                    env,
                     style: AppTextStyles.mono.copyWith(),
                   ),
                 ),

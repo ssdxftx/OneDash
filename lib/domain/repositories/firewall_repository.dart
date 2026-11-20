@@ -105,7 +105,9 @@ abstract interface class FirewallRepository {
     required bool permanent,
   });
 
-  Future<void> resetRules({String? backupFile});
+  Future<void> resetRules();
+
+  Future<void> restoreRules(String backupFile);
 
   Future<List<Map<String, dynamic>>> getListeningProcesses();
 }

@@ -10,6 +10,7 @@ class LoginLogItem {
     required this.status,
     required this.message,
     required this.createdAt,
+    this.user = '',
   });
 
   final int id;
@@ -19,6 +20,7 @@ class LoginLogItem {
   final String status;
   final String message;
   final DateTime createdAt;
+  final String user;
 
   factory LoginLogItem.fromDto(LoginLogDto dto) => LoginLogItem(
     id: dto.id,
@@ -28,6 +30,7 @@ class LoginLogItem {
     status: dto.status,
     message: dto.message,
     createdAt: dto.createdAt,
+    user: dto.user,
   );
 
   bool get isSuccess => status.toLowerCase() == 'success';

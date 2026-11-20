@@ -5,6 +5,9 @@ class AiFeishuBotDto {
     required this.enabled,
     required this.isDefault,
     required this.appId,
+    this.appSecret = '',
+    this.dmPolicy = 'pairing',
+    this.allowFrom = const [],
   });
 
   final String accountId;
@@ -12,6 +15,9 @@ class AiFeishuBotDto {
   final bool enabled;
   final bool isDefault;
   final String appId;
+  final String appSecret;
+  final String dmPolicy;
+  final List<String> allowFrom;
 
   factory AiFeishuBotDto.fromJson(Map<String, dynamic> json) {
     return AiFeishuBotDto(
@@ -20,6 +26,13 @@ class AiFeishuBotDto {
       enabled: json['enabled'] == true,
       isDefault: json['isDefault'] == true,
       appId: json['appId'] as String? ?? '',
+      appSecret: json['appSecret'] as String? ?? '',
+      dmPolicy: json['dmPolicy'] as String? ?? 'pairing',
+      allowFrom:
+          (json['allowFrom'] as List?)
+              ?.map((item) => '$item')
+              .toList(growable: false) ??
+          const [],
     );
   }
 
@@ -29,6 +42,9 @@ class AiFeishuBotDto {
     'enabled': enabled,
     'isDefault': isDefault,
     'appId': appId,
+    'appSecret': appSecret,
+    'dmPolicy': dmPolicy,
+    'allowFrom': allowFrom,
   };
 }
 
@@ -45,6 +61,7 @@ class AiFeishuConfigDto {
     required this.connectionMode,
     required this.bots,
     required this.installed,
+    this.groupSessionScope = 'group',
   });
 
   final bool enabled;
@@ -58,6 +75,7 @@ class AiFeishuConfigDto {
   final String connectionMode;
   final List<AiFeishuBotDto> bots;
   final bool installed;
+  final String groupSessionScope;
 
   factory AiFeishuConfigDto.fromJson(Map<String, dynamic> json) {
     return AiFeishuConfigDto(
@@ -81,6 +99,7 @@ class AiFeishuConfigDto {
               .toList(growable: false) ??
           const [],
       installed: json['installed'] == true,
+      groupSessionScope: json['groupSessionScope'] as String? ?? 'group',
     );
   }
 }

@@ -7442,6 +7442,12 @@ abstract class AppLocalizations {
   /// **'Request URL'**
   String get cronjobs_url;
 
+  /// Optional User-Agent header for a curl job URL.
+  ///
+  /// In en, this message translates to:
+  /// **'User-Agent'**
+  String get cronjobs_urlHeader;
+
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
@@ -8108,6 +8114,12 @@ abstract class AppLocalizations {
   /// **'Enter the compose file content'**
   String get containers_composeContentRequired;
 
+  /// Validation message for an empty Dockerfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the Dockerfile content'**
+  String get containers_dockerfileRequired;
+
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
@@ -8317,6 +8329,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Name'**
   String get files_name;
+
+  /// Validation message for a required file name.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a file name'**
+  String get files_nameRequired;
 
   /// OneDash UI text.
   ///
@@ -13502,6 +13520,18 @@ abstract class AppLocalizations {
   /// **'Auth method'**
   String get logs_authMode;
 
+  /// User who performed an operation.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get logs_user;
+
+  /// API key used for an operation.
+  ///
+  /// In en, this message translates to:
+  /// **'API key'**
+  String get logs_apiKey;
+
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
@@ -17479,6 +17509,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Group and sender'**
   String get ai_agent_group_scope_sender;
+
+  /// Feishu group session scope.
+  ///
+  /// In en, this message translates to:
+  /// **'Group and topic'**
+  String get ai_agent_group_scope_topic;
+
+  /// Feishu group session scope.
+  ///
+  /// In en, this message translates to:
+  /// **'Group, topic and sender'**
+  String get ai_agent_group_scope_topic_sender;
 
   /// OneDash UI text.
   ///

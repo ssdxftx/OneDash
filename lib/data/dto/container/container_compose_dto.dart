@@ -88,6 +88,15 @@ class ContainerComposeDto {
   final String? env;
   final bool isPinned;
 
+  /// Docker Compose may report multiple config files separated by commas.
+  String get primaryConfigFile {
+    for (final item in configFile.split(',')) {
+      final value = item.trim();
+      if (value.isNotEmpty) return value;
+    }
+    return configFile;
+  }
+
   Map<String, dynamic> toJson() => {
     'name': name,
     'createdAt': createdAt,

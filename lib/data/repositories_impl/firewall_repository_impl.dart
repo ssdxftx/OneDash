@@ -190,8 +190,10 @@ class FirewallRepositoryImpl implements FirewallRepository {
   );
 
   @override
-  Future<void> resetRules({String? backupFile}) =>
-      _api.resetRules(backupFile: backupFile);
+  Future<void> resetRules() => _api.resetRules();
+
+  @override
+  Future<void> restoreRules(String backupFile) => _api.restoreRules(backupFile);
 
   @override
   Future<List<Map<String, dynamic>>> getListeningProcesses() =>

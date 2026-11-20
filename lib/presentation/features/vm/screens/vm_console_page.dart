@@ -11,6 +11,7 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/network/one_panel_auth.dart';
 import '../../../../core/network/vnc_client.dart';
 import '../../../../core/network/web_socket_connector.dart';
+import '../../../../data/repositories_impl/vm_repository_impl.dart';
 import '../../../../core/storage/storage_service.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../common/components/app_bar_large.dart';
@@ -57,6 +58,8 @@ class _VmConsolePageState extends ConsumerState<VmConsolePage> {
       if (server == null) {
         throw VncException(AppLocalizations.of(context).process_serverMissing);
       }
+      final repository = await ref.read(vmRepositoryProvider.future);
+      await repository.getVmConsole(widget.name);
       final apiKey = await storage.getApiKey(widget.serverId) ?? '';
       final headers = await OnePanelAuth.signedHeaders(apiKey);
       final session = await storage.getPanelSession(widget.serverId);
@@ -73,11 +76,6 @@ class _VmConsolePageState extends ConsumerState<VmConsolePage> {
         port: uri.port,
         path: '${uri.path}/api/v2/vms/console/ws'.replaceAll('//', '/'),
         queryParameters: {'name': widget.name},
-      );
-      await checkAppWebSocketAuth(
-        wsUrl,
-        headers: headers,
-        allowInsecureConnections: server.allowInsecureConnections,
       );
       final channel = connectAppWebSocket(
         wsUrl,

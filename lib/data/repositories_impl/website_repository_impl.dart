@@ -17,6 +17,7 @@ import '../dto/website/website_create_metadata.dart';
 import '../dto/website/website_create_req.dart';
 import '../dto/website/website_config_file_dto.dart';
 import '../dto/website/website_detail_dto.dart';
+import '../dto/website/website_ssl_dto.dart';
 import '../dto/website/website_dir_dto.dart';
 import '../dto/website/website_index_config_dto.dart';
 import '../dto/website/website_limit_config_dto.dart';
@@ -57,6 +58,10 @@ class WebsiteRepositoryImpl implements WebsiteRepository {
 
   @override
   Future<WebsiteDetailDto> getWebsite(int id) => _websiteApi.getWebsite(id);
+
+  @override
+  Future<WebsiteSslDto> getWebsiteSsl(int websiteId) =>
+      _websiteApi.getWebsiteSsl(websiteId);
 
   @override
   Future<List<WebsiteOptionDto>> getWebsiteOptions() =>
