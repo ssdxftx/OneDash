@@ -272,7 +272,8 @@ class _HeaderMetrics extends StatelessWidget {
       builder: (context, constraints) {
         final stacked =
             constraints.maxWidth < 480 ||
-            MediaQuery.textScalerOf(context).scale(1) > 1.15;
+            MediaQuery.textScalerOf(context).scale(1) >
+                AppTokens.textScaleCompact;
         if (!stacked) {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,

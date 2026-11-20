@@ -175,13 +175,17 @@ class _TitleBlock extends StatelessWidget {
             ],
           ),
           if (subtitle != null)
-            Text(
-              subtitle!,
-              style: AppTextStyles.bodyS.copyWith(
-                color: scheme.onSurfaceVariant,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                subtitle!,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                softWrap: false,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
         ],
       ),

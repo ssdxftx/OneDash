@@ -299,7 +299,9 @@ class _ServerShellScaffoldState extends ConsumerState<_ServerShellScaffold>
                   backgroundColor: scheme.surfaceContainer,
                   elevation: 0,
                   selectedIndex: widget.navigationShell.currentIndex,
-                  labelBehavior: MediaQuery.textScalerOf(context).scale(1) > 1.2
+                  labelBehavior:
+                      MediaQuery.textScalerOf(context).scale(1) >
+                          AppTokens.textScaleCompact
                       ? NavigationDestinationLabelBehavior.onlyShowSelected
                       : NavigationDestinationLabelBehavior.alwaysShow,
                   onDestinationSelected: _selectDestination,

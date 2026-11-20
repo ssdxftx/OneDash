@@ -333,7 +333,8 @@ class _AlertCard extends StatelessWidget {
           final scale = MediaQuery.textScalerOf(context).scale(1);
           final compact =
               constraints.maxWidth < 320 ||
-              (scale >= 1.3 && constraints.maxWidth < 430);
+              (scale >= AppTokens.textScaleCompact &&
+                  constraints.maxWidth < 430);
           final meta = compact
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

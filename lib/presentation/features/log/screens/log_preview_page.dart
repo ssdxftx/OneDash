@@ -808,7 +808,8 @@ class _AccessLogCard extends StatelessWidget {
         ? colors.warning
         : colors.success;
     final time = _parseAccessTime(parsed.time);
-    final largeText = MediaQuery.textScalerOf(context).scale(1) > 1.4;
+    final largeText =
+        MediaQuery.textScalerOf(context).scale(1) > AppTokens.textScaleLarge;
     final statusText = Text(
       status?.toString() ?? '-',
       style: AppTextStyles.mono.copyWith(
@@ -1274,7 +1275,8 @@ class _StructuredLineState extends State<_StructuredLine> {
             pathWithoutMethod + (hideDuration ? durationWidth : 0);
         final pathWithMethod = effectivePath - methodWidth;
         final compact =
-            scaler.scale(1) > 1.2 || effectivePath < _logPathMinWidth;
+            scaler.scale(1) > AppTokens.textScaleCompact ||
+            effectivePath < _logPathMinWidth;
         if (!compact) {
           return Row(
             children: [

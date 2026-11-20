@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tokens.dart';
@@ -134,14 +135,19 @@ class _SegmentedTabsState extends State<SegmentedTabs> {
 
   void _ensureSelectedVisible() {
     if (!mounted || !widget.scrollable || _keys.isEmpty) return;
+    if (!_controller.hasClients) return;
     final index = widget.selectedIndex.clamp(0, _keys.length - 1);
-    final key = _keys[index];
-    final target = key.currentContext;
-    if (target == null) return;
-    Scrollable.ensureVisible(
+    final box = _keys[index].currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return;
+    final position = _controller.position;
+    final target = RenderAbstractViewport.of(box)
+        .getOffsetToReveal(box, 0.5)
+        .offset
+        .clamp(position.minScrollExtent, position.maxScrollExtent);
+    if ((target - position.pixels).abs() < 0.5) return;
+    _controller.animateTo(
       target,
-      alignment: 0.5,
-      duration: target.motion(AppTokens.dBase),
+      duration: context.motion(AppTokens.dBase),
       curve: AppTokens.curveFast,
     );
   }

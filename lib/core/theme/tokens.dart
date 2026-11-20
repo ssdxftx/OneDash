@@ -45,6 +45,12 @@ abstract final class AppTokens {
   static const double menuRowHeight = 40;
   static const double appBarLargeHeight = 84;
 
+  /// 大字号断点：超过此值启用紧凑布局。
+  static const double textScaleCompact = 1.2;
+
+  /// 大字号断点：文案需要降级或改为单列。
+  static const double textScaleLarge = 1.4;
+
   static const double bottomNavHeight = 72;
   static const double bottomNavMaxWidth = 480;
   static const double bottomNavClearance = 96;

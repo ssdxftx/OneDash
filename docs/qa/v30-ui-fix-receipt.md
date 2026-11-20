@@ -80,3 +80,10 @@
 - O-6：终端内容区补 8dp 横向内边距，光标不再贴边。
 - O-7：用量配色收敛到 `OneDashColors.usageTone`，总览与服务器列表共用阈值。
 - 测试：新增控制台页头与快捷键条对比度测试、仪表盘分隔线缩进测试，胶囊测试锁定叠黑后的 4.95 下限与淡底 token，用量阈值补单元测试。
+
+## v34 补充审查复修
+
+- B1：`SegmentedTabs` 不再调用 `Scrollable.ensureVisible`，改为只对自身横向 `_controller` 计算 `getOffsetToReveal` 后 `animateTo`，外层设置页 `ListView` 不会被联动滚动；320dp 与 1.5 倍字号下设置页初始偏移回到 0。
+- B2：新增 `AppTokens.textScaleCompact`(1.2) 与 `AppTokens.textScaleLarge`(1.4)，替换总览卡、设置页、底栏、告警卡、日志页共 6 处字面量阈值；告警卡保留 `maxWidth < 430` 条件。
+- B3：概览页副标题端口前置为 `端口 · 主机`，截断风险时端口仍在；`AppBarLarge` 副标题改为 `FittedBox(scaleDown)`，窄屏与大字号下保留完整文案。
+- 测试：新增 `test/widget/app_settings_scroll_test.dart`，覆盖 320dp 与 1.5 倍字号下打开设置页的初始偏移；`app_bar_large_test.dart` 补大字号窄屏副标题完整显示断言。

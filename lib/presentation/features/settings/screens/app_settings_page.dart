@@ -44,7 +44,7 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
     final darkActive = Theme.of(context).brightness == Brightness.dark;
     final scrollableThemeTabs =
         MediaQuery.sizeOf(context).width < 360 ||
-        MediaQuery.textScalerOf(context).scale(1) > 1.2;
+        MediaQuery.textScalerOf(context).scale(1) > AppTokens.textScaleCompact;
 
     return Scaffold(
       appBar: AppBarLarge(title: l10n.settings_title),

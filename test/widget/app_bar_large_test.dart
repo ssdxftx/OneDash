@@ -120,4 +120,31 @@ void main() {
     expect(chevronRect.left - titleRect.right, lessThan(12));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('long subtitle keeps the full address under large text', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 300);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    const subtitle = '20405 · sg-prod-01.example.com';
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(1.5)),
+          child: child!,
+        ),
+        home: const Scaffold(
+          appBar: AppBarLarge(title: '生产', subtitle: subtitle),
+        ),
+      ),
+    );
+
+    expect(find.text(subtitle), findsOneWidget);
+    expect(find.byType(FittedBox), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
