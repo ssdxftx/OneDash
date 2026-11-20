@@ -3,6 +3,18 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tokens.dart';
 
+double _textWidth(BuildContext context, String text, TextStyle style) {
+  final painter = TextPainter(
+    text: TextSpan(text: text, style: style),
+    maxLines: 1,
+    textDirection: Directionality.of(context),
+    textScaler: MediaQuery.textScalerOf(context),
+  )..layout();
+  final width = painter.width;
+  painter.dispose();
+  return width;
+}
+
 bool _fitsOneLine(
   BuildContext context,
   String text,
@@ -10,15 +22,7 @@ bool _fitsOneLine(
   double maxWidth,
 ) {
   if (!maxWidth.isFinite || maxWidth <= 0) return true;
-  final painter = TextPainter(
-    text: TextSpan(text: text, style: style),
-    maxLines: 1,
-    textDirection: Directionality.of(context),
-    textScaler: MediaQuery.textScalerOf(context),
-  )..layout();
-  final fits = painter.width <= maxWidth;
-  painter.dispose();
-  return fits;
+  return _textWidth(context, text, style) <= maxWidth;
 }
 
 /// 标准大标题栏。滚动内容请使用 [SliverAppBarLarge]。
@@ -175,17 +179,31 @@ class _TitleBlock extends StatelessWidget {
             ],
           ),
           if (subtitle != null)
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: AlignmentDirectional.centerStart,
-              child: Text(
-                subtitle!,
-                style: AppTextStyles.bodyS.copyWith(
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final style = AppTextStyles.bodyS.copyWith(
                   color: scheme.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                softWrap: false,
-              ),
+                );
+                final text = Text(
+                  subtitle!,
+                  style: style,
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.ellipsis,
+                );
+                final maxWidth = constraints.maxWidth;
+                if (!maxWidth.isFinite || maxWidth <= 0) return text;
+                final minScale =
+                    AppTextStyles.caption.fontSize! /
+                    AppTextStyles.bodyS.fontSize!;
+                final needed = _textWidth(context, subtitle!, style);
+                if (needed * minScale > maxWidth) return text;
+                return FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: text,
+                );
+              },
             ),
         ],
       ),

@@ -91,7 +91,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                 title: server?.displayName ?? l10n.nav_overview,
                 subtitle: server == null
                     ? null
-                    : '${server.port} · ${server.host}',
+                    : '${server.host}:${server.port}',
                 onTitleTap: () => showServerSwitcher(
                   context,
                   ref,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onedash/core/theme/app_theme.dart';
+import 'package:onedash/core/theme/tokens.dart';
 import 'package:onedash/presentation/common/components/app_bar_large.dart';
 
 void main() {
@@ -121,14 +123,36 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('long subtitle keeps the full address under large text', (
+  testWidgets('long subtitle stays within the caption floor', (tester) async {
+    tester.view.physicalSize = const Size(320, 300);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    const subtitle = 'eu-central-1.staging.internal.example.com:20405';
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          appBar: AppBarLarge(title: '生产', subtitle: subtitle),
+        ),
+      ),
+    );
+
+    expect(find.text(subtitle), findsOneWidget);
+    expect(
+      _renderedFontSize(tester, subtitle),
+      greaterThanOrEqualTo(AppTextStyles.caption.fontSize!),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('long subtitle responds to text scale on a narrow screen', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(320, 300);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    const subtitle = '20405 · sg-prod-01.example.com';
+    const subtitle = 'eu-central-1.staging.internal.example.com:20405';
     await tester.pumpWidget(
       MaterialApp(
         builder: (context, child) => MediaQuery(
@@ -144,7 +168,15 @@ void main() {
     );
 
     expect(find.text(subtitle), findsOneWidget);
-    expect(find.byType(FittedBox), findsOneWidget);
+    expect(_renderedFontSize(tester, subtitle), greaterThan(16));
     expect(tester.takeException(), isNull);
   });
+}
+
+double _renderedFontSize(WidgetTester tester, String text) {
+  final paragraph = tester.renderObject<RenderParagraph>(find.text(text));
+  final style = paragraph.text.style!;
+  final scaled = paragraph.textScaler.scale(style.fontSize!);
+  final scale = paragraph.getTransformTo(null).getMaxScaleOnAxis();
+  return scaled * scale;
 }

@@ -87,3 +87,9 @@
 - B2：新增 `AppTokens.textScaleCompact`(1.2) 与 `AppTokens.textScaleLarge`(1.4)，替换总览卡、设置页、底栏、告警卡、日志页共 6 处字面量阈值；告警卡保留 `maxWidth < 430` 条件。
 - B3：概览页副标题端口前置为 `端口 · 主机`，截断风险时端口仍在；`AppBarLarge` 副标题改为 `FittedBox(scaleDown)`，窄屏与大字号下保留完整文案。
 - 测试：新增 `test/widget/app_settings_scroll_test.dart`，覆盖 320dp 与 1.5 倍字号下打开设置页的初始偏移；`app_bar_large_test.dart` 补大字号窄屏副标题完整显示断言。
+
+## v36 验收报告复修
+
+- R-1：`AppBarLarge` 副标题增加收缩下限，按 `caption`(12) 与 `bodyS`(13) 的比例判断；需要缩小超过该比例时改用省略号，避免长域名把字号压到 11sp 以下。
+- R-2：概览页头副标题恢复为 `host:port`，与服务器列表、服务器切换面板等 6 处保持一致。
+- R-3：副标题测试改为读取 `RenderParagraph` 的实际字号，覆盖 320dp 常规字号与 1.5 倍字号两种条件，均要求不低于 `caption`(12sp)。
