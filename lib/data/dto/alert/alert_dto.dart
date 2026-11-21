@@ -141,6 +141,7 @@ class AlertConfigInfo {
     this.status = '',
     this.displayName = '',
     this.revision,
+    this.updatedAt,
     this.createdAt,
   });
 
@@ -150,7 +151,10 @@ class AlertConfigInfo {
   final String config;
   final String status;
   final String displayName;
+
+  /// 更新乐观锁版本。服务端列表返回 `updatedAt`，历史接口返回 `revision`。
   final String? revision;
+  final String? updatedAt;
   final String? createdAt;
 
   factory AlertConfigInfo.fromJson(Map<String, dynamic> json) =>

@@ -442,13 +442,23 @@ class RuntimesPage extends ConsumerWidget {
       );
       final nameValue = name.text.trim();
       final remarkValue = remark.text.trim();
-      final portValue = int.tryParse(port.text.trim().split(':').last) ?? 0;
+      final firstPort = port.text.trim().split(',').first;
+      final portValue = int.tryParse(firstPort.split(':').last) ?? 0;
       name.dispose();
       remark.dispose();
       port.dispose();
       if (saved != true || !context.mounted || nameValue.isEmpty) return;
+      if (portValue <= 0) {
+        AppToast.warning(context, l10n.runtime_portInvalid);
+        return;
+      }
+      var portUpdated = false;
       final updatedPorts = detail.exposedPorts
-          .map((item) => item.copyWith(hostPort: portValue))
+          .map((item) {
+            if (portUpdated) return item;
+            portUpdated = true;
+            return item.copyWith(hostPort: portValue);
+          })
           .toList(growable: false);
       await repository.updateRuntime(
         RuntimeCreateReq(

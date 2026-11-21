@@ -989,7 +989,7 @@ class _HostPageState extends ConsumerState<HostPage> {
           id: cert.id,
           name: keyName,
           encryptionMode: cert.encryptionMode,
-          passPhrase: cert.passPhrase,
+          passPhrase: _decodeCertField(cert.passPhrase),
           publicKey: _decodeCertField(cert.publicKey),
           privateKey: _decodeCertField(cert.privateKey),
           description: note,

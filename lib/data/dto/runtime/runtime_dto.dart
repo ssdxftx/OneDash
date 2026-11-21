@@ -161,25 +161,34 @@ class ExposedPort {
     required this.hostPort,
     required this.containerPort,
     required this.hostIP,
+    this.protocol = 'tcp',
   });
 
   final int hostPort;
   final int containerPort;
   final String hostIP;
+  final String protocol;
 
   factory ExposedPort.fromJson(Map<String, dynamic> json) {
     return ExposedPort(
       hostPort: json['hostPort'] as int? ?? 0,
       containerPort: json['containerPort'] as int? ?? 0,
       hostIP: json['hostIP'] as String? ?? '',
+      protocol: json['protocol'] as String? ?? 'tcp',
     );
   }
 
-  ExposedPort copyWith({int? hostPort, int? containerPort, String? hostIP}) {
+  ExposedPort copyWith({
+    int? hostPort,
+    int? containerPort,
+    String? hostIP,
+    String? protocol,
+  }) {
     return ExposedPort(
       hostPort: hostPort ?? this.hostPort,
       containerPort: containerPort ?? this.containerPort,
       hostIP: hostIP ?? this.hostIP,
+      protocol: protocol ?? this.protocol,
     );
   }
 
@@ -187,6 +196,7 @@ class ExposedPort {
     'hostPort': hostPort,
     'containerPort': containerPort,
     'hostIP': hostIP,
+    'protocol': protocol,
   };
 }
 

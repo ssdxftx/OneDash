@@ -2005,8 +2005,19 @@ class _PanelSettingsBody extends ConsumerWidget {
         oldPassword: oldValue,
         newPassword: newValue,
       );
+      ref.invalidate(_panelSettingsProvider);
       if (!context.mounted) return;
       AppToast.success(context, l10n.panelSettings_settingUpdated);
+      final loggedIn = await _loginPanel(
+        context,
+        ref,
+        l10n,
+        entrance: data.value('securityEntrance'),
+        passkeyAvailable: _canOfferPasskey(data, serverUrl),
+      );
+      if (loggedIn && context.mounted) {
+        ref.invalidate(_panelSettingsProvider);
+      }
     } catch (error) {
       if (!context.mounted) return;
       showErrorToast(context, error);

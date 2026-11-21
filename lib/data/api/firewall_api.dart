@@ -367,7 +367,7 @@ class FirewallApi {
   Future<void> restoreRules(String backupFile) async {
     final response = await _client.post<Map<String, dynamic>>(
       '/api/v2/hosts/firewall/rules',
-      data: {'backupFile': backupFile, 'initialize': false, 'items': const []},
+      data: {'backupFile': backupFile, 'initialize': true, 'items': const []},
     );
     await _awaitTask(
       ApiResponseParser.object(response, FirewallTaskResult.fromJson),

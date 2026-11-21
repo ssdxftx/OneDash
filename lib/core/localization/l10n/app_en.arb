@@ -5848,6 +5848,10 @@
   "@files_path": {
     "description": "OneDash UI text."
   },
+  "files_pathRequired": "Enter a path",
+  "@files_pathRequired": {
+    "description": "Validation message for a required file or directory path."
+  },
   "files_shareCodeLabel": "Share code",
   "@files_shareCodeLabel": {
     "description": "OneDash UI text."
@@ -6864,6 +6868,14 @@
   "@containers_repoAuth": {
     "description": "OneDash UI text."
   },
+  "containers_repoPasswordRequired": "Enter the registry password",
+  "@containers_repoPasswordRequired": {
+    "description": "Validation message for an authenticated registry password."
+  },
+  "containers_repoPasswordEditHint": "Re-enter the password when editing an authenticated registry.",
+  "@containers_repoPasswordEditHint": {
+    "description": "Hint shown when editing an authenticated registry."
+  },
   "containers_repoId": "Registry ID",
   "@containers_repoId": {
     "description": "OneDash UI text."
@@ -7603,6 +7615,10 @@
   "runtime_port": "Port",
   "@runtime_port": {
     "description": "OneDash UI text."
+  },
+  "runtime_portInvalid": "Enter a valid port",
+  "@runtime_portInvalid": {
+    "description": "Validation message for an invalid runtime port."
   },
   "runtime_remark": "Remark",
   "@runtime_remark": {

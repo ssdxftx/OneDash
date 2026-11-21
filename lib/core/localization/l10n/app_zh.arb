@@ -1483,6 +1483,10 @@
   "files_name": "名称",
   "files_nameRequired": "请输入文件名",
   "files_path": "路径",
+  "files_pathRequired": "请输入路径",
+  "@files_pathRequired": {
+    "description": "文件或目录路径必填提示。"
+  },
   "files_shareCodeLabel": "分享码",
   "files_sharePassword": "密码",
   "files_shareExpire": "有效期",
@@ -1840,6 +1844,14 @@
   "containers_repoUrl": "仓库地址",
   "containers_protocol": "协议",
   "containers_repoAuth": "需要认证",
+  "containers_repoPasswordRequired": "请输入仓库密码",
+  "@containers_repoPasswordRequired": {
+    "description": "认证仓库密码必填提示。"
+  },
+  "containers_repoPasswordEditHint": "编辑认证仓库时需要重新输入密码。",
+  "@containers_repoPasswordEditHint": {
+    "description": "编辑认证仓库时的密码提示。"
+  },
   "containers_repoId": "仓库 ID",
   "containers_buildImage": "构建镜像",
   "containers_exportImage": "导出镜像",
@@ -2173,6 +2185,10 @@
   "containers_daemonValue": "值",
   "runtime_name": "运行环境名称",
   "runtime_port": "端口",
+  "runtime_portInvalid": "请输入有效端口",
+  "@runtime_portInvalid": {
+    "description": "运行环境端口无效提示。"
+  },
   "runtime_remark": "备注",
   "host_sshConfigFile": "SSH 配置文件",
   "host_sshConfigFileHint": "直接编辑 sshd_config",

@@ -788,7 +788,7 @@ class _AlertSettingsTab extends ConsumerWidget {
           config: contentValue,
           status: status ? 'Enable' : 'Disable',
           displayName: current?.displayName ?? '',
-          revision: current?.revision,
+          revision: current?.revision ?? current?.updatedAt,
         ),
       );
       ref.invalidate(_alertConfigsProvider);

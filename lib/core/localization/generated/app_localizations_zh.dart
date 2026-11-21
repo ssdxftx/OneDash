@@ -4271,6 +4271,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get files_path => '路径';
 
   @override
+  String get files_pathRequired => '请输入路径';
+
+  @override
   String get files_shareCodeLabel => '分享码';
 
   @override
@@ -5019,6 +5022,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get containers_repoAuth => '需要认证';
 
   @override
+  String get containers_repoPasswordRequired => '请输入仓库密码';
+
+  @override
+  String get containers_repoPasswordEditHint => '编辑认证仓库时需要重新输入密码。';
+
+  @override
   String get containers_repoId => '仓库 ID';
 
   @override
@@ -5566,6 +5575,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get runtime_port => '端口';
+
+  @override
+  String get runtime_portInvalid => '请输入有效端口';
 
   @override
   String get runtime_remark => '备注';

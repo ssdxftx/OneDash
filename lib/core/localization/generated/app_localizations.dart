@@ -8342,6 +8342,12 @@ abstract class AppLocalizations {
   /// **'Path'**
   String get files_path;
 
+  /// Validation message for a required file or directory path.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a path'**
+  String get files_pathRequired;
+
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
@@ -9806,6 +9812,18 @@ abstract class AppLocalizations {
   /// **'Requires authentication'**
   String get containers_repoAuth;
 
+  /// Validation message for an authenticated registry password.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the registry password'**
+  String get containers_repoPasswordRequired;
+
+  /// Hint shown when editing an authenticated registry.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter the password when editing an authenticated registry.'**
+  String get containers_repoPasswordEditHint;
+
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
@@ -10885,6 +10903,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Port'**
   String get runtime_port;
+
+  /// Validation message for an invalid runtime port.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid port'**
+  String get runtime_portInvalid;
 
   /// OneDash UI text.
   ///

@@ -724,10 +724,12 @@
 - P2-01、P2-02、P2-04、P2-05：已修复
 - P2-03：暂未改动。`/databases/db/list/:type` 只返回 `DatabaseOption`，但客户端当前仅使用 `type/from/database`，这三个字段与服务端一致，剩余字段未被使用，因此没有实际行为影响
 
+核验报告 `docs/qa/v37-1panel-api-fix-review.md` 发现的 8 项遗留问题已全部修复，包括告警 revision、清理 isCheck、SSH 口令、镜像导出路径、防火墙 initialize、改密会话、运行时端口协议和认证仓库密码。详见该报告第 9 节。
+
 验证结果：
 
 - `flutter analyze --fatal-infos`：通过，0 issues
-- `flutter test`：451 个测试全部通过
+- `flutter test`：454 个测试全部通过
 - `python3 tool/check_hardcoded_english.py`：通过
 - `pubspec.lock` 已恢复，未纳入改动
 

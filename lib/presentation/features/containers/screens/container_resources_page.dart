@@ -586,7 +586,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
   ) async {
     final l10n = AppLocalizations.of(context);
     final name = image.tags.isEmpty ? image.id : image.tags.first;
-    final target = TextEditingController(text: name);
+    final target = TextEditingController(text: operation == 'save' ? '' : name);
     final archive = TextEditingController(
       text: operation == 'save' ? _archiveFileName(name) : '',
     );
@@ -637,7 +637,16 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
     target.dispose();
     archive.dispose();
     repo.dispose();
-    if (saved != true || !context.mounted || value.isEmpty) return;
+    if (saved != true || !context.mounted) return;
+    if (value.isEmpty) {
+      AppToast.warning(
+        context,
+        operation == 'save' || operation == 'load'
+            ? l10n.files_pathRequired
+            : l10n.containers_imageRequired,
+      );
+      return;
+    }
     if (operation == 'build' && archiveValue.isEmpty) {
       AppToast.warning(context, l10n.containers_dockerfileRequired);
       return;
@@ -1371,12 +1380,25 @@ class _RepoSheetState extends State<_RepoSheet> {
             label: l10n.websites_password,
             obscure: true,
           ),
+          if (widget.repo?.auth == true && _auth) ...[
+            const SizedBox(height: AppTokens.s8),
+            Text(
+              l10n.containers_repoPasswordEditHint,
+              style: AppTextStyles.bodyS.copyWith(
+                color: context.scheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ],
         const SizedBox(height: AppTokens.s16),
         PrimaryButton(
           label: l10n.action_save,
           onPressed: () {
             if (_name.text.trim().isEmpty || _url.text.trim().isEmpty) return;
+            if (_auth && _password.text.isEmpty) {
+              AppToast.warning(context, l10n.containers_repoPasswordRequired);
+              return;
+            }
             Navigator.of(context).pop({
               'name': _name.text.trim(),
               'downloadUrl': _url.text.trim(),

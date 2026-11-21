@@ -27,6 +27,7 @@ import 'package:onedash/data/dto/container/container_info_dto.dart';
 import 'package:onedash/data/dto/cronjob/cronjob_dto.dart';
 import 'package:onedash/data/dto/host/ssh_cert_dto.dart';
 import 'package:onedash/data/dto/host/ssh_log_dto.dart';
+import 'package:onedash/data/dto/runtime/runtime_dto.dart';
 import 'package:onedash/data/dto/website/website_create_req.dart';
 import 'package:onedash/data/dto/website/website_log_dto.dart';
 
@@ -2184,7 +2185,7 @@ void main() {
     await FirewallApi(client).restoreRules('rules-20260101.json');
     expect(adapter.paths.single, '/api/v2/hosts/firewall/rules');
     expect(adapter.bodies.single['backupFile'], 'rules-20260101.json');
-    expect(adapter.bodies.single['initialize'], false);
+    expect(adapter.bodies.single['initialize'], true);
   });
 
   test('MFA login forwards the security entrance header', () async {
@@ -2251,10 +2252,23 @@ void main() {
       'id': 7,
       'type': 'custom',
       'displayName': 'Hook',
-      'revision': '2026-01-01T00:00:00Z',
+      'updatedAt': '2026-01-01T00:00:00Z',
     });
     expect(parsed.displayName, 'Hook');
+    expect(parsed.updatedAt, '2026-01-01T00:00:00Z');
     expect(parsed.revision, '2026-01-01T00:00:00Z');
+  });
+
+  test('runtime exposed ports preserve protocol', () {
+    final port = ExposedPort.fromJson({
+      'hostPort': 8080,
+      'containerPort': 80,
+      'hostIP': '0.0.0.0',
+      'protocol': 'udp',
+    });
+    expect(port.protocol, 'udp');
+    expect(port.toJson()['protocol'], 'udp');
+    expect(port.copyWith(hostPort: 9090).protocol, 'udp');
   });
 
   test('cronjob URL items preserve per-URL headers', () {

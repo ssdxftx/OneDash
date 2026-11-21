@@ -125,7 +125,8 @@ AlertConfigInfo _$AlertConfigInfoFromJson(Map<String, dynamic> json) =>
       config: json['config'] as String? ?? '',
       status: json['status'] as String? ?? '',
       displayName: json['displayName'] as String? ?? '',
-      revision: json['revision'] as String?,
+      revision: json['revision'] as String? ?? json['updatedAt'] as String?,
+      updatedAt: json['updatedAt'] as String?,
       createdAt: json['createdAt'] as String?,
     );
 
@@ -138,6 +139,7 @@ Map<String, dynamic> _$AlertConfigInfoToJson(AlertConfigInfo instance) =>
       'status': instance.status,
       'displayName': instance.displayName,
       'revision': instance.revision,
+      'updatedAt': instance.updatedAt,
       'createdAt': instance.createdAt,
     };
 

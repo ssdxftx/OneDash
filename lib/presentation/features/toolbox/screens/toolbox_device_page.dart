@@ -9,6 +9,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../data/repositories_impl/toolbox_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
+import '../clean_items.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/simple_form_page.dart';
@@ -312,37 +313,7 @@ class _ToolboxDevicePageState extends ConsumerState<ToolboxDevicePage> {
       final repository = await ref.read(toolboxRepositoryProvider.future);
       final scan = await repository.scanClean();
       if (!mounted) return;
-      final items = <Map<String, dynamic>>[];
-      void collect(Object? node) {
-        if (node is! Map) return;
-        final children = node['children'];
-        if (children is List && children.isNotEmpty) {
-          for (final child in children) {
-            collect(child);
-          }
-          return;
-        }
-        if (node['canDelete'] != true) return;
-        final type = '${node['type'] ?? ''}';
-        final name = '${node['name'] ?? ''}';
-        if (type.isEmpty || name.isEmpty) return;
-        items.add({'treeType': type, 'name': name, 'size': node['size'] ?? 0});
-      }
-
-      for (final group in const [
-        'systemClean',
-        'backupClean',
-        'uploadClean',
-        'downloadClean',
-        'systemLogClean',
-        'containerClean',
-      ]) {
-        final children = scan[group];
-        if (children is! List) continue;
-        for (final item in children) {
-          collect(item);
-        }
-      }
+      final items = collectCleanItems(scan);
       if (items.isEmpty) {
         AppToast.success(context, l10n.vm_orphansEmpty);
         return;

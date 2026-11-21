@@ -4375,6 +4375,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get files_path => 'Path';
 
   @override
+  String get files_pathRequired => 'Enter a path';
+
+  @override
   String get files_shareCodeLabel => 'Share code';
 
   @override
@@ -5141,6 +5144,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get containers_repoAuth => 'Requires authentication';
 
   @override
+  String get containers_repoPasswordRequired => 'Enter the registry password';
+
+  @override
+  String get containers_repoPasswordEditHint =>
+      'Re-enter the password when editing an authenticated registry.';
+
+  @override
   String get containers_repoId => 'Registry ID';
 
   @override
@@ -5694,6 +5704,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get runtime_port => 'Port';
+
+  @override
+  String get runtime_portInvalid => 'Enter a valid port';
 
   @override
   String get runtime_remark => 'Remark';
