@@ -104,7 +104,10 @@ class _VmConsolePageState extends ConsumerState<VmConsolePage> {
   }
 
   void _onFrame(VncFrame frame) {
-    if (!mounted) return;
+    if (!mounted) {
+      frame.image.dispose();
+      return;
+    }
     final previous = _frame;
     setState(() => _frame = frame);
     if (previous != null) {

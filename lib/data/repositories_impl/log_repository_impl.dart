@@ -85,6 +85,9 @@ class LogRepositoryImpl implements LogRepository {
   );
 
   @override
+  Future<int> getExecutingTaskCount() => _api.getExecutingTaskCount();
+
+  @override
   Future<PageResult<TaskLogDto>> searchTaskLogs({
     int page = 1,
     int pageSize = 20,

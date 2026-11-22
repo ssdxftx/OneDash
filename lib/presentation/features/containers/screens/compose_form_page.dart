@@ -109,20 +109,7 @@ class _ComposeFormPageState extends ConsumerState<ComposeFormPage> {
     };
   }
 
-  Map<String, dynamic> _testPayload() {
-    if (widget.isEditing) {
-      final compose = widget.compose!;
-      return {
-        'taskID': const Uuid().v4(),
-        'name': compose.name,
-        'from': 'path',
-        'path': compose.path,
-        'env': _env.text,
-        'forcePull': _forcePull,
-      };
-    }
-    return _payload(const Uuid().v4());
-  }
+  Map<String, dynamic> _testPayload() => _payload(const Uuid().v4());
 
   Future<void> _test() async {
     final l10n = AppLocalizations.of(context);
@@ -247,7 +234,7 @@ class _ComposeFormPageState extends ConsumerState<ComposeFormPage> {
         saveLabel: widget.isEditing
             ? l10n.action_save
             : l10n.containers_createCompose,
-        footer: _loading
+        footer: _loading || widget.isEditing
             ? null
             : SecondaryButton(
                 label: l10n.containers_testCompose,
@@ -289,7 +276,7 @@ class _ComposeFormPageState extends ConsumerState<ComposeFormPage> {
               loading: _submitting,
               onPressed: _submitting ? null : _submit,
             ),
-            if (!_loading) ...[
+            if (!_loading && !widget.isEditing) ...[
               const SizedBox(height: AppTokens.s8),
               SecondaryButton(
                 label: l10n.containers_testCompose,

@@ -53,6 +53,8 @@ class FilesController
   @override
   Future<FilesState> build(String path) async {
     _disposed = false;
+    _page = 1;
+    _loadingMore = false;
     _generation++;
     ref.onDispose(() => _disposed = true);
     return _fetch(path, page: 1);

@@ -9,6 +9,7 @@ import '../../data/dto/app/app_installed_info_dto.dart';
 import '../../data/dto/app/app_installed_search_req.dart';
 import '../../data/dto/app/app_detail_dto.dart';
 import '../../data/dto/app/app_install_config_dto.dart';
+import '../../data/dto/app/app_service_dto.dart';
 import '../../data/dto/app/app_install_req.dart';
 import '../../data/dto/app/app_tag_dto.dart';
 import '../../data/dto/app/app_update_version_dto.dart';
@@ -50,9 +51,19 @@ abstract interface class AppRepository {
 
   /// 获取应用详情（应用商店）
   Future<AppDetailDto> getAppDetail(String key);
+  Future<AppDetailSimpleDto> getNodeAppDetail({
+    required String appKey,
+    required String version,
+  });
 
   /// 获取应用安装配置。
   Future<AppInstallConfigDto> getAppInstallConfig(int appId, String version);
+
+  /// 获取运行时应用配置。
+  Future<AppInstallConfigDto> getAppRuntimeConfig(int appId, String version);
+
+  /// 获取应用服务列表（数据库连接等）。
+  Future<List<AppServiceDto>> getAppServices(String key);
 
   /// 安装应用。
   Future<void> installApp(AppInstallReq req);

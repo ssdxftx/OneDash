@@ -48,6 +48,13 @@ class ServerRepositoryImpl implements ServerRepository {
 
   @override
   Future<void> update(Server server, {String? apiKey}) async {
+    final existing = await _storage.getServer(server.id);
+    if (existing != null &&
+        (existing.host != server.host ||
+            existing.port != server.port ||
+            existing.isHttps != server.isHttps)) {
+      await _storage.clearPanelSession(server.id);
+    }
     await _storage.saveServer(server);
     if (apiKey != null) {
       await _storage.saveApiKey(server.id, apiKey);

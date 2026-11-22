@@ -381,6 +381,14 @@ class InstalledAppActions {
     );
   }
 
+  static dynamic _paramValue(AppInstalledFieldDto field, String? text) {
+    final value = text ?? '';
+    if (field.type.toLowerCase() == 'number') {
+      return num.tryParse(value) ?? value;
+    }
+    return value;
+  }
+
   static Future<void> editParams(
     BuildContext context,
     WidgetRef ref,
@@ -468,7 +476,8 @@ class InstalledAppActions {
       );
       final params = <String, dynamic>{
         for (final field in data.params)
-          if (field.edit) field.key: controllers[field.key]?.text.trim(),
+          if (field.edit)
+            field.key: _paramValue(field, controllers[field.key]?.text.trim()),
       };
       final request = AppInstalledParamsUpdateReq(
         installId: app.id,
@@ -732,7 +741,7 @@ class InstalledAppActions {
       }
       ref.invalidate(installedInfoProvider(app.id));
       ref.invalidate(ignoredAppsProvider);
-      ref.invalidate(installedIgnoredProvider(app.id));
+      ref.invalidate(installedIgnoredProvider(app.appDetailId));
       invalidateInstalledAppLists(ref);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);

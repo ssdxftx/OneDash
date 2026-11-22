@@ -37,20 +37,38 @@ class FirewallApi {
     List<String> actions = const [],
     bool refresh = false,
   }) async {
-    final response = await _client.post<Map<String, dynamic>>(
-      '/api/v2/hosts/firewall/rules/search',
-      data: {
-        'scopes': scopesFor(provider),
-        'page': page,
-        'pageSize': pageSize,
-        'info': info,
-        'families': families,
-        'actions': actions,
-        'excludeChains': const <String>[],
-        'refresh': refresh,
-      },
+    Future<FirewallInventory> loadPage(int targetPage, bool refreshPage) async {
+      final response = await _client.post<Map<String, dynamic>>(
+        '/api/v2/hosts/firewall/rules/search',
+        data: {
+          'scopes': scopesFor(provider),
+          'page': targetPage,
+          'pageSize': pageSize,
+          'info': info,
+          'families': families,
+          'actions': actions,
+          'excludeChains': const <String>[],
+          'refresh': refreshPage,
+        },
+      );
+      return ApiResponseParser.object(response, FirewallInventory.fromJson);
+    }
+
+    final first = await loadPage(page, refresh);
+    if (page != 1 || first.items.length >= first.total) return first;
+    final items = <FirewallRuleItem>[...first.items];
+    var nextPage = 2;
+    while (items.length < first.total && nextPage <= 50) {
+      final next = await loadPage(nextPage, false);
+      if (next.items.isEmpty) break;
+      items.addAll(next.items);
+      nextPage++;
+    }
+    return FirewallInventory(
+      total: first.total,
+      items: items,
+      notices: first.notices,
     );
-    return ApiResponseParser.object(response, FirewallInventory.fromJson);
   }
 
   Future<void> createRules(

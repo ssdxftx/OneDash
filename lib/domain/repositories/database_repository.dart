@@ -1,10 +1,12 @@
 import '../../data/dto/common/page_result.dart';
+import '../../data/dto/cronjob/cronjob_form_data_dto.dart';
 import '../../data/dto/database/database_instance_dto.dart';
 import '../../data/dto/database/slow_log_file_dto.dart';
 
 /// 数据库数据仓库接口。
 abstract interface class DatabaseRepository {
   Future<List<DatabaseInstanceDto>> listInstances(String types);
+  Future<List<DatabaseItemDto>> loadDatabaseItems(String dbType);
   Future<PageResult<DatabaseInstanceDto>> searchRemoteDatabases({
     required String type,
     int page,
@@ -64,6 +66,7 @@ abstract interface class DatabaseRepository {
   });
   Future<bool> checkRemoteConnection(Map<String, dynamic> body);
   Future<void> createRemoteDatabase(Map<String, dynamic> body);
+  Future<List<DBResourceDto>> checkRemoteDatabaseDelete(int id);
   Future<Map<String, dynamic>> getConnInfo({
     required String type,
     required String name,

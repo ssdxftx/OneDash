@@ -1097,12 +1097,34 @@ class _PanelSettingsBody extends ConsumerWidget {
     WidgetRef ref,
     AppLocalizations l10n,
   ) async {
-    final cert = TextEditingController();
-    final key = TextEditingController();
-    final domain = TextEditingController();
-    final sslId = TextEditingController();
-    String ssl = 'Enable';
-    String sslType = 'import-paste';
+    Map<String, dynamic> sslInfo = const {};
+    try {
+      final repository = await ref.read(settingRepositoryProvider.future);
+      sslInfo = await repository.loadSSLInfo();
+    } catch (_) {
+      // Existing certificate info may be unavailable before SSL is enabled.
+    }
+    if (!context.mounted) return;
+    final cert = TextEditingController(text: sslInfo['cert']?.toString() ?? '');
+    final key = TextEditingController(text: sslInfo['key']?.toString() ?? '');
+    final domain = TextEditingController(
+      text: sslInfo['domain']?.toString() ?? '',
+    );
+    final savedSslID =
+        (sslInfo['sslID'] as num?)?.toInt() ??
+        int.tryParse(data.value('sslID')) ??
+        0;
+    final sslId = TextEditingController(
+      text: savedSslID > 0 ? savedSslID.toString() : '',
+    );
+    final savedSsl = data.value('ssl', fallback: 'Disable');
+    String ssl = savedSsl == 'Enable' || savedSsl == 'Mux'
+        ? savedSsl
+        : 'Disable';
+    final savedSslType = data.value('sslType');
+    String sslType = savedSslType == 'select' || savedSslType == 'self'
+        ? savedSslType
+        : 'import-paste';
     final saved = await pushFormPage<bool>(
       context,
       StatefulBuilder(

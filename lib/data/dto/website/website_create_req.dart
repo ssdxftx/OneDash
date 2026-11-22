@@ -13,6 +13,7 @@ class WebsiteCreateReq {
     this.appType = 'installed',
     this.appInstallID = 0,
     this.runtimeID = 0,
+    this.templateOutputID = 0,
     this.parentWebsiteID = 0,
     this.siteDir = '',
     this.taskID = '',
@@ -48,6 +49,7 @@ class WebsiteCreateReq {
   final String appType;
   final int appInstallID;
   final int runtimeID;
+  final int templateOutputID;
   final int parentWebsiteID;
   final String siteDir;
   final String taskID;
@@ -99,6 +101,7 @@ class WebsiteCreateReq {
       'proxyAddress': '',
       'runtimeType': 'php',
       'runtimeID': runtimeID,
+      'templateOutputID': templateOutputID,
       'parentWebsiteID': parentWebsiteID,
       'taskID': taskID,
       'createDb': createDb,

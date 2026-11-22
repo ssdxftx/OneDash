@@ -344,6 +344,15 @@ class WebsiteSslManagePage extends ConsumerWidget {
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
       final accounts = await repository.searchAcmeAccounts();
+      var dnsAccounts = const <DnsAccountDto>[];
+      try {
+        dnsAccounts = (await repository.searchDnsAccounts({
+          'page': 1,
+          'pageSize': 100,
+        })).items;
+      } catch (_) {
+        dnsAccounts = const [];
+      }
       if (!context.mounted) return;
       if (accounts.isEmpty) {
         AppToast.warning(context, l10n.websites_noAcmeAccount);
@@ -353,6 +362,8 @@ class WebsiteSslManagePage extends ConsumerWidget {
       final description = TextEditingController();
       int accountId = accounts.first.id;
       bool autoRenew = true;
+      bool useDns = domain.contains('*') && dnsAccounts.isNotEmpty;
+      int? dnsAccountId = dnsAccounts.isEmpty ? null : dnsAccounts.first.id;
       final saved = await pushFormPage<bool>(
         context,
         StatefulBuilder(
@@ -383,6 +394,30 @@ class WebsiteSslManagePage extends ConsumerWidget {
                 },
               ),
               const SizedBox(height: AppTokens.s12),
+              if (dnsAccounts.isNotEmpty) ...[
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.websites_dnsValidation),
+                  value: useDns,
+                  onChanged: (value) => setState(() => useDns = value),
+                ),
+                if (useDns)
+                  DropdownButtonFormField<int>(
+                    initialValue: dnsAccountId,
+                    decoration: InputDecoration(
+                      labelText: l10n.websites_dnsType,
+                    ),
+                    items: [
+                      for (final account in dnsAccounts)
+                        DropdownMenuItem(
+                          value: account.id,
+                          child: Text(account.name),
+                        ),
+                    ],
+                    onChanged: (value) => setState(() => dnsAccountId = value),
+                  ),
+                const SizedBox(height: AppTokens.s12),
+              ],
               AppTextField(
                 controller: description,
                 label: l10n.websites_remark,
@@ -405,14 +440,14 @@ class WebsiteSslManagePage extends ConsumerWidget {
       final created = SslCreateReq(
         primaryDomain: target,
         otherDomains: '',
-        provider: 'http',
+        provider: useDns ? 'dnsAccount' : 'http',
         keyType: 'EC256',
         description: note,
         dir: '',
         shell: '',
         nodes: '',
         acmeAccountId: accountId,
-        dnsAccountId: 0,
+        dnsAccountId: useDns ? (dnsAccountId ?? 0) : 0,
         autoRenew: autoRenew,
         pushDir: false,
         execShell: false,

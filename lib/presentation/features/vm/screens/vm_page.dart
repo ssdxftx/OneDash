@@ -153,11 +153,13 @@ class VmPage extends ConsumerWidget {
     List<Map<String, dynamic>> networks = const [];
     List<Map<String, dynamic>> templates = const [];
     List<Map<String, dynamic>> storages = const [];
+    List<Map<String, dynamic>> isos = const [];
     try {
       final repository = await ref.read(vmRepositoryProvider.future);
       networks = await repository.listNetworks();
       templates = await repository.listTemplates();
       storages = await repository.listStorages();
+      isos = await repository.listIsos();
     } catch (_) {
       networks = const [];
     }
@@ -174,6 +176,9 @@ class VmPage extends ConsumerWidget {
         .map((item) => '${item['name'] ?? ''}')
         .where((name) => name.isNotEmpty)
         .toList(growable: false);
+    final isoItems = isos
+        .where((item) => '${item['path'] ?? ''}'.isNotEmpty)
+        .toList(growable: false);
     final name = TextEditingController();
     final cpu = TextEditingController(text: '2');
     final memory = TextEditingController(text: '2048');
@@ -182,6 +187,9 @@ class VmPage extends ConsumerWidget {
     var network = names.isEmpty ? '' : names.first;
     var storagePool = storageNames.isEmpty ? '' : storageNames.first;
     var template = '';
+    var isoPath = templateNames.isEmpty && isoItems.isNotEmpty
+        ? '${isoItems.first['path'] ?? ''}'
+        : '';
     var osType = 'linux';
     var startAfter = true;
     final saved = await pushFormPage<bool>(
@@ -257,6 +265,23 @@ class VmPage extends ConsumerWidget {
                 },
               ),
             if (templateNames.isNotEmpty) const SizedBox(height: AppTokens.s12),
+            if (templateNames.isEmpty && isoItems.isNotEmpty)
+              DropdownButtonFormField<String>(
+                initialValue: isoPath.isEmpty ? null : isoPath,
+                decoration: InputDecoration(labelText: l10n.vm_isos),
+                items: [
+                  for (final item in isoItems)
+                    DropdownMenuItem(
+                      value: '${item['path'] ?? ''}',
+                      child: Text('${item['name'] ?? item['path'] ?? ''}'),
+                    ),
+                ],
+                onChanged: (value) {
+                  if (value != null) setState(() => isoPath = value);
+                },
+              ),
+            if (templateNames.isEmpty && isoItems.isNotEmpty)
+              const SizedBox(height: AppTokens.s12),
             DropdownButtonFormField<String>(
               initialValue: osType,
               decoration: InputDecoration(labelText: l10n.vm_osType),
@@ -304,6 +329,9 @@ class VmPage extends ConsumerWidget {
               .map((item) => (item['id'] as num?)?.toInt() ?? 0)
               .firstOrNull ??
           0,
+      'isoPaths': template.isNotEmpty || isoPath.isEmpty
+          ? const <String>[]
+          : [isoPath],
       'startAfterCreate': startAfter,
       'autoStart': false,
       'description': description.text.trim(),
@@ -314,6 +342,10 @@ class VmPage extends ConsumerWidget {
     disk.dispose();
     description.dispose();
     if (saved != true || !context.mounted || network.isEmpty) return;
+    if (template.isEmpty && isoPath.isEmpty) {
+      AppToast.warning(context, l10n.vm_isoRequired);
+      return;
+    }
     try {
       final repository = await ref.read(vmRepositoryProvider.future);
       await repository.createVm(body);
@@ -831,6 +863,7 @@ class _VmCard extends ConsumerWidget {
       'memory': int.tryParse(memory.text.trim()) ?? 0,
       'network': network,
       'bootOrder': '${detail['bootOrder'] ?? 'cdrom,hd'}',
+      'isoPaths': detail['isoPaths'] ?? detail['isos'] ?? const <String>[],
       'autoStart': autoStart,
       'description': description.text.trim(),
     };

@@ -189,11 +189,15 @@ class FileRepositoryImpl implements FileRepository {
     required String path,
     required String name,
     bool ignoreCertificate = false,
+    bool useProxy = false,
+    bool useServerFilename = false,
   }) => _fileApi.wget(
     url: url,
     path: path,
     name: name,
     ignoreCertificate: ignoreCertificate,
+    useProxy: useProxy,
+    useServerFilename: useServerFilename,
   );
 
   @override

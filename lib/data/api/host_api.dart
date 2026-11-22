@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/network/terminal_identity.dart';
 import '../dto/common/page_result.dart';
 import '../dto/host/disk_dto.dart';
 import '../dto/host/host_diagnostics_dto.dart';
@@ -106,6 +107,14 @@ class HostApi {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/hosts/ssh/log/clean',
       data: const {},
+    );
+  }
+
+  /// POST /api/v2/hosts/update/group — 调整远程主机分组。
+  Future<void> updateHostGroup({required int id, required int groupId}) async {
+    await _client.post<Map<String, dynamic>>(
+      '/api/v2/hosts/update/group',
+      data: {'id': id, 'groupID': groupId},
     );
   }
 
@@ -303,6 +312,9 @@ class HostApi {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/hosts/terminal/sessions/search',
       data: const {},
+      options: Options(
+        headers: TerminalIdentity.headers(apiKey: _client.apiKey),
+      ),
     );
     final data = resp.data?['data'];
     if (data is! List) return const [];
@@ -317,6 +329,9 @@ class HostApi {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/hosts/terminal/sessions/close',
       data: {'id': id},
+      options: Options(
+        headers: TerminalIdentity.headers(apiKey: _client.apiKey),
+      ),
     );
   }
 
@@ -325,6 +340,9 @@ class HostApi {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/hosts/terminal/sessions/closeAll',
       data: const {},
+      options: Options(
+        headers: TerminalIdentity.headers(apiKey: _client.apiKey),
+      ),
     );
   }
 

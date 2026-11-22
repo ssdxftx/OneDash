@@ -40,9 +40,11 @@ import 'installed_app_page.dart';
 import '../providers/app_store_provider.dart';
 import 'app_detail_page.dart';
 
-Future<bool> _isIgnored(WidgetRef ref, int installId) async {
+Future<bool> _isIgnored(WidgetRef ref, int appDetailId) async {
   try {
-    final ignored = await ref.read(installedIgnoredProvider(installId).future);
+    final ignored = await ref.read(
+      installedIgnoredProvider(appDetailId).future,
+    );
     return ignored != null;
   } catch (_) {
     return false;
@@ -71,10 +73,16 @@ Future<void> _syncInstalledApps(WidgetRef ref) async {
 }
 
 class AppStorePage extends ConsumerStatefulWidget {
-  const AppStorePage({super.key, required this.serverId, this.initialTab = 0});
+  const AppStorePage({
+    super.key,
+    required this.serverId,
+    this.initialTab = 0,
+    this.initialQuery = '',
+  });
 
   final int serverId;
   final int initialTab;
+  final String initialQuery;
 
   @override
   ConsumerState<AppStorePage> createState() => _AppStorePageState();
@@ -87,6 +95,15 @@ class _AppStorePageState extends ConsumerState<AppStorePage> {
   final _searchDebouncer = Debouncer();
   String _query = '';
   Timer? _statusTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialQuery.isNotEmpty) {
+      _searchController.text = widget.initialQuery;
+      _query = widget.initialQuery;
+    }
+  }
 
   void _syncStatusTimer(PageResult<AppInstalledDto>? data) {
     final busy =
@@ -544,7 +561,7 @@ class _InstalledTab extends ConsumerWidget {
     final colors = context.appColors;
     final running = app.status.toLowerCase() == 'running';
     final hasContainer = app.container.trim().isNotEmpty;
-    final ignoredFuture = _isIgnored(ref, app.id);
+    final ignoredFuture = _isIgnored(ref, app.appDetailId);
     final versionFuture = _newVersion(ref, app);
     await showAppSheet<void>(
       context: context,

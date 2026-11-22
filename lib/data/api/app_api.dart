@@ -150,6 +150,18 @@ class AppApi {
     return ApiResponseParser.object(resp, AppDetailDto.fromJson);
   }
 
+  /// GET /api/v2/apps/detail/node/{appKey}/{version}
+  Future<AppDetailSimpleDto> getNodeAppDetail({
+    required String appKey,
+    required String version,
+  }) async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/apps/detail/node/'
+      '${Uri.encodeComponent(appKey)}/${Uri.encodeComponent(version)}',
+    );
+    return ApiResponseParser.object(resp, AppDetailSimpleDto.fromJson);
+  }
+
   Future<PageResult<AppInstalledDto>> searchInstalledApps(
     AppInstalledSearchReq req,
   ) async {

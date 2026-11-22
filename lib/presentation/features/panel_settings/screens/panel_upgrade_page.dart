@@ -227,13 +227,18 @@ class _PanelUpgradePageState extends ConsumerState<PanelUpgradePage> {
                           Text(
                             [
                               l10n.panelSettings_newCount(
-                                '${release['newCount'] ?? 0}',
+                                int.tryParse('${release['newCount'] ?? 0}') ??
+                                    0,
                               ),
                               l10n.panelSettings_fixCount(
-                                '${release['fixCount'] ?? 0}',
+                                int.tryParse('${release['fixCount'] ?? 0}') ??
+                                    0,
                               ),
                               l10n.panelSettings_optimizationCount(
-                                '${release['optimizationCount'] ?? 0}',
+                                int.tryParse(
+                                      '${release['optimizationCount'] ?? 0}',
+                                    ) ??
+                                    0,
                               ),
                             ].join(' · '),
                             style: AppTextStyles.bodyS.copyWith(

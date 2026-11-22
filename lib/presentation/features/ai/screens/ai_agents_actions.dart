@@ -870,6 +870,7 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
         SelectionOption(value: 'wecom', label: l10n.alert_method_wecom),
         SelectionOption(value: 'dingtalk', label: l10n.alert_method_dingtalk),
         SelectionOption(value: 'qqbot', label: l10n.ai_channel_qqBot),
+        SelectionOption(value: 'weixin', label: l10n.ai_channel_weixin),
       ],
     );
     if (channel == null || !mounted) return;
@@ -1008,10 +1009,19 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
                 decoration: InputDecoration(
                   labelText: l10n.ai_agent_require_mention,
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'true', child: Text('true')),
-                  DropdownMenuItem(value: 'false', child: Text('false')),
-                  DropdownMenuItem(value: 'open', child: Text('open')),
+                items: [
+                  DropdownMenuItem(
+                    value: 'true',
+                    child: Text(l10n.ai_agent_mention_required),
+                  ),
+                  DropdownMenuItem(
+                    value: 'false',
+                    child: Text(l10n.ai_agent_mention_notRequired),
+                  ),
+                  DropdownMenuItem(
+                    value: 'open',
+                    child: Text(l10n.ai_agent_policy_open),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) setState(() => requireMention = value);
@@ -1023,13 +1033,19 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
                 decoration: InputDecoration(
                   labelText: l10n.ai_agent_group_policy,
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'open', child: Text('open')),
+                items: [
+                  DropdownMenuItem(
+                    value: 'open',
+                    child: Text(l10n.ai_agent_policy_open),
+                  ),
                   DropdownMenuItem(
                     value: 'allowlist',
-                    child: Text('allowlist'),
+                    child: Text(l10n.ai_agent_policy_allowlist),
                   ),
-                  DropdownMenuItem(value: 'disabled', child: Text('disabled')),
+                  DropdownMenuItem(
+                    value: 'disabled',
+                    child: Text(l10n.ai_agent_policy_disabled),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) setState(() => groupPolicy = value);
@@ -1069,12 +1085,15 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
                 decoration: InputDecoration(
                   labelText: l10n.ai_agent_connection_mode,
                 ),
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: 'websocket',
-                    child: Text('websocket'),
+                    child: Text(l10n.ai_agent_connection_websocket),
                   ),
-                  DropdownMenuItem(value: 'webhook', child: Text('webhook')),
+                  DropdownMenuItem(
+                    value: 'webhook',
+                    child: Text(l10n.ai_agent_connection_webhook),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) setState(() => connectionMode = value);

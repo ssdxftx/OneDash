@@ -1209,6 +1209,7 @@ class _WebsitesPageState extends ConsumerState<WebsitesPage>
       final repository = await ref.read(websiteRepositoryProvider.future);
       await repository.deleteWebsite(
         site.id,
+        deleteApp: options.deleteApp,
         deleteBackup: options.deleteBackup,
         forceDelete: options.forceDelete,
         deleteDB: options.deleteDB,
@@ -1233,11 +1234,13 @@ class WebsiteDeleteOptions {
     required this.deleteDB,
     required this.deleteBackup,
     required this.forceDelete,
+    this.deleteApp = false,
   });
 
   final bool deleteDB;
   final bool deleteBackup;
   final bool forceDelete;
+  final bool deleteApp;
 }
 
 class WebsiteDeleteSheet extends StatefulWidget {
@@ -1253,6 +1256,7 @@ class WebsiteDeleteSheetState extends State<WebsiteDeleteSheet> {
   bool _deleteDB = false;
   bool _deleteBackup = false;
   bool _forceDelete = false;
+  bool _deleteApp = false;
 
   @override
   Widget build(BuildContext context) {
@@ -1289,6 +1293,14 @@ class WebsiteDeleteSheetState extends State<WebsiteDeleteSheet> {
                       : l10n.websites_deleteDatabaseCount(0),
                 ),
               ),
+              if (widget.site.type == 'deployment')
+                CheckboxListTile(
+                  value: _deleteApp,
+                  onChanged: (value) =>
+                      setState(() => _deleteApp = value ?? false),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(l10n.websites_deleteApp),
+                ),
               CheckboxListTile(
                 value: _deleteBackup,
                 onChanged: (value) =>
@@ -1324,6 +1336,7 @@ class WebsiteDeleteSheetState extends State<WebsiteDeleteSheet> {
                     deleteDB: _deleteDB,
                     deleteBackup: _deleteBackup,
                     forceDelete: _forceDelete,
+                    deleteApp: _deleteApp,
                   ),
                 ),
               ),

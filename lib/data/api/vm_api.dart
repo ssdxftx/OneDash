@@ -64,7 +64,10 @@ class VmApi {
       '/api/v2/vms',
       data: body,
     );
-    await _awaitTask(ApiResponseParser.map(resp));
+    await _awaitTask(
+      ApiResponseParser.map(resp),
+      taskID: '${body['taskID'] ?? ''}',
+    );
   }
 
   Future<void> updateVm(Map<String, dynamic> body) async {
@@ -72,7 +75,10 @@ class VmApi {
       '/api/v2/vms/update',
       data: body,
     );
-    await _awaitTask(ApiResponseParser.map(resp));
+    await _awaitTask(
+      ApiResponseParser.map(resp),
+      taskID: '${body['taskID'] ?? ''}',
+    );
   }
 
   Future<void> renameVm({
@@ -84,7 +90,7 @@ class VmApi {
       '/api/v2/vms/rename',
       data: {'name': name, 'newName': newName, 'taskID': taskID},
     );
-    await _awaitTask(ApiResponseParser.map(resp));
+    await _awaitTask(ApiResponseParser.map(resp), taskID: taskID);
   }
 
   Future<void> deleteVm({
@@ -96,7 +102,7 @@ class VmApi {
       '/api/v2/vms/del',
       data: {'id': id, 'force': force, 'taskID': taskID},
     );
-    await _awaitTask(ApiResponseParser.map(resp));
+    await _awaitTask(ApiResponseParser.map(resp), taskID: taskID);
   }
 
   Future<void> operateVm(String name, String operate) async {
@@ -129,7 +135,7 @@ class VmApi {
         'taskID': taskID,
       },
     );
-    await _awaitTask(ApiResponseParser.map(resp));
+    await _awaitTask(ApiResponseParser.map(resp), taskID: taskID);
   }
 
   Future<void> recoverSnapshot({
@@ -137,10 +143,11 @@ class VmApi {
     required String snapshotName,
     required String taskID,
   }) async {
-    await _client.post<Map<String, dynamic>>(
+    final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/vms/snapshots/recover',
       data: {'name': name, 'snapshotName': snapshotName, 'taskID': taskID},
     );
+    await _awaitTask(ApiResponseParser.map(resp), taskID: taskID);
   }
 
   Future<void> deleteSnapshot({
@@ -148,10 +155,11 @@ class VmApi {
     required String snapshotName,
     required String taskID,
   }) async {
-    await _client.post<Map<String, dynamic>>(
+    final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/vms/snapshots/del',
       data: {'name': name, 'snapshotName': snapshotName, 'taskID': taskID},
     );
+    await _awaitTask(ApiResponseParser.map(resp), taskID: taskID);
   }
 
   Future<List<Map<String, dynamic>>> listIsos() async {
@@ -234,7 +242,9 @@ class VmApi {
         'taskID': taskID,
       },
     );
-    return ApiResponseParser.map(resp);
+    final data = ApiResponseParser.map(resp);
+    await _awaitTask(data, taskID: taskID);
+    return data;
   }
 
   Future<Map<String, dynamic>> healthCheck(String name) async {
@@ -351,10 +361,17 @@ class VmApi {
     return ApiResponseParser.list(resp, _mapOf);
   }
 
-  Future<void> _awaitTask(Map<String, dynamic> resp) async {
-    final taskID = '${resp['taskID'] ?? ''}';
-    if (taskID.isEmpty) return;
-    await TaskWaiter(_client).waitFor(taskID);
+  Future<void> _awaitTask(
+    Map<String, dynamic> resp, {
+    String taskID = '',
+  }) async {
+    final resolved = taskID.isNotEmpty ? taskID : '${resp['taskID'] ?? ''}';
+    if (resolved.isEmpty) return;
+    await TaskWaiter(
+      _client,
+      interval: const Duration(seconds: 2),
+      maxAttempts: 900,
+    ).waitFor(resolved, subject: 'VM task');
   }
 
   static Map<String, dynamic> _mapOf(Map<dynamic, dynamic> value) =>

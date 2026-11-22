@@ -1180,6 +1180,9 @@ class _SecurityTab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final extensions = TextEditingController(text: current.extensions);
     final returnCode = TextEditingController(text: current.returnCode);
+    final serverNames = TextEditingController(
+      text: current.serverNames.join(', '),
+    );
     bool enable = current.enable;
     bool blocked = current.blocked;
     bool logEnable = current.logEnable;
@@ -1200,11 +1203,15 @@ class _SecurityTab extends ConsumerWidget {
                 cacheUint: current.cacheUint,
                 extensions: extensions.text.trim(),
                 returnCode: returnCode.text.trim(),
-                domains: current.serverNames.join(','),
+                domains: serverNames.text.trim(),
                 noneRef: current.noneRef,
                 logEnable: logEnable,
                 blocked: blocked,
-                serverNames: current.serverNames,
+                serverNames: serverNames.text
+                    .split(RegExp(r'[,\n]'))
+                    .map((item) => item.trim())
+                    .where((item) => item.isNotEmpty)
+                    .toList(growable: false),
               ),
             ),
             children: [
@@ -1225,6 +1232,12 @@ class _SecurityTab extends ConsumerWidget {
                 label: l10n.websites_returnCode,
                 hint: '404',
               ),
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: serverNames,
+                label: l10n.websites_domains,
+                hint: l10n.websites_domainsHint,
+              ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.websites_blocked),
@@ -1244,6 +1257,7 @@ class _SecurityTab extends ConsumerWidget {
     );
     extensions.dispose();
     returnCode.dispose();
+    serverNames.dispose();
     if (request == null || !context.mounted) return;
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);

@@ -1766,6 +1766,12 @@ abstract class AppLocalizations {
   /// **'HTTPS'**
   String get server_edit_https;
 
+  /// Warning shown when HTTPS is disabled for a server.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTP sends credentials without encryption. Enable HTTPS on the panel when possible.'**
+  String get server_edit_httpWarning;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:
@@ -2917,6 +2923,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Detail name'**
   String get backups_detailName;
+
+  /// Validation when the backup detail name is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a detail name'**
+  String get backups_detailRequired;
 
   /// Restore form hint.
   ///
@@ -5089,6 +5101,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Permission updated'**
   String get files_permissionUpdated;
+
+  /// Validation for an invalid file permission mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a mode from 0000 to 0777'**
+  String get files_permissionInvalidMode;
 
   /// Selection mode title.
   ///
@@ -13022,6 +13040,30 @@ abstract class AppLocalizations {
   /// **'Connection mode'**
   String get ai_agent_connection_mode;
 
+  /// Mention requirement option.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get ai_agent_mention_required;
+
+  /// Mention requirement option.
+  ///
+  /// In en, this message translates to:
+  /// **'Not required'**
+  String get ai_agent_mention_notRequired;
+
+  /// Connection mode option.
+  ///
+  /// In en, this message translates to:
+  /// **'WebSocket'**
+  String get ai_agent_connection_websocket;
+
+  /// Connection mode option.
+  ///
+  /// In en, this message translates to:
+  /// **'Webhook'**
+  String get ai_agent_connection_webhook;
+
   /// Bots
   ///
   /// In en, this message translates to:
@@ -13170,7 +13212,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Relative to {path}'**
-  String websites_relativeDir(Object path);
+  String websites_relativeDir(String path);
 
   /// OneDash UI text.
   ///
@@ -13356,7 +13398,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Run \"{action}\" on OpenResty?'**
-  String websites_openRestyServiceConfirm(Object action);
+  String websites_openRestyServiceConfirm(String action);
 
   /// OneDash UI text.
   ///
@@ -15300,7 +15342,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Delete module {name}?'**
-  String websites_openRestyModuleDeleteConfirm(Object name);
+  String websites_openRestyModuleDeleteConfirm(String name);
 
   /// OneDash UI text.
   ///
@@ -15600,13 +15642,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Upgrade to {version}'**
-  String panelSettings_upgradeTo(Object version);
+  String panelSettings_upgradeTo(String version);
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'The panel will upgrade to {version}. Services restart briefly.'**
-  String panelSettings_upgradeConfirm(Object version);
+  String panelSettings_upgradeConfirm(String version);
 
   /// OneDash UI text.
   ///
@@ -15636,19 +15678,19 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} new'**
-  String panelSettings_newCount(Object count);
+  String panelSettings_newCount(int count);
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'{count} fixes'**
-  String panelSettings_fixCount(Object count);
+  String panelSettings_fixCount(int count);
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'{count} optimizations'**
-  String panelSettings_optimizationCount(Object count);
+  String panelSettings_optimizationCount(int count);
 
   /// OneDash UI text.
   ///
@@ -15744,19 +15786,19 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Force stop {name}? Data loss is possible.'**
-  String vm_forceStopConfirm(Object name);
+  String vm_forceStopConfirm(String name);
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'Restore snapshot {name}? The current state will be replaced.'**
-  String vm_snapshotRecoverConfirm(Object name);
+  String vm_snapshotRecoverConfirm(String name);
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'Delete snapshot {name}?'**
-  String vm_snapshotDeleteConfirm(Object name);
+  String vm_snapshotDeleteConfirm(String name);
 
   /// OneDash UI text.
   ///
@@ -16812,7 +16854,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Progress: {percent}%'**
-  String files_wgetProgress(Object percent);
+  String files_wgetProgress(String percent);
 
   /// OneDash UI text.
   ///
@@ -16890,7 +16932,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Delete extension preset \"{name}\"?'**
-  String runtime_presetDeleteConfirm(Object name);
+  String runtime_presetDeleteConfirm(String name);
 
   /// OneDash UI text.
   ///
@@ -17677,6 +17719,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Requires the bound panel domain over HTTPS and Android assetlinks.json on that domain'**
   String get panelSettings_passkeyPrereq;
+
+  /// Delete the application linked to a deployment site.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete associated app'**
+  String get websites_deleteApp;
+
+  /// Use a configured DNS account for certificate validation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use DNS validation'**
+  String get websites_dnsValidation;
+
+  /// Route the remote download through the panel proxy.
+  ///
+  /// In en, this message translates to:
+  /// **'Use server proxy'**
+  String get files_useProxy;
+
+  /// Keep the filename provided by the remote server.
+  ///
+  /// In en, this message translates to:
+  /// **'Use server filename'**
+  String get files_useServerFilename;
+
+  /// A new VM needs either a template or an ISO image.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a template or ISO image'**
+  String get vm_isoRequired;
+
+  /// Details returned by the model load operation.
+  ///
+  /// In en, this message translates to:
+  /// **'Model details'**
+  String get ai_model_details;
+
+  /// The panel does not return stored API keys, so editing requires the key again.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter the API key to save changes'**
+  String get ai_account_api_key_required;
+
+  /// Comma-separated model IDs for custom providers.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial models'**
+  String get ai_account_initial_models;
+
+  /// Hide the discovery action when the provider disables model discovery.
+  ///
+  /// In en, this message translates to:
+  /// **'Model discovery is not supported for this provider'**
+  String get ai_account_discover_unsupported;
+
+  /// MySQL cluster database type label.
+  ///
+  /// In en, this message translates to:
+  /// **'MySQL Cluster'**
+  String get databases_typeMysqlCluster;
+
+  /// PostgreSQL cluster database type label.
+  ///
+  /// In en, this message translates to:
+  /// **'PostgreSQL Cluster'**
+  String get databases_typePostgresqlCluster;
+
+  /// Redis cluster database type label.
+  ///
+  /// In en, this message translates to:
+  /// **'Redis Cluster'**
+  String get databases_typeRedisCluster;
+
+  /// Port used by the runtime application behind the site.
+  ///
+  /// In en, this message translates to:
+  /// **'Backend port'**
+  String get websites_runtimePort;
+
+  /// Application selected for the runtime.
+  ///
+  /// In en, this message translates to:
+  /// **'Application'**
+  String get runtime_app;
+
+  /// Registry or mirror used to install the runtime.
+  ///
+  /// In en, this message translates to:
+  /// **'Image source'**
+  String get runtime_source;
+
+  /// Install runtime dependencies during creation.
+  ///
+  /// In en, this message translates to:
+  /// **'Install dependencies'**
+  String get runtime_installDependencies;
+
+  /// Services and connection targets provided by the installed app.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get apps_services;
+
+  /// Number of background tasks currently executing.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} tasks running'**
+  String logs_taskExecuting(int count);
+
+  /// File share expiration of one hour.
+  ///
+  /// In en, this message translates to:
+  /// **'1 hour'**
+  String get files_shareExpireOneHour;
+
+  /// File share expiration of one day.
+  ///
+  /// In en, this message translates to:
+  /// **'1 day'**
+  String get files_shareExpireOneDay;
+
+  /// File share expiration of seven days.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days'**
+  String get files_shareExpireSevenDays;
+
+  /// File share password length policy.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be 4-256 characters.'**
+  String get files_sharePasswordPolicy;
+
+  /// Password helper for file shares.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Leave blank for no password.'**
+  String get files_sharePasswordOptional;
 }
 
 class _AppLocalizationsDelegate

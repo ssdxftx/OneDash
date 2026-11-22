@@ -268,6 +268,7 @@ class _WebsiteLoadBalanceTabState extends ConsumerState<WebsiteLoadBalanceTab> {
                     DropdownMenuItem(value: 'm', child: Text('m')),
                     DropdownMenuItem(value: 'h', child: Text('h')),
                     DropdownMenuItem(value: 'd', child: Text('d')),
+                    DropdownMenuItem(value: 'w', child: Text('w')),
                   ],
                   onChanged: (value) {
                     if (value != null) draft.failTimeoutUnit = value;

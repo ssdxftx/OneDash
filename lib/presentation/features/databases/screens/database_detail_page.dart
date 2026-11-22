@@ -402,7 +402,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
       final repository = await ref.read(databaseRepositoryProvider.future);
       final status = await repository.getStatus(
         type: widget.type,
-        name: state.item.name,
+        name: widget.instance,
       );
       if (!mounted) return;
       await showAppSheet<void>(
@@ -542,6 +542,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
         );
       }
       if (!mounted) return;
+      ref.invalidate(databaseRepositoryProvider);
       AppToast.success(context, l10n.action_done);
       Navigator.of(context).pop();
     } catch (error) {

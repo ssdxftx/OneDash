@@ -209,7 +209,7 @@ class VncClient {
     );
     final codec = await descriptor.instantiateCodec();
     final frame = await codec.getNextFrame();
-    if (_closed) {
+    if (_closed || !_frames.hasListener) {
       frame.image.dispose();
     } else {
       _frames.add(VncFrame(frame.image, _width, _height));

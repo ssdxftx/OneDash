@@ -427,6 +427,12 @@ class SnapshotPage extends ConsumerWidget {
     if (saved != true || !context.mounted || snapshotName.isEmpty) return;
     try {
       final repository = await ref.read(settingRepositoryProvider.future);
+      var snapshotData = const <String, dynamic>{};
+      try {
+        snapshotData = await repository.loadSnapshotData();
+      } catch (_) {
+        snapshotData = const <String, dynamic>{};
+      }
       await repository.createSnapshot({
         'name': snapshotName,
         'taskID': const Uuid().v4(),
@@ -434,6 +440,9 @@ class SnapshotPage extends ConsumerWidget {
         'downloadAccountID': accountId,
         'description': note,
         'secret': '',
+        'appData': snapshotData['appData'] ?? const [],
+        'backupData': snapshotData['backupData'] ?? const [],
+        'panelData': snapshotData['panelData'] ?? const [],
         ...options,
       });
       ref.invalidate(_snapshotsProvider);

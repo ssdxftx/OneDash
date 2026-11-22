@@ -692,11 +692,17 @@ class _FilesPageState extends ConsumerState<FilesPage> {
 
   Future<void> _share(FileItemDto item) async {
     final l10n = AppLocalizations.of(context);
+    final options = await showAppSheet<_ShareOptions>(
+      context: context,
+      builder: (_) => _ShareCreateSheet(fileName: item.name),
+    );
+    if (options == null || !mounted) return;
     try {
       final repository = await ref.read(fileRepositoryProvider.future);
       final share = await repository.createFileShare(
         path: item.path,
-        expireMinutes: 60,
+        expireMinutes: options.expireMinutes,
+        password: options.password,
       );
       if (!mounted) return;
       await Clipboard.setData(ClipboardData(text: share.code));
@@ -1385,9 +1391,9 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                     ),
                     itemExtent:
                         72 *
-                        MediaQuery.textScalerOf(
-                          context,
-                        ).scale(1).clamp(1.0, 1.8),
+                        MediaQuery.textScalerOf(context)
+                            .scale(1)
+                            .clamp(1.0, 1.8),
                     itemCount: state.items.length,
                     itemBuilder: (context, index) {
                       final item = state.items[index];
@@ -1559,9 +1565,8 @@ class _MoveSheetState extends State<_MoveSheet> {
       onSave: () async {
         final target = _target.text.trim();
         if (target.isEmpty) return;
-        Navigator.of(
-          context,
-        ).pop(_MoveRequest(target: target, copy: _copy, cover: _cover));
+        Navigator.of(context)
+            .pop(_MoveRequest(target: target, copy: _copy, cover: _cover));
       },
       children: [
         AppTextField(
@@ -1979,6 +1984,12 @@ class _UploadSheetState extends ConsumerState<_UploadSheet> {
     unawaited(_start());
   }
 
+  @override
+  void dispose() {
+    _cancelToken?.cancel();
+    super.dispose();
+  }
+
   Future<void> _start() async {
     final token = CancelToken();
     _cancelToken = token;
@@ -2103,6 +2114,122 @@ class _UploadSheetState extends ConsumerState<_UploadSheet> {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _ShareOptions {
+  const _ShareOptions({required this.expireMinutes, required this.password});
+
+  final int expireMinutes;
+  final String password;
+}
+
+class _ShareCreateSheet extends StatefulWidget {
+  const _ShareCreateSheet({required this.fileName});
+
+  final String fileName;
+
+  @override
+  State<_ShareCreateSheet> createState() => _ShareCreateSheetState();
+}
+
+class _ShareCreateSheetState extends State<_ShareCreateSheet> {
+  final TextEditingController _password = TextEditingController();
+  int _expireMinutes = 60;
+
+  @override
+  void dispose() {
+    _password.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.files_share, style: AppTextStyles.titleL),
+          const SizedBox(height: AppTokens.s4),
+          Text(
+            widget.fileName,
+            style: AppTextStyles.bodyS.copyWith(
+              color: context.scheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AppTokens.s16),
+          DropdownButtonFormField<int>(
+            initialValue: _expireMinutes,
+            decoration: InputDecoration(labelText: l10n.files_shareExpire),
+            items: [
+              DropdownMenuItem(
+                value: 60,
+                child: Text(l10n.files_shareExpireOneHour),
+              ),
+              DropdownMenuItem(
+                value: 1440,
+                child: Text(l10n.files_shareExpireOneDay),
+              ),
+              DropdownMenuItem(
+                value: 10080,
+                child: Text(l10n.files_shareExpireSevenDays),
+              ),
+              DropdownMenuItem(
+                value: 0,
+                child: Text(l10n.files_permanentShare),
+              ),
+            ],
+            onChanged: (value) {
+              if (value != null) setState(() => _expireMinutes = value);
+            },
+          ),
+          const SizedBox(height: AppTokens.s12),
+          AppTextField(
+            controller: _password,
+            label: l10n.files_sharePassword,
+            obscure: true,
+            helper: l10n.files_sharePasswordOptional,
+          ),
+          const SizedBox(height: AppTokens.s20),
+          Row(
+            children: [
+              Expanded(
+                child: SecondaryButton(
+                  label: l10n.action_cancel,
+                  expanded: true,
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+              const SizedBox(width: AppTokens.s12),
+              Expanded(
+                child: PrimaryButton(
+                  label: l10n.action_confirm,
+                  expanded: true,
+                  onPressed: () {
+                    final password = _password.text.trim();
+                    if (password.isNotEmpty &&
+                        (password.runes.length < 4 ||
+                            password.runes.length > 256)) {
+                      AppToast.warning(context, l10n.files_sharePasswordPolicy);
+                      return;
+                    }
+                    Navigator.of(context).pop(
+                      _ShareOptions(
+                        expireMinutes: _expireMinutes,
+                        password: password,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

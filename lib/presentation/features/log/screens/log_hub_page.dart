@@ -54,6 +54,7 @@ class LogHubPage extends ConsumerWidget {
                   ref.invalidate(loginLogsProvider);
                   ref.invalidate(sshLogsProvider);
                   ref.invalidate(taskLogsProvider);
+                  ref.invalidate(executingTaskCountProvider);
                 },
               ),
               AppBarAction(
@@ -473,30 +474,59 @@ class _TaskLogTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final logs = ref.watch(taskLogsProvider);
-    return AsyncStateView(
-      value: logs,
-      onRetry: () => ref.invalidate(taskLogsProvider),
-      loading: const LogRowSkeletonList(style: LogSkeletonStyle.task),
-      isEmpty: (items) => items.isEmpty,
-      empty: _emptyState(context),
-      builder: (items) => ListView.builder(
-        padding: EdgeInsets.all(context.pagePadding),
-        itemCount: items.length,
-        itemBuilder: (context, i) => TaskLogRow(
-          item: items[i],
-          onTap: () => showTaskLogSheet(
-            context,
-            title: items[i].name,
-            taskID: items[i].id,
-            reader: (taskID) async {
-              final repository = await ref.read(logRepositoryProvider.future);
-              return repository.readTaskLog(taskID);
+    final executing = ref.watch(executingTaskCountProvider).valueOrNull ?? 0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (executing > 0)
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              context.pagePadding,
+              AppTokens.s8,
+              context.pagePadding,
+              0,
+            ),
+            child: Text(
+              l10n.logs_taskExecuting(executing),
+              style: AppTextStyles.bodyS.copyWith(
+                color: context.scheme.primary,
+              ),
+            ),
+          ),
+        Expanded(
+          child: AsyncStateView(
+            value: logs,
+            onRetry: () {
+              ref.invalidate(taskLogsProvider);
+              ref.invalidate(executingTaskCountProvider);
             },
-            onFinished: () => ref.invalidate(taskLogsProvider),
+            loading: const LogRowSkeletonList(style: LogSkeletonStyle.task),
+            isEmpty: (items) => items.isEmpty,
+            empty: _emptyState(context),
+            builder: (items) => ListView.builder(
+              padding: EdgeInsets.all(context.pagePadding),
+              itemCount: items.length,
+              itemBuilder: (context, i) => TaskLogRow(
+                item: items[i],
+                onTap: () => showTaskLogSheet(
+                  context,
+                  title: items[i].name,
+                  taskID: items[i].id,
+                  reader: (taskID) async {
+                    final repository = await ref.read(
+                      logRepositoryProvider.future,
+                    );
+                    return repository.readTaskLog(taskID);
+                  },
+                  onFinished: () => ref.invalidate(taskLogsProvider),
+                ),
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

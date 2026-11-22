@@ -8,6 +8,7 @@ import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../common/components/app_bar_actions.dart';
+import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/back_to_servers_button.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
@@ -27,6 +28,18 @@ import '../../app_store/widgets/installed_app_card.dart';
 import '../../servers/providers/servers_provider.dart';
 import '../providers/overview_provider.dart';
 import '../widgets/dashboard_cards.dart';
+
+final _quickDirectoriesProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+      final repository = await ref.watch(dashboardRepositoryProvider.future);
+      return repository.getQuickDirectories();
+    }, name: 'dashboardQuickDirectoriesProvider');
+
+final _quickJumpsProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+      final repository = await ref.watch(dashboardRepositoryProvider.future);
+      return repository.getQuickOptions();
+    }, name: 'dashboardQuickJumpsProvider');
 
 class OverviewPage extends ConsumerStatefulWidget {
   const OverviewPage({super.key, required this.serverId});
@@ -125,9 +138,8 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                           if (next == null || !mounted) return;
                           ref
                                   .read(
-                                    overviewSelectionProvider(
-                                      widget.serverId,
-                                    ).notifier,
+                                    overviewSelectionProvider(widget.serverId)
+                                        .notifier,
                                   )
                                   .state =
                               next;
@@ -477,6 +489,8 @@ class _DashboardExtrasSection extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: AppTokens.s12),
+          _QuickAccessSection(serverId: serverId),
+          const SizedBox(height: AppTokens.s12),
           SectionHeader(
             title: l10n.dashboard_launcher,
             trailing: TextButton(
@@ -757,6 +771,441 @@ class _ProcessRankRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _QuickAccessSection extends ConsumerWidget {
+  const _QuickAccessSection({required this.serverId});
+
+  final int serverId;
+
+  Future<List<String>?> _directoryDraft(
+    BuildContext context, {
+    String initialPath = '',
+    String initialAlias = '',
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final path = TextEditingController(text: initialPath);
+    final alias = TextEditingController(text: initialAlias);
+    final result = await showAppSheet<List<String>>(
+      context: context,
+      builder: (sheetContext) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              initialPath.isEmpty
+                  ? l10n.dashboard_addQuickDirectory
+                  : l10n.dashboard_editQuickDirectory,
+              style: AppTextStyles.titleL,
+            ),
+            const SizedBox(height: AppTokens.s16),
+            AppTextField(
+              controller: path,
+              label: l10n.dashboard_quickDirectoryPath,
+              hint: '/opt/data',
+              autofocus: true,
+            ),
+            const SizedBox(height: AppTokens.s12),
+            AppTextField(
+              controller: alias,
+              label: l10n.dashboard_quickDirectoryAlias,
+              hint: 'data',
+            ),
+            const SizedBox(height: AppTokens.s20),
+            Row(
+              children: [
+                Expanded(
+                  child: SecondaryButton(
+                    label: l10n.action_cancel,
+                    expanded: true,
+                    onPressed: () => Navigator.of(sheetContext).pop(),
+                  ),
+                ),
+                const SizedBox(width: AppTokens.s12),
+                Expanded(
+                  child: PrimaryButton(
+                    label: l10n.action_save,
+                    expanded: true,
+                    onPressed: () {
+                      final value = path.text.trim();
+                      if (value.isEmpty) {
+                        AppToast.warning(sheetContext, l10n.files_pathRequired);
+                        return;
+                      }
+                      Navigator.of(sheetContext)
+                          .pop([value, alias.text.trim()]);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    path.dispose();
+    alias.dispose();
+    return result;
+  }
+
+  Future<void> _addDirectory(BuildContext context, WidgetRef ref) async {
+    final draft = await _directoryDraft(context);
+    if (draft == null || !context.mounted) return;
+    try {
+      final repository = await ref.read(dashboardRepositoryProvider.future);
+      await repository.createQuickDirectory(path: draft[0], alias: draft[1]);
+      ref.invalidate(_quickDirectoriesProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, AppLocalizations.of(context).action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _editDirectory(
+    BuildContext context,
+    WidgetRef ref,
+    Map<String, dynamic> item,
+  ) async {
+    final id = (item['id'] as num?)?.toInt() ?? 0;
+    if (id <= 0) return;
+    final draft = await _directoryDraft(
+      context,
+      initialPath: '${item['path'] ?? ''}',
+      initialAlias: '${item['alias'] ?? ''}',
+    );
+    if (draft == null || !context.mounted) return;
+    try {
+      final repository = await ref.read(dashboardRepositoryProvider.future);
+      await repository.updateQuickDirectory(
+        id: id,
+        path: draft[0],
+        alias: draft[1],
+        legacy: item['legacy'] == true,
+      );
+      ref.invalidate(_quickDirectoriesProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, AppLocalizations.of(context).action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _deleteDirectory(
+    BuildContext context,
+    WidgetRef ref,
+    Map<String, dynamic> item,
+  ) async {
+    final id = (item['id'] as num?)?.toInt() ?? 0;
+    if (id <= 0) return;
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmSheet(
+      context,
+      title: l10n.action_delete,
+      message: '${item['path'] ?? ''}',
+      confirmLabel: l10n.action_delete,
+      danger: true,
+    );
+    if (!confirmed || !context.mounted) return;
+    try {
+      final repository = await ref.read(dashboardRepositoryProvider.future);
+      await repository.deleteQuickDirectory(
+        id: id,
+        legacy: item['legacy'] == true,
+      );
+      ref.invalidate(_quickDirectoriesProvider);
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.action_done);
+    } catch (error) {
+      if (!context.mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  void _openDirectory(BuildContext context, Map<String, dynamic> item) {
+    final path = '${item['path'] ?? ''}'.trim();
+    if (path.isEmpty) return;
+    context.push('/s/$serverId/files?path=${Uri.encodeQueryComponent(path)}');
+  }
+
+  String? _quickJumpRoute(Map<String, dynamic> item) {
+    final base = '/s/$serverId';
+    switch ('${item['name'] ?? ''}') {
+      case 'Website':
+        return '$base/websites';
+      case 'Database':
+        return '$base/more/databases';
+      case 'Cronjob':
+        return '$base/more/cronjobs';
+      case 'AppInstalled':
+        return '$base/more/apps?tab=installed';
+      case 'File':
+        return '$base/files';
+      case 'Agent':
+      case 'ModelServices':
+        return '$base/more/ai';
+      default:
+        return null;
+    }
+  }
+
+  Widget _buildQuickJumpChip(BuildContext context, Map<String, dynamic> item) {
+    final title = '${item['title'] ?? item['name'] ?? item['key'] ?? ''}';
+    final detail = '${item['detail'] ?? ''}'.trim();
+    final label = detail.isEmpty || detail == '/' ? title : '$title $detail';
+    final route = _quickJumpRoute(item);
+    const avatar = Icon(TablerIcons.arrow_up_right, size: AppTokens.iconInline);
+    if (route == null) {
+      return Chip(avatar: avatar, label: Text(label));
+    }
+    return ActionChip(
+      avatar: avatar,
+      label: Text(label),
+      onPressed: () => context.push(route),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final directories = ref.watch(_quickDirectoriesProvider);
+    final jumps = ref.watch(_quickJumpsProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHeader(
+          title: l10n.dashboard_quickDirectories,
+          trailing: TextButton(
+            onPressed: () => _addDirectory(context, ref),
+            child: Text(l10n.dashboard_addQuickDirectory),
+          ),
+        ),
+        directories.when(
+          loading: () => const LinearProgressIndicator(),
+          error: (error, _) => Text(
+            describeError(error, l10n),
+            style: AppTextStyles.bodyS.copyWith(color: context.scheme.error),
+          ),
+          data: (items) {
+            if (items.isEmpty) {
+              return Text(
+                l10n.dashboard_noData,
+                style: AppTextStyles.caption.copyWith(
+                  color: context.scheme.onSurfaceVariant,
+                ),
+              );
+            }
+            return Column(
+              children: [
+                for (final item in items) ...[
+                  TonalCard(
+                    onTap: () => _openDirectory(context, item),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          TablerIcons.folder,
+                          size: AppTokens.iconList,
+                        ),
+                        const SizedBox(width: AppTokens.s12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${item['alias'] ?? ''}'.trim().isEmpty
+                                    ? '${item['path'] ?? ''}'
+                                    : '${item['alias']}',
+                                style: AppTextStyles.titleS,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if ('${item['alias'] ?? ''}'.trim().isNotEmpty)
+                                Text(
+                                  '${item['path'] ?? ''}',
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: context.scheme.onSurfaceVariant,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                            ],
+                          ),
+                        ),
+                        AppIconButton(
+                          icon: TablerIcons.dots,
+                          tooltip: l10n.action_more,
+                          onPressed: () async {
+                            final value = await showSelectionMenu<String>(
+                              context,
+                              options: [
+                                SelectionOption(
+                                  label: l10n.action_edit,
+                                  value: 'edit',
+                                  icon: TablerIcons.edit,
+                                ),
+                                SelectionOption(
+                                  label: l10n.action_delete,
+                                  value: 'delete',
+                                  icon: TablerIcons.trash,
+                                  danger: true,
+                                ),
+                              ],
+                            );
+                            if (!context.mounted || value == null) return;
+                            if (value == 'edit') {
+                              await _editDirectory(context, ref, item);
+                            } else {
+                              await _deleteDirectory(context, ref, item);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppTokens.s8),
+                ],
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: AppTokens.s16),
+        SectionHeader(
+          title: l10n.dashboard_quickJumps,
+          trailing: TextButton(
+            onPressed: () => showAppSheet<void>(
+              context: context,
+              builder: (_) => const _QuickJumpManageSheet(),
+            ),
+            child: Text(l10n.action_edit),
+          ),
+        ),
+        jumps.when(
+          loading: () => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
+          data: (items) {
+            final visible = items.where((item) => item['isShow'] == true);
+            if (visible.isEmpty) {
+              return Text(
+                l10n.dashboard_noData,
+                style: AppTextStyles.caption.copyWith(
+                  color: context.scheme.onSurfaceVariant,
+                ),
+              );
+            }
+            return Wrap(
+              spacing: AppTokens.s8,
+              runSpacing: AppTokens.s8,
+              children: [
+                for (final item in visible) _buildQuickJumpChip(context, item),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _QuickJumpManageSheet extends ConsumerStatefulWidget {
+  const _QuickJumpManageSheet();
+
+  @override
+  ConsumerState<_QuickJumpManageSheet> createState() =>
+      _QuickJumpManageSheetState();
+}
+
+class _QuickJumpManageSheetState extends ConsumerState<_QuickJumpManageSheet> {
+  List<Map<String, dynamic>>? _items;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final repository = await ref.read(dashboardRepositoryProvider.future);
+      final items = await repository.getQuickOptions();
+      if (!mounted) return;
+      setState(() => _items = items);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
+  Future<void> _toggle(int index, bool value) async {
+    final items = _items;
+    if (items == null || _saving) return;
+    final next = items.map(Map<String, dynamic>.from).toList(growable: false);
+    next[index]['isShow'] = value;
+    setState(() {
+      _items = next;
+      _saving = true;
+    });
+    try {
+      final repository = await ref.read(dashboardRepositoryProvider.future);
+      await repository.changeQuick([
+        for (final item in next)
+          if ((item['id'] as num?)?.toInt() != null)
+            {
+              'id': (item['id'] as num).toInt(),
+              'isShow': item['isShow'] == true,
+            },
+      ]);
+      ref.invalidate(_quickJumpsProvider);
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+      await _load();
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final items = _items;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.dashboard_quickJumps, style: AppTextStyles.titleL),
+        const SizedBox(height: AppTokens.s12),
+        if (items == null)
+          const Padding(
+            padding: EdgeInsets.all(AppTokens.s24),
+            child: Center(child: CircularProgressIndicator()),
+          )
+        else
+          Column(
+            children: [
+              for (var index = 0; index < items.length; index++)
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    '${items[index]['title'] ?? items[index]['name'] ?? items[index]['key'] ?? ''}',
+                  ),
+                  subtitle: Text(
+                    '${items[index]['router'] ?? items[index]['detail'] ?? ''}',
+                  ),
+                  value: items[index]['isShow'] == true,
+                  onChanged: _saving ? null : (value) => _toggle(index, value),
+                ),
+            ],
+          ),
+      ],
     );
   }
 }

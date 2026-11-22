@@ -663,6 +663,8 @@ class _RemoteDownloadTab extends ConsumerWidget {
                   path: request.path,
                   name: request.name,
                   ignoreCertificate: request.ignoreCertificate,
+                  useProxy: request.useProxy,
+                  useServerFilename: request.useServerFilename,
                 );
                 ref.invalidate(_wgetProvider);
                 if (!context.mounted) return;
@@ -1058,6 +1060,8 @@ class _WgetRequest {
     required this.url,
     required this.path,
     required this.name,
+    this.useProxy = false,
+    this.useServerFilename = false,
     required this.ignoreCertificate,
   });
 
@@ -1065,6 +1069,8 @@ class _WgetRequest {
   final String path;
   final String name;
   final bool ignoreCertificate;
+  final bool useProxy;
+  final bool useServerFilename;
 }
 
 class _WgetSheet extends StatefulWidget {
@@ -1078,6 +1084,8 @@ class _WgetSheetState extends State<_WgetSheet> {
   final _url = TextEditingController();
   final _path = TextEditingController(text: '/opt');
   final _name = TextEditingController();
+  bool _useProxy = false;
+  bool _useServerFilename = false;
   bool _ignoreCertificate = false;
 
   @override
@@ -1121,6 +1129,18 @@ class _WgetSheetState extends State<_WgetSheet> {
           value: _ignoreCertificate,
           onChanged: (value) => setState(() => _ignoreCertificate = value),
         ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.files_useProxy),
+          value: _useProxy,
+          onChanged: (value) => setState(() => _useProxy = value),
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.files_useServerFilename),
+          value: _useServerFilename,
+          onChanged: (value) => setState(() => _useServerFilename = value),
+        ),
         const SizedBox(height: AppTokens.s16),
         PrimaryButton(
           label: l10n.files_startDownload,
@@ -1134,6 +1154,8 @@ class _WgetSheetState extends State<_WgetSheet> {
                 path: path,
                 name: _name.text.trim(),
                 ignoreCertificate: _ignoreCertificate,
+                useProxy: _useProxy,
+                useServerFilename: _useServerFilename,
               ),
             );
           },

@@ -38,8 +38,11 @@ class RuntimeRepositoryImpl implements RuntimeRepository {
       _api.checkRuntimeDelete(id);
 
   @override
-  Future<void> deleteRuntime(int id, {bool forceDelete = false}) =>
-      _api.deleteRuntime(id, forceDelete: forceDelete);
+  Future<void> deleteRuntime(
+    int id, {
+    bool forceDelete = false,
+    String taskID = '',
+  }) => _api.deleteRuntime(id, forceDelete: forceDelete, taskID: taskID);
 
   @override
   Future<void> operateRuntime(int id, String operate) {

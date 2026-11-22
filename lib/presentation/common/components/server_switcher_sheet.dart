@@ -88,6 +88,10 @@ class _ServerSwitcherBody extends ConsumerWidget {
                           showErrorToast(context, error);
                           return;
                         }
+                        if (!context.mounted ||
+                            ModalRoute.of(context)?.isCurrent != true) {
+                          return;
+                        }
                         navigator.pop();
                         if (server.id != currentServerId) {
                           ref.read(activeServerIdStateProvider.notifier).state =

@@ -1245,6 +1245,10 @@
     "description": "OneDash UI string"
   },
   "server_edit_https": "HTTPS",
+  "server_edit_httpWarning": "HTTP sends credentials without encryption. Enable HTTPS on the panel when possible.",
+  "@server_edit_httpWarning": {
+    "description": "Warning shown when HTTPS is disabled for a server."
+  },
   "@server_edit_https": {
     "description": "OneDash UI string"
   },
@@ -2051,6 +2055,10 @@
   "backups_detailName": "Detail name",
   "@backups_detailName": {
     "description": "Restore form label."
+  },
+  "backups_detailRequired": "Enter a detail name",
+  "@backups_detailRequired": {
+    "description": "Validation when the backup detail name is empty."
   },
   "backups_appDetailHint": "App detail name",
   "@backups_appDetailHint": {
@@ -3604,6 +3612,10 @@
   "files_permissionUpdated": "Permission updated",
   "@files_permissionUpdated": {
     "description": "Toast after updating file permission."
+  },
+  "files_permissionInvalidMode": "Enter a mode from 0000 to 0777",
+  "@files_permissionInvalidMode": {
+    "description": "Validation for an invalid file permission mode."
   },
   "files_selectCount": "{count} selected",
   "@files_selectCount": {
@@ -9115,6 +9127,22 @@
   "@ai_agent_connection_mode": {
     "description": "Connection mode"
   },
+  "ai_agent_mention_required": "Required",
+  "@ai_agent_mention_required": {
+    "description": "Mention requirement option."
+  },
+  "ai_agent_mention_notRequired": "Not required",
+  "@ai_agent_mention_notRequired": {
+    "description": "Mention requirement option."
+  },
+  "ai_agent_connection_websocket": "WebSocket",
+  "@ai_agent_connection_websocket": {
+    "description": "Connection mode option."
+  },
+  "ai_agent_connection_webhook": "Webhook",
+  "@ai_agent_connection_webhook": {
+    "description": "Connection mode option."
+  },
   "ai_agent_bots": "Bots",
   "@ai_agent_bots": {
     "description": "Bots"
@@ -9218,6 +9246,11 @@
   },
   "websites_relativeDir": "Relative to {path}",
   "@websites_relativeDir": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "websites_createSuccess": "Website created",
@@ -9342,6 +9375,11 @@
   },
   "websites_openRestyServiceConfirm": "Run \"{action}\" on OpenResty?",
   "@websites_openRestyServiceConfirm": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "websites_createDb": "Create database",
@@ -10701,6 +10739,11 @@
   },
   "websites_openRestyModuleDeleteConfirm": "Delete module {name}?",
   "@websites_openRestyModuleDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "websites_openRestyModuleEmpty": "No custom modules",
@@ -10901,10 +10944,20 @@
   },
   "panelSettings_upgradeTo": "Upgrade to {version}",
   "@panelSettings_upgradeTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "panelSettings_upgradeConfirm": "The panel will upgrade to {version}. Services restart briefly.",
   "@panelSettings_upgradeConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "panelSettings_upgradeSubmitted": "Upgrade task submitted",
@@ -10925,14 +10978,29 @@
   },
   "panelSettings_newCount": "{count} new",
   "@panelSettings_newCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    },
     "description": "OneDash UI text."
   },
   "panelSettings_fixCount": "{count} fixes",
   "@panelSettings_fixCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    },
     "description": "OneDash UI text."
   },
   "panelSettings_optimizationCount": "{count} optimizations",
   "@panelSettings_optimizationCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    },
     "description": "OneDash UI text."
   },
   "backups_publicAccount": "Panel-level backup account",
@@ -10997,14 +11065,29 @@
   },
   "vm_forceStopConfirm": "Force stop {name}? Data loss is possible.",
   "@vm_forceStopConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "vm_snapshotRecoverConfirm": "Restore snapshot {name}? The current state will be replaced.",
   "@vm_snapshotRecoverConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "vm_snapshotDeleteConfirm": "Delete snapshot {name}?",
   "@vm_snapshotDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "vm_statsCpu": "CPU",
@@ -11749,6 +11832,11 @@
   },
   "files_wgetProgress": "Progress: {percent}%",
   "@files_wgetProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "files_wgetWaiting": "Waiting for download progress...",
@@ -11801,6 +11889,11 @@
   },
   "runtime_presetDeleteConfirm": "Delete extension preset \"{name}\"?",
   "@runtime_presetDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "runtime_presetPushed": "Push task submitted",
@@ -12334,5 +12427,102 @@
   },
   "@panelSettings_passkeyPrereq": {
     "description": "panelSettings_passkeyPrereq"
+  },
+  "websites_deleteApp": "Delete associated app",
+  "@websites_deleteApp": {
+    "description": "Delete the application linked to a deployment site."
+  },
+  "websites_dnsValidation": "Use DNS validation",
+  "@websites_dnsValidation": {
+    "description": "Use a configured DNS account for certificate validation."
+  },
+  "files_useProxy": "Use server proxy",
+  "@files_useProxy": {
+    "description": "Route the remote download through the panel proxy."
+  },
+  "files_useServerFilename": "Use server filename",
+  "@files_useServerFilename": {
+    "description": "Keep the filename provided by the remote server."
+  },
+  "vm_isoRequired": "Select a template or ISO image",
+  "@vm_isoRequired": {
+    "description": "A new VM needs either a template or an ISO image."
+  },
+  "ai_model_details": "Model details",
+  "@ai_model_details": {
+    "description": "Details returned by the model load operation."
+  },
+  "ai_account_api_key_required": "Re-enter the API key to save changes",
+  "@ai_account_api_key_required": {
+    "description": "The panel does not return stored API keys, so editing requires the key again."
+  },
+  "ai_account_initial_models": "Initial models",
+  "@ai_account_initial_models": {
+    "description": "Comma-separated model IDs for custom providers."
+  },
+  "ai_account_discover_unsupported": "Model discovery is not supported for this provider",
+  "@ai_account_discover_unsupported": {
+    "description": "Hide the discovery action when the provider disables model discovery."
+  },
+  "databases_typeMysqlCluster": "MySQL Cluster",
+  "@databases_typeMysqlCluster": {
+    "description": "MySQL cluster database type label."
+  },
+  "databases_typePostgresqlCluster": "PostgreSQL Cluster",
+  "@databases_typePostgresqlCluster": {
+    "description": "PostgreSQL cluster database type label."
+  },
+  "databases_typeRedisCluster": "Redis Cluster",
+  "@databases_typeRedisCluster": {
+    "description": "Redis cluster database type label."
+  },
+  "websites_runtimePort": "Backend port",
+  "@websites_runtimePort": {
+    "description": "Port used by the runtime application behind the site."
+  },
+  "runtime_app": "Application",
+  "@runtime_app": {
+    "description": "Application selected for the runtime."
+  },
+  "runtime_source": "Image source",
+  "@runtime_source": {
+    "description": "Registry or mirror used to install the runtime."
+  },
+  "runtime_installDependencies": "Install dependencies",
+  "@runtime_installDependencies": {
+    "description": "Install runtime dependencies during creation."
+  },
+  "apps_services": "Services",
+  "@apps_services": {
+    "description": "Services and connection targets provided by the installed app."
+  },
+  "logs_taskExecuting": "{count} tasks running",
+  "@logs_taskExecuting": {
+    "description": "Number of background tasks currently executing.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "files_shareExpireOneHour": "1 hour",
+  "@files_shareExpireOneHour": {
+    "description": "File share expiration of one hour."
+  },
+  "files_shareExpireOneDay": "1 day",
+  "@files_shareExpireOneDay": {
+    "description": "File share expiration of one day."
+  },
+  "files_shareExpireSevenDays": "7 days",
+  "@files_shareExpireSevenDays": {
+    "description": "File share expiration of seven days."
+  },
+  "files_sharePasswordPolicy": "Password must be 4-256 characters.",
+  "@files_sharePasswordPolicy": {
+    "description": "File share password length policy."
+  },
+  "files_sharePasswordOptional": "Optional. Leave blank for no password.",
+  "@files_sharePasswordOptional": {
+    "description": "Password helper for file shares."
   }
 }

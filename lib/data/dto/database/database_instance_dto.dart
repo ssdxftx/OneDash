@@ -13,6 +13,11 @@ class DatabaseInstanceDto {
     this.description = '',
     this.ssl = false,
     this.timeout = 0,
+    this.initialDB = '',
+    this.rootCert = '',
+    this.clientKey = '',
+    this.clientCert = '',
+    this.skipVerify = false,
   });
 
   final int id;
@@ -27,6 +32,11 @@ class DatabaseInstanceDto {
   final String description;
   final bool ssl;
   final int timeout;
+  final String initialDB;
+  final String rootCert;
+  final String clientKey;
+  final String clientCert;
+  final bool skipVerify;
 
   String get name => database;
 
@@ -35,7 +45,7 @@ class DatabaseInstanceDto {
       id: json['id'] as int? ?? 0,
       type: json['type'] as String? ?? '',
       from: json['from'] as String? ?? '',
-      database: json['database'] as String? ?? '',
+      database: json['database'] as String? ?? json['name'] as String? ?? '',
       version: json['version'] as String? ?? '',
       address: json['address'] as String? ?? '',
       port: json['port'] as int? ?? 0,
@@ -44,6 +54,11 @@ class DatabaseInstanceDto {
       description: json['description'] as String? ?? '',
       ssl: json['ssl'] as bool? ?? false,
       timeout: json['timeout'] as int? ?? 0,
+      initialDB: json['initialDB'] as String? ?? '',
+      rootCert: json['rootCert'] as String? ?? '',
+      clientKey: json['clientKey'] as String? ?? '',
+      clientCert: json['clientCert'] as String? ?? '',
+      skipVerify: json['skipVerify'] as bool? ?? false,
     );
   }
 }

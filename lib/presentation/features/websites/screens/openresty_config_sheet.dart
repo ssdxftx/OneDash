@@ -41,6 +41,7 @@ class _OpenRestyConfigSheet extends ConsumerStatefulWidget {
 class _OpenRestyConfigSheetState extends ConsumerState<_OpenRestyConfigSheet> {
   final _controller = TextEditingController();
   bool _loaded = false;
+  bool _applyScheduled = false;
   bool _saving = false;
   String? _error;
 
@@ -50,10 +51,15 @@ class _OpenRestyConfigSheetState extends ConsumerState<_OpenRestyConfigSheet> {
     super.dispose();
   }
 
-  void _apply(String content) {
-    if (_loaded) return;
-    _loaded = true;
-    _controller.text = content;
+  void _scheduleApply(String content) {
+    if (_loaded || _applyScheduled) return;
+    _applyScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _applyScheduled = false;
+      if (!mounted || _loaded) return;
+      _loaded = true;
+      _controller.text = content;
+    });
   }
 
   Future<void> _save() async {
@@ -81,7 +87,7 @@ class _OpenRestyConfigSheetState extends ConsumerState<_OpenRestyConfigSheet> {
     final l10n = AppLocalizations.of(context);
     final config = ref.watch(_openRestyConfigProvider);
     final data = config.valueOrNull;
-    if (data != null) _apply(data.content);
+    if (data != null && !config.isLoading) _scheduleApply(data.content);
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.82,
       child: Column(
@@ -95,6 +101,7 @@ class _OpenRestyConfigSheetState extends ConsumerState<_OpenRestyConfigSheet> {
                 tooltip: l10n.action_refresh,
                 onPressed: () {
                   _loaded = false;
+                  _applyScheduled = false;
                   ref.invalidate(_openRestyConfigProvider);
                 },
                 icon: const Icon(TablerIcons.refresh),

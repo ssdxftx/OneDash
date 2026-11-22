@@ -106,7 +106,7 @@ abstract interface class AiRepository {
 
   Future<void> deleteOllamaModels(List<int> ids, {bool force});
 
-  Future<void> loadOllamaModel(String name);
+  Future<String> loadOllamaModel(String name);
 
   Future<void> closeOllamaModel(String name);
   Future<List<Map<String, dynamic>>> discoverAgentAccountModels({

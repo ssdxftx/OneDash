@@ -11,7 +11,11 @@ abstract interface class RuntimeRepository {
   Future<RuntimeDetailDto> getRuntime(int id);
   Future<void> updateRuntime(RuntimeCreateReq req);
   Future<List<Map<String, dynamic>>> checkRuntimeDelete(int id);
-  Future<void> deleteRuntime(int id, {bool forceDelete = false});
+  Future<void> deleteRuntime(
+    int id, {
+    bool forceDelete = false,
+    String taskID = '',
+  });
   Future<void> operateRuntime(int id, String operate);
   Future<void> syncRuntimes();
   Future<List<PhpExtensionGroupDto>> searchPhpExtensions();

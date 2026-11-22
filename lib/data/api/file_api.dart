@@ -564,18 +564,27 @@ class FileApi {
     );
     final data = resp.data?['data'];
     if (data is List) {
+      final target = _normalizePath(path);
       for (final item in data.whereType<Map>()) {
-        if ('${item['path'] ?? ''}' == path) {
+        if (_normalizePath('${item['path'] ?? ''}') == target) {
           return (item['size'] as num?)?.toInt() ?? 0;
         }
-      }
-      if (data.isNotEmpty && data.last is Map) {
-        return ((data.last as Map)['size'] as num?)?.toInt() ?? 0;
       }
       return 0;
     }
     if (data is Map) return (data['size'] as num?)?.toInt() ?? 0;
     return (data as num?)?.toInt() ?? 0;
+  }
+
+  static String _normalizePath(String value) {
+    var path = value.replaceAll('\\', '/');
+    while (path.contains('//')) {
+      path = path.replaceAll('//', '/');
+    }
+    if (path.length > 1 && path.endsWith('/')) {
+      path = path.substring(0, path.length - 1);
+    }
+    return path;
   }
 
   /// 查询文件历史。
@@ -765,6 +774,8 @@ class FileApi {
     required String path,
     required String name,
     bool ignoreCertificate = false,
+    bool useProxy = false,
+    bool useServerFilename = false,
   }) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/files/wget',
@@ -773,6 +784,8 @@ class FileApi {
         'path': path,
         'name': name,
         'ignoreCertificate': ignoreCertificate,
+        'useProxy': useProxy,
+        'useServerFilename': useServerFilename,
       },
     );
     final data = resp.data?['data'];

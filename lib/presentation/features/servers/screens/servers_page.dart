@@ -11,6 +11,7 @@ import 'server_edit_page.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/network/dio_client_provider.dart';
+import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/utils/format_utils.dart';
 import '../../../../domain/entities/server.dart';
 import '../../../common/components/app_bar_large.dart';
@@ -433,7 +434,7 @@ class _ServerCard extends ConsumerWidget {
     final health = ref.watch(serverHealthProvider(server.id));
     final snapshot = health.valueOrNull;
     final online = snapshot?.online ?? false;
-    final subtitle = _subtitle(server, snapshot);
+    final subtitle = _subtitle(context, server, snapshot);
 
     return TonalCard(
       onTap: onTap,
@@ -607,7 +608,14 @@ class _ServerCard extends ConsumerWidget {
     );
   }
 
-  String _subtitle(Server server, ServerHealth? snapshot) {
+  String _subtitle(
+    BuildContext context,
+    Server server,
+    ServerHealth? snapshot,
+  ) {
+    if (snapshot?.error is AuthException) {
+      return AppLocalizations.of(context).error_auth_title;
+    }
     final distro = snapshot?.distro.trim() ?? '';
     final ip = snapshot?.ipAddress.trim() ?? '';
     final parts = [if (distro.isNotEmpty) distro, if (ip.isNotEmpty) ip];

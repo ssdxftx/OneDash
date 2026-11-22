@@ -9,6 +9,7 @@ import '../../../../data/dto/cronjob/cronjob_dto.dart';
 import '../../../../data/dto/cronjob/cronjob_form_data_dto.dart';
 import '../../../../data/repositories_impl/backup_account_repository_impl.dart';
 import '../../../../data/repositories_impl/cronjob_repository_impl.dart';
+import '../../../../data/repositories_impl/database_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
@@ -35,6 +36,12 @@ final _backupAccountOptionsProvider =
           .map((item) => item.cast<String, dynamic>())
           .toList(growable: false);
     }, name: 'cronjobBackupAccountOptionsProvider');
+
+final _databaseItemsProvider = FutureProvider.autoDispose
+    .family<List<DatabaseItemDto>, String>((ref, dbType) async {
+      final repository = await ref.watch(databaseRepositoryProvider.future);
+      return repository.loadDatabaseItems(dbType);
+    }, name: 'cronjobDatabaseItemsProvider');
 
 class CronjobFormPage extends ConsumerStatefulWidget {
   const CronjobFormPage({
@@ -77,6 +84,15 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
   bool _submitting = false;
   bool _loaded = false;
   int? _backupAccountId;
+  int? _groupID;
+  String? _secret;
+  String? _exclusionRules;
+  String? _args;
+  String? _executor;
+  String? _command;
+  String? _containerName;
+  String? _user;
+  List<int> _snapshotIgnoreAppIDs = const [];
   int _alertCount = 0;
   String _alertTitle = '';
   String _alertMethod = '';
@@ -136,7 +152,16 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
         _timeout.text = '${item.timeout}';
         _isDir = item.isDir ?? true;
         _withImage = item.snapshotRule?.withImage ?? false;
+        _snapshotIgnoreAppIDs = item.snapshotRule?.ignoreAppIDs ?? const [];
         _backupAccountId = item.downloadAccountID;
+        _groupID = item.groupID;
+        _secret = item.secret;
+        _exclusionRules = item.exclusionRules;
+        _args = item.args;
+        _executor = item.executor;
+        _command = item.command;
+        _containerName = item.containerName;
+        _user = item.user;
         _alertCount = item.alertCount;
         _alertTitle = item.alertTitle;
         _alertMethod = item.alertMethod;
@@ -266,13 +291,24 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
                   .toList()
             : null,
         snapshotRule: _type == 'snapshot'
-            ? SnapshotRuleDto(withImage: _withImage)
+            ? SnapshotRuleDto(
+                withImage: _withImage,
+                ignoreAppIDs: _snapshotIgnoreAppIDs,
+              )
             : null,
         retainCopies: int.tryParse(_retainCopies.text.trim()),
         retryTimes: int.tryParse(_retryTimes.text.trim()),
         timeout: int.tryParse(_timeout.text.trim()),
         sourceAccountIDs: _backupAccountId == null ? null : '$_backupAccountId',
         downloadAccountID: _backupAccountId,
+        groupID: _groupID,
+        secret: _secret,
+        exclusionRules: _exclusionRules,
+        args: _args,
+        executor: _executor,
+        command: _command,
+        containerName: _containerName,
+        user: _user,
         alertCount: _alertCount,
         alertTitle: _alertTitle,
         alertMethod: _alertMethod,
@@ -419,26 +455,77 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
                 decoration: InputDecoration(
                   labelText: l10n.cronjobs_databaseType,
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
-                  DropdownMenuItem(value: 'mariadb', child: Text('MariaDB')),
-                  DropdownMenuItem(
+                items: [
+                  const DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
+                  const DropdownMenuItem(
+                    value: 'mariadb',
+                    child: Text('MariaDB'),
+                  ),
+                  const DropdownMenuItem(
                     value: 'postgresql',
                     child: Text('PostgreSQL'),
                   ),
-                  DropdownMenuItem(value: 'redis', child: Text('Redis')),
-                  DropdownMenuItem(value: 'mongodb', child: Text('MongoDB')),
+                  DropdownMenuItem(
+                    value: 'mysql-cluster',
+                    child: Text(l10n.databases_typeMysqlCluster),
+                  ),
+                  DropdownMenuItem(
+                    value: 'postgresql-cluster',
+                    child: Text(l10n.databases_typePostgresqlCluster),
+                  ),
+                  const DropdownMenuItem(value: 'redis', child: Text('Redis')),
+                  const DropdownMenuItem(
+                    value: 'mongodb',
+                    child: Text('MongoDB'),
+                  ),
                 ],
                 onChanged: (value) {
-                  if (value != null) setState(() => _dbType.text = value);
+                  if (value != null) {
+                    setState(() {
+                      _dbType.text = value;
+                      _dbName.clear();
+                    });
+                  }
                 },
               ),
               const SizedBox(height: AppTokens.s12),
-              AppTextField(
-                controller: _dbName,
-                label: l10n.cronjobs_databaseName,
-                hint: 'app_db',
-              ),
+              ref
+                  .watch(_databaseItemsProvider(_dbType.text))
+                  .when(
+                    loading: () => const LinearProgressIndicator(),
+                    error: (error, _) => AppTextField(
+                      controller: _dbName,
+                      label: l10n.cronjobs_databaseName,
+                      hint: 'app_db',
+                      helper: describeError(error, l10n),
+                    ),
+                    data: (items) {
+                      if (items.isEmpty) {
+                        return AppTextField(
+                          controller: _dbName,
+                          label: l10n.cronjobs_databaseName,
+                          hint: 'app_db',
+                        );
+                      }
+                      final values = [for (final item in items) item.name];
+                      final current = _dbName.text.trim();
+                      if (current.isNotEmpty && !values.contains(current)) {
+                        values.add(current);
+                      }
+                      return DropdownButtonFormField<String>(
+                        initialValue: current.isEmpty ? null : current,
+                        decoration: InputDecoration(
+                          labelText: l10n.cronjobs_databaseName,
+                        ),
+                        items: [
+                          for (final value in values)
+                            DropdownMenuItem(value: value, child: Text(value)),
+                        ],
+                        onChanged: (value) =>
+                            setState(() => _dbName.text = value ?? ''),
+                      );
+                    },
+                  ),
             ],
             if (_type == 'directory') ...[
               AppTextField(

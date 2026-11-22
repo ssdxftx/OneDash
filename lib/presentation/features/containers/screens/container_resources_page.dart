@@ -162,8 +162,28 @@ class _ContainerResourcesPageState
     final l10n = AppLocalizations.of(context);
     try {
       final repository = await ref.read(containerRepositoryProvider.future);
-      await repository.checkImageUpdates();
+      final status = await repository.checkImageUpdates();
       if (!mounted) return;
+      final taskID = '${status['taskID'] ?? ''}';
+      if (taskID.isEmpty) {
+        if (!mounted) return;
+        AppToast.success(context, l10n.containers_imageUpdatesDone);
+        return;
+      }
+      final success = await TaskProgressSheet.run(
+        context,
+        title: l10n.containers_checkImageUpdates,
+        task: (controller) async {
+          await repository.waitForTask(
+            taskID,
+            onUpdate: (log) {
+              if (log.lines.isNotEmpty) controller.log(log.lines.last);
+            },
+          );
+        },
+      );
+      if (!success || !mounted) return;
+      ref.invalidate(containerImagesProvider);
       AppToast.success(context, l10n.containers_imageUpdatesDone);
     } catch (error) {
       if (!mounted) return;
@@ -700,7 +720,7 @@ class _ImagesTabState extends ConsumerState<_ImagesTab> {
                 taskID: taskID,
                 repoID: repoId,
                 tagName: name,
-                name: name,
+                name: value,
               ),
             );
         }

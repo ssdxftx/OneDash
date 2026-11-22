@@ -11,6 +11,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/app/app_installed_dto.dart';
 import '../../../../data/dto/app/app_installed_search_req.dart';
 import '../../../../data/dto/common/page_result.dart';
+import '../../../../data/dto/database/database_instance_dto.dart';
 import '../../../../data/dto/cronjob/cronjob_form_data_dto.dart';
 import '../../../../data/dto/runtime/runtime_dto.dart';
 import '../../../../data/dto/website/ssl_manage_dtos.dart';
@@ -20,6 +21,7 @@ import '../../../../data/dto/website/website_search_req.dart';
 import '../../../../data/dto/website/website_template_dto.dart';
 import '../../../../data/dto/website/website_domain_req.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
+import '../../../../data/repositories_impl/database_repository_impl.dart';
 import '../../../../data/repositories_impl/runtime_repository_impl.dart';
 import '../../../../data/repositories_impl/website_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
@@ -56,6 +58,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
   final _streamServerController = TextEditingController(text: '127.0.0.1:80');
   final _subsitePathController = TextEditingController(text: '/');
   final _portController = TextEditingController(text: '80');
+  final _runtimePortController = TextEditingController(text: '9000');
   final _remarkController = TextEditingController();
   final _ftpUserController = TextEditingController();
   final _ftpPasswordController = TextEditingController();
@@ -86,7 +89,10 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
   List<WebsitePreInstallCheckDto> _appChecks = const [];
   bool _checkingApps = false;
   int? _appInstallId;
+  int? _templateOutputId;
+  List<WebsiteTemplateOutputDto> _templateOutputs = const [];
   List<RuntimeDto> _runtimes = const [];
+  List<DatabaseInstanceDto> _dbInstances = const [];
   List<SslManageDto> _certificates = const [];
   bool _sslLoading = false;
 
@@ -101,6 +107,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
       if (widget.type == 'runtime') _loadRuntimes();
       if (widget.type == 'subsite') _loadParents();
       if (widget.type == 'deployment') _loadApps();
+      if (widget.type == 'static') _loadTemplateOutputs();
     });
   }
 
@@ -114,6 +121,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
     _streamServerController.dispose();
     _subsitePathController.dispose();
     _portController.dispose();
+    _runtimePortController.dispose();
     _remarkController.dispose();
     _ftpUserController.dispose();
     _ftpPasswordController.dispose();
@@ -267,11 +275,77 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
       setState(() {
         _runtimes = result.items;
         _runtime = result.items.isEmpty ? null : result.items.first;
-        final port = int.tryParse(_runtime?.port ?? '') ?? 0;
-        if (port > 0) _portController.text = '$port';
+        _applyRuntimePort(_runtime);
       });
     } catch (_) {
       // Runtime list is optional; keep the form usable.
+    }
+  }
+
+  void _applyRuntimePort(RuntimeDto? runtime) {
+    final raw = runtime?.port ?? '';
+    final port = int.tryParse(raw.split(',').first.trim()) ?? 0;
+    if (port > 0) {
+      _runtimePortController.text = '$port';
+    } else if (runtime?.type == 'php' && runtime?.resource == 'local') {
+      _runtimePortController.text = '9000';
+    }
+  }
+
+  Future<void> _loadDbInstances() async {
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      final instances = await repository.listInstances(
+        'mysql,mariadb,postgresql',
+      );
+      if (!mounted) return;
+      setState(() {
+        _dbInstances = instances;
+        _syncDbHost();
+      });
+    } catch (_) {
+      // Database list is optional; server validates the selected host.
+    }
+  }
+
+  List<DatabaseInstanceDto> get _dbCandidates {
+    return switch (_dbType) {
+      'postgresql' =>
+        _dbInstances
+            .where((item) => item.type.startsWith('postgresql'))
+            .toList(growable: false),
+      _ =>
+        _dbInstances
+            .where((item) => item.type == 'mysql' || item.type == 'mariadb')
+            .toList(growable: false),
+    };
+  }
+
+  void _syncDbHost() {
+    final candidates = _dbCandidates;
+    if (candidates.isEmpty) {
+      _dbHostController.clear();
+      return;
+    }
+    final valid = candidates.any(
+      (item) => item.name == _dbHostController.text.trim(),
+    );
+    if (!valid) _dbHostController.text = candidates.first.name;
+  }
+
+  Future<void> _loadTemplateOutputs() async {
+    try {
+      final repository = await ref.read(websiteRepositoryProvider.future);
+      final result = await repository.searchTemplateOutputs();
+      if (!mounted) return;
+      setState(() {
+        _templateOutputs = result.items;
+        _templateOutputId ??= _templateOutputs.isEmpty
+            ? null
+            : _templateOutputs.first.id;
+      });
+    } catch (_) {
+      // Template outputs are optional.
     }
   }
 
@@ -378,6 +452,19 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
       AppToast.error(context, l10n.websites_invalidDomainFormat);
       return;
     }
+    final runtimePort = widget.type == 'runtime'
+        ? int.tryParse(_runtimePortController.text.trim()) ?? 0
+        : port;
+    if (widget.type == 'runtime' &&
+        (runtimePort <= 0 || runtimePort >= 65536)) {
+      AppToast.error(context, l10n.websites_invalidDomainFormat);
+      return;
+    }
+    final dbHost = _dbHostController.text.trim();
+    if (_createDb && (dbHost.isEmpty || _dbCandidates.isEmpty)) {
+      AppToast.warning(context, l10n.databases_empty_message);
+      return;
+    }
     setState(() => _creating = true);
     try {
       final repository = await ref.read(websiteRepositoryProvider.future);
@@ -403,8 +490,11 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
           proxy: widget.type == 'proxy'
               ? '$_protocol${_proxyController.text.trim()}'
               : '',
-          port: port,
+          port: widget.type == 'runtime' ? runtimePort : port,
           runtimeID: _runtime?.id ?? 0,
+          templateOutputID: widget.type == 'static'
+              ? (_templateOutputId ?? 0)
+              : 0,
           parentWebsiteID: widget.type == 'subsite' ? (_parentId ?? 0) : 0,
           appType: 'installed',
           appInstallID: widget.type == 'deployment' ? (_appInstallId ?? 0) : 0,
@@ -450,7 +540,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
           dbName: _createDb ? _dbNameController.text.trim() : '',
           dbUser: _createDb ? _dbUserController.text.trim() : '',
           dbPassword: _createDb ? _dbPasswordController.text : '',
-          dbHost: _createDb ? _dbHostController.text.trim() : '',
+          dbHost: _createDb ? dbHost : '',
           dbType: _dbType,
         ),
       );
@@ -584,6 +674,24 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: AppTokens.s8),
+                if (widget.type == 'static' && _templateOutputs.isNotEmpty) ...[
+                  const SizedBox(height: AppTokens.s12),
+                  DropdownButtonFormField<int>(
+                    initialValue: _templateOutputId,
+                    decoration: InputDecoration(
+                      labelText: l10n.websites_templateOutputs,
+                    ),
+                    items: [
+                      for (final output in _templateOutputs)
+                        DropdownMenuItem(
+                          value: output.id,
+                          child: Text(output.name),
+                        ),
+                    ],
+                    onChanged: (value) =>
+                        setState(() => _templateOutputId = value),
+                  ),
+                ],
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -648,7 +756,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                     ),
                     items: const [
                       DropdownMenuItem(value: 'php', child: Text('PHP')),
-                      DropdownMenuItem(value: 'nodejs', child: Text('Node.js')),
+                      DropdownMenuItem(value: 'node', child: Text('Node.js')),
                       DropdownMenuItem(value: 'java', child: Text('Java')),
                       DropdownMenuItem(value: 'go', child: Text('Go')),
                       DropdownMenuItem(value: 'python', child: Text('Python')),
@@ -682,10 +790,15 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                         _runtime = _runtimes
                             .where((runtime) => runtime.id == value)
                             .firstOrNull;
-                        final port = int.tryParse(_runtime?.port ?? '') ?? 0;
-                        if (port > 0) _portController.text = '$port';
+                        _applyRuntimePort(_runtime);
                       });
                     },
+                  ),
+                  const SizedBox(height: AppTokens.s12),
+                  AppTextField(
+                    controller: _runtimePortController,
+                    label: l10n.websites_runtimePort,
+                    keyboardType: TextInputType.number,
                   ),
                 ],
               ),
@@ -962,7 +1075,10 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                   contentPadding: EdgeInsets.zero,
                   title: Text(l10n.websites_createDb),
                   value: _createDb,
-                  onChanged: (value) => setState(() => _createDb = value),
+                  onChanged: (value) {
+                    setState(() => _createDb = value);
+                    if (value) _loadDbInstances();
+                  },
                 ),
                 if (_createDb) ...[
                   DropdownButtonFormField<String>(
@@ -976,20 +1092,48 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                         value: 'postgresql',
                         child: Text('PostgreSQL'),
                       ),
-                      DropdownMenuItem(
-                        value: 'mongodb',
-                        child: Text('MongoDB'),
-                      ),
                     ],
                     onChanged: (value) {
-                      if (value != null) setState(() => _dbType = value);
+                      if (value == null) return;
+                      setState(() {
+                        _dbType = value;
+                        _syncDbHost();
+                      });
                     },
                   ),
                   const SizedBox(height: AppTokens.s12),
-                  AppTextField(
-                    controller: _dbHostController,
-                    label: l10n.databases_host,
-                  ),
+                  if (_dbCandidates.isEmpty)
+                    Text(
+                      l10n.databases_empty_message,
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: context.scheme.onSurfaceVariant,
+                      ),
+                    )
+                  else
+                    DropdownButtonFormField<String>(
+                      key: ValueKey('db-$_dbType-${_dbHostController.text}'),
+                      initialValue:
+                          _dbCandidates.any(
+                            (item) => item.name == _dbHostController.text,
+                          )
+                          ? _dbHostController.text
+                          : _dbCandidates.first.name,
+                      decoration: InputDecoration(
+                        labelText: l10n.databases_host,
+                      ),
+                      items: [
+                        for (final instance in _dbCandidates)
+                          DropdownMenuItem(
+                            value: instance.name,
+                            child: Text(instance.name),
+                          ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => _dbHostController.text = value);
+                        }
+                      },
+                    ),
                   const SizedBox(height: AppTokens.s12),
                   AppTextField(
                     controller: _dbNameController,

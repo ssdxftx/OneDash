@@ -100,6 +100,42 @@ class _HostRemoteTabState extends ConsumerState<HostRemoteTab> {
     }
   }
 
+  Future<void> _moveGroup(
+    RemoteHostDto host,
+    List<RemoteHostTreeDto> groups,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final options = _flattenGroups(groups);
+    final groupId = await showSelectionMenu<int>(
+      context,
+      title: l10n.host_group,
+      options: [
+        SelectionOption(
+          label: l10n.host_noGroup,
+          value: 0,
+          icon: TablerIcons.folder_off,
+        ),
+        for (final group in options)
+          SelectionOption(
+            label: group.label,
+            value: group.id,
+            icon: TablerIcons.folder,
+          ),
+      ],
+    );
+    if (groupId == null || !mounted) return;
+    try {
+      final repository = await ref.read(
+        hostRepositoryProvider(widget.serverId).future,
+      );
+      await repository.updateHostGroup(id: host.id, groupId: groupId);
+      _refresh();
+    } catch (error) {
+      if (!mounted) return;
+      showErrorToast(context, error);
+    }
+  }
+
   Future<void> _test(RemoteHostDto host) async {
     final l10n = AppLocalizations.of(context);
     try {
@@ -197,6 +233,11 @@ class _HostRemoteTabState extends ConsumerState<HostRemoteTab> {
                       onPressed: () => context.push(
                         '/s/${widget.serverId}/terminal?sshHostId=${host.id}',
                       ),
+                    ),
+                    IconButton(
+                      tooltip: l10n.host_group,
+                      icon: const Icon(TablerIcons.folder),
+                      onPressed: () => _moveGroup(host, data.groups),
                     ),
                     IconButton(
                       tooltip: l10n.host_testConnection,

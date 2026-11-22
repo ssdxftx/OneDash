@@ -20,7 +20,7 @@ OneDash is a single-panel, zero-backend Android client for [1Panel](https://gith
 
 ## Requirements
 
-- Flutter stable with Dart `^3.11.1`
+- Flutter stable with Dart `^3.13.0`
 - Android SDK 35, JDK 17
 - Android `minSdk` 26, `targetSdk` 35
 - Package id: `dev.onedash.app`
@@ -72,9 +72,8 @@ keyAlias=...
 keyPassword=...
 ```
 
-Without that file, local release builds fall back to the debug signing config so
-`flutter run --release` still works. CI never falls back: missing secrets fail the
-release job.
+Release builds require that file. Missing signing configuration fails the build
+locally and in CI instead of silently falling back to the debug key.
 
 ## Architecture
 

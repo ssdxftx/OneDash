@@ -759,7 +759,7 @@ class _HostPageState extends ConsumerState<HostPage> {
       final value = controller.text;
       controller.dispose();
       if (saved != true || !mounted) return;
-      await repository.updateSshFile('sshdConfPath', value, path);
+      await repository.updateSshFile('sshdConfPath', path, value);
       if (!mounted) return;
       AppToast.success(context, l10n.host_sshConfigSaved);
       _refreshSsh();

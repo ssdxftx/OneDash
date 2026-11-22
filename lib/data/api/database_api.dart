@@ -231,6 +231,20 @@ class DatabaseApi {
     return resp.data?['data'] == true;
   }
 
+  /// 远程数据库删除前检查占用。
+  Future<List<DBResourceDto>> checkRemoteDatabaseDelete(int id) async {
+    final resp = await _client.post<Map<String, dynamic>>(
+      '/api/v2/databases/db/del/check',
+      data: {'id': id},
+    );
+    final data = resp.data?['data'];
+    if (data is! List) return const [];
+    return data
+        .whereType<Map<String, dynamic>>()
+        .map(DBResourceDto.fromJson)
+        .toList();
+  }
+
   /// 创建远程数据库连接。
   Future<void> createRemoteDatabase(Map<String, dynamic> body) async {
     await _client.post<Map<String, dynamic>>(

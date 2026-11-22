@@ -30,7 +30,7 @@ class Server {
 
   Uri get baseUrl {
     final scheme = isHttps ? 'https' : 'http';
-    return Uri.parse('$scheme://$host:$port');
+    return Uri(scheme: scheme, host: host, port: port);
   }
 
   Map<String, Object?> toJson() {
@@ -52,9 +52,9 @@ class Server {
   static Server fromJson(Map<String, Object?> json) {
     return Server()
       ..id = _intValue(json['id'])
-      ..syncId = json['syncId'] as String? ?? ''
-      ..name = json['name'] as String?
-      ..host = json['host'] as String
+      ..syncId = _stringValue(json['syncId'])
+      ..name = _nullableStringValue(json['name'])
+      ..host = _stringValue(json['host'])
       ..port = _intValue(json['port'])
       ..isHttps = json['isHttps'] == true
       ..allowInsecureConnections = json['allowInsecureConnections'] == true
@@ -62,6 +62,17 @@ class Server {
       ..createdAt = _dateTimeValue(json['createdAt'])
       ..updatedAt = _dateTimeValue(json['updatedAt'])
       ..lastUsedAt = _dateTimeValue(json['lastUsedAt']);
+  }
+
+  static String _stringValue(Object? value) {
+    if (value is String) return value;
+    return value?.toString() ?? '';
+  }
+
+  static String? _nullableStringValue(Object? value) {
+    if (value == null) return null;
+    final text = _stringValue(value);
+    return text.isEmpty ? null : text;
   }
 
   static int _intValue(Object? value) {

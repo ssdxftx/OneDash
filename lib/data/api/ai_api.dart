@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/network/network_exceptions.dart';
 import 'task_waiter.dart';
 import '../dto/ai/ai_account_dto.dart';
 import '../dto/ai/ai_agent_model_config_dto.dart';
@@ -54,12 +56,13 @@ class AiApi {
     ApiResponseParser.ok(resp);
   }
 
-  Future<void> loadOllamaModel(String name) async {
+  Future<String> loadOllamaModel(String name) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/ai/ollama/model/load',
       data: {'name': name, 'taskID': const Uuid().v4()},
     );
-    ApiResponseParser.ok(resp);
+    final data = resp.data?['data'];
+    return data?.toString() ?? '';
   }
 
   Future<void> closeOllamaModel(String name) async {
@@ -140,10 +143,41 @@ class AiApi {
     );
     final body = response.data;
     if (body == null) return;
+    final contentType =
+        response.headers.value(Headers.contentTypeHeader)?.toLowerCase() ?? '';
+    if (contentType.contains('json') || contentType.startsWith('text/plain')) {
+      final builder = BytesBuilder(copy: false);
+      await for (final chunk in body.stream) {
+        builder.add(chunk);
+      }
+      final text = utf8.decode(builder.takeBytes(), allowMalformed: true);
+      Object? payload;
+      try {
+        payload = jsonDecode(text);
+      } catch (_) {
+        payload = null;
+      }
+      if (payload is Map) {
+        final rawCode = payload['code'];
+        final code = rawCode is int
+            ? rawCode
+            : int.tryParse('${rawCode ?? ''}');
+        if (code != null && code != 200) {
+          final message =
+              (payload['message'] ?? payload['msg'])?.toString().trim() ?? '';
+          throw ApiBusinessException(
+            code,
+            message,
+            errorCode: payload['errorCode']?.toString(),
+          );
+        }
+      }
+      throw const ApiFormatException(
+        'The chat endpoint returned a non-stream response.',
+      );
+    }
     var buffer = '';
-    await for (final text in body.stream.map(
-      (bytes) => utf8.decode(bytes, allowMalformed: true),
-    )) {
+    await for (final text in utf8.decoder.bind(body.stream)) {
       buffer += text;
       while (true) {
         final separator = buffer.indexOf('\n\n');
@@ -412,10 +446,11 @@ class AiApi {
     required String type,
     required String taskID,
   }) async {
-    await _client.post<Map<String, dynamic>>(
+    final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/ai/agents/plugin/install',
       data: {'agentId': agentId, 'type': type, 'taskID': taskID},
     );
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<void> upgradeAgentChannelPlugin({
@@ -423,10 +458,11 @@ class AiApi {
     required String type,
     required String taskID,
   }) async {
-    await _client.post<Map<String, dynamic>>(
+    final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/ai/agents/plugin/upgrade',
       data: {'agentId': agentId, 'type': type, 'taskID': taskID},
     );
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<void> uninstallAgentChannelPlugin({
@@ -434,10 +470,11 @@ class AiApi {
     required String type,
     required String taskID,
   }) async {
-    await _client.post<Map<String, dynamic>>(
+    final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/ai/agents/plugin/uninstall',
       data: {'agentId': agentId, 'type': type, 'taskID': taskID},
     );
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<void> approveAgentChannelPairing({
@@ -508,7 +545,7 @@ class AiApi {
         'taskID': taskID,
       },
     );
-    await _awaitTask(resp);
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<void> operateAgentPlugin({
@@ -526,7 +563,7 @@ class AiApi {
         'taskID': taskID,
       },
     );
-    await _awaitTask(resp);
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<List<Map<String, dynamic>>> listAgentSkills(int agentId) async {
@@ -568,7 +605,7 @@ class AiApi {
         'taskID': taskID,
       },
     );
-    await _awaitTask(resp);
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<void> updateAgentSkill({
@@ -1113,6 +1150,7 @@ class AiApi {
     'wecom': 'wecom',
     'dingtalk': 'dingtalk',
     'qqbot': 'qqbot',
+    'weixin': 'weixin',
   };
 
   String _channelPath(String channel) {
@@ -1164,16 +1202,20 @@ class AiApi {
   static Map<String, dynamic> _mapOf(Map<dynamic, dynamic> value) =>
       Map<String, dynamic>.from(value);
 
-  Future<void> _awaitTask(Response<dynamic> response) async {
+  Future<void> _awaitTask(
+    Response<dynamic> response, {
+    String taskID = '',
+  }) async {
     final data = response.data is Map ? (response.data as Map)['data'] : null;
-    if (data is! Map) return;
-    final taskID = '${data['taskID'] ?? ''}';
-    if (data['queued'] == true && taskID.isNotEmpty) {
-      await TaskWaiter(
-        _client,
-        interval: const Duration(seconds: 2),
-        maxAttempts: 300,
-      ).waitFor(taskID, subject: 'AI task');
-    }
+    final responseTaskID = data is Map ? '${data['taskID'] ?? ''}' : '';
+    final resolved = responseTaskID.isNotEmpty ? responseTaskID : taskID;
+    if (resolved.isEmpty) return;
+    final queued = data is Map ? data['queued'] == true : false;
+    if (!queued && taskID.isEmpty) return;
+    await TaskWaiter(
+      _client,
+      interval: const Duration(seconds: 2),
+      maxAttempts: 300,
+    ).waitFor(resolved, subject: 'AI task');
   }
 }

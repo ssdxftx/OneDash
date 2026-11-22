@@ -25,12 +25,12 @@ class SettingRepositoryImpl implements SettingRepository {
   SettingRepositoryImpl(
     this._settingApi,
     this._storage, {
-    required Server server,
-  }) : _server = server;
+    required this.server,
+  });
 
   final SettingApi _settingApi;
   final StorageService _storage;
-  final Server _server;
+  final Server server;
 
   @override
   Future<String> getBaseDir() => _settingApi.getBaseDir();
@@ -60,7 +60,7 @@ class SettingRepositoryImpl implements SettingRepository {
   Future<String> getSystemIP() => _settingApi.getSystemIP();
 
   @override
-  String getServerHost() => _server.host;
+  String getServerHost() => server.host;
 
   @override
   Future<Map<String, dynamic>> searchCoreSettings() =>
@@ -68,7 +68,7 @@ class SettingRepositoryImpl implements SettingRepository {
 
   @override
   Future<bool> hasPanelSession() async =>
-      await _storage.getPanelSession(_server.id) != null;
+      await _storage.getPanelSession(server.id) != null;
 
   @override
   Future<Map<String, dynamic>> getLoginSetting() =>
@@ -96,7 +96,7 @@ class SettingRepositoryImpl implements SettingRepository {
       entrance: entrance,
     );
     if (result.session != null && !result.needsMfa) {
-      await _storage.savePanelSession(_server.id, result.session!);
+      await _storage.savePanelSession(server.id, result.session!);
     }
     return result;
   }
@@ -113,7 +113,7 @@ class SettingRepositoryImpl implements SettingRepository {
       entrance: entrance,
     );
     if (result.session != null) {
-      await _storage.savePanelSession(_server.id, result.session!);
+      await _storage.savePanelSession(server.id, result.session!);
     }
     return result;
   }
@@ -123,7 +123,7 @@ class SettingRepositoryImpl implements SettingRepository {
     try {
       await _settingApi.logoutPanel();
     } finally {
-      await _storage.clearPanelSession(_server.id);
+      await _storage.clearPanelSession(server.id);
     }
   }
 
@@ -281,7 +281,7 @@ class SettingRepositoryImpl implements SettingRepository {
       newPassword: newPassword,
     );
     _settingApi.clearPanelSession();
-    await _storage.clearPanelSession(_server.id);
+    await _storage.clearPanelSession(server.id);
   }
 
   @override
@@ -445,7 +445,7 @@ class SettingRepositoryImpl implements SettingRepository {
       entrance: entrance,
     );
     if (result.session != null) {
-      await _storage.savePanelSession(_server.id, result.session!);
+      await _storage.savePanelSession(server.id, result.session!);
     }
     return result;
   }

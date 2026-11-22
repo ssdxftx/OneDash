@@ -12,6 +12,7 @@ import '../../../../data/dto/app/app_ignored_dto.dart';
 import '../../../../data/dto/app/app_installed_search_req.dart';
 import '../../../../data/dto/common/page_result.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
+import '../../server_detail/providers/active_server_provider.dart';
 
 final appCatalogProvider = AsyncNotifierProvider.autoDispose
     .family<AppCatalogController, PageResult<AppCatalogDto>, String>(
@@ -24,6 +25,7 @@ class AppCatalogController
   static const _pageSize = 100;
 
   int _page = 1;
+  int _generation = 0;
   bool _loadingMore = false;
   bool _disposed = false;
 
@@ -31,11 +33,17 @@ class AppCatalogController
   Future<PageResult<AppCatalogDto>> build(String query) async {
     _disposed = false;
     _page = 1;
+    _loadingMore = false;
+    _generation++;
+    ref.watch(activeServerIdProvider);
     ref.onDispose(() => _disposed = true);
     if (query.isEmpty) {
       final link = ref.keepAlive();
       final timer = Timer(const Duration(minutes: 5), link.close);
-      ref.onDispose(timer.cancel);
+      ref.onDispose(() {
+        timer.cancel();
+        link.close();
+      });
     }
     return _fetch(query, 1);
   }
@@ -48,11 +56,13 @@ class AppCatalogController
   }
 
   Future<void> refresh() async {
+    final generation = ++_generation;
     _page = 1;
     state = const AsyncLoading<PageResult<AppCatalogDto>>().copyWithPrevious(
       state,
     );
-    state = await AsyncValue.guard(() => _fetch(arg, 1));
+    final result = await AsyncValue.guard(() => _fetch(arg, 1));
+    if (!_disposed && generation == _generation) state = result;
   }
 
   Future<void> loadMore() async {
@@ -60,9 +70,10 @@ class AppCatalogController
     if (current == null || _loadingMore) return;
     if (current.items.length >= current.total) return;
     _loadingMore = true;
+    final generation = _generation;
     try {
       final next = await _fetch(arg, _page + 1);
-      if (_disposed) return;
+      if (_disposed || generation != _generation) return;
       _page++;
       final latest = state.valueOrNull ?? current;
       state = AsyncData(
@@ -80,9 +91,13 @@ class AppCatalogController
 }
 
 final appTagsProvider = FutureProvider.autoDispose<List<AppTagDto>>((ref) {
+  ref.watch(activeServerIdProvider);
   final link = ref.keepAlive();
   final timer = Timer(const Duration(minutes: 5), link.close);
-  ref.onDispose(timer.cancel);
+  ref.onDispose(() {
+    timer.cancel();
+    link.close();
+  });
   return ref
       .watch(appRepositoryProvider.future)
       .then((repository) => repository.listAppTags());
@@ -99,6 +114,7 @@ class InstalledAppsController
   static const _pageSize = 100;
 
   int _page = 1;
+  int _generation = 0;
   bool _loadingMore = false;
   bool _disposed = false;
 
@@ -106,10 +122,16 @@ class InstalledAppsController
   Future<PageResult<AppInstalledDto>> build() async {
     _disposed = false;
     _page = 1;
+    _loadingMore = false;
+    _generation++;
+    ref.watch(activeServerIdProvider);
     ref.onDispose(() => _disposed = true);
     final link = ref.keepAlive();
     final timer = Timer(const Duration(minutes: 5), link.close);
-    ref.onDispose(timer.cancel);
+    ref.onDispose(() {
+      timer.cancel();
+      link.close();
+    });
     return _fetch(1);
   }
 
@@ -121,11 +143,13 @@ class InstalledAppsController
   }
 
   Future<void> refresh() async {
+    final generation = ++_generation;
     _page = 1;
     state = const AsyncLoading<PageResult<AppInstalledDto>>().copyWithPrevious(
       state,
     );
-    state = await AsyncValue.guard(() => _fetch(1));
+    final result = await AsyncValue.guard(() => _fetch(1));
+    if (!_disposed && generation == _generation) state = result;
   }
 
   Future<void> loadMore() async {
@@ -133,9 +157,10 @@ class InstalledAppsController
     if (current == null || _loadingMore) return;
     if (current.items.length >= current.total) return;
     _loadingMore = true;
+    final generation = _generation;
     try {
       final next = await _fetch(_page + 1);
-      if (_disposed) return;
+      if (_disposed || generation != _generation) return;
       _page++;
       final latest = state.valueOrNull ?? current;
       state = AsyncData(
@@ -163,6 +188,7 @@ class UpgradableAppsController
   static const _pageSize = 100;
 
   int _page = 1;
+  int _generation = 0;
   bool _loadingMore = false;
   bool _disposed = false;
 
@@ -170,10 +196,16 @@ class UpgradableAppsController
   Future<PageResult<AppInstalledDto>> build() async {
     _disposed = false;
     _page = 1;
+    _loadingMore = false;
+    _generation++;
+    ref.watch(activeServerIdProvider);
     ref.onDispose(() => _disposed = true);
     final link = ref.keepAlive();
     final timer = Timer(const Duration(minutes: 2), link.close);
-    ref.onDispose(timer.cancel);
+    ref.onDispose(() {
+      timer.cancel();
+      link.close();
+    });
     return _fetch(1);
   }
 
@@ -185,11 +217,13 @@ class UpgradableAppsController
   }
 
   Future<void> refresh() async {
+    final generation = ++_generation;
     _page = 1;
     state = const AsyncLoading<PageResult<AppInstalledDto>>().copyWithPrevious(
       state,
     );
-    state = await AsyncValue.guard(() => _fetch(1));
+    final result = await AsyncValue.guard(() => _fetch(1));
+    if (!_disposed && generation == _generation) state = result;
   }
 
   Future<void> loadMore() async {
@@ -197,9 +231,10 @@ class UpgradableAppsController
     if (current == null || _loadingMore) return;
     if (current.items.length >= current.total) return;
     _loadingMore = true;
+    final generation = _generation;
     try {
       final next = await _fetch(_page + 1);
-      if (_disposed) return;
+      if (_disposed || generation != _generation) return;
       _page++;
       final latest = state.valueOrNull ?? current;
       state = AsyncData(
@@ -223,6 +258,7 @@ void invalidateInstalledAppLists(WidgetRef ref) {
 
 final appDetailProvider = FutureProvider.autoDispose
     .family<AppDetailDto, String>((ref, key) {
+      ref.watch(activeServerIdProvider);
       return ref
           .watch(appRepositoryProvider.future)
           .then((repository) => repository.getAppDetail(key));
@@ -230,6 +266,7 @@ final appDetailProvider = FutureProvider.autoDispose
 
 final installedInfoProvider = FutureProvider.autoDispose
     .family<AppInstalledInfoDto, int>((ref, id) {
+      ref.watch(activeServerIdProvider);
       return ref
           .watch(appRepositoryProvider.future)
           .then((repository) => repository.getInstalledInfo(id));
@@ -238,18 +275,22 @@ final installedInfoProvider = FutureProvider.autoDispose
 final ignoredAppsProvider = FutureProvider.autoDispose<List<AppIgnoredDto>>((
   ref,
 ) async {
+  ref.watch(activeServerIdProvider);
   final link = ref.keepAlive();
   final timer = Timer(const Duration(seconds: 60), link.close);
-  ref.onDispose(timer.cancel);
+  ref.onDispose(() {
+    timer.cancel();
+    link.close();
+  });
   final repository = await ref.watch(appRepositoryProvider.future);
   return repository.getIgnoredApps();
 }, name: 'ignoredAppsProvider');
 
 final installedIgnoredProvider = FutureProvider.autoDispose
-    .family<AppIgnoredDto?, int>((ref, installId) async {
+    .family<AppIgnoredDto?, int>((ref, appDetailId) async {
       final ignored = await ref.watch(ignoredAppsProvider.future);
       for (final item in ignored) {
-        if (item.appId == installId) return item;
+        if (item.appDetailId == appDetailId) return item;
       }
       return null;
     }, name: 'installedIgnoredProvider');

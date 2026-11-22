@@ -409,6 +409,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                         name: item.name,
                         path: item.path,
                         operation: 'delete',
+                        withFile: true,
                       );
                     });
                   },

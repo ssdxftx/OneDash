@@ -42,6 +42,8 @@ abstract interface class LogRepository {
     int pageSize,
   });
 
+  Future<int> getExecutingTaskCount();
+
   Future<PageResult<TaskLogDto>> searchTaskLogs({
     int page,
     int pageSize,

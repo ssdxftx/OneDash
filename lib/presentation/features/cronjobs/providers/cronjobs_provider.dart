@@ -15,6 +15,7 @@ class CronjobsController
   static const _pageSize = 100;
 
   int _page = 1;
+  int _generation = 0;
   bool _loadingMore = false;
   bool _disposed = false;
 
@@ -22,6 +23,8 @@ class CronjobsController
   Future<PageResult<CronjobDto>> build() async {
     _disposed = false;
     _page = 1;
+    _loadingMore = false;
+    _generation++;
     ref.onDispose(() => _disposed = true);
     return _fetch(1);
   }
@@ -38,11 +41,13 @@ class CronjobsController
   }
 
   Future<void> refresh() async {
+    final generation = ++_generation;
     _page = 1;
     state = const AsyncLoading<PageResult<CronjobDto>>().copyWithPrevious(
       state,
     );
-    state = await AsyncValue.guard(() => _fetch(1));
+    final result = await AsyncValue.guard(() => _fetch(1));
+    if (!_disposed && generation == _generation) state = result;
   }
 
   Future<void> loadMore() async {
@@ -50,9 +55,10 @@ class CronjobsController
     if (current == null || _loadingMore) return;
     if (current.items.length >= current.total) return;
     _loadingMore = true;
+    final generation = _generation;
     try {
       final next = await _fetch(_page + 1);
-      if (_disposed) return;
+      if (_disposed || generation != _generation) return;
       _page++;
       final latest = state.valueOrNull ?? current;
       state = AsyncData(

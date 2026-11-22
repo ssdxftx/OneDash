@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,38 +47,50 @@ final _databasesProvider = FutureProvider.autoDispose<_DatabasesState>((
   List<DatabaseInstanceDto> instances = const [];
   try {
     instances = await repository.listInstances(
-      'mysql,postgresql,redis,mongodb',
+      'mysql,mariadb,mysql-cluster,postgresql,postgresql-cluster,'
+      'redis,redis-cluster,mongodb',
     );
   } catch (_) {
     // 忽略：下方按默认类型兜底查询。
   }
+  final targets = instances.isEmpty
+      ? const [
+          (type: 'mysql', instance: 'mysql'),
+          (type: 'postgresql', instance: 'postgresql'),
+          (type: 'mongodb', instance: 'mongodb'),
+        ]
+      : [
+          for (final instance in instances)
+            if (!instance.type.startsWith('redis'))
+              (type: instance.type, instance: instance.name),
+        ];
   final types = instances.isEmpty
-      ? ['mysql', 'postgresql', 'redis', 'mongodb']
+      ? const ['mysql', 'postgresql', 'redis', 'mongodb']
       : instances.map((e) => e.type).toSet().toList();
   var failures = 0;
   Object? firstError;
   final results = await Future.wait<List<DatabaseSearchItemDto>>(
-    types.map((type) async {
+    targets.map((target) async {
       try {
-        final page = switch (type) {
+        final page = switch (target.type) {
           'postgresql' ||
           'postgresql-cluster' => await repository.searchPgDatabases(
-            database: type,
+            database: target.instance,
             page: 1,
             pageSize: 100,
           ),
           'mongodb' => await repository.searchMongoDatabases(
-            database: type,
+            database: target.instance,
             page: 1,
             pageSize: 100,
           ),
           _ => await repository.searchDatabases(
-            database: type,
+            database: target.instance,
             page: 1,
             pageSize: 100,
           ),
         };
-        return page.items.map((item) => item.withType(type)).toList();
+        return page.items.map((item) => item.withType(target.type)).toList();
       } catch (error) {
         failures++;
         firstError ??= error;
@@ -84,7 +98,7 @@ final _databasesProvider = FutureProvider.autoDispose<_DatabasesState>((
       }
     }),
   );
-  if (types.isNotEmpty && failures == types.length && firstError != null) {
+  if (targets.isNotEmpty && failures == targets.length && firstError != null) {
     throw firstError!;
   }
   return _DatabasesState(
@@ -388,7 +402,7 @@ class _DatabasesPageState extends ConsumerState<DatabasesPage>
                         await repository.deleteDatabase(
                           id: item.id,
                           type: item.dbType,
-                          database: item.name,
+                          database: item.instanceName,
                           forceDelete: false,
                           deleteBackup: false,
                         );
@@ -506,7 +520,16 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
     try {
       final repository = await ref.read(databaseRepositoryProvider.future);
       final results = await Future.wait<List<DatabaseInstanceDto>>([
-        for (final type in const ['mysql', 'postgresql', 'mongodb', 'redis'])
+        for (final type in const [
+          'mysql',
+          'mariadb',
+          'mysql-cluster',
+          'postgresql',
+          'postgresql-cluster',
+          'mongodb',
+          'redis',
+          'redis-cluster',
+        ])
           () async {
             try {
               final page = await repository.searchRemoteDatabases(type: type);
@@ -543,6 +566,11 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
           : _defaultDatabaseVersion(type),
     );
     bool ssl = current?.ssl ?? false;
+    final initialDBValue = current?.initialDB ?? '';
+    final rootCertValue = current?.rootCert ?? '';
+    final clientKeyValue = current?.clientKey ?? '';
+    final clientCertValue = current?.clientCert ?? '';
+    final skipVerifyValue = current?.skipVerify ?? false;
     final saved = await pushFormPage<bool>(
       context,
       StatefulBuilder(
@@ -559,15 +587,33 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
               decoration: InputDecoration(
                 labelText: l10n.cronjobs_databaseType,
               ),
-              items: const [
-                DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
-                DropdownMenuItem(value: 'mariadb', child: Text('MariaDB')),
+              items: [
+                const DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
+                const DropdownMenuItem(
+                  value: 'mariadb',
+                  child: Text('MariaDB'),
+                ),
                 DropdownMenuItem(
+                  value: 'mysql-cluster',
+                  child: Text(l10n.databases_typeMysqlCluster),
+                ),
+                const DropdownMenuItem(
                   value: 'postgresql',
                   child: Text('PostgreSQL'),
                 ),
-                DropdownMenuItem(value: 'mongodb', child: Text('MongoDB')),
-                DropdownMenuItem(value: 'redis', child: Text('Redis')),
+                DropdownMenuItem(
+                  value: 'postgresql-cluster',
+                  child: Text(l10n.databases_typePostgresqlCluster),
+                ),
+                const DropdownMenuItem(
+                  value: 'mongodb',
+                  child: Text('MongoDB'),
+                ),
+                const DropdownMenuItem(value: 'redis', child: Text('Redis')),
+                DropdownMenuItem(
+                  value: 'redis-cluster',
+                  child: Text(l10n.databases_typeRedisCluster),
+                ),
               ],
               onChanged: (value) {
                 if (value == null) return;
@@ -649,6 +695,11 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
       'password': passwordValue,
       'description': note,
       'ssl': ssl,
+      'initialDB': initialDBValue,
+      'rootCert': _encode(ssl ? rootCertValue : ''),
+      'clientKey': _encode(ssl ? clientKeyValue : ''),
+      'clientCert': _encode(ssl ? clientCertValue : ''),
+      'skipVerify': skipVerifyValue,
       'timeout': current?.timeout ?? 30,
     };
     try {
@@ -672,12 +723,15 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
     }
   }
 
+  static String _encode(String value) =>
+      value.isEmpty ? '' : base64Encode(utf8.encode(value));
+
   static String _defaultDatabaseVersion(String type) {
     return switch (type) {
       'mariadb' => '10.x',
-      'postgresql' => '16',
+      'postgresql' || 'postgresql-cluster' => '16',
       'mongodb' => '7.0',
-      'redis' => '7.0',
+      'redis' || 'redis-cluster' => '7.0',
       _ => '8.x',
     };
   }
@@ -685,9 +739,9 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
   static List<String> _databaseVersions(String type, String current) {
     final defaults = switch (type) {
       'mariadb' => const ['10.x', '11.x'],
-      'postgresql' => const ['17', '16', '15', '14'],
+      'postgresql' || 'postgresql-cluster' => const ['17', '16', '15', '14'],
       'mongodb' => const ['7.0', '6.0'],
-      'redis' => const ['7.0', '6.0'],
+      'redis' || 'redis-cluster' => const ['7.0', '6.0'],
       _ => const ['8.x', '5.7', '5.6'],
     };
     return [
@@ -704,11 +758,18 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
         'name': item.name,
         'type': item.type,
         'from': item.from,
+        'version': item.version,
         'address': item.address,
         'port': item.port,
+        'initialDB': item.initialDB,
         'username': item.username,
         'password': item.password,
+        'description': item.description,
         'ssl': item.ssl,
+        'rootCert': _encode(item.ssl ? item.rootCert : ''),
+        'clientKey': _encode(item.ssl ? item.clientKey : ''),
+        'clientCert': _encode(item.ssl ? item.clientCert : ''),
+        'skipVerify': item.skipVerify,
         'timeout': item.timeout,
       });
       if (!mounted) return;
@@ -751,10 +812,21 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
 
   Future<void> _delete(DatabaseInstanceDto item) async {
     final l10n = AppLocalizations.of(context);
+    var resources = const <DBResourceDto>[];
+    try {
+      final repository = await ref.read(databaseRepositoryProvider.future);
+      resources = await repository.checkRemoteDatabaseDelete(item.id);
+    } catch (_) {
+      resources = const [];
+    }
+    if (!mounted) return;
+    final message = resources.isEmpty
+        ? item.name
+        : '${item.name}\n${l10n.databases_deleteRelatedMessage(resources.length)}';
     final confirmed = await showConfirmSheet(
       context,
       title: l10n.action_delete,
-      message: item.name,
+      message: message,
       confirmLabel: l10n.action_delete,
     );
     if (!confirmed || !mounted) return;
@@ -824,11 +896,13 @@ class _RemoteInstancesSheetState extends ConsumerState<_RemoteInstancesSheet> {
                         final value = await showSelectionMenu<String>(
                           context,
                           options: [
-                            SelectionOption(
-                              label: l10n.databases_loadDatabases,
-                              value: 'load',
-                              icon: TablerIcons.database_import,
-                            ),
+                            if (item.type != 'redis' &&
+                                item.type != 'redis-cluster')
+                              SelectionOption(
+                                label: l10n.databases_loadDatabases,
+                                value: 'load',
+                                icon: TablerIcons.database_import,
+                              ),
                             SelectionOption(
                               label: l10n.databases_testConnection,
                               value: 'test',

@@ -23,6 +23,16 @@ void main() {
     expect(text.contains('apiKey: ***'), isTrue);
   });
 
+  test('sanitizes secrets in query strings', () {
+    final text = LogSanitizer.sanitize(
+      'GET /api/v2/files/share/download?code=abc&password=secret&token=abc123',
+    );
+    expect(text.contains('secret'), isFalse);
+    expect(text.contains('abc123'), isFalse);
+    expect(text.contains('password=***'), isTrue);
+    expect(text.contains('token=***'), isTrue);
+  });
+
   test('sanitizes backup credentials', () {
     final text = LogSanitizer.sanitize(
       '{"accessKey":"ak","credential":"sk","secret":"s"}',

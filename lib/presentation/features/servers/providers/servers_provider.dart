@@ -68,6 +68,7 @@ class ServerHealth {
     this.databaseCount = 0,
     this.appCount = 0,
     this.cronjobCount = 0,
+    this.error,
   });
 
   final bool online;
@@ -82,6 +83,7 @@ class ServerHealth {
   final int databaseCount;
   final int appCount;
   final int cronjobCount;
+  final Object? error;
 
   static const offline = ServerHealth(online: false, latencyMs: 0);
 }
@@ -121,11 +123,12 @@ final serverHealthProvider = FutureProvider.autoDispose
           appCount: dashboard.base.appInstalledNumber,
           cronjobCount: dashboard.base.cronjobNumber,
         );
-      } catch (_) {
+      } catch (error) {
         stopwatch.stop();
         return ServerHealth(
           online: false,
           latencyMs: stopwatch.elapsedMilliseconds,
+          error: error,
         );
       }
     }, name: 'serverHealthProvider');

@@ -52,6 +52,10 @@ class HostToolApi {
       path,
       data: {'type': 'supervisord', if (operate == 'set') 'content': content},
     );
+    if (operate == 'set') {
+      ApiResponseParser.ok(resp);
+      return '';
+    }
     final data = ApiResponseParser.map(resp);
     return data['content'] as String? ?? '';
   }

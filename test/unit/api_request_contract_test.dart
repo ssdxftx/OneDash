@@ -38,6 +38,15 @@ class _RecordingAdapter implements HttpClientAdapter {
   final List<RequestOptions> requests = [];
   Object? responseData;
 
+  List<String> get apiPaths => paths
+      .where((path) => path != '/api/v2/logs/tasks/read')
+      .toList(growable: false);
+
+  List<Map<String, dynamic>> get apiBodies => [
+    for (var index = 0; index < paths.length; index++)
+      if (paths[index] != '/api/v2/logs/tasks/read') bodies[index],
+  ];
+
   @override
   Future<ResponseBody> fetch(
     RequestOptions options,
@@ -49,8 +58,11 @@ class _RecordingAdapter implements HttpClientAdapter {
     requests.add(options);
     final data = options.data;
     bodies.add(data is Map ? Map<String, dynamic>.from(data) : {});
+    final payload = options.path == '/api/v2/logs/tasks/read'
+        ? <String, dynamic>{'taskStatus': 'Success'}
+        : responseData;
     return ResponseBody.fromString(
-      jsonEncode({'code': 200, 'data': responseData}),
+      jsonEncode({'code': 200, 'data': payload}),
       200,
       headers: {
         Headers.contentTypeHeader: [Headers.jsonContentType],
@@ -171,17 +183,17 @@ void main() {
 
   test('website batch operate sends ids, operate and task id', () async {
     await WebsiteApi(client).batchOperateWebsites([1, 2], 'stop');
-    expect(adapter.paths.single, '/api/v2/websites/batch/operate');
-    expect(adapter.bodies.single['ids'], [1, 2]);
-    expect(adapter.bodies.single['operate'], 'stop');
-    expect(adapter.bodies.single['taskID'], isNotEmpty);
+    expect(adapter.apiPaths.single, '/api/v2/websites/batch/operate');
+    expect(adapter.apiBodies.single['ids'], [1, 2]);
+    expect(adapter.apiBodies.single['operate'], 'stop');
+    expect(adapter.apiBodies.single['taskID'], isNotEmpty);
   });
 
   test('website batch group and ssl use backend field names', () async {
     final api = WebsiteApi(client);
     await api.batchSetWebsiteGroup([1, 2], 3);
     await api.batchSetWebsiteHttps(ids: [1, 2], sslId: 9);
-    expect(adapter.paths, [
+    expect(adapter.apiPaths, [
       '/api/v2/websites/batch/group',
       '/api/v2/websites/batch/ssl',
     ]);
@@ -596,7 +608,7 @@ void main() {
     );
     await api.updateAgentSkill(agentId: 3, name: 'pdf', enabled: false);
     await api.uninstallAgentSkill(agentId: 3, name: 'pdf');
-    expect(adapter.paths, [
+    expect(adapter.apiPaths, [
       '/api/v2/ai/ollama/model/recreate',
       '/api/v2/ai/ollama/account/sync',
       '/api/v2/ai/gpu/options',
@@ -612,12 +624,12 @@ void main() {
       '/api/v2/ai/agents/skills/update',
       '/api/v2/ai/agents/skills/uninstall',
     ]);
-    expect(adapter.bodies[1]['modelAccountBaseURLType'], 'custom');
-    expect(adapter.bodies[3]['legacy'], isTrue);
-    expect(adapter.bodies[6]['keyword'], 'web');
-    expect(adapter.bodies[8]['operate'], 'enable');
-    expect(adapter.bodies[10]['source'], 'official');
-    expect(adapter.bodies[13]['name'], 'pdf');
+    expect(adapter.apiBodies[1]['modelAccountBaseURLType'], 'custom');
+    expect(adapter.apiBodies[3]['legacy'], isTrue);
+    expect(adapter.apiBodies[6]['keyword'], 'web');
+    expect(adapter.apiBodies[8]['operate'], 'enable');
+    expect(adapter.apiBodies[10]['source'], 'official');
+    expect(adapter.apiBodies[12]['name'], 'pdf');
   });
 
   test('GPU devices, batch agents and Hermes routes use fields', () async {
@@ -1047,7 +1059,7 @@ void main() {
       'upgradable': true,
     };
     final status = await ai.checkAgentChannelPlugin(agentId: 3, type: 'feishu');
-    expect(adapter.paths, [
+    expect(adapter.apiPaths, [
       '/api/v2/ai/accounts/models/discover',
       '/api/v2/ai/agents/plugin/install',
       '/api/v2/ai/agents/plugin/upgrade',
@@ -1314,7 +1326,7 @@ void main() {
       modules: ['headers-more'],
       force: true,
     );
-    final body = adapter.bodies.single;
+    final body = adapter.bodies.first;
     expect(body['mirror'], 'https://example.com');
     expect(body['taskID'], 'task-1');
     expect(body['modules'], ['headers-more']);
