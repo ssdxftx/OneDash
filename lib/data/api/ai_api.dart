@@ -54,12 +54,13 @@ class AiApi {
     ApiResponseParser.ok(resp);
   }
 
-  Future<void> loadOllamaModel(String name) async {
+  Future<String> loadOllamaModel(String name) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/ai/ollama/model/load',
       data: {'name': name, 'taskID': const Uuid().v4()},
     );
-    ApiResponseParser.ok(resp);
+    final data = resp.data?['data'];
+    return data?.toString() ?? '';
   }
 
   Future<void> closeOllamaModel(String name) async {
@@ -412,10 +413,11 @@ class AiApi {
     required String type,
     required String taskID,
   }) async {
-    await _client.post<Map<String, dynamic>>(
+    final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/ai/agents/plugin/install',
       data: {'agentId': agentId, 'type': type, 'taskID': taskID},
     );
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<void> upgradeAgentChannelPlugin({
@@ -423,10 +425,11 @@ class AiApi {
     required String type,
     required String taskID,
   }) async {
-    await _client.post<Map<String, dynamic>>(
+    final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/ai/agents/plugin/upgrade',
       data: {'agentId': agentId, 'type': type, 'taskID': taskID},
     );
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<void> uninstallAgentChannelPlugin({
@@ -434,10 +437,11 @@ class AiApi {
     required String type,
     required String taskID,
   }) async {
-    await _client.post<Map<String, dynamic>>(
+    final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/ai/agents/plugin/uninstall',
       data: {'agentId': agentId, 'type': type, 'taskID': taskID},
     );
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<void> approveAgentChannelPairing({
@@ -508,7 +512,7 @@ class AiApi {
         'taskID': taskID,
       },
     );
-    await _awaitTask(resp);
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<void> operateAgentPlugin({
@@ -526,7 +530,7 @@ class AiApi {
         'taskID': taskID,
       },
     );
-    await _awaitTask(resp);
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<List<Map<String, dynamic>>> listAgentSkills(int agentId) async {
@@ -568,7 +572,7 @@ class AiApi {
         'taskID': taskID,
       },
     );
-    await _awaitTask(resp);
+    await _awaitTask(resp, taskID: taskID);
   }
 
   Future<void> updateAgentSkill({
@@ -1113,6 +1117,7 @@ class AiApi {
     'wecom': 'wecom',
     'dingtalk': 'dingtalk',
     'qqbot': 'qqbot',
+    'weixin': 'weixin',
   };
 
   String _channelPath(String channel) {
@@ -1164,16 +1169,20 @@ class AiApi {
   static Map<String, dynamic> _mapOf(Map<dynamic, dynamic> value) =>
       Map<String, dynamic>.from(value);
 
-  Future<void> _awaitTask(Response<dynamic> response) async {
+  Future<void> _awaitTask(
+    Response<dynamic> response, {
+    String taskID = '',
+  }) async {
     final data = response.data is Map ? (response.data as Map)['data'] : null;
-    if (data is! Map) return;
-    final taskID = '${data['taskID'] ?? ''}';
-    if (data['queued'] == true && taskID.isNotEmpty) {
-      await TaskWaiter(
-        _client,
-        interval: const Duration(seconds: 2),
-        maxAttempts: 300,
-      ).waitFor(taskID, subject: 'AI task');
-    }
+    final responseTaskID = data is Map ? '${data['taskID'] ?? ''}' : '';
+    final resolved = responseTaskID.isNotEmpty ? responseTaskID : taskID;
+    if (resolved.isEmpty) return;
+    final queued = data is Map ? data['queued'] == true : false;
+    if (!queued && taskID.isEmpty) return;
+    await TaskWaiter(
+      _client,
+      interval: const Duration(seconds: 2),
+      maxAttempts: 300,
+    ).waitFor(resolved, subject: 'AI task');
   }
 }

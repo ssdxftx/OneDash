@@ -17,6 +17,7 @@ import '../dto/app/app_installed_info_dto.dart';
 import '../dto/app/app_installed_search_req.dart';
 import '../dto/app/app_detail_dto.dart';
 import '../dto/app/app_install_config_dto.dart';
+import '../dto/app/app_service_dto.dart';
 import '../dto/app/app_install_req.dart';
 import '../dto/app/app_tag_dto.dart';
 import '../dto/app/app_update_version_dto.dart';
@@ -60,6 +61,12 @@ class AppRepositoryImpl implements AppRepository {
   Future<AppDetailDto> getAppDetailById(int id) => _appApi.getAppDetailById(id);
 
   @override
+  Future<AppDetailSimpleDto> getNodeAppDetail({
+    required String appKey,
+    required String version,
+  }) => _appApi.getNodeAppDetail(appKey: appKey, version: version);
+
+  @override
   Future<PageResult<AppInstalledDto>> searchInstalledApps(
     AppInstalledSearchReq req,
   ) => _appApi.searchInstalledApps(req);
@@ -90,6 +97,14 @@ class AppRepositoryImpl implements AppRepository {
   @override
   Future<AppInstallConfigDto> getAppInstallConfig(int appId, String version) =>
       _appApi.getAppInstallConfig(appId, version);
+
+  @override
+  Future<AppInstallConfigDto> getAppRuntimeConfig(int appId, String version) =>
+      _appApi.getAppRuntimeConfig(appId, version);
+
+  @override
+  Future<List<AppServiceDto>> getAppServices(String key) =>
+      _appApi.getAppServices(key);
 
   @override
   Future<void> installApp(AppInstallReq req) => _appApi.installApp(req);

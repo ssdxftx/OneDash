@@ -288,6 +288,7 @@ class _PanelProxySettingsPageState
         proxyPort: _type == 'close' ? '' : port,
         proxyUser: _user.text.trim(),
         proxyPasswd: _password.text,
+        proxyPasswdKeep: _password.text.isEmpty,
         proxyDocker: _docker,
         withDockerRestart: _restartDocker,
       );

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../../data/repositories_impl/vm_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
@@ -494,12 +496,35 @@ class _VmResourcesSheetState extends ConsumerState<_VmResourcesSheet> {
     final name = TextEditingController();
     final path = TextEditingController();
     var type = 'iso';
+    PlatformFile? picked;
     final saved = await _showForm(
       title: l10n.vm_isos,
       children: (setFormState) => [
         AppTextField(controller: name, label: l10n.vm_name),
         const SizedBox(height: AppTokens.s12),
-        AppTextField(controller: path, label: l10n.vm_path),
+        AppTextField(
+          controller: path,
+          label: mode == 'import' ? l10n.files_targetDirectory : l10n.vm_path,
+        ),
+        if (mode == 'import') ...[
+          const SizedBox(height: AppTokens.s12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () async {
+                final result = await FilePicker.pickFiles();
+                final file = result?.files.firstOrNull;
+                if (file == null || file.path == null) return;
+                setFormState(() {
+                  picked = file;
+                  if (name.text.trim().isEmpty) name.text = file.name;
+                });
+              },
+              icon: const Icon(TablerIcons.upload, size: AppTokens.iconInline),
+              label: Text(picked?.name ?? l10n.files_upload),
+            ),
+          ),
+        ],
         const SizedBox(height: AppTokens.s12),
         DropdownButtonFormField<String>(
           initialValue: type,
@@ -514,23 +539,43 @@ class _VmResourcesSheetState extends ConsumerState<_VmResourcesSheet> {
         ),
       ],
     );
+    final targetDir = path.text.trim();
+    final file = picked;
+    final finalPath = mode == 'import' && file != null
+        ? '${targetDir.endsWith('/') ? targetDir.substring(0, targetDir.length - 1) : targetDir}/${file.name}'
+        : targetDir;
     final body = <String, dynamic>{
       'type': type,
       'name': name.text.trim(),
-      'path': path.text.trim(),
+      'path': finalPath,
     };
     name.dispose();
     path.dispose();
     if (!saved || !mounted) return;
+    if (mode == 'import' && (file?.path == null || targetDir.isEmpty)) {
+      AppToast.warning(context, l10n.files_pathRequired);
+      return;
+    }
     try {
       final repository = await ref.read(vmRepositoryProvider.future);
       if (mode == 'import') {
+        final uploadId = const Uuid().v4();
         final id = await repository.startIsoImport({
           ...body,
           'status': 'uploading',
+          'tempFileID': uploadId,
           'tempFileType': 'upload',
         });
         try {
+          if (file == null || file.path == null) {
+            throw StateError(l10n.files_pathRequired);
+          }
+          final fileRepository = await ref.read(fileRepositoryProvider.future);
+          await fileRepository.uploadFile(
+            filePath: file.path!,
+            targetPath: targetDir,
+            uploadId: uploadId,
+          );
           await repository.updateIsoImport({'id': id, 'status': 'ready'});
         } catch (error) {
           await repository.updateIsoImport({
@@ -672,6 +717,9 @@ class _ResourceList extends ConsumerWidget {
       } else if (kind == _ResourceKind.iso) {
         final name = TextEditingController(text: '${item['name'] ?? ''}');
         final path = TextEditingController(text: '${item['path'] ?? ''}');
+        final description = TextEditingController(
+          text: '${item['description'] ?? ''}',
+        );
         var type = '${item['type'] ?? 'iso'}';
         final saved = await pushFormPage<bool>(
           context,
@@ -683,6 +731,11 @@ class _ResourceList extends ConsumerWidget {
                 AppTextField(controller: name, label: l10n.vm_name),
                 const SizedBox(height: AppTokens.s12),
                 AppTextField(controller: path, label: l10n.vm_path),
+                const SizedBox(height: AppTokens.s12),
+                AppTextField(
+                  controller: description,
+                  label: l10n.vm_description,
+                ),
                 const SizedBox(height: AppTokens.s12),
                 DropdownButtonFormField<String>(
                   initialValue: type,
@@ -710,9 +763,11 @@ class _ResourceList extends ConsumerWidget {
           'type': type,
           'name': name.text.trim(),
           'path': path.text.trim(),
+          'description': description.text.trim(),
         };
         name.dispose();
         path.dispose();
+        description.dispose();
         if (saved == true) {
           await repository.updateIso(body);
           ref.invalidate(vmIsoProvider);

@@ -94,6 +94,7 @@ class SslManageDto {
     final acmeAccountJson = json['acmeAccount'];
     final dnsAccountJson = json['dnsAccount'];
     final domains = json['domains'] as String? ?? '';
+    final otherDomains = json['otherDomains'] as String?;
     final websitesJson = json['websites'] as List?;
 
     return SslManageDto(
@@ -104,7 +105,11 @@ class SslManageDto {
       dnsAccountId: json['dnsAccountId'] as int? ?? 0,
       caId: json['caId'] as int? ?? 0,
       primaryDomain: json['primaryDomain'] as String? ?? '',
-      otherDomains: json['otherDomains'] as String? ?? domains,
+      otherDomains:
+          (otherDomains != null && otherDomains.isNotEmpty
+                  ? otherDomains
+                  : domains)
+              .replaceAll(',', '\n'),
       provider: json['provider'] as String? ?? '',
       type: json['type'] as String? ?? '',
       status: json['status'] as String? ?? '',

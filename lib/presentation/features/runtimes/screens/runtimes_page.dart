@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
@@ -22,6 +21,7 @@ import '../../../common/components/tonal_card.dart';
 import '../../../common/states/async_state_view.dart';
 import '../../../common/states/empty_state.dart';
 import '../../../common/states/error_toast.dart';
+import 'runtime_create_page.dart';
 import 'runtime_detail_page.dart';
 
 final _runtimesProvider = FutureProvider.autoDispose<PageResult<RuntimeDto>>((
@@ -299,116 +299,11 @@ class RuntimesPage extends ConsumerWidget {
   }
 
   Future<void> _create(BuildContext context, WidgetRef ref) async {
-    final l10n = AppLocalizations.of(context);
-    final name = TextEditingController();
-    final type = TextEditingController(text: 'php');
-    final image = TextEditingController();
-    final appDetailId = TextEditingController();
-    final resource = TextEditingController();
-    final version = TextEditingController();
-    final codeDir = TextEditingController();
-    final port = TextEditingController();
-    final remark = TextEditingController();
-    final params = TextEditingController(text: '{}');
-    final saved = await pushFormPage<bool>(
+    final created = await pushFormPage<bool>(
       context,
-      Builder(
-        builder: (pageContext) => SimpleFormPage(
-          title: l10n.runtime_create,
-          saveLabel: l10n.action_create,
-          onSave: () async => Navigator.of(pageContext).pop(true),
-          children: [
-            AppTextField(controller: name, label: l10n.runtime_name),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: type, label: l10n.runtime_typeLabel),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: image, label: l10n.runtime_image),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(
-              controller: appDetailId,
-              label: l10n.runtime_appDetailId,
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: resource, label: l10n.runtime_resource),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: version, label: l10n.runtime_version),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: codeDir, label: l10n.runtime_codeDir),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(
-              controller: port,
-              label: l10n.runtime_port,
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: remark, label: l10n.runtime_remark),
-            const SizedBox(height: AppTokens.s12),
-            AppTextField(
-              controller: params,
-              label: l10n.runtime_paramsJson,
-              maxLines: 5,
-            ),
-          ],
-        ),
-      ),
+      const RuntimeCreatePage(),
     );
-    final nameValue = name.text.trim();
-    final typeValue = type.text.trim();
-    final imageValue = image.text.trim();
-    final detailId = int.tryParse(appDetailId.text.trim()) ?? 0;
-    final resourceValue = resource.text.trim();
-    final versionValue = version.text.trim();
-    final codeDirValue = codeDir.text.trim();
-    final portValue = int.tryParse(port.text.trim()) ?? 0;
-    final remarkValue = remark.text.trim();
-    final paramsRaw = params.text.trim();
-    name.dispose();
-    type.dispose();
-    image.dispose();
-    appDetailId.dispose();
-    resource.dispose();
-    version.dispose();
-    codeDir.dispose();
-    port.dispose();
-    remark.dispose();
-    params.dispose();
-    if (saved != true || !context.mounted || nameValue.isEmpty) return;
-    Map<String, dynamic> parsed;
-    try {
-      final decoded = jsonDecode(paramsRaw.isEmpty ? '{}' : paramsRaw);
-      if (decoded is! Map<String, dynamic>) {
-        AppToast.warning(context, l10n.runtime_paramsInvalid);
-        return;
-      }
-      parsed = decoded;
-    } catch (_) {
-      AppToast.warning(context, l10n.runtime_paramsInvalid);
-      return;
-    }
-    try {
-      final repository = await ref.read(runtimeRepositoryProvider.future);
-      await repository.createRuntime(
-        RuntimeCreateReq(
-          name: nameValue,
-          appDetailID: detailId,
-          image: imageValue,
-          params: parsed,
-          type: typeValue,
-          resource: resourceValue,
-          version: versionValue,
-          codeDir: codeDirValue,
-          port: portValue,
-          remark: remarkValue,
-        ),
-      );
-      ref.invalidate(_runtimesProvider);
-      if (!context.mounted) return;
-      AppToast.success(context, l10n.action_done);
-    } catch (error) {
-      if (!context.mounted) return;
-      showErrorToast(context, error);
-    }
+    if (created == true) ref.invalidate(_runtimesProvider);
   }
 
   Future<void> _edit(
@@ -517,7 +412,11 @@ class RuntimesPage extends ConsumerWidget {
         );
         if (!proceed || !context.mounted) return;
       }
-      await repository.deleteRuntime(runtime.id, forceDelete: true);
+      await repository.deleteRuntime(
+        runtime.id,
+        forceDelete: true,
+        taskID: const Uuid().v4(),
+      );
       ref.invalidate(_runtimesProvider);
       if (!context.mounted) return;
       AppToast.success(context, l10n.action_done);

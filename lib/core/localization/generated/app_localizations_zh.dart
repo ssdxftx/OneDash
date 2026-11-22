@@ -9076,4 +9076,75 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get panelSettings_passkeyPrereq =>
       '需通过 HTTPS 访问绑定域名，并在该域名提供 Android assetlinks.json';
+
+  @override
+  String get websites_deleteApp => '同时删除关联应用';
+
+  @override
+  String get websites_dnsValidation => '使用 DNS 验证';
+
+  @override
+  String get files_useProxy => '使用服务端代理';
+
+  @override
+  String get files_useServerFilename => '使用服务器文件名';
+
+  @override
+  String get vm_isoRequired => '请选择模板或 ISO 镜像';
+
+  @override
+  String get ai_model_details => '模型详情';
+
+  @override
+  String get ai_account_api_key_required => '保存修改需重新输入 API Key';
+
+  @override
+  String get ai_account_initial_models => '初始模型';
+
+  @override
+  String get ai_account_discover_unsupported => '该服务商不支持自动发现模型';
+
+  @override
+  String get databases_typeMysqlCluster => 'MySQL 集群';
+
+  @override
+  String get databases_typePostgresqlCluster => 'PostgreSQL 集群';
+
+  @override
+  String get databases_typeRedisCluster => 'Redis 集群';
+
+  @override
+  String get websites_runtimePort => '后端端口';
+
+  @override
+  String get runtime_app => '应用';
+
+  @override
+  String get runtime_source => '镜像源';
+
+  @override
+  String get runtime_installDependencies => '安装依赖';
+
+  @override
+  String get apps_services => '服务';
+
+  @override
+  String logs_taskExecuting(int count) {
+    return '$count 个任务执行中';
+  }
+
+  @override
+  String get files_shareExpireOneHour => '1 小时';
+
+  @override
+  String get files_shareExpireOneDay => '1 天';
+
+  @override
+  String get files_shareExpireSevenDays => '7 天';
+
+  @override
+  String get files_sharePasswordPolicy => '密码长度必须为 4-256 个字符。';
+
+  @override
+  String get files_sharePasswordOptional => '可选，留空表示无密码。';
 }

@@ -91,3 +91,14 @@ class AppDetailDto {
     );
   }
 }
+
+/// `/apps/detail/node/:appKey/:version` 的简化响应。
+class AppDetailSimpleDto {
+  const AppDetailSimpleDto({required this.id});
+
+  final int id;
+
+  factory AppDetailSimpleDto.fromJson(Map<String, dynamic> json) {
+    return AppDetailSimpleDto(id: (json['id'] as num?)?.toInt() ?? 0);
+  }
+}

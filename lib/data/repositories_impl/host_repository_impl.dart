@@ -98,6 +98,10 @@ class HostRepositoryImpl implements HostRepository {
   Future<void> deleteRemoteHosts(List<int> ids) => _api.deleteRemoteHosts(ids);
 
   @override
+  Future<void> updateHostGroup({required int id, required int groupId}) =>
+      _api.updateHostGroup(id: id, groupId: groupId);
+
+  @override
   Future<bool> testRemoteHost(Map<String, dynamic> body) =>
       _api.testRemoteHost(body);
 

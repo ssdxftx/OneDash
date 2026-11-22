@@ -28,6 +28,7 @@ import '../dto/website/website_https_dto.dart';
 import '../dto/website/website_search_req.dart';
 import '../dto/website/website_template_dto.dart';
 import '../dto/website/website_leech_dto.dart';
+import 'task_waiter.dart';
 import '../dto/website/website_real_ip_dto.dart';
 import '../dto/website/website_cors_dto.dart';
 import '../dto/website/website_update_req.dart';
@@ -529,6 +530,19 @@ class WebsiteApi {
       '/api/v2/websites/auths/update',
       data: req.toJson(),
     );
+    if (req.operate == 'create' || req.operate == 'edit') {
+      await _client.post<Map<String, dynamic>>(
+        '/api/v2/websites/auths/update',
+        data: WebsiteAuthUpdateReq(
+          websiteId: req.websiteId,
+          operate: 'enable',
+          username: req.username,
+          password: req.password,
+          remark: req.remark,
+          scope: req.scope,
+        ).toJson(),
+      );
+    }
   }
 
   /// 更新网站路径密码访问配置 (创建、修改、删除)。
@@ -568,6 +582,11 @@ class WebsiteApi {
         'force': force,
       },
     );
+    await TaskWaiter(
+      _client,
+      interval: const Duration(seconds: 2),
+      maxAttempts: 300,
+    ).waitFor(taskID, subject: 'OpenResty build');
   }
 
   /// GET /api/v2/openresty/https
@@ -1237,14 +1256,16 @@ class WebsiteApi {
     String operate, {
     String? taskId,
   }) async {
+    final taskID = taskId ?? const Uuid().v4();
     await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/batch/operate',
-      data: {
-        'ids': ids,
-        'operate': operate,
-        'taskID': taskId ?? const Uuid().v4(),
-      },
+      data: {'ids': ids, 'operate': operate, 'taskID': taskID},
     );
+    await TaskWaiter(
+      _client,
+      interval: const Duration(seconds: 2),
+      maxAttempts: 300,
+    ).waitFor(taskID, subject: 'Website task');
   }
 
   /// 批量修改网站分组。
@@ -1261,11 +1282,12 @@ class WebsiteApi {
     required int sslId,
     String? taskId,
   }) async {
+    final taskID = taskId ?? const Uuid().v4();
     await _client.post<Map<String, dynamic>>(
       '/api/v2/websites/batch/ssl',
       data: {
         'ids': ids,
-        'taskID': taskId ?? const Uuid().v4(),
+        'taskID': taskID,
         'websiteSSLId': sslId,
         'type': 'existed',
         'privateKey': '',
@@ -1281,6 +1303,11 @@ class WebsiteApi {
         'httpsPorts': const [443],
       },
     );
+    await TaskWaiter(
+      _client,
+      interval: const Duration(seconds: 2),
+      maxAttempts: 300,
+    ).waitFor(taskID, subject: 'Website task');
   }
 
   /// 将旧分组迁移到新分组。

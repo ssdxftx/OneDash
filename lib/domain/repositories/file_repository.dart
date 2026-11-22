@@ -110,6 +110,8 @@ abstract class FileRepository {
     required String path,
     required String name,
     bool ignoreCertificate = false,
+    bool useProxy = false,
+    bool useServerFilename = false,
   });
 
   Future<void> wgetStop(String key);

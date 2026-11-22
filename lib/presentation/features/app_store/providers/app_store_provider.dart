@@ -246,10 +246,10 @@ final ignoredAppsProvider = FutureProvider.autoDispose<List<AppIgnoredDto>>((
 }, name: 'ignoredAppsProvider');
 
 final installedIgnoredProvider = FutureProvider.autoDispose
-    .family<AppIgnoredDto?, int>((ref, installId) async {
+    .family<AppIgnoredDto?, int>((ref, appDetailId) async {
       final ignored = await ref.watch(ignoredAppsProvider.future);
       for (final item in ignored) {
-        if (item.appId == installId) return item;
+        if (item.appDetailId == appDetailId) return item;
       }
       return null;
     }, name: 'installedIgnoredProvider');

@@ -4873,5 +4873,102 @@
   },
   "@panelSettings_passkeyPrereq": {
     "description": "panelSettings_passkeyPrereq"
+  },
+  "websites_deleteApp": "同时删除关联应用",
+  "@websites_deleteApp": {
+    "description": "Delete the application linked to a deployment site."
+  },
+  "websites_dnsValidation": "使用 DNS 验证",
+  "@websites_dnsValidation": {
+    "description": "Use a configured DNS account for certificate validation."
+  },
+  "files_useProxy": "使用服务端代理",
+  "@files_useProxy": {
+    "description": "Route the remote download through the panel proxy."
+  },
+  "files_useServerFilename": "使用服务器文件名",
+  "@files_useServerFilename": {
+    "description": "Keep the filename provided by the remote server."
+  },
+  "vm_isoRequired": "请选择模板或 ISO 镜像",
+  "@vm_isoRequired": {
+    "description": "A new VM needs either a template or an ISO image."
+  },
+  "ai_model_details": "模型详情",
+  "@ai_model_details": {
+    "description": "Details returned by the model load operation."
+  },
+  "ai_account_api_key_required": "保存修改需重新输入 API Key",
+  "@ai_account_api_key_required": {
+    "description": "The panel does not return stored API keys, so editing requires the key again."
+  },
+  "ai_account_initial_models": "初始模型",
+  "@ai_account_initial_models": {
+    "description": "Comma-separated model IDs for custom providers."
+  },
+  "ai_account_discover_unsupported": "该服务商不支持自动发现模型",
+  "@ai_account_discover_unsupported": {
+    "description": "Hide the discovery action when the provider disables model discovery."
+  },
+  "databases_typeMysqlCluster": "MySQL 集群",
+  "@databases_typeMysqlCluster": {
+    "description": "MySQL cluster database type label."
+  },
+  "databases_typePostgresqlCluster": "PostgreSQL 集群",
+  "@databases_typePostgresqlCluster": {
+    "description": "PostgreSQL cluster database type label."
+  },
+  "databases_typeRedisCluster": "Redis 集群",
+  "@databases_typeRedisCluster": {
+    "description": "Redis cluster database type label."
+  },
+  "websites_runtimePort": "后端端口",
+  "@websites_runtimePort": {
+    "description": "Port used by the runtime application behind the site."
+  },
+  "runtime_app": "应用",
+  "@runtime_app": {
+    "description": "运行时使用的应用。"
+  },
+  "runtime_source": "镜像源",
+  "@runtime_source": {
+    "description": "安装运行时使用的源或镜像。"
+  },
+  "runtime_installDependencies": "安装依赖",
+  "@runtime_installDependencies": {
+    "description": "创建运行时安装依赖。"
+  },
+  "apps_services": "服务",
+  "@apps_services": {
+    "description": "已安装应用提供的服务与连接信息。"
+  },
+  "logs_taskExecuting": "{count} 个任务执行中",
+  "@logs_taskExecuting": {
+    "description": "Number of background tasks currently executing.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "files_shareExpireOneHour": "1 小时",
+  "@files_shareExpireOneHour": {
+    "description": "文件分享有效期一小时。"
+  },
+  "files_shareExpireOneDay": "1 天",
+  "@files_shareExpireOneDay": {
+    "description": "文件分享有效期一天。"
+  },
+  "files_shareExpireSevenDays": "7 天",
+  "@files_shareExpireSevenDays": {
+    "description": "文件分享有效期七天。"
+  },
+  "files_sharePasswordPolicy": "密码长度必须为 4-256 个字符。",
+  "@files_sharePasswordPolicy": {
+    "description": "文件分享密码长度策略。"
+  },
+  "files_sharePasswordOptional": "可选，留空表示无密码。",
+  "@files_sharePasswordOptional": {
+    "description": "文件分享密码提示。"
   }
 }

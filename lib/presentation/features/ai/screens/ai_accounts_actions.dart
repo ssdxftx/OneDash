@@ -42,6 +42,11 @@ mixin _AiAccountsActions on ConsumerState<AiPage> {
     );
     final apiKey = TextEditingController(text: account?.apiKey ?? '');
     final remark = TextEditingController(text: account?.remark ?? '');
+    final initialModels = TextEditingController(
+      text: account == null
+          ? apiType.models.map((item) => item.id).join(', ')
+          : '',
+    );
     var verifyModel = account?.verifyModel ?? '';
     var rememberKey = account?.rememberApiKey ?? true;
     var validate = account?.validateAvailability ?? true;
@@ -77,6 +82,9 @@ mixin _AiAccountsActions on ConsumerState<AiPage> {
                         baseUrl.text = apiType.baseUrl.isNotEmpty
                             ? apiType.baseUrl
                             : next.baseUrl;
+                        initialModels.text = apiType.models
+                            .map((item) => item.id)
+                            .join(', ');
                         verifyModel = '';
                       });
                     },
@@ -105,6 +113,9 @@ mixin _AiAccountsActions on ConsumerState<AiPage> {
                 setState(() {
                   apiType = next;
                   if (next.baseUrl.isNotEmpty) baseUrl.text = next.baseUrl;
+                  initialModels.text = next.models
+                      .map((item) => item.id)
+                      .join(', ');
                   verifyModel = '';
                 });
               },
@@ -112,13 +123,34 @@ mixin _AiAccountsActions on ConsumerState<AiPage> {
             const SizedBox(height: AppTokens.s12),
             AppTextField(controller: name, label: l10n.ai_account_name),
             const SizedBox(height: AppTokens.s12),
-            AppTextField(controller: baseUrl, label: l10n.ai_account_base_url),
+            AppTextField(
+              controller: baseUrl,
+              label: l10n.ai_account_base_url,
+              enabled: apiType.editableBaseUrl,
+            ),
             const SizedBox(height: AppTokens.s12),
             AppTextField(
               controller: apiKey,
               label: l10n.ai_account_api_key,
               obscure: true,
+              helper: account?.apiKey.isEmpty == true
+                  ? l10n.ai_account_api_key_required
+                  : null,
             ),
+            if (account == null &&
+                const {
+                  'custom',
+                  'vllm',
+                  'ollama',
+                  'llmman',
+                }.contains(provider.provider)) ...[
+              const SizedBox(height: AppTokens.s12),
+              AppTextField(
+                controller: initialModels,
+                label: l10n.ai_account_initial_models,
+                hint: 'model-a, model-b',
+              ),
+            ],
             const SizedBox(height: AppTokens.s12),
             DropdownButtonFormField<String>(
               initialValue: apiType.models.any((item) => item.id == verifyModel)
@@ -161,17 +193,33 @@ mixin _AiAccountsActions on ConsumerState<AiPage> {
       'rememberApiKey': rememberKey,
       'baseURL': baseUrl.text.trim(),
       'apiType': apiType.apiType,
-      'authMode': apiType.defaultAuthMode,
+      'authMode': account?.authMode.isNotEmpty == true
+          ? account!.authMode
+          : apiType.defaultAuthMode,
       'verifyModel': verifyModel,
       'validateAvailability': validate,
       'remark': remark.text.trim(),
       if (account != null) 'syncAgents': false,
+      if (account == null && initialModels.text.trim().isNotEmpty)
+        'models': initialModels.text
+            .split(',')
+            .map((item) => item.trim())
+            .where((item) => item.isNotEmpty)
+            .map((item) => {'id': item, 'name': item})
+            .toList(),
     };
+    final missingApiKey =
+        account != null && '${body['apiKey'] ?? ''}'.trim().isEmpty;
     name.dispose();
     baseUrl.dispose();
     apiKey.dispose();
     remark.dispose();
+    initialModels.dispose();
     if (saved != true || !mounted) return;
+    if (missingApiKey) {
+      AppToast.warning(context, l10n.ai_account_api_key_required);
+      return;
+    }
     try {
       final repository = await ref.read(aiRepositoryProvider.future);
       if (account == null) {
@@ -375,12 +423,55 @@ mixin _AiAccountsActions on ConsumerState<AiPage> {
 
   Future<void> _discoverModels(AiAccountDto account) async {
     final l10n = AppLocalizations.of(context);
+    var apiKey = account.apiKey;
+    if (apiKey.isEmpty) {
+      final controller = TextEditingController();
+      apiKey =
+          await showDialog<String>(
+            context: context,
+            builder: (dialogContext) => AlertDialog(
+              title: Text(l10n.ai_account_api_key),
+              content: TextField(
+                controller: controller,
+                obscureText: true,
+                autofocus: true,
+                decoration: InputDecoration(labelText: l10n.ai_account_api_key),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text(l10n.action_cancel),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(dialogContext).pop(controller.text.trim()),
+                  child: Text(l10n.action_done),
+                ),
+              ],
+            ),
+          ) ??
+          '';
+      controller.dispose();
+      if (apiKey.isEmpty || !mounted) return;
+    }
     try {
       final repository = await ref.read(aiRepositoryProvider.future);
+      final providers = await repository.getProviders();
+      final provider = providers
+          .where((item) => item.provider == account.provider)
+          .firstOrNull;
+      final apiType = provider?.apiTypes
+          .where((item) => item.apiType == account.apiType)
+          .firstOrNull;
+      if (apiType != null && !apiType.supportsModelDiscovery) {
+        if (!mounted) return;
+        AppToast.warning(context, l10n.ai_account_discover_unsupported);
+        return;
+      }
       final models = await repository.discoverAgentAccountModels(
         provider: account.provider,
         baseURL: account.baseUrl,
-        apiKey: account.apiKey,
+        apiKey: apiKey,
         apiType: account.apiType,
       );
       if (!mounted) return;

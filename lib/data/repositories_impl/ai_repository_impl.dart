@@ -316,7 +316,7 @@ class AiRepositoryImpl implements AiRepository {
       _api.deleteOllamaModels(ids, force: force);
 
   @override
-  Future<void> loadOllamaModel(String name) => _api.loadOllamaModel(name);
+  Future<String> loadOllamaModel(String name) => _api.loadOllamaModel(name);
 
   @override
   Future<void> closeOllamaModel(String name) => _api.closeOllamaModel(name);

@@ -9,11 +9,13 @@ import '../../../../data/dto/app/app_install_config_dto.dart';
 import '../../../../data/dto/app/app_install_req.dart';
 import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../providers/app_store_provider.dart';
+import 'installed_app_actions.dart';
 import '../../../common/components/app_text_field.dart';
 import '../../../common/components/app_toast.dart';
 import '../../../common/components/buttons.dart';
 import '../../../common/components/section_header.dart';
 import '../../../common/components/simple_form_page.dart';
+import '../../../common/components/task_progress_sheet.dart';
 import '../../../common/states/error_toast.dart';
 
 Future<bool> showAppInstallPage(BuildContext context, AppDetailDto app) async {
@@ -157,17 +159,30 @@ class _AppInstallSheetState extends ConsumerState<AppInstallSheet> {
           ? appName
           : '${widget.app.key.isEmpty ? widget.app.name : widget.app.key}-${const Uuid().v4().substring(0, 4)}';
       final repository = await ref.read(appRepositoryProvider.future);
-      await repository.installApp(
-        AppInstallReq(
-          appDetailId: config.id,
-          params: params,
-          name: name,
-          version: config.version,
-          taskID: const Uuid().v4(),
-          appID: widget.app.key,
-        ),
+      if (!mounted) return;
+      final taskID = const Uuid().v4();
+      final success = await TaskProgressSheet.run(
+        context,
+        title: AppLocalizations.of(context).apps_install,
+        task: (controller) async {
+          await repository.installApp(
+            AppInstallReq(
+              appDetailId: config.id,
+              params: params,
+              name: name,
+              version: config.version,
+              taskID: taskID,
+              appID: widget.app.key,
+            ),
+          );
+          await InstalledAppActions.waitTask(controller, repository, taskID);
+        },
       );
       if (!mounted) return;
+      if (!success) {
+        setState(() => _installing = false);
+        return;
+      }
       invalidateInstalledAppLists(ref);
       AppToast.success(context, AppLocalizations.of(context).action_done);
       Navigator.of(context).pop(true);

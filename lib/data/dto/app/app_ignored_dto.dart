@@ -28,7 +28,7 @@ class AppIgnoredDto {
 
   factory AppIgnoredDto.fromJson(Map<String, dynamic> json) {
     return AppIgnoredDto(
-      id: json['ID'] as int? ?? 0,
+      id: (json['id'] ?? json['ID'] as num?)?.toInt() ?? 0,
       appId: json['appID'] as int? ?? 0,
       appDetailId: json['appDetailID'] as int? ?? 0,
       scope: json['scope'] as String? ?? '',

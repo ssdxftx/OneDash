@@ -40,9 +40,11 @@ import 'installed_app_page.dart';
 import '../providers/app_store_provider.dart';
 import 'app_detail_page.dart';
 
-Future<bool> _isIgnored(WidgetRef ref, int installId) async {
+Future<bool> _isIgnored(WidgetRef ref, int appDetailId) async {
   try {
-    final ignored = await ref.read(installedIgnoredProvider(installId).future);
+    final ignored = await ref.read(
+      installedIgnoredProvider(appDetailId).future,
+    );
     return ignored != null;
   } catch (_) {
     return false;
@@ -544,7 +546,7 @@ class _InstalledTab extends ConsumerWidget {
     final colors = context.appColors;
     final running = app.status.toLowerCase() == 'running';
     final hasContainer = app.container.trim().isNotEmpty;
-    final ignoredFuture = _isIgnored(ref, app.id);
+    final ignoredFuture = _isIgnored(ref, app.appDetailId);
     final versionFuture = _newVersion(ref, app);
     await showAppSheet<void>(
       context: context,

@@ -3,6 +3,7 @@ import '../../core/network/dio_client.dart';
 import '../dto/common/page_result.dart';
 import '../dto/runtime/node_script_dto.dart';
 import '../dto/runtime/runtime_dto.dart';
+import 'task_waiter.dart';
 
 /// 运行环境 API。
 ///
@@ -32,6 +33,14 @@ class RuntimeApi {
       '/api/v2/runtimes',
       data: req.toJson(),
     );
+    final taskID = req.taskID ?? '';
+    if (taskID.isNotEmpty) {
+      await TaskWaiter(
+        _client,
+        interval: const Duration(seconds: 2),
+        maxAttempts: 300,
+      ).waitFor(taskID, subject: 'Runtime task');
+    }
   }
 
   /// 查询运行环境详情。
@@ -60,11 +69,22 @@ class RuntimeApi {
   }
 
   /// 删除运行环境。
-  Future<void> deleteRuntime(int id, {bool forceDelete = false}) async {
+  Future<void> deleteRuntime(
+    int id, {
+    bool forceDelete = false,
+    String taskID = '',
+  }) async {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/runtimes/del',
-      data: {'id': id, 'forceDelete': forceDelete},
+      data: {'id': id, 'forceDelete': forceDelete, 'taskID': taskID},
     );
+    if (taskID.isNotEmpty) {
+      await TaskWaiter(
+        _client,
+        interval: const Duration(seconds: 2),
+        maxAttempts: 300,
+      ).waitFor(taskID, subject: 'Runtime task');
+    }
   }
 
   /// 操作运行环境（启动/停止/重启）。
@@ -108,6 +128,13 @@ class RuntimeApi {
       '/api/v2/runtimes/php/extensions/install',
       data: {'ID': id, 'name': name, 'taskID': taskId},
     );
+    if (taskId.isNotEmpty) {
+      await TaskWaiter(
+        _client,
+        interval: const Duration(seconds: 2),
+        maxAttempts: 300,
+      ).waitFor(taskId, subject: 'PHP extension');
+    }
   }
 
   /// POST /api/v2/runtimes/php/extensions/uninstall

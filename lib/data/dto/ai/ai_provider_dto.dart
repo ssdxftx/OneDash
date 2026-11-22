@@ -16,6 +16,8 @@ class AiProviderApiDto {
   const AiProviderApiDto({
     required this.apiType,
     required this.baseUrl,
+    this.editableBaseUrl = true,
+    this.supportsModelDiscovery = true,
     required this.defaultAuthMode,
     required this.authModes,
     required this.models,
@@ -23,6 +25,8 @@ class AiProviderApiDto {
 
   final String apiType;
   final String baseUrl;
+  final bool editableBaseUrl;
+  final bool supportsModelDiscovery;
   final String defaultAuthMode;
   final List<String> authModes;
   final List<AiProviderModelDto> models;
@@ -31,6 +35,8 @@ class AiProviderApiDto {
     return AiProviderApiDto(
       apiType: json['apiType'] as String? ?? '',
       baseUrl: json['baseUrl'] as String? ?? '',
+      editableBaseUrl: json['editableBaseUrl'] as bool? ?? true,
+      supportsModelDiscovery: json['supportsModelDiscovery'] as bool? ?? true,
       defaultAuthMode: json['defaultAuthMode'] as String? ?? '',
       authModes:
           (json['authModes'] as List?)

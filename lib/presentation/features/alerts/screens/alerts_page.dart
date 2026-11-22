@@ -718,14 +718,7 @@ class _AlertSettingsTab extends ConsumerWidget {
   ]) async {
     final l10n = AppLocalizations.of(context);
     final repository = await ref.read(alertRepositoryProvider.future);
-    var config = current;
-    if (config == null) {
-      try {
-        config = await repository.getAlertConfig();
-      } catch (_) {
-        config = null;
-      }
-    }
+    final config = current;
     if (!context.mounted) return;
     final title = TextEditingController(text: config?.title ?? '');
     final type = TextEditingController(

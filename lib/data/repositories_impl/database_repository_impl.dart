@@ -8,6 +8,7 @@ import '../api/app_api.dart';
 import '../api/database_api.dart';
 import '../api/file_api.dart';
 import '../dto/common/page_result.dart';
+import '../dto/cronjob/cronjob_form_data_dto.dart';
 import '../dto/database/database_instance_dto.dart';
 import '../dto/database/slow_log_file_dto.dart';
 
@@ -24,6 +25,10 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
   @override
   Future<List<DatabaseInstanceDto>> listInstances(String types) =>
       _api.listInstances(types);
+
+  @override
+  Future<List<DatabaseItemDto>> loadDatabaseItems(String dbType) =>
+      _api.loadDatabaseItems(dbType);
 
   @override
   Future<PageResult<DatabaseInstanceDto>> searchRemoteDatabases({
@@ -149,6 +154,10 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
   @override
   Future<void> createRemoteDatabase(Map<String, dynamic> body) =>
       _api.createRemoteDatabase(body);
+
+  @override
+  Future<List<DBResourceDto>> checkRemoteDatabaseDelete(int id) =>
+      _api.checkRemoteDatabaseDelete(id);
 
   @override
   Future<Map<String, dynamic>> getConnInfo({

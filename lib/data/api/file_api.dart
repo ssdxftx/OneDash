@@ -765,6 +765,8 @@ class FileApi {
     required String path,
     required String name,
     bool ignoreCertificate = false,
+    bool useProxy = false,
+    bool useServerFilename = false,
   }) async {
     final resp = await _client.post<Map<String, dynamic>>(
       '/api/v2/files/wget',
@@ -773,6 +775,8 @@ class FileApi {
         'path': path,
         'name': name,
         'ignoreCertificate': ignoreCertificate,
+        'useProxy': useProxy,
+        'useServerFilename': useServerFilename,
       },
     );
     final data = resp.data?['data'];

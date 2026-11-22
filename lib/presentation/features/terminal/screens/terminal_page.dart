@@ -11,6 +11,7 @@ import 'package:xterm/xterm.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../common/states/error_toast.dart';
 import '../../../../core/network/api_compatibility.dart';
+import '../../../../core/network/terminal_identity.dart';
 import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/network/one_panel_auth.dart';
 import '../../../../core/network/web_socket_connector.dart';
@@ -82,7 +83,10 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
         );
       }
       final apiKey = await storage.getApiKey(widget.serverId) ?? '';
-      final headers = await OnePanelAuth.signedHeaders(apiKey);
+      final headers = {
+        ...await OnePanelAuth.signedHeaders(apiKey),
+        ...TerminalIdentity.headers(apiKey: apiKey),
+      };
       final uri = server.baseUrl;
       final wsScheme = uri.scheme == 'https' ? 'wss' : 'ws';
       final isContainer = widget.containerName != null;

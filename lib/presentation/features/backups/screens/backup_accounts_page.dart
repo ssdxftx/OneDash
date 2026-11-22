@@ -196,10 +196,10 @@ class BackupAccountsPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final name = TextEditingController(text: '${current?['name'] ?? ''}');
     final accessKey = TextEditingController(
-      text: '${current?['accessKey'] ?? ''}',
+      text: _decode('${current?['accessKey'] ?? ''}'),
     );
     final credential = TextEditingController(
-      text: '${current?['credential'] ?? ''}',
+      text: _decode('${current?['credential'] ?? ''}'),
     );
     final bucket = TextEditingController(text: '${current?['bucket'] ?? ''}');
     final backupPath = TextEditingController(
@@ -373,8 +373,8 @@ class BackupAccountsPage extends ConsumerWidget {
         'type': account['type'] ?? '',
         'isPublic': account['isPublic'] ?? false,
         'bucket': account['bucket'] ?? '',
-        'accessKey': _encode('${account['accessKey'] ?? ''}'),
-        'credential': _encode('${account['credential'] ?? ''}'),
+        'accessKey': '${account['accessKey'] ?? ''}',
+        'credential': '${account['credential'] ?? ''}',
         'backupPath': account['backupPath'] ?? '',
         'vars': account['vars'] ?? '',
         'rememberAuth': account['rememberAuth'] ?? false,
@@ -400,14 +400,23 @@ class BackupAccountsPage extends ConsumerWidget {
     'type': account['type'] ?? '',
     'isPublic': account['isPublic'] ?? false,
     'bucket': account['bucket'] ?? '',
-    'accessKey': _encode('${account['accessKey'] ?? ''}'),
-    'credential': _encode('${account['credential'] ?? ''}'),
+    'accessKey': '${account['accessKey'] ?? ''}',
+    'credential': '${account['credential'] ?? ''}',
     'backupPath': account['backupPath'] ?? '',
     'vars': account['vars'] ?? '',
     'rememberAuth': account['rememberAuth'] ?? false,
   };
 
   static String _encode(String value) => base64Encode(utf8.encode(value));
+
+  static String _decode(String value) {
+    if (value.isEmpty) return value;
+    try {
+      return utf8.decode(base64Decode(value));
+    } catch (_) {
+      return value;
+    }
+  }
 
   Future<String?> _oneDriveVars(WidgetRef ref) async {
     try {

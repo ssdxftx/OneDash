@@ -12334,5 +12334,102 @@
   },
   "@panelSettings_passkeyPrereq": {
     "description": "panelSettings_passkeyPrereq"
+  },
+  "websites_deleteApp": "Delete associated app",
+  "@websites_deleteApp": {
+    "description": "Delete the application linked to a deployment site."
+  },
+  "websites_dnsValidation": "Use DNS validation",
+  "@websites_dnsValidation": {
+    "description": "Use a configured DNS account for certificate validation."
+  },
+  "files_useProxy": "Use server proxy",
+  "@files_useProxy": {
+    "description": "Route the remote download through the panel proxy."
+  },
+  "files_useServerFilename": "Use server filename",
+  "@files_useServerFilename": {
+    "description": "Keep the filename provided by the remote server."
+  },
+  "vm_isoRequired": "Select a template or ISO image",
+  "@vm_isoRequired": {
+    "description": "A new VM needs either a template or an ISO image."
+  },
+  "ai_model_details": "Model details",
+  "@ai_model_details": {
+    "description": "Details returned by the model load operation."
+  },
+  "ai_account_api_key_required": "Re-enter the API key to save changes",
+  "@ai_account_api_key_required": {
+    "description": "The panel does not return stored API keys, so editing requires the key again."
+  },
+  "ai_account_initial_models": "Initial models",
+  "@ai_account_initial_models": {
+    "description": "Comma-separated model IDs for custom providers."
+  },
+  "ai_account_discover_unsupported": "Model discovery is not supported for this provider",
+  "@ai_account_discover_unsupported": {
+    "description": "Hide the discovery action when the provider disables model discovery."
+  },
+  "databases_typeMysqlCluster": "MySQL Cluster",
+  "@databases_typeMysqlCluster": {
+    "description": "MySQL cluster database type label."
+  },
+  "databases_typePostgresqlCluster": "PostgreSQL Cluster",
+  "@databases_typePostgresqlCluster": {
+    "description": "PostgreSQL cluster database type label."
+  },
+  "databases_typeRedisCluster": "Redis Cluster",
+  "@databases_typeRedisCluster": {
+    "description": "Redis cluster database type label."
+  },
+  "websites_runtimePort": "Backend port",
+  "@websites_runtimePort": {
+    "description": "Port used by the runtime application behind the site."
+  },
+  "runtime_app": "Application",
+  "@runtime_app": {
+    "description": "Application selected for the runtime."
+  },
+  "runtime_source": "Image source",
+  "@runtime_source": {
+    "description": "Registry or mirror used to install the runtime."
+  },
+  "runtime_installDependencies": "Install dependencies",
+  "@runtime_installDependencies": {
+    "description": "Install runtime dependencies during creation."
+  },
+  "apps_services": "Services",
+  "@apps_services": {
+    "description": "Services and connection targets provided by the installed app."
+  },
+  "logs_taskExecuting": "{count} tasks running",
+  "@logs_taskExecuting": {
+    "description": "Number of background tasks currently executing.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "files_shareExpireOneHour": "1 hour",
+  "@files_shareExpireOneHour": {
+    "description": "File share expiration of one hour."
+  },
+  "files_shareExpireOneDay": "1 day",
+  "@files_shareExpireOneDay": {
+    "description": "File share expiration of one day."
+  },
+  "files_shareExpireSevenDays": "7 days",
+  "@files_shareExpireSevenDays": {
+    "description": "File share expiration of seven days."
+  },
+  "files_sharePasswordPolicy": "Password must be 4-256 characters.",
+  "@files_sharePasswordPolicy": {
+    "description": "File share password length policy."
+  },
+  "files_sharePasswordOptional": "Optional. Leave blank for no password.",
+  "@files_sharePasswordOptional": {
+    "description": "Password helper for file shares."
   }
 }

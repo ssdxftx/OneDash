@@ -870,6 +870,7 @@ mixin _AiAgentsActions on ConsumerState<AiPage> {
         SelectionOption(value: 'wecom', label: l10n.alert_method_wecom),
         SelectionOption(value: 'dingtalk', label: l10n.alert_method_dingtalk),
         SelectionOption(value: 'qqbot', label: l10n.ai_channel_qqBot),
+        SelectionOption(value: 'weixin', label: l10n.ai_channel_weixin),
       ],
     );
     if (channel == null || !mounted) return;

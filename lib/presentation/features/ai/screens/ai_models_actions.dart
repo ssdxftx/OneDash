@@ -228,7 +228,22 @@ mixin _AiModelsActions on ConsumerState<AiPage> {
       } else if (value == 'recreate') {
         await repository.recreateOllamaModel(model.name);
       } else if (value == 'load') {
-        await repository.loadOllamaModel(model.name);
+        final detail = await repository.loadOllamaModel(model.name);
+        if (!mounted) return;
+        if (detail.trim().isNotEmpty) {
+          await showAppSheet<void>(
+            context: context,
+            builder: (sheetContext) => Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.ai_model_details, style: AppTextStyles.titleL),
+                const SizedBox(height: AppTokens.s12),
+                SelectableText(detail, style: AppTextStyles.monoSmall),
+              ],
+            ),
+          );
+        }
       } else {
         await repository.closeOllamaModel(model.name);
       }

@@ -42,6 +42,7 @@ abstract interface class HostRepository {
   Future<void> createRemoteHost(Map<String, dynamic> body);
   Future<void> updateRemoteHost(Map<String, dynamic> body);
   Future<void> deleteRemoteHosts(List<int> ids);
+  Future<void> updateHostGroup({required int id, required int groupId});
   Future<bool> testRemoteHost(Map<String, dynamic> body);
   Future<bool> testRemoteHostById(int id);
   Future<void> createSshCert(SshCertOperateReq req);

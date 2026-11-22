@@ -147,9 +147,16 @@ mixin _AiMcpActions on ConsumerState<AiPage> {
       'baseUrl': '$protocol${url.text.trim()}',
       'url': url.text.trim(),
       'outputTransport': transport,
+      'streamableHttpPath': server?.streamableHttpPath ?? ssePath.text.trim(),
       'ssePath': ssePath.text.trim(),
       'environments': _parseEnv(env.text),
       'volumes': _parseVolumes(volumes.text),
+      if (server != null) ...{
+        'hostIP': server.hostIP,
+        'gatewayImage': server.gatewayImage,
+        'protocolVersion': server.protocolVersion,
+        'gatewayArgs': server.gatewayArgs,
+      },
       if (server == null) 'taskID': const Uuid().v4(),
     };
     name.dispose();

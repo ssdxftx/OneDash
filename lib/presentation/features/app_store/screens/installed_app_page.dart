@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/app/app_installed_dto.dart';
+import '../../../../data/dto/app/app_service_dto.dart';
+import '../../../../data/repositories_impl/app_repository_impl.dart';
 import '../../../common/components/app_bar_large.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/section_header.dart';
@@ -17,6 +19,17 @@ import '../../../common/states/async_state_view.dart';
 import '../../containers/widgets/container_log_page.dart';
 import '../providers/app_store_provider.dart';
 import '../widgets/installed_app_actions.dart';
+
+final _appServicesProvider = FutureProvider.autoDispose
+    .family<List<AppServiceDto>, String>((ref, appKey) async {
+      final repository = await ref.watch(appRepositoryProvider.future);
+      if (appKey.trim().isEmpty) return const [];
+      try {
+        return await repository.getAppServices(appKey);
+      } catch (_) {
+        return const [];
+      }
+    }, name: 'installedAppServicesProvider');
 
 class InstalledAppPage extends ConsumerWidget {
   const InstalledAppPage({
@@ -37,7 +50,6 @@ class InstalledAppPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final id = int.tryParse(installId) ?? 0;
     final info = ref.watch(installedInfoProvider(id));
-    final ignored = ref.watch(installedIgnoredProvider(id)).valueOrNull;
     final installed = ref.watch(installedAppsProvider).valueOrNull;
     AppInstalledDto? app;
     for (final item in installed?.items ?? const <AppInstalledDto>[]) {
@@ -46,6 +58,9 @@ class InstalledAppPage extends ConsumerWidget {
         break;
       }
     }
+    final ignored = ref
+        .watch(installedIgnoredProvider(app?.appDetailId ?? detailId ?? 0))
+        .valueOrNull;
     final current = info.valueOrNull;
     final container = current?.container;
     final appName = current?.name ?? app?.displayName ?? '';
@@ -106,6 +121,10 @@ class InstalledAppPage extends ConsumerWidget {
                 ),
             ],
           ),
+          if (data.appKey.trim().isNotEmpty) ...[
+            const SizedBox(height: AppTokens.s24),
+            _AppServicesSection(appKey: data.appKey),
+          ],
           if (app != null) ...[
             const SizedBox(height: AppTokens.s24),
             SectionHeader(title: l10n.containers_groupMaintenance),
@@ -304,4 +323,41 @@ Future<void> showInstalledAppSheet(
       ),
     ),
   );
+}
+
+class _AppServicesSection extends ConsumerWidget {
+  const _AppServicesSection({required this.appKey});
+
+  final String appKey;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final services = ref.watch(_appServicesProvider(appKey));
+    return services.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+      data: (items) {
+        if (items.isEmpty) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionHeader(title: l10n.apps_services),
+            SplitListGroup(
+              children: [
+                for (final service in items)
+                  SplitListTile(
+                    title: service.label.isEmpty
+                        ? service.value
+                        : service.label,
+                    subtitle: service.label.isEmpty ? null : service.value,
+                    value: service.status,
+                  ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

@@ -9271,4 +9271,78 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get panelSettings_passkeyPrereq =>
       'Requires the bound panel domain over HTTPS and Android assetlinks.json on that domain';
+
+  @override
+  String get websites_deleteApp => 'Delete associated app';
+
+  @override
+  String get websites_dnsValidation => 'Use DNS validation';
+
+  @override
+  String get files_useProxy => 'Use server proxy';
+
+  @override
+  String get files_useServerFilename => 'Use server filename';
+
+  @override
+  String get vm_isoRequired => 'Select a template or ISO image';
+
+  @override
+  String get ai_model_details => 'Model details';
+
+  @override
+  String get ai_account_api_key_required =>
+      'Re-enter the API key to save changes';
+
+  @override
+  String get ai_account_initial_models => 'Initial models';
+
+  @override
+  String get ai_account_discover_unsupported =>
+      'Model discovery is not supported for this provider';
+
+  @override
+  String get databases_typeMysqlCluster => 'MySQL Cluster';
+
+  @override
+  String get databases_typePostgresqlCluster => 'PostgreSQL Cluster';
+
+  @override
+  String get databases_typeRedisCluster => 'Redis Cluster';
+
+  @override
+  String get websites_runtimePort => 'Backend port';
+
+  @override
+  String get runtime_app => 'Application';
+
+  @override
+  String get runtime_source => 'Image source';
+
+  @override
+  String get runtime_installDependencies => 'Install dependencies';
+
+  @override
+  String get apps_services => 'Services';
+
+  @override
+  String logs_taskExecuting(int count) {
+    return '$count tasks running';
+  }
+
+  @override
+  String get files_shareExpireOneHour => '1 hour';
+
+  @override
+  String get files_shareExpireOneDay => '1 day';
+
+  @override
+  String get files_shareExpireSevenDays => '7 days';
+
+  @override
+  String get files_sharePasswordPolicy => 'Password must be 4-256 characters.';
+
+  @override
+  String get files_sharePasswordOptional =>
+      'Optional. Leave blank for no password.';
 }

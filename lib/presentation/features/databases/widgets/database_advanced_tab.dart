@@ -34,7 +34,7 @@ class DatabaseAdvancedTab extends ConsumerWidget {
 
   bool get _isRedis => type.toLowerCase() == 'redis';
   bool get _isMysql => const ['mysql', 'mariadb'].contains(type.toLowerCase());
-  bool get _isPg => type.toLowerCase() == 'postgresql';
+  bool get _isMongo => type.toLowerCase() == 'mongodb';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,15 +45,16 @@ class DatabaseAdvancedTab extends ConsumerWidget {
         TonalCard(
           child: Column(
             children: [
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(TablerIcons.file_code),
-                title: Text(l10n.databases_configFile),
-                subtitle: Text(l10n.databases_configFileHint),
-                trailing: const Icon(TablerIcons.chevron_right),
-                onTap: () => _editConfig(context, ref),
-              ),
-              if (_isMysql || _isPg)
+              if (!_isMongo)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(TablerIcons.file_code),
+                  title: Text(l10n.databases_configFile),
+                  subtitle: Text(l10n.databases_configFileHint),
+                  trailing: const Icon(TablerIcons.chevron_right),
+                  onTap: () => _editConfig(context, ref),
+                ),
+              if (_isMysql)
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(TablerIcons.file_alert),

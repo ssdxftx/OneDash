@@ -257,6 +257,7 @@ class RuntimeCreateReq {
     required this.type,
     required this.resource,
     this.id,
+    this.taskID,
     this.appID,
     this.version,
     this.rebuild,
@@ -273,6 +274,7 @@ class RuntimeCreateReq {
   });
 
   final int? id;
+  final String? taskID;
   final String name;
   final int appDetailID;
   final String image;
@@ -293,29 +295,56 @@ class RuntimeCreateReq {
   final List<ExtraHost>? extraHosts;
   final String? remark;
 
-  Map<String, dynamic> toJson() => {
-    if (id != null) 'id': id,
-    'name': name,
-    'appDetailId': appDetailID,
-    'image': image,
-    'params': params,
-    'type': type,
-    'resource': resource,
-    if (appID != null) 'appID': appID,
-    if (version != null) 'version': version,
-    if (rebuild != null) 'rebuild': rebuild,
-    if (source != null) 'source': source,
-    if (codeDir != null) 'codeDir': codeDir,
-    if (port != null) 'port': port,
-    if (install != null) 'install': install,
-    if (clean != null) 'clean': clean,
-    if (exposedPorts != null)
-      'exposedPorts': exposedPorts!.map((e) => e.toJson()).toList(),
-    if (environments != null)
-      'environments': environments!.map((e) => e.toJson()).toList(),
-    if (volumes != null) 'volumes': volumes!.map((e) => e.toJson()).toList(),
-    if (extraHosts != null)
-      'extraHosts': extraHosts!.map((e) => e.toJson()).toList(),
-    if (remark != null) 'remark': remark,
-  };
+  Map<String, dynamic> toJson() {
+    final effectiveParams = Map<String, dynamic>.from(params);
+    final portValue = port;
+    if (type == 'php' &&
+        portValue != null &&
+        portValue > 0 &&
+        !effectiveParams.containsKey('PANEL_APP_PORT_HTTP')) {
+      effectiveParams['PANEL_APP_PORT_HTTP'] = portValue;
+    }
+    final configuredPorts = exposedPorts;
+    final derivedPorts =
+        configuredPorts == null &&
+            portValue != null &&
+            portValue > 0 &&
+            type != 'php'
+        ? [
+            <String, dynamic>{
+              'hostPort': portValue,
+              'containerPort': portValue,
+              'protocol': 'tcp',
+            },
+          ]
+        : null;
+    final portsJson =
+        configuredPorts?.map((e) => e.toJson()).toList(growable: false) ??
+        derivedPorts;
+    return {
+      if (id != null) 'id': id,
+      if (taskID != null) 'taskID': taskID,
+      'name': name,
+      'appDetailId': appDetailID,
+      'image': image,
+      'params': effectiveParams,
+      'type': type,
+      'resource': resource,
+      if (appID != null) 'appID': appID,
+      if (version != null) 'version': version,
+      if (rebuild != null) 'rebuild': rebuild,
+      if (source != null) 'source': source,
+      if (codeDir != null) 'codeDir': codeDir,
+      if (port != null) 'port': port,
+      if (install != null) 'install': install,
+      if (clean != null) 'clean': clean,
+      if (portsJson != null) 'exposedPorts': portsJson,
+      if (environments != null)
+        'environments': environments!.map((e) => e.toJson()).toList(),
+      if (volumes != null) 'volumes': volumes!.map((e) => e.toJson()).toList(),
+      if (extraHosts != null)
+        'extraHosts': extraHosts!.map((e) => e.toJson()).toList(),
+      if (remark != null) 'remark': remark,
+    };
+  }
 }

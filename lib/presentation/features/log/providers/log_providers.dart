@@ -59,3 +59,8 @@ final taskLogsProvider = FutureProvider.autoDispose<List<TaskLogItem>>((
   );
   return page.items.map(TaskLogItem.fromDto).toList(growable: false);
 }, name: 'taskLogsProvider');
+
+final executingTaskCountProvider = FutureProvider.autoDispose<int>((ref) async {
+  final repository = await ref.watch(logRepositoryProvider.future);
+  return repository.getExecutingTaskCount();
+}, name: 'executingTaskCountProvider');

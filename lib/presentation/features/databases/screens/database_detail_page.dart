@@ -402,7 +402,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
       final repository = await ref.read(databaseRepositoryProvider.future);
       final status = await repository.getStatus(
         type: widget.type,
-        name: state.item.name,
+        name: widget.instance,
       );
       if (!mounted) return;
       await showAppSheet<void>(
