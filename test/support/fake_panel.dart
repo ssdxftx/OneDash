@@ -43,6 +43,18 @@ class FakePanel {
       await request.response.close();
       return;
     }
+    if (scenario == 'businessError') {
+      request.response.headers.contentType = ContentType.json;
+      request.response.write(
+        jsonEncode({
+          'code': 500,
+          'message': 'fake business failure',
+          'data': null,
+        }),
+      );
+      await request.response.close();
+      return;
+    }
 
     final path = request.uri.path;
     final body = switch (path) {
@@ -74,6 +86,11 @@ class FakePanel {
       }),
       '/api/v2/hosts/firewall/search' => _page(const []),
       '/api/v2/logs/tasks/read' => _taskLog(),
+      '/api/v2/files/depth/size' => _envelope([
+        {'path': '/data/sub', 'size': 10},
+        {'path': '/data', 'size': 99},
+      ]),
+      '/api/v2/files/download' => _envelope(null),
       _ => null,
     };
 

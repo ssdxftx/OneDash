@@ -28,6 +28,8 @@ class WebsitesController
   @override
   Future<PageResult<WebsiteDto>> build() {
     _disposed = false;
+    _page = 1;
+    _loadingMore = false;
     ref.onDispose(() => _disposed = true);
     _generation++;
     return _fetch(page: 1);

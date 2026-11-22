@@ -28,13 +28,28 @@ jobs:
         run: tool/check_error_leaks.sh
 
       - name: Check action reachability
-        run: tool/check_action_reachability.sh | tee guard-action.log
+        shell: bash
+        run: |
+          set -o pipefail
+          tool/check_action_reachability.sh | tee guard-action.log
 
       - name: Check UI consistency
-        run: python3 tool/check_ui_consistency.py | tee guard-ui.log
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 tool/check_ui_consistency.py | tee guard-ui.log
 
       - name: Check hardcoded english
-        run: python3 tool/check_hardcoded_english.py | tee guard-hardcoded.log
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 tool/check_hardcoded_english.py | tee guard-hardcoded.log
+
+      - name: Check sheet whitelist
+        shell: bash
+        run: |
+          set -o pipefail
+          tool/check_sheet_whitelist.sh | tee guard-sheet.log
 
       - name: Upload UI guard logs
         if: always()
@@ -48,3 +63,6 @@ jobs:
 
       - name: Test
         run: flutter test --coverage
+
+      - name: Build debug APK
+        run: flutter build apk --debug

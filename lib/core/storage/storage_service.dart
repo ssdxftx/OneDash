@@ -40,6 +40,8 @@ class StorageService {
   static const _serversFileName = 'servers.json';
   static const _serverMemoPrefix = 'server_memo_v1_';
   static const _panelSessionPrefix = 'panel_session_v1_';
+  static const _nextServerIdKey = 'server_next_id_v1';
+  Future<void>? _mutationTail;
 
   Stream<void> get serversChanged => _serversChangedController.stream;
 
@@ -115,40 +117,50 @@ class StorageService {
   Future<List<Server>> getServers() async {
     final servers = await _readServers();
     servers.sort((a, b) => a.sortIndex.compareTo(b.sortIndex));
-    return servers;
+    return servers.map(_copyServer).toList(growable: false);
   }
 
   Future<Server?> getServer(int id) async {
     final servers = await _readServers();
     for (final server in servers) {
-      if (server.id == id) return server;
+      if (server.id == id) return _copyServer(server);
     }
     return null;
   }
 
-  Future<void> saveServer(Server server) async {
-    final servers = await _readServers();
-    if (server.id <= 0) {
-      server.id = _nextServerId(servers);
-    }
+  Server _copyServer(Server server) => Server.fromJson(server.toJson());
 
-    final index = servers.indexWhere((item) => item.id == server.id);
-    if (index == -1) {
-      servers.add(server);
-    } else {
-      servers[index] = server;
-    }
-    await _writeServers(servers, notify: true);
+  Future<void> saveServer(Server server) {
+    return _serialize(() async {
+      final servers = await _readServers();
+      if (server.id <= 0) {
+        server.id = _nextServerId(servers);
+      }
+
+      final index = servers.indexWhere((item) => item.id == server.id);
+      if (index == -1) {
+        servers.add(server);
+      } else {
+        servers[index] = server;
+      }
+      await _writeServers(servers, notify: true);
+      if (server.id > 0) {
+        await _prefs.setInt(_nextServerIdKey, server.id);
+      }
+    });
   }
 
-  Future<void> deleteServer(int id) async {
-    final servers = await _readServers();
-    final nextServers = servers.where((server) => server.id != id).toList();
-    if (nextServers.length == servers.length) return;
+  Future<void> deleteServer(int id) {
+    return _serialize(() async {
+      final servers = await _readServers();
+      final nextServers = servers.where((server) => server.id != id).toList();
+      if (nextServers.length == servers.length) return;
 
-    await _writeServers(nextServers, notify: true);
-    await deleteApiKey(id);
-    await deleteServerMemo(id);
+      await _writeServers(nextServers, notify: true);
+      await deleteApiKey(id);
+      await deleteServerMemo(id);
+      await clearPanelSession(id);
+    });
   }
 
   Future<String> getServerMemo(int serverId) async {
@@ -177,18 +189,39 @@ class StorageService {
       return [];
     }
 
-    final json = jsonDecode(content);
+    Object? json;
+    try {
+      json = jsonDecode(content);
+    } catch (_) {
+      await _quarantineCorruptServersFile();
+      _serversCache = const [];
+      return [];
+    }
     if (json is! List) {
+      await _quarantineCorruptServersFile();
       _serversCache = const [];
       return [];
     }
 
-    final servers = json
-        .whereType<Map>()
-        .map((item) => Server.fromJson(Map<String, Object?>.from(item)))
-        .toList();
+    final servers = <Server>[];
+    for (final item in json.whereType<Map>()) {
+      try {
+        final server = Server.fromJson(Map<String, Object?>.from(item));
+        if (server.host.trim().isEmpty || server.port <= 0) continue;
+        servers.add(server);
+      } catch (_) {
+        continue;
+      }
+    }
     _serversCache = servers;
     return List<Server>.of(servers);
+  }
+
+  Future<void> _quarantineCorruptServersFile() async {
+    try {
+      final suffix = DateTime.now().millisecondsSinceEpoch;
+      await _serversFile.rename('${_serversFile.path}.corrupt-$suffix');
+    } catch (_) {}
   }
 
   Future<void> _writeServers(
@@ -199,11 +232,12 @@ class StorageService {
       await _serversFile.parent.create(recursive: true);
     }
 
-    final content = const JsonEncoder.withIndent(
-      '  ',
-    ).convert(servers.map((server) => server.toJson()).toList());
+    final content = const JsonEncoder.withIndent('  ')
+        .convert(servers.map((server) => server.toJson()).toList());
 
-    final tmpFile = File('${_serversFile.path}.tmp');
+    final tmpFile = File(
+      '${_serversFile.path}.${DateTime.now().microsecondsSinceEpoch}.tmp',
+    );
     await tmpFile.writeAsString('$content\n', flush: true);
     await tmpFile.rename(_serversFile.path);
     _serversCache = List<Server>.of(servers);
@@ -212,8 +246,18 @@ class StorageService {
     }
   }
 
+  Future<T> _serialize<T>(Future<T> Function() action) {
+    final previous = _mutationTail;
+    final completer = Completer<void>();
+    _mutationTail = completer.future;
+    final chained = previous ?? Future<void>.value();
+    return chained.then((_) => action()).whenComplete(() {
+      if (!completer.isCompleted) completer.complete();
+    });
+  }
+
   int _nextServerId(List<Server> servers) {
-    var maxId = 0;
+    var maxId = _prefs.getInt(_nextServerIdKey) ?? 0;
     for (final server in servers) {
       if (server.id > maxId) maxId = server.id;
     }

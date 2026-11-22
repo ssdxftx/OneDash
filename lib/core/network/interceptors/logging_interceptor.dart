@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../utils/app_logger.dart';
+import '../../utils/log_sanitizer.dart';
 
 /// HTTP 请求/响应日志拦截器。
 ///
@@ -16,9 +17,12 @@ class LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (kDebugMode) {
-      AppLogger.d(_tag, '🚀 ${options.method} ${options.uri}');
+      AppLogger.d(
+        _tag,
+        '🚀 ${options.method} ${LogSanitizer.sanitize(options.uri)}',
+      );
       if (options.data != null) {
-        AppLogger.d(_tag, '   body: ${options.data}');
+        AppLogger.d(_tag, '   body: ${LogSanitizer.sanitize(options.data)}');
       }
     }
     handler.next(options);
@@ -31,10 +35,13 @@ class LoggingInterceptor extends Interceptor {
       final isOk = status == 200;
       final icon = isOk ? '✅' : '❌';
 
-      AppLogger.d(_tag, '$icon $status ${response.requestOptions.uri}');
+      AppLogger.d(
+        _tag,
+        '$icon $status ${LogSanitizer.sanitize(response.requestOptions.uri)}',
+      );
 
       if ((showResponseData || !isOk) && response.data != null) {
-        AppLogger.d(_tag, '   body: ${response.data}');
+        AppLogger.d(_tag, '   body: ${LogSanitizer.sanitize(response.data)}');
       }
     }
     handler.next(response);
@@ -46,17 +53,22 @@ class LoggingInterceptor extends Interceptor {
     if (!kDebugMode) {
       AppLogger.w(
         _tag,
-        '${err.requestOptions.method} ${err.requestOptions.uri} -> $status',
+        '${err.requestOptions.method} '
+        '${LogSanitizer.sanitize(err.requestOptions.uri)} -> $status',
       );
       return handler.next(err);
     }
     AppLogger.w(
       _tag,
-      '🚨 xxx ${err.requestOptions.method} ${err.requestOptions.uri} -> '
-      '$status ${err.message}',
+      '🚨 xxx ${err.requestOptions.method} '
+      '${LogSanitizer.sanitize(err.requestOptions.uri)} -> '
+      '$status ${LogSanitizer.sanitize(err.message)}',
     );
     if (err.response?.data != null) {
-      AppLogger.w(_tag, '   body: ${err.response?.data}');
+      AppLogger.w(
+        _tag,
+        '   body: ${LogSanitizer.sanitize(err.response?.data)}',
+      );
     }
     handler.next(err);
   }

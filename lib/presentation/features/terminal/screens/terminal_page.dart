@@ -11,6 +11,7 @@ import 'package:xterm/xterm.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../common/states/error_toast.dart';
 import '../../../../core/network/api_compatibility.dart';
+import '../../../../core/network/dio_client_provider.dart';
 import '../../../../core/network/terminal_identity.dart';
 import '../../../../core/network/network_exceptions.dart';
 import '../../../../core/network/one_panel_auth.dart';
@@ -60,6 +61,8 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
   _TerminalStatus _status = _TerminalStatus.connecting;
   String? _error;
   double _fontSize = 14;
+  int _connectGeneration = 0;
+  bool _connecting = false;
 
   @override
   void initState() {
@@ -68,13 +71,19 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
   }
 
   Future<void> _connect() async {
+    if (_connecting) return;
+    _connecting = true;
+    final generation = ++_connectGeneration;
     setState(() {
       _status = _TerminalStatus.connecting;
       _error = null;
     });
     try {
       final storage = ref.read(storageServiceProvider);
+      final client = await ref.read(dioClientProvider(widget.serverId).future);
+      if (!mounted || generation != _connectGeneration) return;
       final server = await storage.getServer(widget.serverId);
+      if (!mounted || generation != _connectGeneration) return;
       if (server == null) {
         if (!mounted) return;
         throw ApiBusinessException(
@@ -151,7 +160,7 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
               ),
             )
             .toList(growable: false),
-        cacheScope: widget.serverId,
+        cacheScope: client,
         cacheKey: isScript
             ? 'terminal.script'
             : isSsh
@@ -163,6 +172,10 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
             : 'terminal.host',
       );
 
+      if (!mounted || generation != _connectGeneration) {
+        await channel.sink.close();
+        return;
+      }
       _channel = channel;
       _subscription = channel.stream.listen(
         (data) {
@@ -227,12 +240,20 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
         });
       }
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || generation != _connectGeneration) return;
       setState(() {
         _status = _TerminalStatus.error;
         _error = describeError(error, AppLocalizations.of(context));
       });
+    } finally {
+      _connecting = false;
     }
+  }
+
+  Future<void> _refreshConnection() async {
+    if (_connecting) return;
+    await _disconnect();
+    await _connect();
   }
 
   Future<void> _showSessions() async {
@@ -244,6 +265,7 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
   }
 
   Future<void> _disconnect() async {
+    _connectGeneration++;
     await _subscription?.cancel();
     await _channel?.sink.close();
     _subscription = null;
@@ -335,10 +357,7 @@ class _TerminalPageState extends ConsumerState<TerminalPage> {
           actions: [
             IconButton(
               tooltip: l10n.action_refresh,
-              onPressed: () async {
-                await _disconnect();
-                await _connect();
-              },
+              onPressed: _refreshConnection,
               icon: const Icon(TablerIcons.refresh),
             ),
             IconButton(

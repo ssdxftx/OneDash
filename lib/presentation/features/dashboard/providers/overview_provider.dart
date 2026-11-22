@@ -117,13 +117,17 @@ class OverviewController
 
   @override
   Future<OverviewState> build(int serverId) async {
+    _disposed = false;
+    _tickInFlight = false;
     ref.onDispose(() {
       _disposed = true;
       _timer?.cancel();
     });
     await ref.watch(dashboardRepositoryForServerProvider(serverId).future);
     ref.watch(overviewSelectionProvider(serverId));
-    return _loadInitial();
+    final result = await _loadInitial();
+    if (_visible) _schedule(Duration.zero);
+    return result;
   }
 
   Future<OverviewState> _loadInitial() async {

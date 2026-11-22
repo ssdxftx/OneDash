@@ -1766,6 +1766,12 @@ abstract class AppLocalizations {
   /// **'HTTPS'**
   String get server_edit_https;
 
+  /// Warning shown when HTTPS is disabled for a server.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTP sends credentials without encryption. Enable HTTPS on the panel when possible.'**
+  String get server_edit_httpWarning;
+
   /// OneDash UI string
   ///
   /// In en, this message translates to:
@@ -2917,6 +2923,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Detail name'**
   String get backups_detailName;
+
+  /// Validation when the backup detail name is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a detail name'**
+  String get backups_detailRequired;
 
   /// Restore form hint.
   ///
@@ -5089,6 +5101,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Permission updated'**
   String get files_permissionUpdated;
+
+  /// Validation for an invalid file permission mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a mode from 0000 to 0777'**
+  String get files_permissionInvalidMode;
 
   /// Selection mode title.
   ///
@@ -13022,6 +13040,30 @@ abstract class AppLocalizations {
   /// **'Connection mode'**
   String get ai_agent_connection_mode;
 
+  /// Mention requirement option.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get ai_agent_mention_required;
+
+  /// Mention requirement option.
+  ///
+  /// In en, this message translates to:
+  /// **'Not required'**
+  String get ai_agent_mention_notRequired;
+
+  /// Connection mode option.
+  ///
+  /// In en, this message translates to:
+  /// **'WebSocket'**
+  String get ai_agent_connection_websocket;
+
+  /// Connection mode option.
+  ///
+  /// In en, this message translates to:
+  /// **'Webhook'**
+  String get ai_agent_connection_webhook;
+
   /// Bots
   ///
   /// In en, this message translates to:
@@ -13170,7 +13212,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Relative to {path}'**
-  String websites_relativeDir(Object path);
+  String websites_relativeDir(String path);
 
   /// OneDash UI text.
   ///
@@ -13356,7 +13398,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Run \"{action}\" on OpenResty?'**
-  String websites_openRestyServiceConfirm(Object action);
+  String websites_openRestyServiceConfirm(String action);
 
   /// OneDash UI text.
   ///
@@ -15300,7 +15342,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Delete module {name}?'**
-  String websites_openRestyModuleDeleteConfirm(Object name);
+  String websites_openRestyModuleDeleteConfirm(String name);
 
   /// OneDash UI text.
   ///
@@ -15600,13 +15642,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Upgrade to {version}'**
-  String panelSettings_upgradeTo(Object version);
+  String panelSettings_upgradeTo(String version);
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'The panel will upgrade to {version}. Services restart briefly.'**
-  String panelSettings_upgradeConfirm(Object version);
+  String panelSettings_upgradeConfirm(String version);
 
   /// OneDash UI text.
   ///
@@ -15636,19 +15678,19 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} new'**
-  String panelSettings_newCount(Object count);
+  String panelSettings_newCount(int count);
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'{count} fixes'**
-  String panelSettings_fixCount(Object count);
+  String panelSettings_fixCount(int count);
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'{count} optimizations'**
-  String panelSettings_optimizationCount(Object count);
+  String panelSettings_optimizationCount(int count);
 
   /// OneDash UI text.
   ///
@@ -15744,19 +15786,19 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Force stop {name}? Data loss is possible.'**
-  String vm_forceStopConfirm(Object name);
+  String vm_forceStopConfirm(String name);
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'Restore snapshot {name}? The current state will be replaced.'**
-  String vm_snapshotRecoverConfirm(Object name);
+  String vm_snapshotRecoverConfirm(String name);
 
   /// OneDash UI text.
   ///
   /// In en, this message translates to:
   /// **'Delete snapshot {name}?'**
-  String vm_snapshotDeleteConfirm(Object name);
+  String vm_snapshotDeleteConfirm(String name);
 
   /// OneDash UI text.
   ///
@@ -16812,7 +16854,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Progress: {percent}%'**
-  String files_wgetProgress(Object percent);
+  String files_wgetProgress(String percent);
 
   /// OneDash UI text.
   ///
@@ -16890,7 +16932,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Delete extension preset \"{name}\"?'**
-  String runtime_presetDeleteConfirm(Object name);
+  String runtime_presetDeleteConfirm(String name);
 
   /// OneDash UI text.
   ///

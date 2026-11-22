@@ -100,8 +100,15 @@ jobs:
           flutter gen-l10n
 
       - name: Verify
+        shell: bash
         run: |
+          set -o pipefail
           dart format --output=none --set-exit-if-changed lib test
+          tool/check_error_leaks.sh
+          tool/check_action_reachability.sh | tee guard-action.log
+          python3 tool/check_ui_consistency.py | tee guard-ui.log
+          python3 tool/check_hardcoded_english.py | tee guard-hardcoded.log
+          tool/check_sheet_whitelist.sh | tee guard-sheet.log
           flutter analyze --fatal-infos
           flutter test
 

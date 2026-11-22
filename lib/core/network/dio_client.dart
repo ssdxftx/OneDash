@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -193,15 +195,97 @@ class DioClient {
     void Function(int received, int total)? onReceiveProgress,
     CancelToken? cancelToken,
   }) {
-    return _run(
-      () => _dio.download(
+    return _run(() async {
+      final response = await _dio.get<ResponseBody>(
         urlPath,
-        savePath,
         queryParameters: query,
         cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
-      ),
-    );
+        options: Options(responseType: ResponseType.stream),
+      );
+      final body = response.data;
+      if (body == null) {
+        throw const ApiFormatException('The download response is empty.');
+      }
+      final contentType =
+          response.headers.value(Headers.contentTypeHeader)?.toLowerCase() ??
+          '';
+      final disposition =
+          response.headers.value('content-disposition')?.toLowerCase() ?? '';
+      final isAttachment = disposition.contains('attachment');
+      if (!isAttachment &&
+          (contentType.contains('json') || contentType.startsWith('text/'))) {
+        final bytes = await _readBody(body, cancelToken);
+        final text = utf8.decode(bytes, allowMalformed: true);
+        Object? payload;
+        try {
+          payload = jsonDecode(text);
+        } catch (_) {
+          payload = null;
+        }
+        if (payload is Map) {
+          final rawCode = payload['code'];
+          final code = rawCode is int
+              ? rawCode
+              : int.tryParse('${rawCode ?? ''}');
+          if (code != null && code != 200) {
+            final message =
+                (payload['message'] ?? payload['msg'])?.toString().trim() ?? '';
+            throw ApiBusinessException(
+              code,
+              message,
+              errorCode: payload['errorCode']?.toString(),
+            );
+          }
+        }
+        throw const ApiFormatException(
+          'The server returned text instead of a file.',
+        );
+      }
+
+      final file = File(savePath);
+      await file.parent.create(recursive: true);
+      final handle = await file.open(mode: FileMode.write);
+      var received = 0;
+      final total =
+          int.tryParse(
+            response.headers.value(Headers.contentLengthHeader) ?? '',
+          ) ??
+          -1;
+      try {
+        await for (final chunk in body.stream) {
+          if (cancelToken?.isCancelled ?? false) {
+            throw cancelToken!.cancelError!;
+          }
+          await handle.writeFrom(chunk);
+          received += chunk.length;
+          onReceiveProgress?.call(received, total);
+        }
+      } finally {
+        await handle.close();
+      }
+      return Response<void>(
+        requestOptions: response.requestOptions,
+        statusCode: response.statusCode,
+        statusMessage: response.statusMessage,
+        headers: response.headers,
+        redirects: response.redirects,
+        isRedirect: response.isRedirect,
+      );
+    });
+  }
+
+  Future<Uint8List> _readBody(
+    ResponseBody body,
+    CancelToken? cancelToken,
+  ) async {
+    final builder = BytesBuilder(copy: false);
+    await for (final chunk in body.stream) {
+      if (cancelToken?.isCancelled ?? false) {
+        throw cancelToken!.cancelError!;
+      }
+      builder.add(chunk);
+    }
+    return builder.takeBytes();
   }
 
   static BaseOptions _baseOptions(

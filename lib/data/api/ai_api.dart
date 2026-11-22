@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/network/network_exceptions.dart';
 import 'task_waiter.dart';
 import '../dto/ai/ai_account_dto.dart';
 import '../dto/ai/ai_agent_model_config_dto.dart';
@@ -141,10 +143,41 @@ class AiApi {
     );
     final body = response.data;
     if (body == null) return;
+    final contentType =
+        response.headers.value(Headers.contentTypeHeader)?.toLowerCase() ?? '';
+    if (contentType.contains('json') || contentType.startsWith('text/plain')) {
+      final builder = BytesBuilder(copy: false);
+      await for (final chunk in body.stream) {
+        builder.add(chunk);
+      }
+      final text = utf8.decode(builder.takeBytes(), allowMalformed: true);
+      Object? payload;
+      try {
+        payload = jsonDecode(text);
+      } catch (_) {
+        payload = null;
+      }
+      if (payload is Map) {
+        final rawCode = payload['code'];
+        final code = rawCode is int
+            ? rawCode
+            : int.tryParse('${rawCode ?? ''}');
+        if (code != null && code != 200) {
+          final message =
+              (payload['message'] ?? payload['msg'])?.toString().trim() ?? '';
+          throw ApiBusinessException(
+            code,
+            message,
+            errorCode: payload['errorCode']?.toString(),
+          );
+        }
+      }
+      throw const ApiFormatException(
+        'The chat endpoint returned a non-stream response.',
+      );
+    }
     var buffer = '';
-    await for (final text in body.stream.map(
-      (bytes) => utf8.decode(bytes, allowMalformed: true),
-    )) {
+    await for (final text in utf8.decoder.bind(body.stream)) {
       buffer += text;
       while (true) {
         final separator = buffer.indexOf('\n\n');

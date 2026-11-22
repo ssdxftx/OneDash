@@ -27,6 +27,13 @@ class HostDisksTab extends ConsumerStatefulWidget {
   ConsumerState<HostDisksTab> createState() => _HostDisksTabState();
 }
 
+class _DiskFormResult {
+  const _DiskFormResult({required this.request, required this.noFail});
+
+  final DiskPartitionReq request;
+  final bool noFail;
+}
+
 class _HostDisksTabState extends ConsumerState<HostDisksTab> {
   CompleteDiskDto _disks = const CompleteDiskDto();
   bool _loading = true;
@@ -98,7 +105,7 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
       final repository = await ref.read(
         hostRepositoryProvider(widget.serverId).future,
       );
-      await repository.partitionDisk(result);
+      await repository.partitionDisk(result.request);
       if (!mounted) return;
       AppToast.success(context, l10n.host_diskActionDone);
       unawaited(_load());
@@ -119,7 +126,7 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
     final confirmed = await showConfirmSheet(
       context,
       title: l10n.host_diskMount,
-      message: '${result.device}\n${result.mountPoint}',
+      message: '${result.request.device}\n${result.request.mountPoint}',
       confirmLabel: l10n.host_diskMount,
       danger: false,
     );
@@ -130,10 +137,11 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
       );
       await repository.mountDisk(
         DiskMountReq(
-          device: result.device,
-          filesystem: result.filesystem,
-          mountPoint: result.mountPoint,
-          autoMount: result.autoMount,
+          device: result.request.device,
+          filesystem: result.request.filesystem,
+          mountPoint: result.request.mountPoint,
+          autoMount: result.request.autoMount,
+          noFail: result.noFail,
         ),
       );
       if (!mounted) return;
@@ -145,7 +153,7 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
     }
   }
 
-  Future<DiskPartitionReq?> _showDiskForm({
+  Future<_DiskFormResult?> _showDiskForm({
     required String device,
     required bool partition,
     required String filesystem,
@@ -156,7 +164,16 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
     var fs = filesystem.isEmpty ? 'ext4' : filesystem;
     var autoMount = true;
     var noFail = true;
-    return pushFormPage<DiskPartitionReq>(
+    final filesystems = <String>{
+      fs,
+      'ext4',
+      'xfs',
+      'btrfs',
+      'vfat',
+      'ntfs',
+      'exfat',
+    }.toList(growable: false);
+    return pushFormPage<_DiskFormResult>(
       context,
       StatefulBuilder(
         builder: (pageContext, setSheetState) => SimpleFormPage(
@@ -167,12 +184,15 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
             final path = mountPoint.text.trim();
             if (path.isEmpty) return;
             Navigator.of(pageContext).pop(
-              DiskPartitionReq(
-                device: device,
-                filesystem: fs,
-                mountPoint: path,
-                label: label.text.trim(),
-                autoMount: autoMount,
+              _DiskFormResult(
+                request: DiskPartitionReq(
+                  device: device,
+                  filesystem: fs,
+                  mountPoint: path,
+                  label: label.text.trim(),
+                  autoMount: autoMount,
+                ),
+                noFail: noFail,
               ),
             );
           },
@@ -180,9 +200,9 @@ class _HostDisksTabState extends ConsumerState<HostDisksTab> {
             DropdownButtonFormField<String>(
               initialValue: fs,
               decoration: InputDecoration(labelText: l10n.host_diskFilesystem),
-              items: const [
-                DropdownMenuItem(value: 'ext4', child: Text('ext4')),
-                DropdownMenuItem(value: 'xfs', child: Text('xfs')),
+              items: [
+                for (final value in filesystems)
+                  DropdownMenuItem(value: value, child: Text(value)),
               ],
               onChanged: partition || filesystem.isEmpty
                   ? (value) {

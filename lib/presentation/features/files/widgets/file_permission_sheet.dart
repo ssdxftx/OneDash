@@ -8,6 +8,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../data/dto/file/file_item_dto.dart';
 import '../../../../data/repositories_impl/file_repository_impl.dart';
 import '../../../common/components/app_text_field.dart';
+import '../../../common/components/app_toast.dart';
 import '../../../common/components/bottom_sheet_surface.dart';
 import '../../../common/components/simple_form_page.dart';
 import '../../../common/states/error_toast.dart';
@@ -157,7 +158,13 @@ class _FilePermissionSheetState extends ConsumerState<_FilePermissionSheet> {
 
   Future<void> _save() async {
     final modeText = _mode.text.trim();
-    if (!RegExp(r'^[0-7]{3,4}$').hasMatch(modeText)) return;
+    if (!RegExp(r'^[0-7]{3,4}$').hasMatch(modeText)) {
+      AppToast.warning(
+        context,
+        AppLocalizations.of(context).files_permissionInvalidMode,
+      );
+      return;
+    }
     final mode = int.parse(modeText.padLeft(4, '0'), radix: 8);
     setState(() => _saving = true);
     try {

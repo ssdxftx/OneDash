@@ -67,6 +67,7 @@ class _OpenRestyPerformanceSheetState
   final _gzipLevel = TextEditingController();
   bool _gzip = true;
   bool _loaded = false;
+  bool _applyScheduled = false;
   bool _saving = false;
   String? _error;
 
@@ -81,20 +82,25 @@ class _OpenRestyPerformanceSheetState
     super.dispose();
   }
 
-  void _apply(List<OpenRestyPerformanceItemDto> items) {
-    if (_loaded) return;
-    _loaded = true;
-    _serverNamesHash.text = _stripUnit(
-      _valueOf(items, 'server_names_hash_bucket_size', ''),
-    );
-    _clientHeaderBuffer.text = _stripUnit(
-      _valueOf(items, 'client_header_buffer_size', ''),
-    );
-    _maxBody.text = _stripUnit(_valueOf(items, 'client_max_body_size', ''));
-    _keepalive.text = _stripUnit(_valueOf(items, 'keepalive_timeout', ''));
-    _gzipMinLength.text = _stripUnit(_valueOf(items, 'gzip_min_length', ''));
-    _gzipLevel.text = _stripUnit(_valueOf(items, 'gzip_comp_level', ''));
-    _gzip = _valueOf(items, 'gzip', 'on').toLowerCase() != 'off';
+  void _scheduleApply(List<OpenRestyPerformanceItemDto> items) {
+    if (_loaded || _applyScheduled) return;
+    _applyScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _applyScheduled = false;
+      if (!mounted || _loaded) return;
+      _loaded = true;
+      _serverNamesHash.text = _stripUnit(
+        _valueOf(items, 'server_names_hash_bucket_size', ''),
+      );
+      _clientHeaderBuffer.text = _stripUnit(
+        _valueOf(items, 'client_header_buffer_size', ''),
+      );
+      _maxBody.text = _stripUnit(_valueOf(items, 'client_max_body_size', ''));
+      _keepalive.text = _stripUnit(_valueOf(items, 'keepalive_timeout', ''));
+      _gzipMinLength.text = _stripUnit(_valueOf(items, 'gzip_min_length', ''));
+      _gzipLevel.text = _stripUnit(_valueOf(items, 'gzip_comp_level', ''));
+      _gzip = _valueOf(items, 'gzip', 'on').toLowerCase() != 'off';
+    });
   }
 
   Future<void> _save() async {
@@ -131,7 +137,7 @@ class _OpenRestyPerformanceSheetState
     final l10n = AppLocalizations.of(context);
     final items = ref.watch(_openRestyPerformanceProvider);
     final data = items.valueOrNull;
-    if (data != null) _apply(data);
+    if (data != null && !items.isLoading) _scheduleApply(data);
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.72,
       child: Column(
@@ -145,6 +151,7 @@ class _OpenRestyPerformanceSheetState
                 tooltip: l10n.action_refresh,
                 onPressed: () {
                   _loaded = false;
+                  _applyScheduled = false;
                   ref.invalidate(_openRestyPerformanceProvider);
                 },
                 icon: const Icon(TablerIcons.refresh),

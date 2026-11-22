@@ -293,6 +293,10 @@
   "server_edit_host": "主机",
   "server_edit_port": "端口",
   "server_edit_https": "HTTPS",
+  "server_edit_httpWarning": "HTTP 不会加密传输凭据，建议在面板上启用 HTTPS。",
+  "@server_edit_httpWarning": {
+    "description": "关闭 HTTPS 时的安全提示。"
+  },
   "server_edit_api_key": "API 密钥",
   "server_edit_api_key_hint": "粘贴 1Panel 生成的密钥",
   "server_edit_allow_insecure": "允许自签名证书",
@@ -559,6 +563,10 @@
   "backups_appNameHint": "应用名称",
   "backups_databaseInstanceHint": "数据库实例名称",
   "backups_detailName": "详情名称",
+  "backups_detailRequired": "请输入详细信息名称",
+  "@backups_detailRequired": {
+    "description": "备份详细信息名称为空时的校验提示。"
+  },
   "backups_appDetailHint": "应用详情名称",
   "backups_databaseNameHint": "数据库名称",
   "backups_databaseType": "数据库类型",
@@ -932,6 +940,10 @@
   "files_permissionUser": "用户",
   "files_permissionGroupName": "用户组",
   "files_permissionUpdated": "权限已更新",
+  "files_permissionInvalidMode": "请输入 0000 到 0777 之间的权限值",
+  "@files_permissionInvalidMode": {
+    "description": "文件权限值无效时的校验提示。"
+  },
   "files_selectCount": "已选 {count} 项",
   "files_selectAll": "全选",
   "files_cancelSelection": "取消",
@@ -3082,6 +3094,22 @@
   "@ai_agent_connection_mode": {
     "description": "连接方式"
   },
+  "ai_agent_mention_required": "需要",
+  "@ai_agent_mention_required": {
+    "description": "提及要求选项。"
+  },
+  "ai_agent_mention_notRequired": "不需要",
+  "@ai_agent_mention_notRequired": {
+    "description": "提及要求选项。"
+  },
+  "ai_agent_connection_websocket": "WebSocket",
+  "@ai_agent_connection_websocket": {
+    "description": "连接模式选项。"
+  },
+  "ai_agent_connection_webhook": "Webhook",
+  "@ai_agent_connection_webhook": {
+    "description": "连接模式选项。"
+  },
   "ai_agent_bots": "机器人",
   "@ai_agent_bots": {
     "description": "机器人"
@@ -4294,6 +4322,11 @@
   },
   "files_wgetProgress": "进度：{percent}%",
   "@files_wgetProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "files_wgetWaiting": "等待下载进度...",
@@ -4346,6 +4379,11 @@
   },
   "runtime_presetDeleteConfirm": "删除扩展预设“{name}”？",
   "@runtime_presetDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "runtime_presetPushed": "推送任务已提交",

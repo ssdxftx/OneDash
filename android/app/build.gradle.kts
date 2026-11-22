@@ -54,10 +54,19 @@ android {
             signingConfig = if (keystorePropertiesFile.exists()) {
                 signingConfigs.getByName("release")
             } else {
-                // Local release builds stay runnable without a private keystore.
-                signingConfigs.getByName("debug")
+                null
             }
         }
+    }
+}
+
+gradle.taskGraph.whenReady {
+    if (!keystorePropertiesFile.exists() &&
+        allTasks.any { it.name.contains("Release") }
+    ) {
+        throw GradleException(
+            "android/key.properties is required for release builds"
+        )
     }
 }
 

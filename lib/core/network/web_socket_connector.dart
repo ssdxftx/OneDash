@@ -51,10 +51,10 @@ Future<void> checkAppWebSocketAuth(
     final statusCode = response.statusCode;
     final contentType = response.headers.contentType?.mimeType ?? '';
     final body = contentType == 'application/json'
-        ? await utf8.decoder.bind(response).join()
+        ? await utf8.decoder.bind(response).join().timeout(timeout)
         : '';
     if (contentType != 'application/json') {
-      await response.drain<void>();
+      await response.drain<void>().timeout(timeout);
     }
 
     if (statusCode == 401) {

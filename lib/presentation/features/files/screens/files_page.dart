@@ -1391,9 +1391,9 @@ class _FilesPageState extends ConsumerState<FilesPage> {
                     ),
                     itemExtent:
                         72 *
-                        MediaQuery.textScalerOf(
-                          context,
-                        ).scale(1).clamp(1.0, 1.8),
+                        MediaQuery.textScalerOf(context)
+                            .scale(1)
+                            .clamp(1.0, 1.8),
                     itemCount: state.items.length,
                     itemBuilder: (context, index) {
                       final item = state.items[index];
@@ -1565,9 +1565,8 @@ class _MoveSheetState extends State<_MoveSheet> {
       onSave: () async {
         final target = _target.text.trim();
         if (target.isEmpty) return;
-        Navigator.of(
-          context,
-        ).pop(_MoveRequest(target: target, copy: _copy, cover: _cover));
+        Navigator.of(context)
+            .pop(_MoveRequest(target: target, copy: _copy, cover: _cover));
       },
       children: [
         AppTextField(
@@ -1983,6 +1982,12 @@ class _UploadSheetState extends ConsumerState<_UploadSheet> {
     _chunked = widget.fileSize > _chunkThreshold;
     _uploadId = _chunked ? _newUploadId() : null;
     unawaited(_start());
+  }
+
+  @override
+  void dispose() {
+    _cancelToken?.cancel();
+    super.dispose();
   }
 
   Future<void> _start() async {

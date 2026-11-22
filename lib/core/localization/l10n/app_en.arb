@@ -1245,6 +1245,10 @@
     "description": "OneDash UI string"
   },
   "server_edit_https": "HTTPS",
+  "server_edit_httpWarning": "HTTP sends credentials without encryption. Enable HTTPS on the panel when possible.",
+  "@server_edit_httpWarning": {
+    "description": "Warning shown when HTTPS is disabled for a server."
+  },
   "@server_edit_https": {
     "description": "OneDash UI string"
   },
@@ -2051,6 +2055,10 @@
   "backups_detailName": "Detail name",
   "@backups_detailName": {
     "description": "Restore form label."
+  },
+  "backups_detailRequired": "Enter a detail name",
+  "@backups_detailRequired": {
+    "description": "Validation when the backup detail name is empty."
   },
   "backups_appDetailHint": "App detail name",
   "@backups_appDetailHint": {
@@ -3604,6 +3612,10 @@
   "files_permissionUpdated": "Permission updated",
   "@files_permissionUpdated": {
     "description": "Toast after updating file permission."
+  },
+  "files_permissionInvalidMode": "Enter a mode from 0000 to 0777",
+  "@files_permissionInvalidMode": {
+    "description": "Validation for an invalid file permission mode."
   },
   "files_selectCount": "{count} selected",
   "@files_selectCount": {
@@ -9115,6 +9127,22 @@
   "@ai_agent_connection_mode": {
     "description": "Connection mode"
   },
+  "ai_agent_mention_required": "Required",
+  "@ai_agent_mention_required": {
+    "description": "Mention requirement option."
+  },
+  "ai_agent_mention_notRequired": "Not required",
+  "@ai_agent_mention_notRequired": {
+    "description": "Mention requirement option."
+  },
+  "ai_agent_connection_websocket": "WebSocket",
+  "@ai_agent_connection_websocket": {
+    "description": "Connection mode option."
+  },
+  "ai_agent_connection_webhook": "Webhook",
+  "@ai_agent_connection_webhook": {
+    "description": "Connection mode option."
+  },
   "ai_agent_bots": "Bots",
   "@ai_agent_bots": {
     "description": "Bots"
@@ -9218,6 +9246,11 @@
   },
   "websites_relativeDir": "Relative to {path}",
   "@websites_relativeDir": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "websites_createSuccess": "Website created",
@@ -9342,6 +9375,11 @@
   },
   "websites_openRestyServiceConfirm": "Run \"{action}\" on OpenResty?",
   "@websites_openRestyServiceConfirm": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "websites_createDb": "Create database",
@@ -10701,6 +10739,11 @@
   },
   "websites_openRestyModuleDeleteConfirm": "Delete module {name}?",
   "@websites_openRestyModuleDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "websites_openRestyModuleEmpty": "No custom modules",
@@ -10901,10 +10944,20 @@
   },
   "panelSettings_upgradeTo": "Upgrade to {version}",
   "@panelSettings_upgradeTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "panelSettings_upgradeConfirm": "The panel will upgrade to {version}. Services restart briefly.",
   "@panelSettings_upgradeConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "panelSettings_upgradeSubmitted": "Upgrade task submitted",
@@ -10925,14 +10978,29 @@
   },
   "panelSettings_newCount": "{count} new",
   "@panelSettings_newCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    },
     "description": "OneDash UI text."
   },
   "panelSettings_fixCount": "{count} fixes",
   "@panelSettings_fixCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    },
     "description": "OneDash UI text."
   },
   "panelSettings_optimizationCount": "{count} optimizations",
   "@panelSettings_optimizationCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    },
     "description": "OneDash UI text."
   },
   "backups_publicAccount": "Panel-level backup account",
@@ -10997,14 +11065,29 @@
   },
   "vm_forceStopConfirm": "Force stop {name}? Data loss is possible.",
   "@vm_forceStopConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "vm_snapshotRecoverConfirm": "Restore snapshot {name}? The current state will be replaced.",
   "@vm_snapshotRecoverConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "vm_snapshotDeleteConfirm": "Delete snapshot {name}?",
   "@vm_snapshotDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "vm_statsCpu": "CPU",
@@ -11749,6 +11832,11 @@
   },
   "files_wgetProgress": "Progress: {percent}%",
   "@files_wgetProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "files_wgetWaiting": "Waiting for download progress...",
@@ -11801,6 +11889,11 @@
   },
   "runtime_presetDeleteConfirm": "Delete extension preset \"{name}\"?",
   "@runtime_presetDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
     "description": "OneDash UI text."
   },
   "runtime_presetPushed": "Push task submitted",

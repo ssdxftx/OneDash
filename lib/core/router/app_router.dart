@@ -77,14 +77,24 @@ final appRouter = GoRouter(
   debugLogDiagnostics: false,
   observers: [appRouteObserver],
   redirect: (context, state) {
+    final segments = state.uri.pathSegments;
+    final isServerPath = segments.length >= 2 && segments.first == 's';
+    if (!isServerPath) {
+      if (segments.length >= 2 &&
+          segments.first == 'servers' &&
+          segments[1] != 'add') {
+        final id = int.tryParse(segments[1]);
+        if (id == null || id <= 0) return '/';
+      }
+      return null;
+    }
+
     final id = int.tryParse(state.pathParameters['id'] ?? '');
-    if (id == null) return null;
+    if (id == null || id <= 0) return '/';
 
     final notifier = appContainer.read(activeServerIdStateProvider.notifier);
     final active = notifier.state;
-    final segments = state.uri.pathSegments;
-    final isServerPath = segments.length >= 2 && segments.first == 's';
-    if (active > 0 && id != active && isServerPath) {
+    if (active > 0 && id != active) {
       final target = state.uri.replace(
         pathSegments: ['s', '$active', ...segments.skip(2)],
       );
@@ -409,6 +419,7 @@ final appRouter = GoRouter(
                               state.uri.queryParameters['tab'] == 'installed'
                               ? 1
                               : 0,
+                          initialQuery: state.uri.queryParameters['key'] ?? '',
                         ),
                       ),
                       routes: [
@@ -636,13 +647,15 @@ final appRouter = GoRouter(
                       ),
                     ),
                     GoRoute(
-                      path: 'runtimes/:id',
+                      path: 'runtimes/:runtimeId',
                       pageBuilder: (context, state) => slidePage(
                         state,
                         RuntimeDetailPage(
                           serverId: _serverId(state),
                           id:
-                              int.tryParse(state.pathParameters['id'] ?? '') ??
+                              int.tryParse(
+                                state.pathParameters['runtimeId'] ?? '',
+                              ) ??
                               0,
                           type: state.uri.queryParameters['type'] ?? '',
                           name: state.uri.queryParameters['name'] ?? '',

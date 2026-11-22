@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -893,6 +894,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get server_edit_https => 'HTTPS';
 
   @override
+  String get server_edit_httpWarning => 'HTTP 不会加密传输凭据，建议在面板上启用 HTTPS。';
+
+  @override
   String get server_edit_api_key => 'API 密钥';
 
   @override
@@ -1479,6 +1483,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get backups_detailName => '详情名称';
+
+  @override
+  String get backups_detailRequired => '请输入详细信息名称';
 
   @override
   String get backups_appDetailHint => '应用详情名称';
@@ -2613,6 +2620,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get files_permissionUpdated => '权限已更新';
+
+  @override
+  String get files_permissionInvalidMode => '请输入 0000 到 0777 之间的权限值';
 
   @override
   String files_selectCount(int count) {
@@ -6678,6 +6688,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ai_agent_connection_mode => '连接方式';
 
   @override
+  String get ai_agent_mention_required => '需要';
+
+  @override
+  String get ai_agent_mention_notRequired => '不需要';
+
+  @override
+  String get ai_agent_connection_websocket => 'WebSocket';
+
+  @override
+  String get ai_agent_connection_webhook => 'Webhook';
+
+  @override
   String get ai_agent_bots => '机器人';
 
   @override
@@ -6753,7 +6775,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_ipv6 => 'IPv6';
 
   @override
-  String websites_relativeDir(Object path) {
+  String websites_relativeDir(String path) {
     return '相对主目录：$path';
   }
 
@@ -6848,7 +6870,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_openRestyInstallHint => '请先安装 OpenResty 后再使用全局配置。';
 
   @override
-  String websites_openRestyServiceConfirm(Object action) {
+  String websites_openRestyServiceConfirm(String action) {
     return '确认对 OpenResty 执行「$action」？';
   }
 
@@ -7846,7 +7868,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get websites_openRestyModuleDelete => '删除模块';
 
   @override
-  String websites_openRestyModuleDeleteConfirm(Object name) {
+  String websites_openRestyModuleDeleteConfirm(String name) {
     return '确定删除模块 $name 吗？';
   }
 
@@ -7998,12 +8020,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get panelSettings_upToDate => '已是最新版本';
 
   @override
-  String panelSettings_upgradeTo(Object version) {
+  String panelSettings_upgradeTo(String version) {
     return '升级到 $version';
   }
 
   @override
-  String panelSettings_upgradeConfirm(Object version) {
+  String panelSettings_upgradeConfirm(String version) {
     return '面板将升级到 $version，升级期间服务会短暂中断。';
   }
 
@@ -8020,17 +8042,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get panelSettings_releaseNotesTitle => '版本记录';
 
   @override
-  String panelSettings_newCount(Object count) {
+  String panelSettings_newCount(int count) {
     return '新增 $count';
   }
 
   @override
-  String panelSettings_fixCount(Object count) {
+  String panelSettings_fixCount(int count) {
     return '修复 $count';
   }
 
   @override
-  String panelSettings_optimizationCount(Object count) {
+  String panelSettings_optimizationCount(int count) {
     return '优化 $count';
   }
 
@@ -8080,17 +8102,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get host_sshLogLoadFailed => 'SSH 日志加载失败';
 
   @override
-  String vm_forceStopConfirm(Object name) {
+  String vm_forceStopConfirm(String name) {
     return '强制停止 $name？可能导致数据丢失。';
   }
 
   @override
-  String vm_snapshotRecoverConfirm(Object name) {
+  String vm_snapshotRecoverConfirm(String name) {
     return '恢复到快照 $name？当前状态将被替换。';
   }
 
   @override
-  String vm_snapshotDeleteConfirm(Object name) {
+  String vm_snapshotDeleteConfirm(String name) {
     return '删除快照 $name？';
   }
 
@@ -8636,7 +8658,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get files_wgetDetails => '下载详情';
 
   @override
-  String files_wgetProgress(Object percent) {
+  String files_wgetProgress(String percent) {
     return '进度：$percent%';
   }
 
@@ -8677,7 +8699,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get runtime_presetNodesHint => '多个节点用逗号分隔';
 
   @override
-  String runtime_presetDeleteConfirm(Object name) {
+  String runtime_presetDeleteConfirm(String name) {
     return '删除扩展预设“$name”？';
   }
 

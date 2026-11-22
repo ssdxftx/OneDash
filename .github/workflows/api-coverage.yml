@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'lib/data/api/**'
+      - 'lib/data/dto/**'
       - 'lib/domain/repositories/**'
       - 'scripts/check_1panel_api_coverage.py'
       - '.github/workflows/api-coverage.yml'

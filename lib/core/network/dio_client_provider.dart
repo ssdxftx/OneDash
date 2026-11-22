@@ -60,7 +60,7 @@ Future<DioClient> createProbeClient({
   final scheme = isHttps ? 'https' : 'http';
   final userAgent = await DioClient.defaultUserAgent();
   return DioClient(
-    baseUrl: '$scheme://$host:$port',
+    baseUrl: Uri(scheme: scheme, host: host, port: port).toString(),
     apiKey: apiKey,
     requestTimeout: Duration(seconds: requestTimeoutSeconds),
     customHeaders: customHeaders,

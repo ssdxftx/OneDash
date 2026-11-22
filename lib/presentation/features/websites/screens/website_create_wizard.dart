@@ -296,7 +296,7 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
     try {
       final repository = await ref.read(databaseRepositoryProvider.future);
       final instances = await repository.listInstances(
-        'mysql,mariadb,mysql-cluster,postgresql,postgresql-cluster,mongodb',
+        'mysql,mariadb,postgresql',
       );
       if (!mounted) return;
       setState(() {
@@ -310,22 +310,13 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
 
   List<DatabaseInstanceDto> get _dbCandidates {
     return switch (_dbType) {
-      'postgresql' || 'postgresql-cluster' =>
+      'postgresql' =>
         _dbInstances
             .where((item) => item.type.startsWith('postgresql'))
             .toList(growable: false),
-      'mongodb' =>
-        _dbInstances
-            .where((item) => item.type == 'mongodb')
-            .toList(growable: false),
       _ =>
         _dbInstances
-            .where(
-              (item) =>
-                  item.type == 'mysql' ||
-                  item.type == 'mariadb' ||
-                  item.type == 'mysql-cluster',
-            )
+            .where((item) => item.type == 'mysql' || item.type == 'mariadb')
             .toList(growable: false),
     };
   }
@@ -1100,10 +1091,6 @@ class _WebsiteCreateWizardState extends ConsumerState<WebsiteCreateWizard> {
                       DropdownMenuItem(
                         value: 'postgresql',
                         child: Text('PostgreSQL'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'mongodb',
-                        child: Text('MongoDB'),
                       ),
                     ],
                     onChanged: (value) {

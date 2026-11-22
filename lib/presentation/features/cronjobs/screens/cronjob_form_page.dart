@@ -455,15 +455,29 @@ class _CronjobFormPageState extends ConsumerState<CronjobFormPage> {
                 decoration: InputDecoration(
                   labelText: l10n.cronjobs_databaseType,
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
-                  DropdownMenuItem(value: 'mariadb', child: Text('MariaDB')),
-                  DropdownMenuItem(
+                items: [
+                  const DropdownMenuItem(value: 'mysql', child: Text('MySQL')),
+                  const DropdownMenuItem(
+                    value: 'mariadb',
+                    child: Text('MariaDB'),
+                  ),
+                  const DropdownMenuItem(
                     value: 'postgresql',
                     child: Text('PostgreSQL'),
                   ),
-                  DropdownMenuItem(value: 'redis', child: Text('Redis')),
-                  DropdownMenuItem(value: 'mongodb', child: Text('MongoDB')),
+                  DropdownMenuItem(
+                    value: 'mysql-cluster',
+                    child: Text(l10n.databases_typeMysqlCluster),
+                  ),
+                  DropdownMenuItem(
+                    value: 'postgresql-cluster',
+                    child: Text(l10n.databases_typePostgresqlCluster),
+                  ),
+                  const DropdownMenuItem(value: 'redis', child: Text('Redis')),
+                  const DropdownMenuItem(
+                    value: 'mongodb',
+                    child: Text('MongoDB'),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) {

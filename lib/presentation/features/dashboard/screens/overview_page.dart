@@ -138,9 +138,8 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                           if (next == null || !mounted) return;
                           ref
                                   .read(
-                                    overviewSelectionProvider(
-                                      widget.serverId,
-                                    ).notifier,
+                                    overviewSelectionProvider(widget.serverId)
+                                        .notifier,
                                   )
                                   .state =
                               next;
@@ -839,9 +838,8 @@ class _QuickAccessSection extends ConsumerWidget {
                         AppToast.warning(sheetContext, l10n.files_pathRequired);
                         return;
                       }
-                      Navigator.of(
-                        sheetContext,
-                      ).pop([value, alias.text.trim()]);
+                      Navigator.of(sheetContext)
+                          .pop([value, alias.text.trim()]);
                     },
                   ),
                 ),
@@ -1041,25 +1039,33 @@ class _QuickAccessSection extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        PopupMenuButton<String>(
-                          tooltip: l10n.action_edit,
-                          onSelected: (value) {
+                        AppIconButton(
+                          icon: TablerIcons.dots,
+                          tooltip: l10n.action_more,
+                          onPressed: () async {
+                            final value = await showSelectionMenu<String>(
+                              context,
+                              options: [
+                                SelectionOption(
+                                  label: l10n.action_edit,
+                                  value: 'edit',
+                                  icon: TablerIcons.edit,
+                                ),
+                                SelectionOption(
+                                  label: l10n.action_delete,
+                                  value: 'delete',
+                                  icon: TablerIcons.trash,
+                                  danger: true,
+                                ),
+                              ],
+                            );
+                            if (!context.mounted || value == null) return;
                             if (value == 'edit') {
-                              _editDirectory(context, ref, item);
-                            } else if (value == 'delete') {
-                              _deleteDirectory(context, ref, item);
+                              await _editDirectory(context, ref, item);
+                            } else {
+                              await _deleteDirectory(context, ref, item);
                             }
                           },
-                          itemBuilder: (_) => [
-                            PopupMenuItem(
-                              value: 'edit',
-                              child: Text(l10n.action_edit),
-                            ),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text(l10n.action_delete),
-                            ),
-                          ],
                         ),
                       ],
                     ),

@@ -55,10 +55,10 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _hostController = TextEditingController();
-  final _portController = TextEditingController(text: '9999');
+  final _portController = TextEditingController(text: '443');
   final _apiKeyController = TextEditingController();
 
-  bool _isHttps = false;
+  bool _isHttps = true;
   bool _allowInsecure = false;
   bool _obscureKey = true;
   bool _saving = false;
@@ -477,6 +477,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage> {
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.server_edit_https),
+              subtitle: _isHttps ? null : Text(l10n.server_edit_httpWarning),
               value: _isHttps,
               onChanged: (value) {
                 setState(() {

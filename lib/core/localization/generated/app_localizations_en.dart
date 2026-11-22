@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -912,6 +913,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get server_edit_https => 'HTTPS';
 
   @override
+  String get server_edit_httpWarning =>
+      'HTTP sends credentials without encryption. Enable HTTPS on the panel when possible.';
+
+  @override
   String get server_edit_api_key => 'API key';
 
   @override
@@ -1510,6 +1515,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backups_detailName => 'Detail name';
+
+  @override
+  String get backups_detailRequired => 'Enter a detail name';
 
   @override
   String get backups_appDetailHint => 'App detail name';
@@ -2680,6 +2688,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get files_permissionUpdated => 'Permission updated';
+
+  @override
+  String get files_permissionInvalidMode => 'Enter a mode from 0000 to 0777';
 
   @override
   String files_selectCount(int count) {
@@ -6824,6 +6835,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ai_agent_connection_mode => 'Connection mode';
 
   @override
+  String get ai_agent_mention_required => 'Required';
+
+  @override
+  String get ai_agent_mention_notRequired => 'Not required';
+
+  @override
+  String get ai_agent_connection_websocket => 'WebSocket';
+
+  @override
+  String get ai_agent_connection_webhook => 'Webhook';
+
+  @override
   String get ai_agent_bots => 'Bots';
 
   @override
@@ -6903,7 +6926,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_ipv6 => 'IPv6';
 
   @override
-  String websites_relativeDir(Object path) {
+  String websites_relativeDir(String path) {
     return 'Relative to $path';
   }
 
@@ -7000,7 +7023,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Install OpenResty before changing global settings.';
 
   @override
-  String websites_openRestyServiceConfirm(Object action) {
+  String websites_openRestyServiceConfirm(String action) {
     return 'Run \"$action\" on OpenResty?';
   }
 
@@ -8010,7 +8033,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get websites_openRestyModuleDelete => 'Delete module';
 
   @override
-  String websites_openRestyModuleDeleteConfirm(Object name) {
+  String websites_openRestyModuleDeleteConfirm(String name) {
     return 'Delete module $name?';
   }
 
@@ -8168,12 +8191,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get panelSettings_upToDate => 'Already up to date';
 
   @override
-  String panelSettings_upgradeTo(Object version) {
+  String panelSettings_upgradeTo(String version) {
     return 'Upgrade to $version';
   }
 
   @override
-  String panelSettings_upgradeConfirm(Object version) {
+  String panelSettings_upgradeConfirm(String version) {
     return 'The panel will upgrade to $version. Services restart briefly.';
   }
 
@@ -8190,17 +8213,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get panelSettings_releaseNotesTitle => 'Release history';
 
   @override
-  String panelSettings_newCount(Object count) {
+  String panelSettings_newCount(int count) {
     return '$count new';
   }
 
   @override
-  String panelSettings_fixCount(Object count) {
+  String panelSettings_fixCount(int count) {
     return '$count fixes';
   }
 
   @override
-  String panelSettings_optimizationCount(Object count) {
+  String panelSettings_optimizationCount(int count) {
     return '$count optimizations';
   }
 
@@ -8252,17 +8275,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get host_sshLogLoadFailed => 'Failed to load SSH logs';
 
   @override
-  String vm_forceStopConfirm(Object name) {
+  String vm_forceStopConfirm(String name) {
     return 'Force stop $name? Data loss is possible.';
   }
 
   @override
-  String vm_snapshotRecoverConfirm(Object name) {
+  String vm_snapshotRecoverConfirm(String name) {
     return 'Restore snapshot $name? The current state will be replaced.';
   }
 
   @override
-  String vm_snapshotDeleteConfirm(Object name) {
+  String vm_snapshotDeleteConfirm(String name) {
     return 'Delete snapshot $name?';
   }
 
@@ -8813,7 +8836,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get files_wgetDetails => 'Download details';
 
   @override
-  String files_wgetProgress(Object percent) {
+  String files_wgetProgress(String percent) {
     return 'Progress: $percent%';
   }
 
@@ -8856,7 +8879,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get runtime_presetNodesHint => 'Separate nodes with commas';
 
   @override
-  String runtime_presetDeleteConfirm(Object name) {
+  String runtime_presetDeleteConfirm(String name) {
     return 'Delete extension preset \"$name\"?';
   }
 

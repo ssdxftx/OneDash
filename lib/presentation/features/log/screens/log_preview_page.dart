@@ -103,6 +103,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
   final Set<String> _expanded = <String>{};
   String _query = '';
   bool _loadInFlight = false;
+  int _loadGeneration = 0;
   List<String>? _filteredSource;
   String _filteredQuery = '';
   List<String>? _filteredCache;
@@ -163,9 +164,10 @@ class _LogPreviewPageState extends State<LogPreviewPage>
     }
   }
 
-  Future<void> _load({bool silent = false}) async {
+  Future<void> _load({bool silent = false, bool force = false}) async {
     if (silent && !_isVisible) return;
-    if (_loadInFlight) return;
+    if (_loadInFlight && !force) return;
+    final generation = force ? ++_loadGeneration : _loadGeneration;
     _loadInFlight = true;
     if (!silent) {
       setState(() {
@@ -185,7 +187,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
         lines = await _source.load();
         end = true;
       }
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       if (silent && loadPage != null && _page > 1) {
         final merged = _appendNewest(lines, _lines);
         if (listEquals(merged, _lines) && _error == null) return;
@@ -218,7 +220,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
         _scrollToFollowEdge();
       }
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       _timer?.cancel();
       _timer = null;
       final hasBufferedLines = _lines.isNotEmpty;
@@ -229,7 +231,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       });
       if (hasBufferedLines) showErrorToast(context, error);
     } finally {
-      _loadInFlight = false;
+      if (generation == _loadGeneration) _loadInFlight = false;
     }
   }
 
@@ -241,10 +243,11 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       return;
     }
     if (_end) return;
+    final generation = _loadGeneration;
     setState(() => _loadingEarlier = true);
     try {
       final batch = await loadPage(_page + 1, widget.pageSize);
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       final incoming = batch.lines;
       final existing = _lines;
       final overlap = _suffixPrefixOverlap(incoming, existing);
@@ -269,7 +272,7 @@ class _LogPreviewPageState extends State<LogPreviewPage>
         _loadingEarlier = false;
       });
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       setState(() => _loadingEarlier = false);
       showErrorToast(context, error);
     }
@@ -331,10 +334,11 @@ class _LogPreviewPageState extends State<LogPreviewPage>
       _end = true;
       _lines = const [];
       _hasAccess = false;
+      _loadingEarlier = false;
       _modePinned = false;
       _mode = LogDisplayMode.raw;
     });
-    _load();
+    _load(force: true);
   }
 
   Future<void> _export() async {

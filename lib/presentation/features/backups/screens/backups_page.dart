@@ -50,6 +50,7 @@ class BackupRecordsController
   static const _pageSize = 50;
 
   int _page = 1;
+  int _generation = 0;
   bool _loadingMore = false;
   bool _disposed = false;
 
@@ -57,6 +58,8 @@ class BackupRecordsController
   Future<PageResult<BackupRecordDto>> build(String type) async {
     _disposed = false;
     _page = 1;
+    _loadingMore = false;
+    _generation++;
     ref.onDispose(() => _disposed = true);
     return _fetch(type, 1);
   }
@@ -99,11 +102,13 @@ class BackupRecordsController
   }
 
   Future<void> refresh() async {
+    final generation = ++_generation;
     _page = 1;
     state = const AsyncLoading<PageResult<BackupRecordDto>>().copyWithPrevious(
       state,
     );
-    state = await AsyncValue.guard(() => _fetch(arg, 1));
+    final result = await AsyncValue.guard(() => _fetch(arg, 1));
+    if (!_disposed && generation == _generation) state = result;
   }
 
   Future<void> loadMore() async {
@@ -111,9 +116,10 @@ class BackupRecordsController
     if (current == null || _loadingMore) return;
     if (current.items.length >= current.total) return;
     _loadingMore = true;
+    final generation = _generation;
     try {
       final next = await _fetch(arg, _page + 1);
-      if (_disposed) return;
+      if (_disposed || generation != _generation) return;
       _page++;
       final latest = state.valueOrNull ?? current;
       final items = [...latest.items, ...next.items]
@@ -473,6 +479,12 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
   description.dispose();
   if (confirmed != true || !context.mounted) return;
   if (resource.isEmpty) return;
+  final needsDetail =
+      type == 'app' || type == 'website' || _databaseBackupTypes.contains(type);
+  if (needsDetail && detailName.isEmpty) {
+    AppToast.warning(context, l10n.backups_detailRequired);
+    return;
+  }
   final repository = await ref.read(backupRepositoryProvider.future);
   if (!context.mounted) return;
   final taskID = const Uuid().v4();

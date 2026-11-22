@@ -542,6 +542,7 @@ class _DatabaseDetailPageState extends ConsumerState<DatabaseDetailPage> {
         );
       }
       if (!mounted) return;
+      ref.invalidate(databaseRepositoryProvider);
       AppToast.success(context, l10n.action_done);
       Navigator.of(context).pop();
     } catch (error) {
